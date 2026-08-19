@@ -1,0 +1,1159 @@
+{
+ "schema": "saaya-lite/spec_graph/1",
+ "kind": "knowledge_graph",
+ "note": "Domain facts with provenance. Never merge with build_graph.json - different truth standards.",
+ "rule": "Every numeric or colour literal in source must trace to a fact id here, or the grounded checker fails the node.",
+ "count": 115,
+ "facts": [
+  {
+   "id": "ladder.cd1",
+   "kind": "number",
+   "value": 90,
+   "unit": "s",
+   "means": "check-in 1 countdown",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true
+  },
+  {
+   "id": "ladder.cd2",
+   "kind": "number",
+   "value": 60,
+   "unit": "s",
+   "means": "check-in 2 countdown",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true
+  },
+  {
+   "id": "ladder.cancel",
+   "kind": "number",
+   "value": 60,
+   "unit": "s",
+   "means": "family cancel window",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true
+  },
+  {
+   "id": "ladder.total",
+   "kind": "number",
+   "value": 210,
+   "unit": "s",
+   "means": "check-in 1 to SOS",
+   "sourced_from": "derived: 90+60+60",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true
+  },
+  {
+   "id": "demo.divisor",
+   "kind": "number",
+   "value": 6,
+   "unit": "x",
+   "means": "demo speed divisor",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true
+  },
+  {
+   "id": "demo.total",
+   "kind": "number",
+   "value": 35,
+   "unit": "s",
+   "means": "ladder under demo speed",
+   "sourced_from": "derived: 210/6",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true
+  },
+  {
+   "id": "interval.high.deep",
+   "kind": "number",
+   "value": 5,
+   "unit": "min",
+   "means": "HIGH zone, NIGHT_DEEP",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true
+  },
+  {
+   "id": "interval.high.late",
+   "kind": "number",
+   "value": 8,
+   "unit": "min",
+   "means": "HIGH, NIGHT_LATE or DAWN",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true
+  },
+  {
+   "id": "interval.high.early",
+   "kind": "number",
+   "value": 10,
+   "unit": "min",
+   "means": "HIGH, NIGHT_EARLY",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true
+  },
+  {
+   "id": "interval.elev.deep",
+   "kind": "number",
+   "value": 8,
+   "unit": "min",
+   "means": "ELEVATED, NIGHT_DEEP",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true
+  },
+  {
+   "id": "interval.elev.other",
+   "kind": "number",
+   "value": 10,
+   "unit": "min",
+   "means": "ELEVATED, NIGHT_LATE or DAWN",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true
+  },
+  {
+   "id": "interval.mod.deep",
+   "kind": "number",
+   "value": 12,
+   "unit": "min",
+   "means": "MODERATE, NIGHT_DEEP",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true
+  },
+  {
+   "id": "interval.manual",
+   "kind": "number",
+   "value": 10,
+   "unit": "min",
+   "means": "manual arm, any zone",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true
+  },
+  {
+   "id": "dwell.enter",
+   "kind": "number",
+   "value": 60,
+   "unit": "s",
+   "means": "continuous containment before arming",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true
+  },
+  {
+   "id": "dwell.exit",
+   "kind": "number",
+   "value": 180,
+   "unit": "s",
+   "means": "continuous non-containment before disarm",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true
+  },
+  {
+   "id": "cooldown.manual",
+   "kind": "number",
+   "value": 45,
+   "unit": "min",
+   "means": "after manual disarm, same zone",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true
+  },
+  {
+   "id": "cooldown.ok",
+   "kind": "number",
+   "value": 20,
+   "unit": "min",
+   "means": "after RESOLVED_OK, same zone",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true
+  },
+  {
+   "id": "pin.length",
+   "kind": "number",
+   "value": 4,
+   "unit": "digits",
+   "means": "PIN length",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true
+  },
+  {
+   "id": "pin.attempts",
+   "kind": "number",
+   "value": 5,
+   "unit": "tries",
+   "means": "before lockout",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true
+  },
+  {
+   "id": "pin.lockout",
+   "kind": "number",
+   "value": 60,
+   "unit": "s",
+   "means": "initial lockout, doubles to 15 min",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true
+  },
+  {
+   "id": "pin.lockout.max",
+   "kind": "number",
+   "value": 15,
+   "unit": "min",
+   "means": "lockout ceiling",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true
+  },
+  {
+   "id": "const.earth",
+   "kind": "number",
+   "value": 6371008.8,
+   "unit": "m",
+   "means": "IUGG mean earth radius, haversine",
+   "sourced_from": "IUGG",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true
+  },
+  {
+   "id": "const.tz",
+   "kind": "number",
+   "value": "Asia/Kolkata",
+   "unit": "tz",
+   "means": "hardcoded timezone",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true
+  },
+  {
+   "id": "dist.station.max",
+   "kind": "number",
+   "value": 20,
+   "unit": "km",
+   "means": "beyond this, no station in range",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true
+  },
+  {
+   "id": "loc.accuracy.reject",
+   "kind": "number",
+   "value": 100,
+   "unit": "m",
+   "means": "discard fix for containment above this",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true
+  },
+  {
+   "id": "loc.sample.shadow",
+   "kind": "number",
+   "value": 15,
+   "unit": "s",
+   "means": "location interval while SHADOW",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true
+  },
+  {
+   "id": "loc.sample.sos",
+   "kind": "number",
+   "value": 5,
+   "unit": "s",
+   "means": "location interval while SOS_ACTIVE",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true
+  },
+  {
+   "id": "loc.sample.idle.fg",
+   "kind": "number",
+   "value": 30,
+   "unit": "s",
+   "means": "location interval idle foreground",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true
+  },
+  {
+   "id": "queue.backoff.0",
+   "kind": "number",
+   "value": 5,
+   "unit": "s",
+   "means": "queue retry step 1",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true
+  },
+  {
+   "id": "queue.backoff.1",
+   "kind": "number",
+   "value": 15,
+   "unit": "s",
+   "means": "queue retry step 2",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true
+  },
+  {
+   "id": "queue.backoff.2",
+   "kind": "number",
+   "value": 60,
+   "unit": "s",
+   "means": "queue retry step 3",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true
+  },
+  {
+   "id": "queue.backoff.3",
+   "kind": "number",
+   "value": 300,
+   "unit": "s",
+   "means": "queue retry step 4",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true
+  },
+  {
+   "id": "queue.backoff.4",
+   "kind": "number",
+   "value": 900,
+   "unit": "s",
+   "means": "queue retry step 5",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true
+  },
+  {
+   "id": "queue.max_attempts",
+   "kind": "number",
+   "value": 20,
+   "unit": "tries",
+   "means": "before FAILED_PERMANENT",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true
+  },
+  {
+   "id": "color.brand",
+   "kind": "color",
+   "value": "#A78BFA",
+   "unit": "hex",
+   "means": "lavender accent",
+   "sourced_from": "iOS AppTheme.swift",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "color.brandLight",
+   "kind": "color",
+   "value": "#C2ADFD",
+   "unit": "hex",
+   "means": "hover",
+   "sourced_from": "iOS AppTheme.swift",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "color.brandDark",
+   "kind": "color",
+   "value": "#8566D1",
+   "unit": "hex",
+   "means": "pressed",
+   "sourced_from": "iOS AppTheme.swift",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "color.background",
+   "kind": "color",
+   "value": "#0B0B0F",
+   "unit": "hex",
+   "means": "app bg",
+   "sourced_from": "iOS AppTheme.swift",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "color.cardFill",
+   "kind": "color",
+   "value": "#1F1F1F",
+   "unit": "hex",
+   "means": "card fill, iOS Color(white:0.12)",
+   "sourced_from": "iOS AppTheme.swift",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "color.safe",
+   "kind": "color",
+   "value": "#34C759",
+   "unit": "hex",
+   "means": "safe",
+   "sourced_from": "iOS AppTheme.swift",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "color.amber",
+   "kind": "color",
+   "value": "#F09921",
+   "unit": "hex",
+   "means": "escalation, iOS AppTheme.amber",
+   "sourced_from": "iOS AppTheme.swift",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "color.danger",
+   "kind": "color",
+   "value": "#FF3B30",
+   "unit": "hex",
+   "means": "SOS and high tier",
+   "sourced_from": "iOS AppTheme.swift",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "color.zone.high",
+   "kind": "color",
+   "value": "#FF3B30",
+   "unit": "hex",
+   "means": "high tier fill",
+   "sourced_from": "vizag_heatmap.geojson",
+   "governs": "MAP_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "color.zone.moderate",
+   "kind": "color",
+   "value": "#FF9500",
+   "unit": "hex",
+   "means": "moderate",
+   "sourced_from": "vizag_heatmap.geojson",
+   "governs": "MAP_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "color.zone.elevated",
+   "kind": "color",
+   "value": "#FFCC00",
+   "unit": "hex",
+   "means": "elevated",
+   "sourced_from": "vizag_heatmap.geojson",
+   "governs": "MAP_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "color.zone.safe",
+   "kind": "color",
+   "value": "#00000000",
+   "unit": "hex",
+   "means": "safe, NOT DRAWN",
+   "sourced_from": "vizag_heatmap.geojson",
+   "governs": "MAP_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "grade.checkin1.stroke",
+   "kind": "number",
+   "value": 1.0,
+   "unit": "dp",
+   "means": "card border, rung 1",
+   "sourced_from": "iOS SUSCheckInCardView.swift",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "grade.checkin2.stroke",
+   "kind": "number",
+   "value": 1.5,
+   "unit": "dp",
+   "means": "card border, rung 2",
+   "sourced_from": "iOS SUSCheckInCardView.swift",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "grade.family.stroke",
+   "kind": "number",
+   "value": 2.0,
+   "unit": "dp",
+   "means": "card border, rung 3",
+   "sourced_from": "iOS SUSCheckInCardView.swift",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "grade.border.opacity",
+   "kind": "number",
+   "value": 0.5,
+   "unit": "alpha",
+   "means": "border is accent at 50%",
+   "sourced_from": "iOS SUSCheckInCardView.swift",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "dim.card.radius",
+   "kind": "number",
+   "value": 22,
+   "unit": "dp",
+   "means": "card corner radius",
+   "sourced_from": "iOS SUSCheckInCardView.swift",
+   "governs": "COMPONENT_LIBRARY.md",
+   "frozen": true
+  },
+  {
+   "id": "dim.card.padding",
+   "kind": "number",
+   "value": 22,
+   "unit": "dp",
+   "means": "card padding",
+   "sourced_from": "iOS SUSCheckInCardView.swift",
+   "governs": "COMPONENT_LIBRARY.md",
+   "frozen": true
+  },
+  {
+   "id": "dim.card.margin",
+   "kind": "number",
+   "value": 30,
+   "unit": "dp",
+   "means": "card horizontal margin",
+   "sourced_from": "iOS SUSCheckInCardView.swift",
+   "governs": "COMPONENT_LIBRARY.md",
+   "frozen": true
+  },
+  {
+   "id": "dim.card.spacing",
+   "kind": "number",
+   "value": 14,
+   "unit": "dp",
+   "means": "card content spacing",
+   "sourced_from": "iOS SUSCheckInCardView.swift",
+   "governs": "COMPONENT_LIBRARY.md",
+   "frozen": true
+  },
+  {
+   "id": "dim.card.bottom",
+   "kind": "number",
+   "value": 44,
+   "unit": "dp",
+   "means": "card offset above bottom",
+   "sourced_from": "iOS SUSCheckInCardView.swift",
+   "governs": "COMPONENT_LIBRARY.md",
+   "frozen": true
+  },
+  {
+   "id": "dim.radius.control",
+   "kind": "number",
+   "value": 14,
+   "unit": "dp",
+   "means": "button and chip radius",
+   "sourced_from": "iOS AppTheme.cornerRadius",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "dim.radius.small",
+   "kind": "number",
+   "value": 10,
+   "unit": "dp",
+   "means": "small control radius",
+   "sourced_from": "iOS AppTheme.cornerRadiusSmall",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "dim.icon.hero",
+   "kind": "number",
+   "value": 40,
+   "unit": "dp",
+   "means": "card hero icon",
+   "sourced_from": "iOS SUSCheckInCardView.swift",
+   "governs": "COMPONENT_LIBRARY.md",
+   "frozen": true
+  },
+  {
+   "id": "dim.btn.accent",
+   "kind": "number",
+   "value": 50,
+   "unit": "dp",
+   "means": "accent button height",
+   "sourced_from": "iOS SUSCheckInCardView.swift",
+   "governs": "COMPONENT_LIBRARY.md",
+   "frozen": true
+  },
+  {
+   "id": "dim.btn.textonly",
+   "kind": "number",
+   "value": 34,
+   "unit": "dp",
+   "means": "text-only button height",
+   "sourced_from": "iOS SUSCheckInCardView.swift",
+   "governs": "COMPONENT_LIBRARY.md",
+   "frozen": true
+  },
+  {
+   "id": "dim.btn.primary",
+   "kind": "number",
+   "value": 56,
+   "unit": "dp",
+   "means": "primary button height",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "COMPONENT_LIBRARY.md",
+   "frozen": true
+  },
+  {
+   "id": "dim.btn.big",
+   "kind": "number",
+   "value": 72,
+   "unit": "dp",
+   "means": "BigActionButton height",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "COMPONENT_LIBRARY.md",
+   "frozen": true
+  },
+  {
+   "id": "dim.touch.min",
+   "kind": "number",
+   "value": 48,
+   "unit": "dp",
+   "means": "minimum touch target",
+   "sourced_from": "Android a11y",
+   "governs": "COMPONENT_LIBRARY.md",
+   "frozen": true
+  },
+  {
+   "id": "dim.scrim",
+   "kind": "number",
+   "value": 0.4,
+   "unit": "alpha",
+   "means": "black scrim behind cards",
+   "sourced_from": "iOS SUSCheckInCardView.swift",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "dim.ring.card",
+   "kind": "number",
+   "value": 88,
+   "unit": "dp",
+   "means": "countdown ring in card",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "COMPONENT_LIBRARY.md",
+   "frozen": true
+  },
+  {
+   "id": "dim.ring.sos",
+   "kind": "number",
+   "value": 140,
+   "unit": "dp",
+   "means": "countdown ring on SOS",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "COMPONENT_LIBRARY.md",
+   "frozen": true
+  },
+  {
+   "id": "dim.armbanner.autohide",
+   "kind": "number",
+   "value": 6,
+   "unit": "s",
+   "means": "arm banner auto-hide",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "COMPONENT_LIBRARY.md",
+   "frozen": true
+  },
+  {
+   "id": "dim.sheet.peek",
+   "kind": "number",
+   "value": 160,
+   "unit": "dp",
+   "means": "bottom sheet peek",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "COMPONENT_LIBRARY.md",
+   "frozen": true
+  },
+  {
+   "id": "type.display",
+   "kind": "number",
+   "value": 34,
+   "unit": "sp",
+   "means": "display size",
+   "sourced_from": "founder 2026-08-18 / iOS",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "type.title",
+   "kind": "number",
+   "value": 24,
+   "unit": "sp",
+   "means": "title size",
+   "sourced_from": "founder 2026-08-18 / iOS",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "type.cardTitle",
+   "kind": "number",
+   "value": 20,
+   "unit": "sp",
+   "means": "cardTitle size",
+   "sourced_from": "founder 2026-08-18 / iOS",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "type.headline",
+   "kind": "number",
+   "value": 18,
+   "unit": "sp",
+   "means": "headline size",
+   "sourced_from": "founder 2026-08-18 / iOS",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "type.body",
+   "kind": "number",
+   "value": 16,
+   "unit": "sp",
+   "means": "body size",
+   "sourced_from": "founder 2026-08-18 / iOS",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "type.cardBody",
+   "kind": "number",
+   "value": 14,
+   "unit": "sp",
+   "means": "cardBody size",
+   "sourced_from": "founder 2026-08-18 / iOS",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "type.caption",
+   "kind": "number",
+   "value": 13,
+   "unit": "sp",
+   "means": "caption size",
+   "sourced_from": "founder 2026-08-18 / iOS",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "type.label",
+   "kind": "number",
+   "value": 11,
+   "unit": "sp",
+   "means": "label size",
+   "sourced_from": "founder 2026-08-18 / iOS",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "notif.SHADOW_ONGOING",
+   "kind": "number",
+   "value": 1001,
+   "unit": "id",
+   "means": "notification id",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "ANDROID_PLATFORM.md",
+   "frozen": true
+  },
+  {
+   "id": "notif.CHECKIN_1",
+   "kind": "number",
+   "value": 1002,
+   "unit": "id",
+   "means": "notification id",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "ANDROID_PLATFORM.md",
+   "frozen": true
+  },
+  {
+   "id": "notif.CHECKIN_2",
+   "kind": "number",
+   "value": 1003,
+   "unit": "id",
+   "means": "notification id",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "ANDROID_PLATFORM.md",
+   "frozen": true
+  },
+  {
+   "id": "notif.FAMILY",
+   "kind": "number",
+   "value": 1004,
+   "unit": "id",
+   "means": "notification id",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "ANDROID_PLATFORM.md",
+   "frozen": true
+  },
+  {
+   "id": "notif.SOS_ONGOING",
+   "kind": "number",
+   "value": 1005,
+   "unit": "id",
+   "means": "notification id",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "ANDROID_PLATFORM.md",
+   "frozen": true
+  },
+  {
+   "id": "notif.QUEUE_FAILED",
+   "kind": "number",
+   "value": 1006,
+   "unit": "id",
+   "means": "notification id",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "ANDROID_PLATFORM.md",
+   "frozen": true
+  },
+  {
+   "id": "notif.SERVICE_KILLED",
+   "kind": "number",
+   "value": 1007,
+   "unit": "id",
+   "means": "notification id",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "ANDROID_PLATFORM.md",
+   "frozen": true
+  },
+  {
+   "id": "reqcode.TIMER_CHECKIN",
+   "kind": "number",
+   "value": 2001,
+   "unit": "id",
+   "means": "PendingIntent request code",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "ANDROID_PLATFORM.md",
+   "frozen": true
+  },
+  {
+   "id": "reqcode.TIMER_CD1",
+   "kind": "number",
+   "value": 2002,
+   "unit": "id",
+   "means": "PendingIntent request code",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "ANDROID_PLATFORM.md",
+   "frozen": true
+  },
+  {
+   "id": "reqcode.TIMER_CD2",
+   "kind": "number",
+   "value": 2003,
+   "unit": "id",
+   "means": "PendingIntent request code",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "ANDROID_PLATFORM.md",
+   "frozen": true
+  },
+  {
+   "id": "reqcode.TIMER_CANCEL",
+   "kind": "number",
+   "value": 2004,
+   "unit": "id",
+   "means": "PendingIntent request code",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "ANDROID_PLATFORM.md",
+   "frozen": true
+  },
+  {
+   "id": "reqcode.GEOFENCE",
+   "kind": "number",
+   "value": 2005,
+   "unit": "id",
+   "means": "PendingIntent request code",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "ANDROID_PLATFORM.md",
+   "frozen": true
+  },
+  {
+   "id": "reqcode.BOOT",
+   "kind": "number",
+   "value": 2006,
+   "unit": "id",
+   "means": "PendingIntent request code",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "ANDROID_PLATFORM.md",
+   "frozen": true
+  },
+  {
+   "id": "reqcode.ACTION_IM_OK",
+   "kind": "number",
+   "value": 2101,
+   "unit": "id",
+   "means": "PendingIntent request code",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "ANDROID_PLATFORM.md",
+   "frozen": true
+  },
+  {
+   "id": "reqcode.ACTION_HELP_NOW",
+   "kind": "number",
+   "value": 2102,
+   "unit": "id",
+   "means": "PendingIntent request code",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "ANDROID_PLATFORM.md",
+   "frozen": true
+  },
+  {
+   "id": "reqcode.ACTION_CANCEL",
+   "kind": "number",
+   "value": 2103,
+   "unit": "id",
+   "means": "PendingIntent request code",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "ANDROID_PLATFORM.md",
+   "frozen": true
+  },
+  {
+   "id": "reqcode.OPEN_APP",
+   "kind": "number",
+   "value": 2201,
+   "unit": "id",
+   "means": "PendingIntent request code",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "ANDROID_PLATFORM.md",
+   "frozen": true
+  },
+  {
+   "id": "build.minSdk",
+   "kind": "number",
+   "value": 24,
+   "unit": "api",
+   "means": "minimum SDK",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "BUILD_CONFIG.md",
+   "frozen": true
+  },
+  {
+   "id": "build.targetSdk",
+   "kind": "number",
+   "value": 34,
+   "unit": "api",
+   "means": "target SDK",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "BUILD_CONFIG.md",
+   "frozen": true
+  },
+  {
+   "id": "build.jvm",
+   "kind": "number",
+   "value": 17,
+   "unit": "version",
+   "means": "JVM target",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "BUILD_CONFIG.md",
+   "frozen": true
+  },
+  {
+   "id": "build.versionCode",
+   "kind": "number",
+   "value": 1,
+   "unit": "int",
+   "means": "version code",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "BUILD_CONFIG.md",
+   "frozen": true
+  },
+  {
+   "id": "font.budget",
+   "kind": "number",
+   "value": 250,
+   "unit": "KB",
+   "means": "all font assets combined",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "map.zoom.default",
+   "kind": "number",
+   "value": 12.5,
+   "unit": "z",
+   "means": "default zoom",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "MAP_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "map.zoom.min",
+   "kind": "number",
+   "value": 10,
+   "unit": "z",
+   "means": "min zoom",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "MAP_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "map.zoom.max",
+   "kind": "number",
+   "value": 17,
+   "unit": "z",
+   "means": "max zoom",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "MAP_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "map.label.hide_below",
+   "kind": "number",
+   "value": 12,
+   "unit": "z",
+   "means": "hide zone labels below",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "MAP_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "map.tile.cache",
+   "kind": "number",
+   "value": 64,
+   "unit": "MB",
+   "means": "osmdroid tile cache",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "MAP_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "map.tile.timeout",
+   "kind": "number",
+   "value": 4,
+   "unit": "s",
+   "means": "before showing map-offline note",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "MAP_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "map.dot",
+   "kind": "number",
+   "value": 14,
+   "unit": "dp",
+   "means": "her location dot",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "MAP_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "map.center.lat",
+   "kind": "number",
+   "value": 17.71,
+   "unit": "deg",
+   "means": "default centre lat",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "MAP_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "map.center.lon",
+   "kind": "number",
+   "value": 83.3,
+   "unit": "deg",
+   "means": "default centre lon",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "MAP_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "zones.total",
+   "kind": "number",
+   "value": 24,
+   "unit": "count",
+   "means": "zones in geojson",
+   "sourced_from": "vizag_heatmap.geojson",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true
+  },
+  {
+   "id": "zones.high",
+   "kind": "number",
+   "value": 6,
+   "unit": "count",
+   "means": "HIGH tier zones",
+   "sourced_from": "vizag_heatmap.geojson",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true
+  },
+  {
+   "id": "zones.moderate",
+   "kind": "number",
+   "value": 9,
+   "unit": "count",
+   "means": "MODERATE tier",
+   "sourced_from": "vizag_heatmap.geojson",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true
+  },
+  {
+   "id": "zones.elevated",
+   "kind": "number",
+   "value": 4,
+   "unit": "count",
+   "means": "ELEVATED tier",
+   "sourced_from": "vizag_heatmap.geojson",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true
+  },
+  {
+   "id": "zones.safe",
+   "kind": "number",
+   "value": 5,
+   "unit": "count",
+   "means": "SAFE tier, not drawn",
+   "sourced_from": "vizag_heatmap.geojson",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true
+  },
+  {
+   "id": "zones.drawn",
+   "kind": "number",
+   "value": 19,
+   "unit": "count",
+   "means": "zones actually rendered",
+   "sourced_from": "derived: 24-5",
+   "governs": "MAP_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "cards.total",
+   "kind": "number",
+   "value": 19,
+   "unit": "count",
+   "means": "zone_info_cards entries",
+   "sourced_from": "zone_info_cards.json",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true
+  },
+  {
+   "id": "stations.total",
+   "kind": "number",
+   "value": 37,
+   "unit": "count",
+   "means": "police points",
+   "sourced_from": "vizag_police_points.json",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true
+  }
+ ]
+}

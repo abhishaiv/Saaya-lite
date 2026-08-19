@@ -1,0 +1,1061 @@
+{
+ "schema": "saaya-lite/build_graph/1",
+ "kind": "commit_dag",
+ "note": "Work lineage. Never merge with spec_graph.json - different truth standards.",
+ "execution": "single continuous run, topological order by seq",
+ "frozen_nodes": [
+  "docs/FEATURES.md",
+  "assets/vizag_heatmap.geojson",
+  "assets/zone_info_cards.json",
+  "assets/vizag_police_points.json",
+  "copy:ios_verbatim",
+  "invariant:trust_boundary_at_sos"
+ ],
+ "total_hours": 45.0,
+ "order": [
+  "T1.1",
+  "T2.1",
+  "T4.1",
+  "T4.2",
+  "T1.2",
+  "T8.1",
+  "T8.2",
+  "T1.3",
+  "T2.2",
+  "T4.3",
+  "T3.1",
+  "T3.2",
+  "T5.1",
+  "T6.1",
+  "T6.2",
+  "T7.1",
+  "T7.2",
+  "T7.3",
+  "T8.3",
+  "T9.0",
+  "T9.1",
+  "T9.2"
+ ],
+ "nodes": {
+  "T1.1": {
+   "id": "T1.1",
+   "seq": 1,
+   "title": "Scaffold, theme, manifest privacy flags",
+   "hours": 2.0,
+   "requires": [],
+   "produces": [
+    "gradle_project",
+    "theme_tokens",
+    "manifest_privacy"
+   ],
+   "reads": [
+    "BUILD_CONFIG.md",
+    "ARCHITECTURE.md",
+    "DESIGN_SYSTEM.md"
+   ],
+   "extra_gates": [
+    "aapt2_allowbackup_false"
+   ],
+   "risk": "low",
+   "cumulative_hours": 2.0,
+   "status": "pending",
+   "run_id": null,
+   "gates_passed": [],
+   "artifacts": [],
+   "corrections": [],
+   "verify_lenses": [
+    "spec"
+   ],
+   "verify_command": "code gates only",
+   "shape": "serial",
+   "fanout": null
+  },
+  "T2.1": {
+   "id": "T2.1",
+   "seq": 2,
+   "title": "Zone parsing to typed Zone/ZoneCard/PoliceStation",
+   "hours": 1.5,
+   "requires": [
+    "T1.1"
+   ],
+   "produces": [
+    "type:Zone",
+    "type:ZoneCard",
+    "type:PoliceStation",
+    "assets_bundled"
+   ],
+   "reads": [
+    "DATA_MODEL.md",
+    "TEST_PLAN.md"
+   ],
+   "extra_gates": [
+    "ZoneParsingTest"
+   ],
+   "risk": "low",
+   "cumulative_hours": 3.5,
+   "status": "pending",
+   "run_id": null,
+   "gates_passed": [],
+   "artifacts": [],
+   "corrections": [],
+   "verify_lenses": [
+    "spec"
+   ],
+   "verify_command": "code gates only",
+   "shape": "diamond",
+   "fanout": {
+    "split": "one worker per bundled asset file",
+    "workers": 3,
+    "items": [
+     {
+      "id": "zones",
+      "owns": [
+       "data/zone/ZoneParser.kt",
+       "domain/model/Zone.kt"
+      ],
+      "manifest": "build/fanout/T2.1/zones.json"
+     },
+     {
+      "id": "cards",
+      "owns": [
+       "data/zone/CardParser.kt",
+       "domain/model/ZoneCard.kt"
+      ],
+      "manifest": "build/fanout/T2.1/cards.json"
+     },
+     {
+      "id": "stations",
+      "owns": [
+       "data/zone/StationParser.kt",
+       "domain/model/PoliceStation.kt"
+      ],
+      "manifest": "build/fanout/T2.1/stations.json"
+     }
+    ],
+    "shared_files_written_by_merge": [
+     "data/zone/ZoneLoader.kt"
+    ],
+    "merge": "code: assert 24/19/37 counts and lat 17.6-17.9 lon 83.1-83.5; then write the single ZoneLoader that composes the three parsers"
+   }
+  },
+  "T4.1": {
+   "id": "T4.1",
+   "seq": 3,
+   "title": "Session engine, pure JVM, no Android imports",
+   "hours": 3.0,
+   "requires": [
+    "T2.1"
+   ],
+   "produces": [
+    "type:SessionState",
+    "type:SessionEvent",
+    "type:Command",
+    "engine_pure"
+   ],
+   "reads": [
+    "STATE_MACHINE.md",
+    "BUSINESS_RULES.md",
+    "TEST_PLAN.md",
+    "PROBLEM.md"
+   ],
+   "extra_gates": [
+    "RulesTest",
+    "SessionEngineTest",
+    "no_android_import_in_domain"
+   ],
+   "risk": "HIGH",
+   "cumulative_hours": 6.5,
+   "status": "pending",
+   "run_id": null,
+   "gates_passed": [],
+   "artifacts": [],
+   "corrections": [],
+   "verify_lenses": [
+    "spec",
+    "boundary",
+    "invention"
+   ],
+   "verify_command": "python3 scripts/verify_node.py T4.1",
+   "shape": "serial",
+   "fanout": null
+  },
+  "T4.2": {
+   "id": "T4.2",
+   "seq": 4,
+   "title": "Foreground service, geofencing, alarms, recovery",
+   "hours": 3.0,
+   "requires": [
+    "T4.1",
+    "T2.1"
+   ],
+   "produces": [
+    "service_running",
+    "geofences_registered",
+    "timers_exact",
+    "recovery_works"
+   ],
+   "reads": [
+    "ANDROID_PLATFORM.md",
+    "STATE_MACHINE.md",
+    "BUSINESS_RULES.md"
+   ],
+   "extra_gates": [
+    "device_arms_with_no_tap"
+   ],
+   "risk": "HIGHEST",
+   "cumulative_hours": 9.5,
+   "status": "pending",
+   "run_id": null,
+   "gates_passed": [],
+   "artifacts": [],
+   "corrections": [],
+   "verify_lenses": [
+    "spec",
+    "boundary",
+    "invention"
+   ],
+   "verify_command": "python3 scripts/verify_node.py T4.2",
+   "shape": "serial",
+   "fanout": null
+  },
+  "T1.2": {
+   "id": "T1.2",
+   "seq": 5,
+   "title": "Firebase wiring, anonymous auth",
+   "hours": 1.0,
+   "requires": [
+    "T1.1"
+   ],
+   "produces": [
+    "firebase_project",
+    "anon_auth",
+    "firestore_client"
+   ],
+   "reads": [
+    "SETUP.md",
+    "SECRETS_AND_ACCESS.md",
+    "DATA_MODEL.md"
+   ],
+   "extra_gates": [],
+   "risk": "low",
+   "cumulative_hours": 10.5,
+   "status": "pending",
+   "run_id": null,
+   "gates_passed": [],
+   "artifacts": [],
+   "corrections": [],
+   "verify_lenses": [
+    "spec"
+   ],
+   "verify_command": "code gates only",
+   "shape": "serial",
+   "fanout": null
+  },
+  "T8.1": {
+   "id": "T8.1",
+   "seq": 6,
+   "title": "Seed zones to Firestore",
+   "hours": 0.5,
+   "requires": [
+    "T1.2",
+    "T2.1"
+   ],
+   "produces": [
+    "firestore_zones_seeded"
+   ],
+   "reads": [
+    "DATA_MODEL.md",
+    "SETUP.md"
+   ],
+   "extra_gates": [],
+   "risk": "low",
+   "cumulative_hours": 11.0,
+   "status": "pending",
+   "run_id": null,
+   "gates_passed": [],
+   "artifacts": [],
+   "corrections": [],
+   "verify_lenses": [
+    "spec"
+   ],
+   "verify_command": "code gates only",
+   "shape": "serial",
+   "fanout": null
+  },
+  "T8.2": {
+   "id": "T8.2",
+   "seq": 7,
+   "title": "Console: the live demo link",
+   "hours": 3.0,
+   "requires": [
+    "T8.1"
+   ],
+   "produces": [
+    "console_live_url",
+    "console_snapshot_listener",
+    "firestore_indexes"
+   ],
+   "reads": [
+    "CONSOLE_SPEC.md",
+    "DATA_MODEL.md",
+    "DESIGN_SYSTEM.md",
+    "OPERATING_MODEL.md"
+   ],
+   "extra_gates": [
+    "console_loads_logged_out"
+   ],
+   "risk": "HIGH",
+   "cumulative_hours": 14.0,
+   "status": "pending",
+   "run_id": null,
+   "gates_passed": [],
+   "artifacts": [],
+   "corrections": [],
+   "verify_lenses": [
+    "spec",
+    "boundary",
+    "invention"
+   ],
+   "verify_command": "python3 scripts/verify_node.py T8.2",
+   "shape": "serial",
+   "fanout": null
+  },
+  "T1.3": {
+   "id": "T1.3",
+   "seq": 8,
+   "title": "Component library C1 to C14",
+   "hours": 3.0,
+   "requires": [
+    "T1.1"
+   ],
+   "produces": [
+    "components_c1_c14",
+    "fonts_bundled",
+    "icons_subset"
+   ],
+   "reads": [
+    "COMPONENT_LIBRARY.md",
+    "DESIGN_SYSTEM.md",
+    "ICONOGRAPHY.md",
+    "MOTION_SPEC.md"
+   ],
+   "extra_gates": [
+    "component_gallery"
+   ],
+   "risk": "med",
+   "cumulative_hours": 17.0,
+   "status": "pending",
+   "run_id": null,
+   "gates_passed": [],
+   "artifacts": [],
+   "corrections": [],
+   "verify_lenses": [
+    "spec",
+    "invention"
+   ],
+   "verify_command": "code gates only",
+   "shape": "diamond",
+   "fanout": {
+    "split": "one worker per component C1-C14",
+    "workers": 14,
+    "item_contract": {
+     "owns": [
+      "ui/components/<Name>.kt"
+     ],
+     "manifest": "build/fanout/T1.3/<Cn>.json",
+     "manifest_shape": {
+      "component": "C1",
+      "file": "ui/components/SaayaButton.kt",
+      "tokens_used": [
+       "color.brand",
+       "dim.btn.primary"
+      ],
+      "strings_used": [
+       "cta_continue"
+      ],
+      "helpers_declared": [
+       {
+        "name": "Modifier.minTouchTarget",
+        "signature": "..."
+       }
+      ],
+      "preview": "SaayaButtonPreview"
+     },
+     "forbidden": [
+      "ui/theme/**",
+      "values/strings.xml",
+      "any file another worker owns"
+     ]
+    },
+    "shared_files_written_by_merge": [
+     "ui/components/SaayaModifiers.kt",
+     "ui/gallery/ComponentGallery.kt"
+    ],
+    "merge": "code: (1) assert every tokens_used entry exists in graph/spec_graph.json, fail on an invented token; (2) collect helpers_declared, emit each ONCE into SaayaModifiers.kt, fail on same name with different signature; (3) generate ComponentGallery.kt from the 14 previews; (4) collect strings_used and hand forward to T9.1"
+   }
+  },
+  "T2.2": {
+   "id": "T2.2",
+   "seq": 9,
+   "title": "Map screen, zones, her dot, offline",
+   "hours": 2.5,
+   "requires": [
+    "T2.1",
+    "T1.3"
+   ],
+   "produces": [
+    "map_screen",
+    "zones_rendered",
+    "attribution_visible"
+   ],
+   "reads": [
+    "MAP_SPEC.md",
+    "SCREENS.md",
+    "RESPONSIVE_SPEC.md",
+    "STATES_CATALOGUE.md"
+   ],
+   "extra_gates": [
+    "zones_render_offline"
+   ],
+   "risk": "med",
+   "cumulative_hours": 19.5,
+   "status": "pending",
+   "run_id": null,
+   "gates_passed": [],
+   "artifacts": [],
+   "corrections": [],
+   "verify_lenses": [
+    "spec",
+    "invention"
+   ],
+   "verify_command": "code gates only",
+   "shape": "serial",
+   "fanout": null
+  },
+  "T4.3": {
+   "id": "T4.3",
+   "seq": 10,
+   "title": "Home session states, arm banner, demo panel",
+   "hours": 2.0,
+   "requires": [
+    "T4.2",
+    "T2.2",
+    "T1.3"
+   ],
+   "produces": [
+    "home_states",
+    "arm_banner",
+    "demo_panel"
+   ],
+   "reads": [
+    "SCREENS.md",
+    "COPY.md",
+    "COMPONENT_LIBRARY.md",
+    "MOTION_SPEC.md"
+   ],
+   "extra_gates": [],
+   "risk": "med",
+   "cumulative_hours": 21.5,
+   "status": "pending",
+   "run_id": null,
+   "gates_passed": [],
+   "artifacts": [],
+   "corrections": [],
+   "verify_lenses": [
+    "spec",
+    "invention"
+   ],
+   "verify_command": "code gates only",
+   "shape": "serial",
+   "fanout": null
+  },
+  "T3.1": {
+   "id": "T3.1",
+   "seq": 11,
+   "title": "Zone detail sheet, nearest station",
+   "hours": 2.0,
+   "requires": [
+    "T2.1",
+    "T1.3"
+   ],
+   "produces": [
+    "zone_sheet",
+    "nearest_station"
+   ],
+   "reads": [
+    "SCREENS.md",
+    "BUSINESS_RULES.md",
+    "COPY.md",
+    "COMPONENT_LIBRARY.md",
+    "STATES_CATALOGUE.md"
+   ],
+   "extra_gates": [],
+   "risk": "low",
+   "cumulative_hours": 23.5,
+   "status": "pending",
+   "run_id": null,
+   "gates_passed": [],
+   "artifacts": [],
+   "corrections": [],
+   "verify_lenses": [
+    "spec"
+   ],
+   "verify_command": "code gates only",
+   "shape": "serial",
+   "fanout": null
+  },
+  "T3.2": {
+   "id": "T3.2",
+   "seq": 12,
+   "title": "Onboarding, permissions, favourites, PIN",
+   "hours": 3.0,
+   "requires": [
+    "T1.3"
+   ],
+   "produces": [
+    "onboarding",
+    "pin_stored_hashed",
+    "favourites_local"
+   ],
+   "reads": [
+    "SCREENS.md",
+    "ANDROID_PLATFORM.md",
+    "BUSINESS_RULES.md",
+    "COMPONENT_LIBRARY.md",
+    "ACCESSIBILITY_SPEC.md"
+   ],
+   "extra_gates": [
+    "PinStorageTest"
+   ],
+   "risk": "med",
+   "cumulative_hours": 26.5,
+   "status": "pending",
+   "run_id": null,
+   "gates_passed": [],
+   "artifacts": [],
+   "corrections": [],
+   "verify_lenses": [
+    "spec",
+    "invention"
+   ],
+   "verify_command": "code gates only",
+   "shape": "serial",
+   "fanout": null
+  },
+  "T5.1": {
+   "id": "T5.1",
+   "seq": 13,
+   "title": "Check-in 1 and 2, notifications, lock screen",
+   "hours": 3.0,
+   "requires": [
+    "T4.1",
+    "T1.3"
+   ],
+   "produces": [
+    "checkin_screens",
+    "notif_channels",
+    "fullscreen_intent"
+   ],
+   "reads": [
+    "SCREENS.md",
+    "ANDROID_PLATFORM.md",
+    "COPY.md",
+    "COMPONENT_LIBRARY.md",
+    "INTERACTION_SPEC.md",
+    "MOTION_SPEC.md",
+    "ACCESSIBILITY_SPEC.md"
+   ],
+   "extra_gates": [
+    "checkin2_over_lockscreen"
+   ],
+   "risk": "HIGH",
+   "cumulative_hours": 29.5,
+   "status": "pending",
+   "run_id": null,
+   "gates_passed": [],
+   "artifacts": [],
+   "corrections": [],
+   "verify_lenses": [
+    "spec",
+    "boundary",
+    "invention"
+   ],
+   "verify_command": "python3 scripts/verify_node.py T5.1",
+   "shape": "serial",
+   "fanout": null
+  },
+  "T6.1": {
+   "id": "T6.1",
+   "seq": 14,
+   "title": "Family escalation composer and screen",
+   "hours": 2.0,
+   "requires": [
+    "T4.1",
+    "T1.3",
+    "T2.1"
+   ],
+   "produces": [
+    "family_screen",
+    "escalation_message",
+    "mock_disclosure_visible"
+   ],
+   "reads": [
+    "BUSINESS_RULES.md",
+    "SCREENS.md",
+    "COPY.md",
+    "COMPONENT_LIBRARY.md",
+    "INTERACTION_SPEC.md"
+   ],
+   "extra_gates": [],
+   "risk": "med",
+   "cumulative_hours": 31.5,
+   "status": "pending",
+   "run_id": null,
+   "gates_passed": [],
+   "artifacts": [],
+   "corrections": [],
+   "verify_lenses": [
+    "spec",
+    "invention"
+   ],
+   "verify_command": "code gates only",
+   "shape": "serial",
+   "fanout": null
+  },
+  "T6.2": {
+   "id": "T6.2",
+   "seq": 15,
+   "title": "Offline queue with backoff",
+   "hours": 1.5,
+   "requires": [
+    "T1.2"
+   ],
+   "produces": [
+    "queue_repository",
+    "backoff_policy"
+   ],
+   "reads": [
+    "ARCHITECTURE.md",
+    "BUSINESS_RULES.md",
+    "TEST_PLAN.md"
+   ],
+   "extra_gates": [
+    "QueueTest",
+    "airplane_mode_survives"
+   ],
+   "risk": "med",
+   "cumulative_hours": 33.0,
+   "status": "pending",
+   "run_id": null,
+   "gates_passed": [],
+   "artifacts": [],
+   "corrections": [],
+   "verify_lenses": [
+    "spec",
+    "invention"
+   ],
+   "verify_command": "code gates only",
+   "shape": "serial",
+   "fanout": null
+  },
+  "T7.1": {
+   "id": "T7.1",
+   "seq": 16,
+   "title": "SOS screen and PIN entry",
+   "hours": 2.5,
+   "requires": [
+    "T4.1",
+    "T1.3",
+    "T3.2"
+   ],
+   "produces": [
+    "sos_screen",
+    "pin_entry",
+    "sos_inescapable"
+   ],
+   "reads": [
+    "SCREENS.md",
+    "BUSINESS_RULES.md",
+    "STATE_MACHINE.md",
+    "COMPONENT_LIBRARY.md",
+    "MOTION_SPEC.md",
+    "INTERACTION_SPEC.md"
+   ],
+   "extra_gates": [],
+   "risk": "HIGH",
+   "cumulative_hours": 35.5,
+   "status": "pending",
+   "run_id": null,
+   "gates_passed": [],
+   "artifacts": [],
+   "corrections": [],
+   "verify_lenses": [
+    "spec",
+    "boundary",
+    "invention"
+   ],
+   "verify_command": "python3 scripts/verify_node.py T7.1",
+   "shape": "serial",
+   "fanout": null
+  },
+  "T7.2": {
+   "id": "T7.2",
+   "seq": 17,
+   "title": "Anonymiser and the two Firestore writers",
+   "hours": 2.0,
+   "requires": [
+    "T6.2",
+    "T4.1"
+   ],
+   "produces": [
+    "anonymiser",
+    "sus_writer",
+    "sos_writer",
+    "firestore_rules_deployed"
+   ],
+   "reads": [
+    "DATA_MODEL.md",
+    "TEST_PLAN.md",
+    "PROBLEM.md"
+   ],
+   "extra_gates": [
+    "AnonymiserTest",
+    "zero_writes_before_family"
+   ],
+   "risk": "HIGHEST",
+   "cumulative_hours": 37.5,
+   "status": "pending",
+   "run_id": null,
+   "gates_passed": [],
+   "artifacts": [],
+   "corrections": [],
+   "verify_lenses": [
+    "spec",
+    "boundary",
+    "invention"
+   ],
+   "verify_command": "python3 scripts/verify_node.py T7.2",
+   "shape": "serial",
+   "fanout": null
+  },
+  "T7.3": {
+   "id": "T7.3",
+   "seq": 18,
+   "title": "What the police see, in app",
+   "hours": 1.5,
+   "requires": [
+    "T7.2",
+    "T1.3"
+   ],
+   "produces": [
+    "police_view"
+   ],
+   "reads": [
+    "SCREENS.md",
+    "COPY.md",
+    "COMPONENT_LIBRARY.md",
+    "OPERATING_MODEL.md"
+   ],
+   "extra_gates": [],
+   "risk": "low",
+   "cumulative_hours": 39.0,
+   "status": "pending",
+   "run_id": null,
+   "gates_passed": [],
+   "artifacts": [],
+   "corrections": [],
+   "verify_lenses": [
+    "spec"
+   ],
+   "verify_command": "code gates only",
+   "shape": "serial",
+   "fanout": null
+  },
+  "T8.3": {
+   "id": "T8.3",
+   "seq": 19,
+   "title": "Console live journey trigger",
+   "hours": 1.5,
+   "requires": [
+    "T8.2",
+    "T7.2"
+   ],
+   "produces": [
+    "journey_trigger",
+    "narration_strip"
+   ],
+   "reads": [
+    "CONSOLE_SPEC.md",
+    "DATA_MODEL.md"
+   ],
+   "extra_gates": [],
+   "risk": "med",
+   "cumulative_hours": 40.5,
+   "status": "pending",
+   "run_id": null,
+   "gates_passed": [],
+   "artifacts": [],
+   "corrections": [],
+   "verify_lenses": [
+    "spec",
+    "invention"
+   ],
+   "verify_command": "code gates only",
+   "shape": "serial",
+   "fanout": null
+  },
+  "T9.0": {
+   "id": "T9.0",
+   "seq": 20,
+   "title": "Landing page with APK and video",
+   "hours": 1.0,
+   "requires": [
+    "T8.2"
+   ],
+   "produces": [
+    "landing_page"
+   ],
+   "reads": [
+    "SUBMISSION.md",
+    "COMPLIANCE.md",
+    "EVIDENCE.md",
+    "DEMO_SCRIPT.md"
+   ],
+   "extra_gates": [],
+   "risk": "low",
+   "cumulative_hours": 41.5,
+   "status": "pending",
+   "run_id": null,
+   "gates_passed": [],
+   "artifacts": [],
+   "corrections": [],
+   "verify_lenses": [
+    "spec"
+   ],
+   "verify_command": "code gates only",
+   "shape": "serial",
+   "fanout": null
+  },
+  "T9.1": {
+   "id": "T9.1",
+   "seq": 21,
+   "title": "Localisation, low-end, font scale, a11y",
+   "hours": 2.0,
+   "requires": [
+    "T4.3",
+    "T5.1",
+    "T6.1",
+    "T7.1",
+    "T7.3",
+    "T3.1"
+   ],
+   "produces": [
+    "strings_en",
+    "strings_te",
+    "a11y_pass"
+   ],
+   "reads": [
+    "COPY.md",
+    "RESPONSIVE_SPEC.md",
+    "ACCESSIBILITY_SPEC.md",
+    "COMPLIANCE.md"
+   ],
+   "extra_gates": [
+    "founder_verifies_telugu"
+   ],
+   "risk": "med",
+   "cumulative_hours": 43.5,
+   "status": "pending",
+   "run_id": null,
+   "gates_passed": [],
+   "artifacts": [],
+   "corrections": [],
+   "verify_lenses": [
+    "spec",
+    "invention"
+   ],
+   "verify_command": "code gates only",
+   "shape": "diamond",
+   "fanout": {
+    "split": "one worker per screen S1-S13",
+    "workers": 13,
+    "item_contract": {
+     "owns": [
+      "build/fanout/T9.1/<Screen>.strings.json"
+     ],
+     "manifest_shape": {
+      "screen": "S3",
+      "keys": {
+       "status_idle": {
+        "en": "Not watching",
+        "te": "..."
+       }
+      }
+     },
+     "forbidden": [
+      "values/strings.xml",
+      "values-te/strings.xml",
+      "any other screen's file"
+     ]
+    },
+    "shared_files_written_by_merge": [
+     "res/values/strings.xml",
+     "res/values-te/strings.xml"
+    ],
+    "merge": "code: (1) FAIL LOUDLY on any key claimed by two screens with different text - a shared-file write would have silently clobbered one; (2) FAIL on any key present in en but missing in te; (3) assert every key marked iOS-verbatim in COPY.md matches character for character; (4) emit both strings.xml files sorted by key"
+   }
+  },
+  "T9.2": {
+   "id": "T9.2",
+   "seq": 22,
+   "title": "Verification sweep V1 to V8",
+   "hours": 1.5,
+   "requires": [
+    "T9.1",
+    "T8.3",
+    "T9.0"
+   ],
+   "produces": [
+    "v1_v8_evidence"
+   ],
+   "reads": [
+    "TEST_PLAN.md",
+    "SUBMISSION.md",
+    "COMPLIANCE.md",
+    "EVIDENCE.md",
+    "BUILD_PLAN.md",
+    "DEMO_SCRIPT.md"
+   ],
+   "extra_gates": [
+    "all_anchors_green"
+   ],
+   "risk": "HIGH",
+   "cumulative_hours": 45.0,
+   "status": "pending",
+   "run_id": null,
+   "gates_passed": [],
+   "artifacts": [],
+   "corrections": [],
+   "verify_lenses": [
+    "spec",
+    "boundary",
+    "invention"
+   ],
+   "verify_command": "python3 scripts/verify_node.py T9.2",
+   "shape": "diamond+cycle",
+   "fanout": {
+    "split": "one worker per submission check V1-V8",
+    "workers": 8,
+    "items": [
+     "V1",
+     "V2",
+     "V3",
+     "V4",
+     "V5",
+     "V6",
+     "V7",
+     "V8"
+    ],
+    "merge": "code: all eight must be green",
+    "cycle": {
+     "pattern": "loop-until-dry",
+     "stop_after_empty_rounds": 2,
+     "dedupe_against": "EVERY finding seen this node, not only confirmed ones",
+     "max_rounds": 5,
+     "why": "final bug sweep is unknown-size discovery; a counter would miss the tail"
+    },
+    "item_contract": {
+     "owns": [
+      "build/fanout/T9.2/<Vn>.json"
+     ],
+     "manifest_shape": {
+      "check": "V7",
+      "passed": true,
+      "evidence": "raw command output"
+     },
+     "forbidden": [
+      "any source file - verification checks NEVER write code"
+     ]
+    },
+    "shared_files_written_by_merge": [
+     "build/fanout/T9.2/summary.json"
+    ]
+   }
+  }
+ },
+ "verification": {
+  "why": "Gates are the implementer grading its own homework. A verifier is a separate agent with FRESH CONTEXT whose only job is to kill the work.",
+  "evidence": "Google Research: independent agents amplify errors 17.2x; a centralised orchestrator as validation bottleneck reduces it to 4.3x.",
+  "no_fanout_on_implementation": "Same research: multi-agent on sequential reasoning tasks scores -70%. Implementation stays single-agent.",
+  "tiers": {
+   "HIGHEST": "3 lenses",
+   "HIGH": "3 lenses",
+   "med": "2 lenses",
+   "low": "1 lens"
+  },
+  "total_verifier_runs": 44
+ },
+ "human_gates": [
+  {
+   "before": "T8.1",
+   "gate": "Firestore rules and public read go live",
+   "why": "public read is hard to un-publish; confirm every record is synthetic first"
+  },
+  {
+   "before": "T8.2",
+   "gate": "console URL becomes reachable",
+   "why": "this is the submission's live link; once shared it is judged"
+  },
+  {
+   "after": "T9.0",
+   "gate": "APK published on the landing page",
+   "why": "an installed APK cannot be recalled from a judge's phone"
+  },
+  {
+   "after": "T9.2",
+   "gate": "submission",
+   "why": "irreversible by definition"
+  }
+ ],
+ "architecture": {
+  "principle": "Fan out only genuinely decomposable work. Sequential reasoning stays single-agent.",
+  "evidence": [
+   "Google Research: sequential reasoning tasks score -70% across every multi-agent variant",
+   "graph-engineering repo stop rule: parallel configurations win ~80%, sequential work loses across configurations",
+   "Google Research: error amplification 17.2x independent vs 4.3x with a centralised orchestrator"
+  ],
+  "codex_native_subagents": true,
+  "shapes": {
+   "serial": "one agent, bounded subgraph, no fan-out",
+   "diamond": "split -> N parallel workers with contracts -> merge in code",
+   "diamond+cycle": "diamond, then loop-until-dry until 2 consecutive empty rounds"
+  },
+  "diamond_nodes": [
+   "T2.1",
+   "T1.3",
+   "T9.1",
+   "T9.2"
+  ],
+  "parallel_workers_total": 38,
+  "verifier_runs_total": 44,
+  "verifier_note": "Every node now gets at least a spec skeptic. Fan-out is native, so breadth is affordable; the -70% finding constrains implementation, not verification.",
+  "isolation": {
+   "decision": "NO git worktrees.",
+   "reason": "A collision means the node contract was drawn wrong. Every worker now owns a disjoint set of paths plus its own manifest; the merge is plain code that assembles the shared files. There is nothing left to collide.",
+   "roadmap_alignment": "Step 3: bounded input, bounded output, exactly one job. Step 4: the reduce is plain code and edges are free. Step 10 says worktrees are the seatbelt for the one topology that needs it, not a default tax.",
+   "cost_avoided": "14 full Android checkouts for T1.3, and one merge becoming fourteen.",
+   "when_worktrees_WOULD_be_right": "If a future diamond's workers must each modify the SAME existing file - a cross-cutting refactor, a rename across call sites. We have no such node. If one is ever added, isolate it; do not widen the contracts to fit.",
+   "workers_never_commit": "Only the parent commits, once, after the merge. Avoids git index contention entirely.",
+   "guard": "python3 scripts/fanout_check.py <node> - asserts no worker wrote outside its owned paths and no two workers claimed the same path."
+  }
+ },
+ "always_read": {
+  "files": [
+   "README.md",
+   "docs/spec/SPEC_README.md",
+   "docs/FEATURES.md",
+   "docs/SCOPE.md"
+  ],
+  "rule": "Re-read these at the START of EVERY node, in addition to the node's `reads` array. The DROP step discards node context, which would otherwise drop the contract itself. These four are small and they are what stop scope drift across a long run."
+ }
+}

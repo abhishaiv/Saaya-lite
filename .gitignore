@@ -1,0 +1,23 @@
+# Secrets and machine-local (none exist yet, listed defensively)
+google-services.json
+keystore.properties
+*.jks
+*.keystore
+local.properties
+.env
+.env.*
+
+# Build output
+/build/
+**/build/
+.gradle/
+*.apk
+*.aab
+
+# IDE / OS
+.idea/
+*.iml
+.DS_Store
+
+# Fan-out worker scratch (manifests are regenerated per node)
+build/fanout/

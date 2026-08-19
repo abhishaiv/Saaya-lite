@@ -1,0 +1,4592 @@
+{
+ "schema": "saaya-lite/knowledge_graph/2",
+ "built_with": "9-stage pipeline: scope, representation, ontology, entities, relations, events, quality gate, fusion, serve",
+ "note": "Project brain. Codex appends after EVERY node via scripts/kg.py. Never delete; supersede.",
+ "scope": "Everything: build knowledge, product evidence chain, and domain research context.",
+ "ontology": {
+  "classes": {
+   "Source": {
+    "attrs": [
+     "kind",
+     "year"
+    ],
+    "desc": "external evidence we did not produce"
+   },
+   "Finding": {
+    "attrs": [
+     "value",
+     "note"
+    ],
+    "desc": "a measured fact drawn from a Source"
+   },
+   "Claim": {
+    "attrs": [
+     "risk_if_false"
+    ],
+    "desc": "an assertion the submission makes"
+   },
+   "Constraint": {
+    "attrs": [
+     "frozen"
+    ],
+    "desc": "a rule that binds the build"
+   },
+   "Decision": {
+    "attrs": [
+     "by",
+     "date",
+     "rationale"
+    ],
+    "desc": "a choice made, with its reasoning"
+   },
+   "Competitor": {
+    "attrs": [
+     "verdict"
+    ],
+    "desc": "an existing service we are measured against"
+   },
+   "Persona": {
+    "attrs": [
+     "detail"
+    ],
+    "desc": "the user"
+   },
+   "BuildNode": {
+    "attrs": [
+     "risk",
+     "shape",
+     "seq"
+    ],
+    "desc": "mirror of a build_graph node, so the two graphs link without merging"
+   },
+   "Artifact": {
+    "attrs": [
+     "path",
+     "kind",
+     "node"
+    ],
+    "desc": "something the build produced"
+   },
+   "Failure": {
+    "attrs": [
+     "node",
+     "gate"
+    ],
+    "desc": "a gate or verifier rejection, kept even after it was fixed"
+   },
+   "Deviation": {
+    "attrs": [
+     "node",
+     "spec_ref"
+    ],
+    "desc": "where implementation diverged from spec, and why"
+   },
+   "Question": {
+    "attrs": [
+     "status"
+    ],
+    "desc": "something blocked, superseded when answered"
+   },
+   "Anchor": {
+    "attrs": [
+     "node",
+     "taken_by"
+    ],
+    "desc": "a measurement from OUTSIDE the graph; the only thing that verifies a claim"
+   },
+   "Verification": {
+    "attrs": [
+     "node",
+     "lens",
+     "verdict"
+    ],
+    "desc": "a skeptic's verdict"
+   },
+   "Document": {
+    "attrs": [
+     "path",
+     "tier",
+     "always_read"
+    ],
+    "desc": "a specification or planning document; the written form of a constraint or decision"
+   },
+   "Repository": {
+    "attrs": [
+     "url",
+     "visibility",
+     "branch"
+    ],
+    "desc": "the git remote this build is committed to"
+   }
+  },
+  "relations": {
+   "sourced_from": {
+    "domain": [
+     "Finding",
+     "Claim",
+     "Constraint",
+     "Decision"
+    ],
+    "range": [
+     "Source",
+     "Finding"
+    ]
+   },
+   "evidences": {
+    "domain": [
+     "Finding"
+    ],
+    "range": [
+     "Competitor",
+     "Claim",
+     "Persona"
+    ]
+   },
+   "about": {
+    "domain": [
+     "Claim"
+    ],
+    "range": [
+     "Persona",
+     "Competitor"
+    ]
+   },
+   "motivated_by": {
+    "domain": [
+     "Decision"
+    ],
+    "range": [
+     "Finding",
+     "Constraint",
+     "Question"
+    ]
+   },
+   "enforces": {
+    "domain": [
+     "Constraint",
+     "Decision",
+     "Artifact"
+    ],
+    "range": [
+     "Claim",
+     "Constraint"
+    ]
+   },
+   "enables": {
+    "domain": [
+     "Decision",
+     "Artifact"
+    ],
+    "range": [
+     "Claim"
+    ]
+   },
+   "respects": {
+    "domain": [
+     "Decision",
+     "Constraint",
+     "Artifact"
+    ],
+    "range": [
+     "Constraint"
+    ]
+   },
+   "produced_by": {
+    "domain": [
+     "Artifact"
+    ],
+    "range": [
+     "BuildNode"
+    ]
+   },
+   "verified_by": {
+    "domain": [
+     "Claim",
+     "Artifact",
+     "BuildNode"
+    ],
+    "range": [
+     "Anchor",
+     "Verification"
+    ]
+   },
+   "caused_by": {
+    "domain": [
+     "Failure"
+    ],
+    "range": [
+     "*"
+    ]
+   },
+   "supersedes": {
+    "domain": [
+     "*"
+    ],
+    "range": [
+     "*"
+    ]
+   },
+   "contradicts": {
+    "domain": [
+     "*"
+    ],
+    "range": [
+     "*"
+    ]
+   },
+   "depends_on": {
+    "domain": [
+     "Artifact",
+     "BuildNode"
+    ],
+    "range": [
+     "Artifact",
+     "BuildNode"
+    ]
+   },
+   "governs": {
+    "domain": [
+     "Constraint",
+     "Document"
+    ],
+    "range": [
+     "BuildNode",
+     "Artifact"
+    ]
+   },
+   "read_by": {
+    "domain": [
+     "Document"
+    ],
+    "range": [
+     "BuildNode"
+    ]
+   },
+   "specifies": {
+    "domain": [
+     "Document"
+    ],
+    "range": [
+     "Claim",
+     "Constraint",
+     "Decision",
+     "Artifact"
+    ]
+   },
+   "written_at": {
+    "domain": [
+     "Document"
+    ],
+    "range": [
+     "BuildNode"
+    ]
+   },
+   "hosted_in": {
+    "domain": [
+     "Artifact",
+     "Document"
+    ],
+    "range": [
+     "Repository"
+    ]
+   }
+  },
+  "rules": [
+   "An edge is invalid unless its endpoints match the relation's domain and range.",
+   "Every edge carries `at` and `by`. A bare connection is not a fact.",
+   "Nothing is ever deleted. Supersede it, so the history stays auditable.",
+   "Only an Anchor or a Verification may verify a Claim. Self-assertion is not verification."
+  ]
+ },
+ "event_types": [
+  "node_started",
+  "node_completed",
+  "gate_failed",
+  "verifier_killed",
+  "verifier_passed",
+  "anchor_taken",
+  "decision_made",
+  "blocked",
+  "unblocked",
+  "spec_amended",
+  "fusion_merge"
+ ],
+ "counts": {
+  "entities": 141,
+  "edges": 405,
+  "events": 1
+ },
+ "entities": [
+  {
+   "id": "src.cag2025",
+   "label": "CAG Report No. 7 of 2025, Compliance Audit",
+   "kind": "government_audit",
+   "year": 2025,
+   "class": "Source"
+  },
+  {
+   "id": "src.nfhs5",
+   "label": "NFHS-5 (2019-21)",
+   "kind": "government_survey",
+   "class": "Source"
+  },
+  {
+   "id": "src.borker",
+   "label": "Borker, Safety First, World Bank / Harvard",
+   "kind": "academic",
+   "class": "Source"
+  },
+  {
+   "id": "src.dgp_ap",
+   "label": "DGP Andhra Pradesh, published figures May 2025",
+   "kind": "government_statement",
+   "class": "Source"
+  },
+  {
+   "id": "src.acb_delhi",
+   "label": "Delhi ACB audit of bus panic buttons",
+   "kind": "government_audit",
+   "class": "Source"
+  },
+  {
+   "id": "src.ncrb2023",
+   "label": "NCRB Crime in India 2023, city tables",
+   "kind": "government_statistics",
+   "class": "Source"
+  },
+  {
+   "id": "src.cbga",
+   "label": "CBGA / parliamentary panel on Nirbhaya Fund",
+   "kind": "policy_analysis",
+   "class": "Source"
+  },
+  {
+   "id": "src.oxfam",
+   "label": "Oxfam, women's scheme budget share",
+   "kind": "ngo_research",
+   "class": "Source"
+  },
+  {
+   "id": "src.safetipin",
+   "label": "Safetipin (Shreya Basu) meeting 2026-07-30",
+   "kind": "operator_interview",
+   "class": "Source"
+  },
+  {
+   "id": "src.interviews",
+   "label": "12 solo women travellers, founder interviews",
+   "kind": "primary_research",
+   "class": "Source"
+  },
+  {
+   "id": "src.tspolice",
+   "label": "Telangana Police Women Safety Wing, T-Safe",
+   "kind": "government_service",
+   "class": "Source"
+  },
+  {
+   "id": "src.appbrain",
+   "label": "AppBrain download figures",
+   "kind": "third_party_data",
+   "class": "Source"
+  },
+  {
+   "id": "src.google_agents",
+   "label": "Google Research, science of scaling agent systems",
+   "kind": "research",
+   "class": "Source"
+  },
+  {
+   "id": "src.graph_course",
+   "label": "Graph Engineering 14-step roadmap (Codez) + agentfactory crash course",
+   "kind": "method",
+   "class": "Source"
+  },
+  {
+   "id": "f.shakthi.presses",
+   "label": "Shakthi SOS presses",
+   "value": "11,60,146",
+   "note": "",
+   "class": "Finding"
+  },
+  {
+   "id": "f.shakthi.fir",
+   "label": "Shakthi FIRs from those presses",
+   "value": "3,193 = 0.28%",
+   "note": "the number the whole submission turns on",
+   "class": "Finding"
+  },
+  {
+   "id": "f.shakthi.response",
+   "label": "Shakthi presses registered for immediate response",
+   "value": "34,192 = 2.9%",
+   "note": "",
+   "class": "Finding"
+  },
+  {
+   "id": "f.shakthi.downloads",
+   "label": "Shakthi downloads",
+   "value": "1.52 crore",
+   "note": "",
+   "class": "Finding"
+  },
+  {
+   "id": "f.tsafe.downloads",
+   "label": "T-Safe downloads in 30 days",
+   "value": "~1,300",
+   "note": "solved the mechanic, nobody uses it",
+   "class": "Finding"
+  },
+  {
+   "id": "f.tsafe.mechanic",
+   "label": "T-Safe already does check-in-and-escalate",
+   "value": "15 min fixed timer, she starts the trip",
+   "note": "",
+   "class": "Finding"
+  },
+  {
+   "id": "f.erss.vehicles",
+   "label": "ERSS response vehicles deployed vs required",
+   "value": "258 of 1,866 (86% shortfall)",
+   "note": "",
+   "class": "Finding"
+  },
+  {
+   "id": "f.erss.181",
+   "label": "Women's Helpline 181 integration into 112",
+   "value": "not integrated",
+   "note": "",
+   "class": "Finding"
+  },
+  {
+   "id": "f.acb.buttons",
+   "label": "Delhi buses with a working panic button",
+   "value": "0 of 14 tested",
+   "note": "",
+   "class": "Finding"
+  },
+  {
+   "id": "f.nfhs.help",
+   "label": "Women facing IPV who sought any help",
+   "value": "14.2%",
+   "note": "",
+   "class": "Finding"
+  },
+  {
+   "id": "f.nfhs.police",
+   "label": "Women who sought help from police",
+   "value": "~7%",
+   "note": "",
+   "class": "Finding"
+  },
+  {
+   "id": "f.borker.harass",
+   "label": "Delhi women students harassed while travelling",
+   "value": "89%",
+   "note": "",
+   "class": "Finding"
+  },
+  {
+   "id": "f.borker.pay",
+   "label": "Extra per year women pay for a 1SD safer route",
+   "value": "Rs 18,800",
+   "note": "",
+   "class": "Finding"
+  },
+  {
+   "id": "f.nirbhaya.util",
+   "label": "States under 15% Nirbhaya utilisation",
+   "value": "18 of 36",
+   "note": "",
+   "class": "Finding"
+  },
+  {
+   "id": "f.category.death",
+   "label": "Women's safety apps launched post-2013 vs surviving",
+   "value": "~115 launched, ~4 survive",
+   "note": "",
+   "class": "Finding"
+  },
+  {
+   "id": "f.nobody.presses",
+   "label": "Solo women travellers with a safety app who had ever pressed SOS",
+   "value": "0 of 12",
+   "note": "the entire product thesis",
+   "class": "Finding"
+  },
+  {
+   "id": "f.agents.sequential",
+   "label": "Multi-agent on sequential reasoning tasks",
+   "value": "-70% performance",
+   "note": "why we do NOT fan out implementation",
+   "class": "Finding"
+  },
+  {
+   "id": "f.agents.parallel",
+   "label": "Multi-agent on parallelisable tasks",
+   "value": "+81% with centralised coordination",
+   "note": "",
+   "class": "Finding"
+  },
+  {
+   "id": "f.agents.errors",
+   "label": "Error amplification, independent vs orchestrated",
+   "value": "17.2x vs 4.3x",
+   "note": "why verification is the thing worth parallelising",
+   "class": "Finding"
+  },
+  {
+   "id": "comp.shakthi",
+   "label": "Shakthi, AP Police",
+   "verdict": "everybody installs it, nothing happens",
+   "class": "Competitor"
+  },
+  {
+   "id": "comp.tsafe",
+   "label": "T-Safe, Telangana Police",
+   "verdict": "solved the mechanic, nobody uses it",
+   "class": "Competitor"
+  },
+  {
+   "id": "comp.erss",
+   "label": "112 / ERSS",
+   "verdict": "under-resourced, and only accepts completed crimes",
+   "class": "Competitor"
+  },
+  {
+   "id": "persona.meera",
+   "label": "Meera, 22, Visakhapatnam",
+   "detail": "~240 solo journeys a year, has never pressed an SOS button",
+   "class": "Persona"
+  },
+  {
+   "id": "claim.gap",
+   "label": "India's emergency intake accepts exactly one event type: a crime that already happened",
+   "class": "Claim"
+  },
+  {
+   "id": "claim.no_press",
+   "label": "She never presses anything, and what reaches the state is legible anyway",
+   "class": "Claim"
+  },
+  {
+   "id": "claim.context",
+   "label": "The signal carries context by construction, not by classification",
+   "class": "Claim"
+  },
+  {
+   "id": "claim.boundary",
+   "label": "Nothing identifying leaves the device before SOS",
+   "class": "Claim"
+  },
+  {
+   "id": "claim.noai",
+   "label": "There is no AI or model in the product; every decision is a stated rule",
+   "class": "Claim"
+  },
+  {
+   "id": "claim.nokeys",
+   "label": "No third-party API key, no billing account, nothing that can fail on submission day",
+   "class": "Claim"
+  },
+  {
+   "id": "con.noai",
+   "label": "No AI, ML or model calls anywhere in the product",
+   "frozen": true,
+   "class": "Constraint"
+  },
+  {
+   "id": "con.boundary",
+   "label": "Trust boundary at SOS: nothing identifying leaves the device before it",
+   "frozen": true,
+   "class": "Constraint"
+  },
+  {
+   "id": "con.suszone",
+   "label": "A SUS record snaps to its zone and carries no session id",
+   "frozen": true,
+   "class": "Constraint"
+  },
+  {
+   "id": "con.favourites",
+   "label": "Favourites never leave the device",
+   "frozen": true,
+   "class": "Constraint"
+  },
+  {
+   "id": "con.notracking",
+   "label": "No live location sharing exists, it is absent not disabled",
+   "frozen": true,
+   "class": "Constraint"
+  },
+  {
+   "id": "con.mocklabel",
+   "label": "Every mock is labelled in the UI, not only the write-up",
+   "frozen": true,
+   "class": "Constraint"
+  },
+  {
+   "id": "con.noanim",
+   "label": "The escalation accent never animates; SOS appears instantly",
+   "frozen": true,
+   "class": "Constraint"
+  },
+  {
+   "id": "con.nogovt",
+   "label": "No government branding or implied endorsement",
+   "frozen": true,
+   "class": "Constraint"
+  },
+  {
+   "id": "con.synthetic",
+   "label": "All data synthetic; no Aadhaar, PAN, OTP, payment or health data",
+   "frozen": true,
+   "class": "Constraint"
+  },
+  {
+   "id": "con.nodeps",
+   "label": "No dependency outside ARCHITECTURE.md and the version catalog",
+   "frozen": true,
+   "class": "Constraint"
+  },
+  {
+   "id": "con.noprod",
+   "label": "Never touch the Saaya production Firebase project",
+   "frozen": true,
+   "class": "Constraint"
+  },
+  {
+   "id": "con.nodata",
+   "label": "Never regenerate the audited Vizag dataset",
+   "frozen": true,
+   "class": "Constraint"
+  },
+  {
+   "id": "con.favourites_word",
+   "label": "They are called favourites, never contacts",
+   "frozen": true,
+   "class": "Constraint"
+  },
+  {
+   "id": "con.iosverbatim",
+   "label": "Strings marked iOS verbatim are copied character for character",
+   "frozen": true,
+   "class": "Constraint"
+  },
+  {
+   "id": "d.android",
+   "label": "Native Android, Kotlin + Compose",
+   "rationale": "founder call; the iOS product already exists",
+   "by": "founder",
+   "date": "2026-08-18",
+   "class": "Decision"
+  },
+  {
+   "id": "d.problem",
+   "label": "Anchor on Shakthi and T-Safe as the public digital services being replaced",
+   "rationale": "they are real government services that fail in opposite directions",
+   "by": "founder",
+   "date": "2026-08-18",
+   "class": "Decision"
+  },
+  {
+   "id": "d.noai",
+   "label": "Cut the AI engine and the labelling entirely",
+   "rationale": "escalation-based only; no API key needed",
+   "by": "founder",
+   "date": "2026-08-18",
+   "class": "Decision"
+  },
+  {
+   "id": "d.map_in",
+   "label": "Keep the map, cut the live unsafe-roads display",
+   "rationale": "without the map there is no reason to open the app on an ordinary day",
+   "by": "founder",
+   "date": "2026-08-18",
+   "class": "Decision"
+  },
+  {
+   "id": "d.ladder",
+   "label": "Four-step ladder: Shadow, SUS, family, SOS",
+   "rationale": "the trust boundary becomes a visible step she can see",
+   "by": "founder",
+   "date": "2026-08-18",
+   "class": "Decision"
+  },
+  {
+   "id": "d.state_sees",
+   "label": "State sees SOS in full and SUS anonymised; no density layer",
+   "rationale": "H3 and HyperLogLog are unnecessary complication at this size",
+   "by": "founder",
+   "date": "2026-08-18",
+   "class": "Decision"
+  },
+  {
+   "id": "d.pin",
+   "label": "SOS is always PIN-protected, PIN set during onboarding",
+   "rationale": "someone may be holding her phone",
+   "by": "founder",
+   "date": "2026-08-18",
+   "class": "Decision"
+  },
+  {
+   "id": "d.aesthetic",
+   "label": "Warm and human aesthetic",
+   "rationale": "it should feel like something a person made for another person",
+   "by": "founder",
+   "date": "2026-08-18",
+   "class": "Decision"
+  },
+  {
+   "id": "d.poppins",
+   "label": "Poppins, confirmed from the deck's embedded fonts",
+   "rationale": "brand continuity with Saaya",
+   "by": "founder",
+   "date": "2026-08-18",
+   "class": "Decision"
+  },
+  {
+   "id": "d.osmdroid",
+   "label": "osmdroid with CARTO Dark Matter over Google Maps",
+   "rationale": "no key, no billing, no quota that can fail on submission day",
+   "by": "founder",
+   "date": "2026-08-18",
+   "class": "Decision"
+  },
+  {
+   "id": "d.posture",
+   "label": "Prototype posture: do not build for production",
+   "rationale": "nine evenings; strip anything that only pays off after launch",
+   "by": "founder",
+   "date": "2026-08-18",
+   "class": "Decision"
+  },
+  {
+   "id": "d.graph",
+   "label": "Adopt graph engineering",
+   "rationale": "the agent forgets, the graph does not",
+   "by": "founder",
+   "date": "2026-08-18",
+   "class": "Decision"
+  },
+  {
+   "id": "d.sequential",
+   "label": "One continuous sequential run, no parallel implementation",
+   "rationale": "matches the -70% finding on sequential reasoning tasks",
+   "by": "founder",
+   "date": "2026-08-18",
+   "class": "Decision"
+  },
+  {
+   "id": "d.verifier",
+   "label": "Add fresh-context verifier diamonds, tiered by risk",
+   "rationale": "verification is the one genuinely parallelisable part, and it is what stops error propagation",
+   "by": "founder",
+   "date": "2026-08-18",
+   "class": "Decision"
+  },
+  {
+   "id": "d.kg",
+   "label": "Knowledge graph updated after every node",
+   "rationale": "a long run must query, not re-read transcripts",
+   "by": "founder",
+   "date": "2026-08-18",
+   "class": "Decision"
+  },
+  {
+   "id": "guard.nobutton",
+   "label": "Nobody presses a panic button, including a decade-long operator",
+   "frozen": true,
+   "class": "Constraint"
+  },
+  {
+   "id": "guard.noreport",
+   "label": "Nobody does a safety audit while feeling unsafe",
+   "frozen": true,
+   "class": "Constraint"
+  },
+  {
+   "id": "guard.tracking",
+   "label": "Live tracking becomes control in the Indian family context; Safetipin built it and removed it",
+   "frozen": true,
+   "class": "Constraint"
+  },
+  {
+   "id": "guard.policedata",
+   "label": "Police data is politically unreliable at scale",
+   "frozen": true,
+   "class": "Constraint"
+  },
+  {
+   "id": "guard.money",
+   "label": "Assume user, business, police and government money are all closed by default",
+   "frozen": true,
+   "class": "Constraint"
+  },
+  {
+   "id": "node.T1.1",
+   "class": "BuildNode",
+   "label": "Scaffold, theme, manifest privacy flags",
+   "risk": "low",
+   "shape": "serial",
+   "seq": 1
+  },
+  {
+   "id": "node.T2.1",
+   "class": "BuildNode",
+   "label": "Zone parsing to typed Zone/ZoneCard/PoliceStation",
+   "risk": "low",
+   "shape": "diamond",
+   "seq": 2
+  },
+  {
+   "id": "node.T4.1",
+   "class": "BuildNode",
+   "label": "Session engine, pure JVM, no Android imports",
+   "risk": "HIGH",
+   "shape": "serial",
+   "seq": 3
+  },
+  {
+   "id": "node.T4.2",
+   "class": "BuildNode",
+   "label": "Foreground service, geofencing, alarms, recovery",
+   "risk": "HIGHEST",
+   "shape": "serial",
+   "seq": 4
+  },
+  {
+   "id": "node.T1.2",
+   "class": "BuildNode",
+   "label": "Firebase wiring, anonymous auth",
+   "risk": "low",
+   "shape": "serial",
+   "seq": 5
+  },
+  {
+   "id": "node.T8.1",
+   "class": "BuildNode",
+   "label": "Seed zones to Firestore",
+   "risk": "low",
+   "shape": "serial",
+   "seq": 6
+  },
+  {
+   "id": "node.T8.2",
+   "class": "BuildNode",
+   "label": "Console: the live demo link",
+   "risk": "HIGH",
+   "shape": "serial",
+   "seq": 7
+  },
+  {
+   "id": "node.T1.3",
+   "class": "BuildNode",
+   "label": "Component library C1 to C14",
+   "risk": "med",
+   "shape": "diamond",
+   "seq": 8
+  },
+  {
+   "id": "node.T2.2",
+   "class": "BuildNode",
+   "label": "Map screen, zones, her dot, offline",
+   "risk": "med",
+   "shape": "serial",
+   "seq": 9
+  },
+  {
+   "id": "node.T4.3",
+   "class": "BuildNode",
+   "label": "Home session states, arm banner, demo panel",
+   "risk": "med",
+   "shape": "serial",
+   "seq": 10
+  },
+  {
+   "id": "node.T3.1",
+   "class": "BuildNode",
+   "label": "Zone detail sheet, nearest station",
+   "risk": "low",
+   "shape": "serial",
+   "seq": 11
+  },
+  {
+   "id": "node.T3.2",
+   "class": "BuildNode",
+   "label": "Onboarding, permissions, favourites, PIN",
+   "risk": "med",
+   "shape": "serial",
+   "seq": 12
+  },
+  {
+   "id": "node.T5.1",
+   "class": "BuildNode",
+   "label": "Check-in 1 and 2, notifications, lock screen",
+   "risk": "HIGH",
+   "shape": "serial",
+   "seq": 13
+  },
+  {
+   "id": "node.T6.1",
+   "class": "BuildNode",
+   "label": "Family escalation composer and screen",
+   "risk": "med",
+   "shape": "serial",
+   "seq": 14
+  },
+  {
+   "id": "node.T6.2",
+   "class": "BuildNode",
+   "label": "Offline queue with backoff",
+   "risk": "med",
+   "shape": "serial",
+   "seq": 15
+  },
+  {
+   "id": "node.T7.1",
+   "class": "BuildNode",
+   "label": "SOS screen and PIN entry",
+   "risk": "HIGH",
+   "shape": "serial",
+   "seq": 16
+  },
+  {
+   "id": "node.T7.2",
+   "class": "BuildNode",
+   "label": "Anonymiser and the two Firestore writers",
+   "risk": "HIGHEST",
+   "shape": "serial",
+   "seq": 17
+  },
+  {
+   "id": "node.T7.3",
+   "class": "BuildNode",
+   "label": "What the police see, in app",
+   "risk": "low",
+   "shape": "serial",
+   "seq": 18
+  },
+  {
+   "id": "node.T8.3",
+   "class": "BuildNode",
+   "label": "Console live journey trigger",
+   "risk": "med",
+   "shape": "serial",
+   "seq": 19
+  },
+  {
+   "id": "node.T9.0",
+   "class": "BuildNode",
+   "label": "Landing page with APK and video",
+   "risk": "low",
+   "shape": "serial",
+   "seq": 20
+  },
+  {
+   "id": "node.T9.1",
+   "class": "BuildNode",
+   "label": "Localisation, low-end, font scale, a11y",
+   "risk": "med",
+   "shape": "diamond",
+   "seq": 21
+  },
+  {
+   "id": "node.T9.2",
+   "class": "BuildNode",
+   "label": "Verification sweep V1 to V8",
+   "risk": "HIGH",
+   "shape": "diamond+cycle",
+   "seq": 22
+  },
+  {
+   "id": "f.oxfam.budget",
+   "class": "Finding",
+   "label": "Direct-benefit women's schemes as share of union budget 2020-21",
+   "value": "under 0.07%",
+   "note": "the funding context behind the Nirbhaya underspend"
+  },
+  {
+   "id": "f.dataset",
+   "class": "Finding",
+   "label": "Vizag zone dataset calibration",
+   "value": "24 zones, 5,746 total / 997 CAW, NCRB 2023 calibrated",
+   "note": "aggregate counts per police jurisdiction; no victim, accused, address or FIR number"
+  },
+  {
+   "id": "doc.build-state",
+   "class": "Document",
+   "label": "BUILD_STATE.md",
+   "path": "BUILD_STATE.md",
+   "tier": "0",
+   "always_read": "False"
+  },
+  {
+   "id": "doc.codex-prompt",
+   "class": "Document",
+   "label": "CODEX_PROMPT.md",
+   "path": "CODEX_PROMPT.md",
+   "tier": "0",
+   "always_read": "False"
+  },
+  {
+   "id": "doc.readme",
+   "class": "Document",
+   "label": "README.md",
+   "path": "README.md",
+   "tier": "0",
+   "always_read": "True"
+  },
+  {
+   "id": "doc.build-plan",
+   "class": "Document",
+   "label": "BUILD_PLAN.md",
+   "path": "docs/BUILD_PLAN.md",
+   "tier": "1",
+   "always_read": "False"
+  },
+  {
+   "id": "doc.compliance",
+   "class": "Document",
+   "label": "COMPLIANCE.md",
+   "path": "docs/COMPLIANCE.md",
+   "tier": "5",
+   "always_read": "False"
+  },
+  {
+   "id": "doc.evidence",
+   "class": "Document",
+   "label": "EVIDENCE.md",
+   "path": "docs/EVIDENCE.md",
+   "tier": "5",
+   "always_read": "False"
+  },
+  {
+   "id": "doc.features",
+   "class": "Document",
+   "label": "FEATURES.md",
+   "path": "docs/FEATURES.md",
+   "tier": "1",
+   "always_read": "True"
+  },
+  {
+   "id": "doc.operating-model",
+   "class": "Document",
+   "label": "OPERATING_MODEL.md",
+   "path": "docs/OPERATING_MODEL.md",
+   "tier": "5",
+   "always_read": "False"
+  },
+  {
+   "id": "doc.problem",
+   "class": "Document",
+   "label": "PROBLEM.md",
+   "path": "docs/PROBLEM.md",
+   "tier": "5",
+   "always_read": "False"
+  },
+  {
+   "id": "doc.scope",
+   "class": "Document",
+   "label": "SCOPE.md",
+   "path": "docs/SCOPE.md",
+   "tier": "1",
+   "always_read": "True"
+  },
+  {
+   "id": "doc.accessibility-spec",
+   "class": "Document",
+   "label": "ACCESSIBILITY_SPEC.md",
+   "path": "docs/spec/ACCESSIBILITY_SPEC.md",
+   "tier": "2",
+   "always_read": "False"
+  },
+  {
+   "id": "doc.android-platform",
+   "class": "Document",
+   "label": "ANDROID_PLATFORM.md",
+   "path": "docs/spec/ANDROID_PLATFORM.md",
+   "tier": "2",
+   "always_read": "False"
+  },
+  {
+   "id": "doc.architecture",
+   "class": "Document",
+   "label": "ARCHITECTURE.md",
+   "path": "docs/spec/ARCHITECTURE.md",
+   "tier": "2",
+   "always_read": "False"
+  },
+  {
+   "id": "doc.build-config",
+   "class": "Document",
+   "label": "BUILD_CONFIG.md",
+   "path": "docs/spec/BUILD_CONFIG.md",
+   "tier": "2",
+   "always_read": "False"
+  },
+  {
+   "id": "doc.business-rules",
+   "class": "Document",
+   "label": "BUSINESS_RULES.md",
+   "path": "docs/spec/BUSINESS_RULES.md",
+   "tier": "2",
+   "always_read": "False"
+  },
+  {
+   "id": "doc.codex-log",
+   "class": "Document",
+   "label": "CODEX_LOG.md",
+   "path": "docs/spec/CODEX_LOG.md",
+   "tier": "0",
+   "always_read": "False"
+  },
+  {
+   "id": "doc.codex-tasks",
+   "class": "Document",
+   "label": "CODEX_TASKS.md",
+   "path": "docs/spec/CODEX_TASKS.md",
+   "tier": "0",
+   "always_read": "False"
+  },
+  {
+   "id": "doc.component-library",
+   "class": "Document",
+   "label": "COMPONENT_LIBRARY.md",
+   "path": "docs/spec/COMPONENT_LIBRARY.md",
+   "tier": "2",
+   "always_read": "False"
+  },
+  {
+   "id": "doc.console-spec",
+   "class": "Document",
+   "label": "CONSOLE_SPEC.md",
+   "path": "docs/spec/CONSOLE_SPEC.md",
+   "tier": "2",
+   "always_read": "False"
+  },
+  {
+   "id": "doc.copy",
+   "class": "Document",
+   "label": "COPY.md",
+   "path": "docs/spec/COPY.md",
+   "tier": "2",
+   "always_read": "False"
+  },
+  {
+   "id": "doc.data-model",
+   "class": "Document",
+   "label": "DATA_MODEL.md",
+   "path": "docs/spec/DATA_MODEL.md",
+   "tier": "2",
+   "always_read": "False"
+  },
+  {
+   "id": "doc.demo-script",
+   "class": "Document",
+   "label": "DEMO_SCRIPT.md",
+   "path": "docs/spec/DEMO_SCRIPT.md",
+   "tier": "2",
+   "always_read": "False"
+  },
+  {
+   "id": "doc.design-system",
+   "class": "Document",
+   "label": "DESIGN_SYSTEM.md",
+   "path": "docs/spec/DESIGN_SYSTEM.md",
+   "tier": "2",
+   "always_read": "False"
+  },
+  {
+   "id": "doc.graph-engineering",
+   "class": "Document",
+   "label": "GRAPH_ENGINEERING.md",
+   "path": "docs/spec/GRAPH_ENGINEERING.md",
+   "tier": "2",
+   "always_read": "False"
+  },
+  {
+   "id": "doc.iconography",
+   "class": "Document",
+   "label": "ICONOGRAPHY.md",
+   "path": "docs/spec/ICONOGRAPHY.md",
+   "tier": "2",
+   "always_read": "False"
+  },
+  {
+   "id": "doc.interaction-spec",
+   "class": "Document",
+   "label": "INTERACTION_SPEC.md",
+   "path": "docs/spec/INTERACTION_SPEC.md",
+   "tier": "2",
+   "always_read": "False"
+  },
+  {
+   "id": "doc.map-spec",
+   "class": "Document",
+   "label": "MAP_SPEC.md",
+   "path": "docs/spec/MAP_SPEC.md",
+   "tier": "2",
+   "always_read": "False"
+  },
+  {
+   "id": "doc.motion-spec",
+   "class": "Document",
+   "label": "MOTION_SPEC.md",
+   "path": "docs/spec/MOTION_SPEC.md",
+   "tier": "2",
+   "always_read": "False"
+  },
+  {
+   "id": "doc.responsive-spec",
+   "class": "Document",
+   "label": "RESPONSIVE_SPEC.md",
+   "path": "docs/spec/RESPONSIVE_SPEC.md",
+   "tier": "2",
+   "always_read": "False"
+  },
+  {
+   "id": "doc.screens",
+   "class": "Document",
+   "label": "SCREENS.md",
+   "path": "docs/spec/SCREENS.md",
+   "tier": "2",
+   "always_read": "False"
+  },
+  {
+   "id": "doc.secrets-and-access",
+   "class": "Document",
+   "label": "SECRETS_AND_ACCESS.md",
+   "path": "docs/spec/SECRETS_AND_ACCESS.md",
+   "tier": "2",
+   "always_read": "False"
+  },
+  {
+   "id": "doc.setup",
+   "class": "Document",
+   "label": "SETUP.md",
+   "path": "docs/spec/SETUP.md",
+   "tier": "2",
+   "always_read": "False"
+  },
+  {
+   "id": "doc.spec-readme",
+   "class": "Document",
+   "label": "SPEC_README.md",
+   "path": "docs/spec/SPEC_README.md",
+   "tier": "0",
+   "always_read": "True"
+  },
+  {
+   "id": "doc.states-catalogue",
+   "class": "Document",
+   "label": "STATES_CATALOGUE.md",
+   "path": "docs/spec/STATES_CATALOGUE.md",
+   "tier": "2",
+   "always_read": "False"
+  },
+  {
+   "id": "doc.state-machine",
+   "class": "Document",
+   "label": "STATE_MACHINE.md",
+   "path": "docs/spec/STATE_MACHINE.md",
+   "tier": "2",
+   "always_read": "False"
+  },
+  {
+   "id": "doc.submission",
+   "class": "Document",
+   "label": "SUBMISSION.md",
+   "path": "docs/spec/SUBMISSION.md",
+   "tier": "2",
+   "always_read": "False"
+  },
+  {
+   "id": "doc.test-plan",
+   "class": "Document",
+   "label": "TEST_PLAN.md",
+   "path": "docs/spec/TEST_PLAN.md",
+   "tier": "2",
+   "always_read": "False"
+  },
+  {
+   "id": "doc.progress",
+   "class": "Document",
+   "label": "progress.md",
+   "path": "progress.md",
+   "tier": "9",
+   "always_read": "False"
+  },
+  {
+   "id": "repo.saaya-lite",
+   "class": "Repository",
+   "label": "abhishaiv/Saaya-lite",
+   "url": "https://github.com/abhishaiv/Saaya-lite",
+   "visibility": "public",
+   "branch": "main"
+  },
+  {
+   "id": "d.repo",
+   "class": "Decision",
+   "label": "Use a public GitHub repo for the build",
+   "by": "founder",
+   "date": "2026-08-19",
+   "rationale": "the hackathon accepts a source repo as a submission artifact, and a public planning trail supports the Codex-contribution claim and the honesty criterion"
+  }
+ ],
+ "edges": [
+  {
+   "from": "f.shakthi.presses",
+   "rel": "sourced_from",
+   "to": "src.dgp_ap",
+   "at": "2026-08-18",
+   "by": "founder+claude",
+   "confidence": "high"
+  },
+  {
+   "from": "f.shakthi.fir",
+   "rel": "sourced_from",
+   "to": "src.dgp_ap",
+   "at": "2026-08-18",
+   "by": "founder+claude",
+   "confidence": "high"
+  },
+  {
+   "from": "f.shakthi.response",
+   "rel": "sourced_from",
+   "to": "src.dgp_ap",
+   "at": "2026-08-18",
+   "by": "founder+claude",
+   "confidence": "high"
+  },
+  {
+   "from": "f.shakthi.downloads",
+   "rel": "sourced_from",
+   "to": "src.dgp_ap",
+   "at": "2026-08-18",
+   "by": "founder+claude",
+   "confidence": "high"
+  },
+  {
+   "from": "f.tsafe.downloads",
+   "rel": "sourced_from",
+   "to": "src.appbrain",
+   "at": "2026-08-18",
+   "by": "founder+claude",
+   "confidence": "high"
+  },
+  {
+   "from": "f.tsafe.mechanic",
+   "rel": "sourced_from",
+   "to": "src.tspolice",
+   "at": "2026-08-18",
+   "by": "founder+claude",
+   "confidence": "high"
+  },
+  {
+   "from": "f.erss.vehicles",
+   "rel": "sourced_from",
+   "to": "src.cag2025",
+   "at": "2026-08-18",
+   "by": "founder+claude",
+   "confidence": "high"
+  },
+  {
+   "from": "f.erss.181",
+   "rel": "sourced_from",
+   "to": "src.cag2025",
+   "at": "2026-08-18",
+   "by": "founder+claude",
+   "confidence": "high"
+  },
+  {
+   "from": "f.acb.buttons",
+   "rel": "sourced_from",
+   "to": "src.acb_delhi",
+   "at": "2026-08-18",
+   "by": "founder+claude",
+   "confidence": "high"
+  },
+  {
+   "from": "f.nfhs.help",
+   "rel": "sourced_from",
+   "to": "src.nfhs5",
+   "at": "2026-08-18",
+   "by": "founder+claude",
+   "confidence": "high"
+  },
+  {
+   "from": "f.nfhs.police",
+   "rel": "sourced_from",
+   "to": "src.nfhs5",
+   "at": "2026-08-18",
+   "by": "founder+claude",
+   "confidence": "high"
+  },
+  {
+   "from": "f.borker.harass",
+   "rel": "sourced_from",
+   "to": "src.borker",
+   "at": "2026-08-18",
+   "by": "founder+claude",
+   "confidence": "high"
+  },
+  {
+   "from": "f.borker.pay",
+   "rel": "sourced_from",
+   "to": "src.borker",
+   "at": "2026-08-18",
+   "by": "founder+claude",
+   "confidence": "high"
+  },
+  {
+   "from": "f.nirbhaya.util",
+   "rel": "sourced_from",
+   "to": "src.cbga",
+   "at": "2026-08-18",
+   "by": "founder+claude",
+   "confidence": "high"
+  },
+  {
+   "from": "f.category.death",
+   "rel": "sourced_from",
+   "to": "src.safetipin",
+   "at": "2026-08-18",
+   "by": "founder+claude",
+   "confidence": "high"
+  },
+  {
+   "from": "f.nobody.presses",
+   "rel": "sourced_from",
+   "to": "src.interviews",
+   "at": "2026-08-18",
+   "by": "founder+claude",
+   "confidence": "high"
+  },
+  {
+   "from": "f.agents.sequential",
+   "rel": "sourced_from",
+   "to": "src.google_agents",
+   "at": "2026-08-18",
+   "by": "founder+claude",
+   "confidence": "high"
+  },
+  {
+   "from": "f.agents.parallel",
+   "rel": "sourced_from",
+   "to": "src.google_agents",
+   "at": "2026-08-18",
+   "by": "founder+claude",
+   "confidence": "high"
+  },
+  {
+   "from": "f.agents.errors",
+   "rel": "sourced_from",
+   "to": "src.google_agents",
+   "at": "2026-08-18",
+   "by": "founder+claude",
+   "confidence": "high"
+  },
+  {
+   "from": "f.shakthi.fir",
+   "rel": "evidences",
+   "to": "comp.shakthi",
+   "at": "2026-08-18",
+   "by": "founder+claude",
+   "confidence": "high"
+  },
+  {
+   "from": "f.shakthi.presses",
+   "rel": "evidences",
+   "to": "comp.shakthi",
+   "at": "2026-08-18",
+   "by": "founder+claude",
+   "confidence": "high"
+  },
+  {
+   "from": "f.tsafe.downloads",
+   "rel": "evidences",
+   "to": "comp.tsafe",
+   "at": "2026-08-18",
+   "by": "founder+claude",
+   "confidence": "high"
+  },
+  {
+   "from": "f.tsafe.mechanic",
+   "rel": "evidences",
+   "to": "comp.tsafe",
+   "at": "2026-08-18",
+   "by": "founder+claude",
+   "confidence": "high"
+  },
+  {
+   "from": "f.erss.vehicles",
+   "rel": "evidences",
+   "to": "comp.erss",
+   "at": "2026-08-18",
+   "by": "founder+claude",
+   "confidence": "high"
+  },
+  {
+   "from": "f.erss.181",
+   "rel": "evidences",
+   "to": "comp.erss",
+   "at": "2026-08-18",
+   "by": "founder+claude",
+   "confidence": "high"
+  },
+  {
+   "from": "claim.gap",
+   "rel": "about",
+   "to": "persona.meera",
+   "at": "2026-08-18",
+   "by": "founder+claude",
+   "confidence": "high"
+  },
+  {
+   "from": "claim.no_press",
+   "rel": "about",
+   "to": "persona.meera",
+   "at": "2026-08-18",
+   "by": "founder+claude",
+   "confidence": "high"
+  },
+  {
+   "from": "claim.context",
+   "rel": "about",
+   "to": "persona.meera",
+   "at": "2026-08-18",
+   "by": "founder+claude",
+   "confidence": "high"
+  },
+  {
+   "from": "claim.gap",
+   "rel": "sourced_from",
+   "to": "f.erss.181",
+   "at": "2026-08-18",
+   "by": "founder+claude",
+   "confidence": "high"
+  },
+  {
+   "from": "claim.gap",
+   "rel": "sourced_from",
+   "to": "f.shakthi.fir",
+   "at": "2026-08-18",
+   "by": "founder+claude",
+   "confidence": "high"
+  },
+  {
+   "from": "claim.no_press",
+   "rel": "sourced_from",
+   "to": "f.nobody.presses",
+   "at": "2026-08-18",
+   "by": "founder+claude",
+   "confidence": "high"
+  },
+  {
+   "from": "claim.no_press",
+   "rel": "sourced_from",
+   "to": "f.category.death",
+   "at": "2026-08-18",
+   "by": "founder+claude",
+   "confidence": "high"
+  },
+  {
+   "from": "claim.context",
+   "rel": "sourced_from",
+   "to": "f.shakthi.fir",
+   "at": "2026-08-18",
+   "by": "founder+claude",
+   "confidence": "high"
+  },
+  {
+   "from": "con.boundary",
+   "rel": "enforces",
+   "to": "claim.boundary",
+   "at": "2026-08-18",
+   "by": "founder+claude",
+   "confidence": "high"
+  },
+  {
+   "from": "con.noai",
+   "rel": "enforces",
+   "to": "claim.noai",
+   "at": "2026-08-18",
+   "by": "founder+claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.problem",
+   "rel": "motivated_by",
+   "to": "f.tsafe.downloads",
+   "at": "2026-08-18",
+   "by": "founder+claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.sequential",
+   "rel": "motivated_by",
+   "to": "f.agents.sequential",
+   "at": "2026-08-18",
+   "by": "founder+claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.verifier",
+   "rel": "motivated_by",
+   "to": "f.agents.errors",
+   "at": "2026-08-18",
+   "by": "founder+claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.noai",
+   "rel": "enforces",
+   "to": "con.noai",
+   "at": "2026-08-18",
+   "by": "founder+claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.state_sees",
+   "rel": "enforces",
+   "to": "con.boundary",
+   "at": "2026-08-18",
+   "by": "founder+claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.osmdroid",
+   "rel": "enables",
+   "to": "claim.nokeys",
+   "at": "2026-08-18",
+   "by": "founder+claude",
+   "confidence": "high"
+  },
+  {
+   "from": "guard.nobutton",
+   "rel": "sourced_from",
+   "to": "src.safetipin",
+   "at": "2026-08-18",
+   "by": "founder+claude",
+   "confidence": "high"
+  },
+  {
+   "from": "guard.noreport",
+   "rel": "sourced_from",
+   "to": "src.safetipin",
+   "at": "2026-08-18",
+   "by": "founder+claude",
+   "confidence": "high"
+  },
+  {
+   "from": "guard.tracking",
+   "rel": "sourced_from",
+   "to": "src.safetipin",
+   "at": "2026-08-18",
+   "by": "founder+claude",
+   "confidence": "high"
+  },
+  {
+   "from": "guard.policedata",
+   "rel": "sourced_from",
+   "to": "src.safetipin",
+   "at": "2026-08-18",
+   "by": "founder+claude",
+   "confidence": "high"
+  },
+  {
+   "from": "guard.money",
+   "rel": "sourced_from",
+   "to": "src.safetipin",
+   "at": "2026-08-18",
+   "by": "founder+claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.ladder",
+   "rel": "respects",
+   "to": "guard.nobutton",
+   "at": "2026-08-18",
+   "by": "founder+claude",
+   "confidence": "high"
+  },
+  {
+   "from": "con.notracking",
+   "rel": "respects",
+   "to": "guard.tracking",
+   "at": "2026-08-18",
+   "by": "founder+claude",
+   "confidence": "high"
+  },
+  {
+   "from": "con.boundary",
+   "rel": "governs",
+   "to": "node.T7.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "con.suszone",
+   "rel": "governs",
+   "to": "node.T7.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "con.noai",
+   "rel": "governs",
+   "to": "node.T4.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "con.favourites",
+   "rel": "governs",
+   "to": "node.T3.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "con.mocklabel",
+   "rel": "governs",
+   "to": "node.T6.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "con.noanim",
+   "rel": "governs",
+   "to": "node.T5.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "con.notracking",
+   "rel": "governs",
+   "to": "node.T7.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "con.nodata",
+   "rel": "governs",
+   "to": "node.T2.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "f.oxfam.budget",
+   "rel": "sourced_from",
+   "to": "src.oxfam",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "f.oxfam.budget",
+   "rel": "evidences",
+   "to": "claim.gap",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "f.dataset",
+   "rel": "sourced_from",
+   "to": "src.ncrb2023",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "con.nodata",
+   "rel": "sourced_from",
+   "to": "src.ncrb2023",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "con.nodata",
+   "rel": "governs",
+   "to": "node.T2.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "con.nogovt",
+   "rel": "governs",
+   "to": "node.T8.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "con.synthetic",
+   "rel": "governs",
+   "to": "node.T8.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "con.nodeps",
+   "rel": "governs",
+   "to": "node.T1.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "con.noprod",
+   "rel": "governs",
+   "to": "node.T1.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "con.favourites_word",
+   "rel": "governs",
+   "to": "node.T9.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "con.iosverbatim",
+   "rel": "governs",
+   "to": "node.T5.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.graph",
+   "rel": "sourced_from",
+   "to": "src.graph_course",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.verifier",
+   "rel": "sourced_from",
+   "to": "src.graph_course",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.sequential",
+   "rel": "sourced_from",
+   "to": "src.google_agents",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.android",
+   "rel": "enables",
+   "to": "claim.no_press",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.problem",
+   "rel": "enables",
+   "to": "claim.gap",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.map_in",
+   "rel": "enables",
+   "to": "claim.no_press",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.ladder",
+   "rel": "enforces",
+   "to": "con.boundary",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.pin",
+   "rel": "enforces",
+   "to": "con.favourites",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.aesthetic",
+   "rel": "respects",
+   "to": "guard.nobutton",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.poppins",
+   "rel": "respects",
+   "to": "con.iosverbatim",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.posture",
+   "rel": "respects",
+   "to": "con.nodeps",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.kg",
+   "rel": "enables",
+   "to": "claim.noai",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.state_sees",
+   "rel": "enforces",
+   "to": "con.suszone",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.noai",
+   "rel": "sourced_from",
+   "to": "f.category.death",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "guard.noreport",
+   "rel": "governs",
+   "to": "node.T4.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "guard.policedata",
+   "rel": "governs",
+   "to": "node.T8.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "guard.money",
+   "rel": "governs",
+   "to": "node.T9.0",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "con.mocklabel",
+   "rel": "governs",
+   "to": "node.T9.0",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "con.notracking",
+   "rel": "governs",
+   "to": "node.T4.3",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "con.nodata",
+   "rel": "governs",
+   "to": "node.T8.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.build-config",
+   "rel": "read_by",
+   "to": "node.T1.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.architecture",
+   "rel": "read_by",
+   "to": "node.T1.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.design-system",
+   "rel": "read_by",
+   "to": "node.T1.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.data-model",
+   "rel": "read_by",
+   "to": "node.T2.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.test-plan",
+   "rel": "read_by",
+   "to": "node.T2.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.state-machine",
+   "rel": "read_by",
+   "to": "node.T4.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.business-rules",
+   "rel": "read_by",
+   "to": "node.T4.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.test-plan",
+   "rel": "read_by",
+   "to": "node.T4.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.problem",
+   "rel": "read_by",
+   "to": "node.T4.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.android-platform",
+   "rel": "read_by",
+   "to": "node.T4.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.state-machine",
+   "rel": "read_by",
+   "to": "node.T4.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.business-rules",
+   "rel": "read_by",
+   "to": "node.T4.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.setup",
+   "rel": "read_by",
+   "to": "node.T1.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.secrets-and-access",
+   "rel": "read_by",
+   "to": "node.T1.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.data-model",
+   "rel": "read_by",
+   "to": "node.T1.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.data-model",
+   "rel": "read_by",
+   "to": "node.T8.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.setup",
+   "rel": "read_by",
+   "to": "node.T8.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.console-spec",
+   "rel": "read_by",
+   "to": "node.T8.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.data-model",
+   "rel": "read_by",
+   "to": "node.T8.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.design-system",
+   "rel": "read_by",
+   "to": "node.T8.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.operating-model",
+   "rel": "read_by",
+   "to": "node.T8.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.component-library",
+   "rel": "read_by",
+   "to": "node.T1.3",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.design-system",
+   "rel": "read_by",
+   "to": "node.T1.3",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.iconography",
+   "rel": "read_by",
+   "to": "node.T1.3",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.motion-spec",
+   "rel": "read_by",
+   "to": "node.T1.3",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.map-spec",
+   "rel": "read_by",
+   "to": "node.T2.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.screens",
+   "rel": "read_by",
+   "to": "node.T2.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.responsive-spec",
+   "rel": "read_by",
+   "to": "node.T2.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.states-catalogue",
+   "rel": "read_by",
+   "to": "node.T2.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.screens",
+   "rel": "read_by",
+   "to": "node.T4.3",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.copy",
+   "rel": "read_by",
+   "to": "node.T4.3",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.component-library",
+   "rel": "read_by",
+   "to": "node.T4.3",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.motion-spec",
+   "rel": "read_by",
+   "to": "node.T4.3",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.screens",
+   "rel": "read_by",
+   "to": "node.T3.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.business-rules",
+   "rel": "read_by",
+   "to": "node.T3.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.copy",
+   "rel": "read_by",
+   "to": "node.T3.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.component-library",
+   "rel": "read_by",
+   "to": "node.T3.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.states-catalogue",
+   "rel": "read_by",
+   "to": "node.T3.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.screens",
+   "rel": "read_by",
+   "to": "node.T3.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.android-platform",
+   "rel": "read_by",
+   "to": "node.T3.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.business-rules",
+   "rel": "read_by",
+   "to": "node.T3.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.component-library",
+   "rel": "read_by",
+   "to": "node.T3.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.accessibility-spec",
+   "rel": "read_by",
+   "to": "node.T3.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.screens",
+   "rel": "read_by",
+   "to": "node.T5.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.android-platform",
+   "rel": "read_by",
+   "to": "node.T5.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.copy",
+   "rel": "read_by",
+   "to": "node.T5.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.component-library",
+   "rel": "read_by",
+   "to": "node.T5.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.interaction-spec",
+   "rel": "read_by",
+   "to": "node.T5.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.motion-spec",
+   "rel": "read_by",
+   "to": "node.T5.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.accessibility-spec",
+   "rel": "read_by",
+   "to": "node.T5.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.business-rules",
+   "rel": "read_by",
+   "to": "node.T6.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.screens",
+   "rel": "read_by",
+   "to": "node.T6.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.copy",
+   "rel": "read_by",
+   "to": "node.T6.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.component-library",
+   "rel": "read_by",
+   "to": "node.T6.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.interaction-spec",
+   "rel": "read_by",
+   "to": "node.T6.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.architecture",
+   "rel": "read_by",
+   "to": "node.T6.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.business-rules",
+   "rel": "read_by",
+   "to": "node.T6.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.test-plan",
+   "rel": "read_by",
+   "to": "node.T6.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.screens",
+   "rel": "read_by",
+   "to": "node.T7.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.business-rules",
+   "rel": "read_by",
+   "to": "node.T7.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.state-machine",
+   "rel": "read_by",
+   "to": "node.T7.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.component-library",
+   "rel": "read_by",
+   "to": "node.T7.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.motion-spec",
+   "rel": "read_by",
+   "to": "node.T7.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.interaction-spec",
+   "rel": "read_by",
+   "to": "node.T7.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.data-model",
+   "rel": "read_by",
+   "to": "node.T7.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.test-plan",
+   "rel": "read_by",
+   "to": "node.T7.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.problem",
+   "rel": "read_by",
+   "to": "node.T7.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.screens",
+   "rel": "read_by",
+   "to": "node.T7.3",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.copy",
+   "rel": "read_by",
+   "to": "node.T7.3",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.component-library",
+   "rel": "read_by",
+   "to": "node.T7.3",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.operating-model",
+   "rel": "read_by",
+   "to": "node.T7.3",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.console-spec",
+   "rel": "read_by",
+   "to": "node.T8.3",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.data-model",
+   "rel": "read_by",
+   "to": "node.T8.3",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.submission",
+   "rel": "read_by",
+   "to": "node.T9.0",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.compliance",
+   "rel": "read_by",
+   "to": "node.T9.0",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.evidence",
+   "rel": "read_by",
+   "to": "node.T9.0",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.copy",
+   "rel": "read_by",
+   "to": "node.T9.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.responsive-spec",
+   "rel": "read_by",
+   "to": "node.T9.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.accessibility-spec",
+   "rel": "read_by",
+   "to": "node.T9.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.compliance",
+   "rel": "read_by",
+   "to": "node.T9.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.test-plan",
+   "rel": "read_by",
+   "to": "node.T9.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.submission",
+   "rel": "read_by",
+   "to": "node.T9.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.compliance",
+   "rel": "read_by",
+   "to": "node.T9.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.evidence",
+   "rel": "read_by",
+   "to": "node.T9.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.build-plan",
+   "rel": "read_by",
+   "to": "node.T9.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.readme",
+   "rel": "read_by",
+   "to": "node.T1.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.readme",
+   "rel": "read_by",
+   "to": "node.T2.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.readme",
+   "rel": "read_by",
+   "to": "node.T4.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.readme",
+   "rel": "read_by",
+   "to": "node.T4.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.readme",
+   "rel": "read_by",
+   "to": "node.T1.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.readme",
+   "rel": "read_by",
+   "to": "node.T8.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.readme",
+   "rel": "read_by",
+   "to": "node.T8.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.readme",
+   "rel": "read_by",
+   "to": "node.T1.3",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.readme",
+   "rel": "read_by",
+   "to": "node.T2.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.readme",
+   "rel": "read_by",
+   "to": "node.T4.3",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.readme",
+   "rel": "read_by",
+   "to": "node.T3.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.readme",
+   "rel": "read_by",
+   "to": "node.T3.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.readme",
+   "rel": "read_by",
+   "to": "node.T5.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.readme",
+   "rel": "read_by",
+   "to": "node.T6.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.readme",
+   "rel": "read_by",
+   "to": "node.T6.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.readme",
+   "rel": "read_by",
+   "to": "node.T7.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.readme",
+   "rel": "read_by",
+   "to": "node.T7.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.readme",
+   "rel": "read_by",
+   "to": "node.T7.3",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.readme",
+   "rel": "read_by",
+   "to": "node.T8.3",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.readme",
+   "rel": "read_by",
+   "to": "node.T9.0",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.readme",
+   "rel": "read_by",
+   "to": "node.T9.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.readme",
+   "rel": "read_by",
+   "to": "node.T9.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.spec-readme",
+   "rel": "read_by",
+   "to": "node.T1.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.spec-readme",
+   "rel": "read_by",
+   "to": "node.T2.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.spec-readme",
+   "rel": "read_by",
+   "to": "node.T4.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.spec-readme",
+   "rel": "read_by",
+   "to": "node.T4.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.spec-readme",
+   "rel": "read_by",
+   "to": "node.T1.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.spec-readme",
+   "rel": "read_by",
+   "to": "node.T8.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.spec-readme",
+   "rel": "read_by",
+   "to": "node.T8.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.spec-readme",
+   "rel": "read_by",
+   "to": "node.T1.3",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.spec-readme",
+   "rel": "read_by",
+   "to": "node.T2.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.spec-readme",
+   "rel": "read_by",
+   "to": "node.T4.3",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.spec-readme",
+   "rel": "read_by",
+   "to": "node.T3.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.spec-readme",
+   "rel": "read_by",
+   "to": "node.T3.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.spec-readme",
+   "rel": "read_by",
+   "to": "node.T5.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.spec-readme",
+   "rel": "read_by",
+   "to": "node.T6.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.spec-readme",
+   "rel": "read_by",
+   "to": "node.T6.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.spec-readme",
+   "rel": "read_by",
+   "to": "node.T7.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.spec-readme",
+   "rel": "read_by",
+   "to": "node.T7.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.spec-readme",
+   "rel": "read_by",
+   "to": "node.T7.3",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.spec-readme",
+   "rel": "read_by",
+   "to": "node.T8.3",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.spec-readme",
+   "rel": "read_by",
+   "to": "node.T9.0",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.spec-readme",
+   "rel": "read_by",
+   "to": "node.T9.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.spec-readme",
+   "rel": "read_by",
+   "to": "node.T9.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.features",
+   "rel": "read_by",
+   "to": "node.T1.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.features",
+   "rel": "read_by",
+   "to": "node.T2.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.features",
+   "rel": "read_by",
+   "to": "node.T4.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.features",
+   "rel": "read_by",
+   "to": "node.T4.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.features",
+   "rel": "read_by",
+   "to": "node.T1.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.features",
+   "rel": "read_by",
+   "to": "node.T8.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.features",
+   "rel": "read_by",
+   "to": "node.T8.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.features",
+   "rel": "read_by",
+   "to": "node.T1.3",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.features",
+   "rel": "read_by",
+   "to": "node.T2.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.features",
+   "rel": "read_by",
+   "to": "node.T4.3",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.features",
+   "rel": "read_by",
+   "to": "node.T3.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.features",
+   "rel": "read_by",
+   "to": "node.T3.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.features",
+   "rel": "read_by",
+   "to": "node.T5.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.features",
+   "rel": "read_by",
+   "to": "node.T6.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.features",
+   "rel": "read_by",
+   "to": "node.T6.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.features",
+   "rel": "read_by",
+   "to": "node.T7.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.features",
+   "rel": "read_by",
+   "to": "node.T7.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.features",
+   "rel": "read_by",
+   "to": "node.T7.3",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.features",
+   "rel": "read_by",
+   "to": "node.T8.3",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.features",
+   "rel": "read_by",
+   "to": "node.T9.0",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.features",
+   "rel": "read_by",
+   "to": "node.T9.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.features",
+   "rel": "read_by",
+   "to": "node.T9.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.scope",
+   "rel": "read_by",
+   "to": "node.T1.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.scope",
+   "rel": "read_by",
+   "to": "node.T2.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.scope",
+   "rel": "read_by",
+   "to": "node.T4.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.scope",
+   "rel": "read_by",
+   "to": "node.T4.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.scope",
+   "rel": "read_by",
+   "to": "node.T1.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.scope",
+   "rel": "read_by",
+   "to": "node.T8.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.scope",
+   "rel": "read_by",
+   "to": "node.T8.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.scope",
+   "rel": "read_by",
+   "to": "node.T1.3",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.scope",
+   "rel": "read_by",
+   "to": "node.T2.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.scope",
+   "rel": "read_by",
+   "to": "node.T4.3",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.scope",
+   "rel": "read_by",
+   "to": "node.T3.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.scope",
+   "rel": "read_by",
+   "to": "node.T3.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.scope",
+   "rel": "read_by",
+   "to": "node.T5.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.scope",
+   "rel": "read_by",
+   "to": "node.T6.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.scope",
+   "rel": "read_by",
+   "to": "node.T6.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.scope",
+   "rel": "read_by",
+   "to": "node.T7.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.scope",
+   "rel": "read_by",
+   "to": "node.T7.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.scope",
+   "rel": "read_by",
+   "to": "node.T7.3",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.scope",
+   "rel": "read_by",
+   "to": "node.T8.3",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.scope",
+   "rel": "read_by",
+   "to": "node.T9.0",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.scope",
+   "rel": "read_by",
+   "to": "node.T9.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.scope",
+   "rel": "read_by",
+   "to": "node.T9.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.problem",
+   "rel": "specifies",
+   "to": "claim.gap",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.problem",
+   "rel": "specifies",
+   "to": "claim.no_press",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.evidence",
+   "rel": "specifies",
+   "to": "claim.context",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.compliance",
+   "rel": "specifies",
+   "to": "claim.nokeys",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.operating-model",
+   "rel": "specifies",
+   "to": "claim.gap",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.features",
+   "rel": "specifies",
+   "to": "claim.no_press",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.scope",
+   "rel": "specifies",
+   "to": "claim.noai",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.graph-engineering",
+   "rel": "specifies",
+   "to": "claim.noai",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.data-model",
+   "rel": "specifies",
+   "to": "claim.boundary",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.business-rules",
+   "rel": "specifies",
+   "to": "claim.noai",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.secrets-and-access",
+   "rel": "specifies",
+   "to": "claim.nokeys",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.codex-log",
+   "rel": "written_at",
+   "to": "node.T1.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.codex-log",
+   "rel": "written_at",
+   "to": "node.T2.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.codex-log",
+   "rel": "written_at",
+   "to": "node.T4.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.codex-log",
+   "rel": "written_at",
+   "to": "node.T4.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.codex-log",
+   "rel": "written_at",
+   "to": "node.T1.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.codex-log",
+   "rel": "written_at",
+   "to": "node.T8.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.codex-log",
+   "rel": "written_at",
+   "to": "node.T8.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.codex-log",
+   "rel": "written_at",
+   "to": "node.T1.3",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.codex-log",
+   "rel": "written_at",
+   "to": "node.T2.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.codex-log",
+   "rel": "written_at",
+   "to": "node.T4.3",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.codex-log",
+   "rel": "written_at",
+   "to": "node.T3.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.codex-log",
+   "rel": "written_at",
+   "to": "node.T3.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.codex-log",
+   "rel": "written_at",
+   "to": "node.T5.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.codex-log",
+   "rel": "written_at",
+   "to": "node.T6.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.codex-log",
+   "rel": "written_at",
+   "to": "node.T6.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.codex-log",
+   "rel": "written_at",
+   "to": "node.T7.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.codex-log",
+   "rel": "written_at",
+   "to": "node.T7.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.codex-log",
+   "rel": "written_at",
+   "to": "node.T7.3",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.codex-log",
+   "rel": "written_at",
+   "to": "node.T8.3",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.codex-log",
+   "rel": "written_at",
+   "to": "node.T9.0",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.codex-log",
+   "rel": "written_at",
+   "to": "node.T9.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.codex-log",
+   "rel": "written_at",
+   "to": "node.T9.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.build-state",
+   "rel": "written_at",
+   "to": "node.T1.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.build-state",
+   "rel": "written_at",
+   "to": "node.T2.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.build-state",
+   "rel": "written_at",
+   "to": "node.T4.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.build-state",
+   "rel": "written_at",
+   "to": "node.T4.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.build-state",
+   "rel": "written_at",
+   "to": "node.T1.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.build-state",
+   "rel": "written_at",
+   "to": "node.T8.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.build-state",
+   "rel": "written_at",
+   "to": "node.T8.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.build-state",
+   "rel": "written_at",
+   "to": "node.T1.3",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.build-state",
+   "rel": "written_at",
+   "to": "node.T2.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.build-state",
+   "rel": "written_at",
+   "to": "node.T4.3",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.build-state",
+   "rel": "written_at",
+   "to": "node.T3.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.build-state",
+   "rel": "written_at",
+   "to": "node.T3.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.build-state",
+   "rel": "written_at",
+   "to": "node.T5.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.build-state",
+   "rel": "written_at",
+   "to": "node.T6.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.build-state",
+   "rel": "written_at",
+   "to": "node.T6.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.build-state",
+   "rel": "written_at",
+   "to": "node.T7.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.build-state",
+   "rel": "written_at",
+   "to": "node.T7.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.build-state",
+   "rel": "written_at",
+   "to": "node.T7.3",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.build-state",
+   "rel": "written_at",
+   "to": "node.T8.3",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.build-state",
+   "rel": "written_at",
+   "to": "node.T9.0",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.build-state",
+   "rel": "written_at",
+   "to": "node.T9.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.build-state",
+   "rel": "written_at",
+   "to": "node.T9.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.codex-tasks",
+   "rel": "read_by",
+   "to": "node.T1.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.codex-tasks",
+   "rel": "read_by",
+   "to": "node.T2.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.codex-tasks",
+   "rel": "read_by",
+   "to": "node.T4.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.codex-tasks",
+   "rel": "read_by",
+   "to": "node.T4.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.codex-tasks",
+   "rel": "read_by",
+   "to": "node.T1.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.codex-tasks",
+   "rel": "read_by",
+   "to": "node.T8.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.codex-tasks",
+   "rel": "read_by",
+   "to": "node.T8.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.codex-tasks",
+   "rel": "read_by",
+   "to": "node.T1.3",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.codex-tasks",
+   "rel": "read_by",
+   "to": "node.T2.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.codex-tasks",
+   "rel": "read_by",
+   "to": "node.T4.3",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.codex-tasks",
+   "rel": "read_by",
+   "to": "node.T3.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.codex-tasks",
+   "rel": "read_by",
+   "to": "node.T3.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.codex-tasks",
+   "rel": "read_by",
+   "to": "node.T5.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.codex-tasks",
+   "rel": "read_by",
+   "to": "node.T6.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.codex-tasks",
+   "rel": "read_by",
+   "to": "node.T6.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.codex-tasks",
+   "rel": "read_by",
+   "to": "node.T7.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.codex-tasks",
+   "rel": "read_by",
+   "to": "node.T7.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.codex-tasks",
+   "rel": "read_by",
+   "to": "node.T7.3",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.codex-tasks",
+   "rel": "read_by",
+   "to": "node.T8.3",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.codex-tasks",
+   "rel": "read_by",
+   "to": "node.T9.0",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.codex-tasks",
+   "rel": "read_by",
+   "to": "node.T9.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.codex-tasks",
+   "rel": "read_by",
+   "to": "node.T9.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.demo-script",
+   "rel": "read_by",
+   "to": "node.T9.0",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.demo-script",
+   "rel": "read_by",
+   "to": "node.T9.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.graph-engineering",
+   "rel": "governs",
+   "to": "node.T1.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.graph-engineering",
+   "rel": "governs",
+   "to": "node.T2.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.graph-engineering",
+   "rel": "governs",
+   "to": "node.T4.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.graph-engineering",
+   "rel": "governs",
+   "to": "node.T4.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.graph-engineering",
+   "rel": "governs",
+   "to": "node.T1.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.graph-engineering",
+   "rel": "governs",
+   "to": "node.T8.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.graph-engineering",
+   "rel": "governs",
+   "to": "node.T8.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.graph-engineering",
+   "rel": "governs",
+   "to": "node.T1.3",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.graph-engineering",
+   "rel": "governs",
+   "to": "node.T2.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.graph-engineering",
+   "rel": "governs",
+   "to": "node.T4.3",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.graph-engineering",
+   "rel": "governs",
+   "to": "node.T3.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.graph-engineering",
+   "rel": "governs",
+   "to": "node.T3.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.graph-engineering",
+   "rel": "governs",
+   "to": "node.T5.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.graph-engineering",
+   "rel": "governs",
+   "to": "node.T6.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.graph-engineering",
+   "rel": "governs",
+   "to": "node.T6.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.graph-engineering",
+   "rel": "governs",
+   "to": "node.T7.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.graph-engineering",
+   "rel": "governs",
+   "to": "node.T7.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.graph-engineering",
+   "rel": "governs",
+   "to": "node.T7.3",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.graph-engineering",
+   "rel": "governs",
+   "to": "node.T8.3",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.graph-engineering",
+   "rel": "governs",
+   "to": "node.T9.0",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.graph-engineering",
+   "rel": "governs",
+   "to": "node.T9.1",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.graph-engineering",
+   "rel": "governs",
+   "to": "node.T9.2",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.progress",
+   "rel": "specifies",
+   "to": "d.graph",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.progress",
+   "rel": "specifies",
+   "to": "d.verifier",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.progress",
+   "rel": "specifies",
+   "to": "d.sequential",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.progress",
+   "rel": "specifies",
+   "to": "d.posture",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.codex-prompt",
+   "rel": "specifies",
+   "to": "d.sequential",
+   "at": "2026-08-18",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.build-state",
+   "rel": "hosted_in",
+   "to": "repo.saaya-lite",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.codex-prompt",
+   "rel": "hosted_in",
+   "to": "repo.saaya-lite",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.readme",
+   "rel": "hosted_in",
+   "to": "repo.saaya-lite",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.build-plan",
+   "rel": "hosted_in",
+   "to": "repo.saaya-lite",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.compliance",
+   "rel": "hosted_in",
+   "to": "repo.saaya-lite",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.evidence",
+   "rel": "hosted_in",
+   "to": "repo.saaya-lite",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.features",
+   "rel": "hosted_in",
+   "to": "repo.saaya-lite",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.operating-model",
+   "rel": "hosted_in",
+   "to": "repo.saaya-lite",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.problem",
+   "rel": "hosted_in",
+   "to": "repo.saaya-lite",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.scope",
+   "rel": "hosted_in",
+   "to": "repo.saaya-lite",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.accessibility-spec",
+   "rel": "hosted_in",
+   "to": "repo.saaya-lite",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.android-platform",
+   "rel": "hosted_in",
+   "to": "repo.saaya-lite",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.architecture",
+   "rel": "hosted_in",
+   "to": "repo.saaya-lite",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.build-config",
+   "rel": "hosted_in",
+   "to": "repo.saaya-lite",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.business-rules",
+   "rel": "hosted_in",
+   "to": "repo.saaya-lite",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.codex-log",
+   "rel": "hosted_in",
+   "to": "repo.saaya-lite",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.codex-tasks",
+   "rel": "hosted_in",
+   "to": "repo.saaya-lite",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.component-library",
+   "rel": "hosted_in",
+   "to": "repo.saaya-lite",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.console-spec",
+   "rel": "hosted_in",
+   "to": "repo.saaya-lite",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.copy",
+   "rel": "hosted_in",
+   "to": "repo.saaya-lite",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.data-model",
+   "rel": "hosted_in",
+   "to": "repo.saaya-lite",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.demo-script",
+   "rel": "hosted_in",
+   "to": "repo.saaya-lite",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.design-system",
+   "rel": "hosted_in",
+   "to": "repo.saaya-lite",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.graph-engineering",
+   "rel": "hosted_in",
+   "to": "repo.saaya-lite",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.iconography",
+   "rel": "hosted_in",
+   "to": "repo.saaya-lite",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.interaction-spec",
+   "rel": "hosted_in",
+   "to": "repo.saaya-lite",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.map-spec",
+   "rel": "hosted_in",
+   "to": "repo.saaya-lite",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.motion-spec",
+   "rel": "hosted_in",
+   "to": "repo.saaya-lite",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.responsive-spec",
+   "rel": "hosted_in",
+   "to": "repo.saaya-lite",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.screens",
+   "rel": "hosted_in",
+   "to": "repo.saaya-lite",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.secrets-and-access",
+   "rel": "hosted_in",
+   "to": "repo.saaya-lite",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.setup",
+   "rel": "hosted_in",
+   "to": "repo.saaya-lite",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.spec-readme",
+   "rel": "hosted_in",
+   "to": "repo.saaya-lite",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.states-catalogue",
+   "rel": "hosted_in",
+   "to": "repo.saaya-lite",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.state-machine",
+   "rel": "hosted_in",
+   "to": "repo.saaya-lite",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.submission",
+   "rel": "hosted_in",
+   "to": "repo.saaya-lite",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.test-plan",
+   "rel": "hosted_in",
+   "to": "repo.saaya-lite",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.progress",
+   "rel": "hosted_in",
+   "to": "repo.saaya-lite",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.repo",
+   "rel": "enables",
+   "to": "claim.nokeys",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  }
+ ],
+ "events": [
+  {
+   "id": "ev.0001",
+   "type": "decision_made",
+   "at": "2026-08-18",
+   "actor": "founder",
+   "detail": "Graph engineering adopted, then upgraded to native subagent fan-out",
+   "refs": [
+    "d.graph",
+    "d.verifier"
+   ]
+  }
+ ]
+}
