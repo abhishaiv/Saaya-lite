@@ -313,7 +313,7 @@
  ],
  "counts": {
   "entities": 143,
-  "edges": 430,
+  "edges": 409,
   "events": 1
  },
  "entities": [
@@ -2728,182 +2728,6 @@
    "confidence": "high"
   },
   {
-   "from": "doc.readme",
-   "rel": "read_by",
-   "to": "node.T1.1",
-   "at": "2026-08-18",
-   "by": "claude",
-   "confidence": "high"
-  },
-  {
-   "from": "doc.readme",
-   "rel": "read_by",
-   "to": "node.T2.1",
-   "at": "2026-08-18",
-   "by": "claude",
-   "confidence": "high"
-  },
-  {
-   "from": "doc.readme",
-   "rel": "read_by",
-   "to": "node.T4.1",
-   "at": "2026-08-18",
-   "by": "claude",
-   "confidence": "high"
-  },
-  {
-   "from": "doc.readme",
-   "rel": "read_by",
-   "to": "node.T4.2",
-   "at": "2026-08-18",
-   "by": "claude",
-   "confidence": "high"
-  },
-  {
-   "from": "doc.readme",
-   "rel": "read_by",
-   "to": "node.T1.2",
-   "at": "2026-08-18",
-   "by": "claude",
-   "confidence": "high"
-  },
-  {
-   "from": "doc.readme",
-   "rel": "read_by",
-   "to": "node.T8.1",
-   "at": "2026-08-18",
-   "by": "claude",
-   "confidence": "high"
-  },
-  {
-   "from": "doc.readme",
-   "rel": "read_by",
-   "to": "node.T8.2",
-   "at": "2026-08-18",
-   "by": "claude",
-   "confidence": "high"
-  },
-  {
-   "from": "doc.readme",
-   "rel": "read_by",
-   "to": "node.T1.3",
-   "at": "2026-08-18",
-   "by": "claude",
-   "confidence": "high"
-  },
-  {
-   "from": "doc.readme",
-   "rel": "read_by",
-   "to": "node.T2.2",
-   "at": "2026-08-18",
-   "by": "claude",
-   "confidence": "high"
-  },
-  {
-   "from": "doc.readme",
-   "rel": "read_by",
-   "to": "node.T4.3",
-   "at": "2026-08-18",
-   "by": "claude",
-   "confidence": "high"
-  },
-  {
-   "from": "doc.readme",
-   "rel": "read_by",
-   "to": "node.T3.1",
-   "at": "2026-08-18",
-   "by": "claude",
-   "confidence": "high"
-  },
-  {
-   "from": "doc.readme",
-   "rel": "read_by",
-   "to": "node.T3.2",
-   "at": "2026-08-18",
-   "by": "claude",
-   "confidence": "high"
-  },
-  {
-   "from": "doc.readme",
-   "rel": "read_by",
-   "to": "node.T5.1",
-   "at": "2026-08-18",
-   "by": "claude",
-   "confidence": "high"
-  },
-  {
-   "from": "doc.readme",
-   "rel": "read_by",
-   "to": "node.T6.1",
-   "at": "2026-08-18",
-   "by": "claude",
-   "confidence": "high"
-  },
-  {
-   "from": "doc.readme",
-   "rel": "read_by",
-   "to": "node.T6.2",
-   "at": "2026-08-18",
-   "by": "claude",
-   "confidence": "high"
-  },
-  {
-   "from": "doc.readme",
-   "rel": "read_by",
-   "to": "node.T7.1",
-   "at": "2026-08-18",
-   "by": "claude",
-   "confidence": "high"
-  },
-  {
-   "from": "doc.readme",
-   "rel": "read_by",
-   "to": "node.T7.2",
-   "at": "2026-08-18",
-   "by": "claude",
-   "confidence": "high"
-  },
-  {
-   "from": "doc.readme",
-   "rel": "read_by",
-   "to": "node.T7.3",
-   "at": "2026-08-18",
-   "by": "claude",
-   "confidence": "high"
-  },
-  {
-   "from": "doc.readme",
-   "rel": "read_by",
-   "to": "node.T8.3",
-   "at": "2026-08-18",
-   "by": "claude",
-   "confidence": "high"
-  },
-  {
-   "from": "doc.readme",
-   "rel": "read_by",
-   "to": "node.T9.0",
-   "at": "2026-08-18",
-   "by": "claude",
-   "confidence": "high"
-  },
-  {
-   "from": "doc.readme",
-   "rel": "read_by",
-   "to": "node.T9.1",
-   "at": "2026-08-18",
-   "by": "claude",
-   "confidence": "high"
-  },
-  {
-   "from": "doc.readme",
-   "rel": "read_by",
-   "to": "node.T9.2",
-   "at": "2026-08-18",
-   "by": "claude",
-   "confidence": "high"
-  },
-  {
    "from": "doc.spec-readme",
    "rel": "read_by",
    "to": "node.T1.1",
@@ -4787,6 +4611,14 @@
    "from": "doc.agents",
    "rel": "hosted_in",
    "to": "repo.saaya-lite",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.readme",
+   "rel": "specifies",
+   "to": "d.repo-targeting",
    "at": "2026-08-19",
    "by": "claude",
    "confidence": "high"
