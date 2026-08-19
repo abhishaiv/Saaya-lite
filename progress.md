@@ -834,3 +834,42 @@ every document referenced, zero orphans.
 **Two artifacts published:** the execution-graph reference, and a hand-drawn diagram set
 covering the node diamond, the four fan-out nodes against the eighteen that must stay serial,
 and the disjoint-contract isolation model.
+
+## 2026-08-19 - Repository live
+
+Founder supplied github.com/abhishaiv/Saaya-lite. Checked it first: a fresh public repo with
+a single placeholder README from GitHub's initial commit, default branch `main`.
+
+**Checked before pushing, not after.** Ran a credential scan across the whole tree for API
+keys, tokens, private keys and Slack/OpenAI patterns: nothing. That is not luck, it is the
+result of the earlier decisions - osmdroid removed the Maps key, no model in the product
+removed the OpenAI key, mocked delivery removed the SMS gateway, and debug signing removed
+the keystore. There is genuinely nothing in this project to leak.
+
+Wrote `.gitignore` first, listing `google-services.json`, `keystore.properties`, `*.jks`,
+`local.properties` and `.env` defensively even though none exist yet, so an accidental one
+can never be committed later.
+
+**Based the commit on the remote's existing initial commit** rather than force-pushing over
+it, so the history stays linear and nothing was discarded. 48 files, 604K, one commit.
+
+**The repo is public, and that is a deliberate choice worth recording.** The hackathon
+accepts a source repository as a submission artifact and requires every link to open without
+an access request. More than that, a public planning trail is evidence for two things we
+claim: that Codex built this (the log is in the open) and that we disclosed the reuse of
+Saaya rather than being caught at it. Our posture throughout has been that we would rather be
+checked than believed, and a private repo would contradict it.
+
+One consequence the founder should know rather than discover: `progress.md` is now public. It
+is a raw decision log including my own corrections. I think that helps rather than hurts, but
+it was not an explicit decision so it is flagged here.
+
+**Wired the repo into the plan** rather than leaving it as an out-of-band fact: README and
+CODEX_PROMPT carry the URL and the clone step, SETUP.md documents it and why it is public,
+BUILD_CONFIG.md carries the remote and the commit convention (one commit per completed node,
+after all 9 gates, pushed each time), SUBMISSION.md lists it as the source-repo artifact, and
+the knowledge graph gained a `Repository` class with a `hosted_in` edge from all 38 documents
+plus a `Decision` entity recording why it is public.
+
+Added a COMMIT step to the node loop, so committing is a gated step like any other rather
+than something remembered at the end.

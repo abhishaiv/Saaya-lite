@@ -154,6 +154,15 @@ continue the node loop exactly as before.
 
 ---
 
+## FIRST, ONCE: get the repo
+
+```bash
+gh repo clone abhishaiv/Saaya-lite && cd Saaya-lite
+```
+
+Everything below runs inside that clone. The specification is already committed there;
+you are adding application code to it, node by node.
+
 ## FOUNDER NOTES
 
 **Why the order looks strange.** It is risk-first, not phase-first. The two nodes most
