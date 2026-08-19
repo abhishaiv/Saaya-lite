@@ -22,7 +22,7 @@ each before moving on. The graph is your memory, not the transcript. Read
 docs/spec/GRAPH_ENGINEERING.md first and understand why before you start.
 
 READ FIRST, IN FULL, IN THIS ORDER:
-  1. README.md                          the loop, the 9 gates, the hard rules, the doc map
+  1. AGENTS.md                          the loop, the 9 gates, the hard rules, the doc map
   2. docs/spec/GRAPH_ENGINEERING.md     why the graph, the node protocol, the verifier
                                         diamond, frozen nodes, anchors, the knowledge
                                         graph, and the context-hygiene rule
@@ -81,7 +81,8 @@ THEN RUN THE NODE LOOP, from README.md, for every node in graph/build_graph.json
              graph (python3 scripts/kg.py query <term>). Do not try to recall it.
   8. COMMIT   git add -A && git commit, ONE commit for this node, subject
               "<node id> <what it did>", body listing gates passed and anything
-              corrected. Then git push origin main.
+              corrected, plus the trailers Node:, Built-with: OpenAI Codex and
+              Verified-by:. Then git push origin main.
               Never commit google-services.json, local.properties, a keystore, or
               anything matching .gitignore.
   9. REPORT   one short summary to me, then continue to the next node
@@ -139,7 +140,7 @@ T1.1 before writing any code.
 Resuming the Saaya Lite graph-driven build. Working directory is this repository.
 
 Read, in full:
-  1. README.md                        the loop, the 9 gates, the hard rules
+  1. AGENTS.md                        the loop, the 9 gates, the hard rules
   2. docs/spec/GRAPH_ENGINEERING.md   the node protocol and the context-hygiene rule
   3. graph/build_graph.json           find the first node whose status is not "complete"
   4. the last 3 lines of graph/runs.jsonl, so you know what just happened

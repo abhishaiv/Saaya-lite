@@ -873,3 +873,45 @@ plus a `Decision` entity recording why it is public.
 
 Added a COMMIT step to the node loop, so committing is a gated step like any other rather
 than something remembered at the end.
+
+## 2026-08-19 - Repo targeted at reviewers
+
+Founder pointed out the judges will review the git repo and are looking for Codex, not
+Claude, and asked whether to delete the repo and re-commit everything as Codex.
+
+**Said no, and why.** Committing 38 specification documents as Codex would be a false record
+and a fragile one: those docs discuss decisions made in conversation, cite sources Codex never
+read, and progress.md is a dated log of a planning dialogue. 44,000 words landing in one shot
+before any code is not what a Codex build looks like to people who use Codex daily. It also
+solves the wrong problem - the repo has no Codex work because the build has not started, and
+re-committing the same files adds zero application code. Most of all it would contradict the
+one thing this submission is strongest on: every claim we make is checkable, and Honesty is a
+scored criterion.
+
+**What actually targets the review is the ratio and the legibility**, not the attribution.
+After the build there will be ~22 Codex commits of real Kotlin against 2 spec commits.
+
+**Three changes.**
+
+`README.md` became **reviewer-facing**. It was a 298-line instruction manual for a build
+agent, which is the wrong first thing for a judge to read. It now opens with the problem and
+Shakthi's 0.28%, states what is real and what is mocked, explains how Codex built this with
+commands the reviewer can run, lists known limitations including the two that are wrong for
+production, and carries the disclaimers.
+
+The agent manual moved to **`AGENTS.md`**, which is Codex's own convention, so Codex picks it
+up automatically and a reviewer sees a Codex-native repo. `always_read` now points at it.
+
+**Every Codex commit is greppable.** The commit convention gained three trailers: `Node:`,
+`Built-with: OpenAI Codex` and `Verified-by:`. They are not decoration - `git log --grep` on
+them is a documented verification step in the README, so a missing trailer is a broken claim.
+
+Added `scripts/codex_contribution.py`, which generates the contribution summary from the
+actual record: git trailers, the node graph, runs.jsonl and the verifier verdicts. It reports
+zeroes today, which is correct, and the numbers accumulate as the build runs. Writing this
+now rather than at E9 is the difference between evidence and recollection.
+
+**The framing we are going with, stated in the README rather than hidden:** the specification
+was written with Claude and frozen; Codex builds every line of the application against it,
+gated mechanically and checked by adversarial verifiers. That is a more sophisticated Codex
+workflow than a chat transcript, it is true, and stating it first means nobody discovers it.

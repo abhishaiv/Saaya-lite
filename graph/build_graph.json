@@ -1051,7 +1051,7 @@
  },
  "always_read": {
   "files": [
-   "README.md",
+   "AGENTS.md",
    "docs/spec/SPEC_README.md",
    "docs/FEATURES.md",
    "docs/SCOPE.md"

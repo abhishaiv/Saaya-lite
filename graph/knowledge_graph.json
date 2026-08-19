@@ -312,8 +312,8 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 141,
-  "edges": 405,
+  "entities": 143,
+  "edges": 430,
   "events": 1
  },
  "entities": [
@@ -1332,6 +1332,22 @@
    "by": "founder",
    "date": "2026-08-19",
    "rationale": "the hackathon accepts a source repo as a submission artifact, and a public planning trail supports the Codex-contribution claim and the honesty criterion"
+  },
+  {
+   "id": "d.repo-targeting",
+   "class": "Decision",
+   "label": "Target the repo at reviewers; do not scrub Claude from history",
+   "by": "founder+claude",
+   "date": "2026-08-19",
+   "rationale": "the Codex contribution is made visible by accumulating real build commits with greppable trailers, not by rewriting authorship. A scrubbed history would contradict the verifiable-honesty posture the submission rests on, and Honesty is a scored criterion."
+  },
+  {
+   "id": "doc.agents",
+   "class": "Document",
+   "label": "AGENTS.md",
+   "path": "AGENTS.md",
+   "tier": "0",
+   "always_read": "True"
   }
  ],
  "edges": [
@@ -4571,6 +4587,206 @@
    "from": "d.repo",
    "rel": "enables",
    "to": "claim.nokeys",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.repo-targeting",
+   "rel": "respects",
+   "to": "con.mocklabel",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.repo-targeting",
+   "rel": "enables",
+   "to": "claim.noai",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.agents",
+   "rel": "read_by",
+   "to": "node.T1.1",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.agents",
+   "rel": "read_by",
+   "to": "node.T2.1",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.agents",
+   "rel": "read_by",
+   "to": "node.T4.1",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.agents",
+   "rel": "read_by",
+   "to": "node.T4.2",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.agents",
+   "rel": "read_by",
+   "to": "node.T1.2",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.agents",
+   "rel": "read_by",
+   "to": "node.T8.1",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.agents",
+   "rel": "read_by",
+   "to": "node.T8.2",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.agents",
+   "rel": "read_by",
+   "to": "node.T1.3",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.agents",
+   "rel": "read_by",
+   "to": "node.T2.2",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.agents",
+   "rel": "read_by",
+   "to": "node.T4.3",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.agents",
+   "rel": "read_by",
+   "to": "node.T3.1",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.agents",
+   "rel": "read_by",
+   "to": "node.T3.2",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.agents",
+   "rel": "read_by",
+   "to": "node.T5.1",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.agents",
+   "rel": "read_by",
+   "to": "node.T6.1",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.agents",
+   "rel": "read_by",
+   "to": "node.T6.2",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.agents",
+   "rel": "read_by",
+   "to": "node.T7.1",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.agents",
+   "rel": "read_by",
+   "to": "node.T7.2",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.agents",
+   "rel": "read_by",
+   "to": "node.T7.3",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.agents",
+   "rel": "read_by",
+   "to": "node.T8.3",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.agents",
+   "rel": "read_by",
+   "to": "node.T9.0",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.agents",
+   "rel": "read_by",
+   "to": "node.T9.1",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.agents",
+   "rel": "read_by",
+   "to": "node.T9.2",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.agents",
+   "rel": "hosted_in",
+   "to": "repo.saaya-lite",
    "at": "2026-08-19",
    "by": "claude",
    "confidence": "high"
