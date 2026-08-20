@@ -1099,3 +1099,25 @@ friction lands on every line of UI code and the verifier already covers it far m
 
 Two blocks on node one, both legitimate, both finding things no audit of mine had. The
 protocol is earning its keep before a line of Kotlin exists.
+
+**And then self-testing that fix found something worse.** Writing a test for the new alpha
+facts, `0.37f` was not flagged. The pattern was
+`(?<![\w.])(\d+\.\d+|\d+)(?![\w.])` - it required a non-word, non-dot character after the
+number. That matches **none** of `16.dp`, `0.75f`, `14.sp`, `12f` or `1_000`, which is how
+essentially every product value is written in Compose. Only bare integers like `90` were
+being checked.
+
+**Gate G6 was effectively inert against real Kotlin.** It would have passed an invented
+padding, an invented alpha, an invented type size - everything the "no invention" claim rests
+on. It had been sitting there since I wrote it, passing its own toy self-test because that
+test used bare integers.
+
+Fixed the pattern to read the numeric core and ignore the suffix or extension property.
+Normalised ARGB colours (`0xFFA78BFA` is our `#A78BFA`) through one helper used by **both**
+the gate and `--explain`, so they can never disagree. Committed `test/grounded_fixture.kt`
+covering every literal form real Compose uses, and documented it in TEST_PLAN as G6's own
+regression test.
+
+The lesson worth keeping: I tested the checker against the literals I happened to write,
+not against the literals the codebase would actually contain. Codex's block is what led me
+to look.

@@ -107,3 +107,31 @@ Room round trips and notification channels are covered by the manual script inst
 
 V7 and V8 are how we prove the honesty claims rather than assert them. Run them and paste
 the output into the write-up.
+
+---
+
+## Gate G6's own regression test
+
+The grounded checker is the mechanism behind a submission claim, so it gets a test like any
+other load-bearing code. Run it whenever `grounded_check.py` changes:
+
+```bash
+python3 scripts/grounded_check.py test/grounded_fixture.kt   # must exit 1
+python3 scripts/grounded_check.py --explain test/grounded_fixture.kt
+```
+
+The fixture covers every literal form real Compose code uses. It exists because the original
+pattern required a non-word, non-dot character after a number, which matched **none** of
+`16.dp`, `0.75f`, `14.sp` or `1_000` — so the gate was effectively inert against real Kotlin
+and would have passed anything. Found on 2026-08-19 while self-testing a different fix.
+
+| Form | Example | Must |
+|---|---|---|
+| Compose dimension | `16.dp` | be read as 16 |
+| Compose type size | `14.sp` | be read as 14 |
+| Float suffix | `0.75f`, `13f` | be read as 0.75, 13 |
+| Underscored | `6_371_008.8` | be read as 6371008.8 |
+| ARGB colour | `0xFFA78BFA` | normalise to `#A78BFA` |
+| Invented | `0.37f`, `#FF123456` | be **flagged** |
+| Structural | `2` | be skipped |
+| Exempted | `7 // GROUNDED-EXEMPT: stride` | be skipped |

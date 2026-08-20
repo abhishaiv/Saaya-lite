@@ -29,8 +29,21 @@ SKIP_LINE=re.compile(r'^\s*(//|\*|/\*|#)')
 # Anything on a line carrying this marker is exempt, with the reason required after it.
 EXEMPT=re.compile(r'GROUNDED-EXEMPT:\s*\S+')
 
-NUM_RE=re.compile(r'(?<![\w.])(\d+\.\d+|\d+)(?![\w.])')
+# Kotlin and Compose write product values as 16.dp, 14.sp, 0.75f, 1_000. An earlier
+# pattern required a non-word, non-dot character after the number, so it matched NONE of
+# those and the gate was effectively inert against real Compose code. Match the numeric
+# core and ignore whatever suffix or extension property follows it.
+NUM_RE=re.compile(r'(?<![\w.$])(\d[\d_]*(?:\.\d[\d_]*)?)')
+HEXNUM_RE=re.compile(r'0[xX][0-9A-Fa-f]+')
 HEX_RE=re.compile(r'#([0-9A-Fa-f]{6,8})\b|0x([0-9A-Fa-f]{8})\b')
+
+def hexlookup(hx):
+    """Compose writes colours as ARGB: 0xFFA78BFA is our #A78BFA at full alpha.
+    Normalise before lookup, and use this in BOTH gate and explain so they never disagree."""
+    hx=hx.upper()
+    for cand in (hx, "#"+hx[3:] if len(hx)==9 and hx.startswith("#FF") else hx):
+        if cand in COLORS: return COLORS[cand]
+    return None
 
 def check(path):
     bad=[]
@@ -40,10 +53,10 @@ def check(path):
         if SKIP_LINE.match(ln) or EXEMPT.search(ln): continue
         for m in HEX_RE.finditer(ln):
             hx=("#"+(m.group(1) or m.group(2))).upper()
-            if hx not in COLORS and hx.replace("#FF","#",1) not in COLORS:
-                bad.append((i,hx,"colour"))
-        for m in NUM_RE.finditer(ln):
-            try: v=float(m.group(1))
+            if hexlookup(hx) is None: bad.append((i,hx,"colour"))
+        scan=HEXNUM_RE.sub(" ",ln)
+        for m in NUM_RE.finditer(scan):
+            try: v=float(m.group(1).replace("_",""))
             except: continue
             if v in TRIVIAL: continue
             if v not in NUMS: bad.append((i,m.group(1),"number"))
@@ -59,9 +72,9 @@ def explain(path):
         if SKIP_LINE.match(ln) or EXEMPT.search(ln): continue
         for m in HEX_RE.finditer(ln):
             hx=("#"+(m.group(1) or m.group(2))).upper()
-            print(f"  {path}:{i}  {hx:>10}  ->  {COLORS.get(hx,'UNGROUNDED')}")
-        for m in NUM_RE.finditer(ln):
-            try: v=float(m.group(1))
+            print(f"  {path}:{i}  {hx:>12}  ->  {hexlookup(hx) or 'UNGROUNDED'}")
+        for m in NUM_RE.finditer(HEXNUM_RE.sub(" ",ln)):
+            try: v=float(m.group(1).replace("_",""))
             except: continue
             if v in TRIVIAL: continue
             ids=NUMS.get(v)

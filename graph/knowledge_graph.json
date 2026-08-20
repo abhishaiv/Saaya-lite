@@ -312,9 +312,9 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 150,
-  "edges": 420,
-  "events": 6
+  "entities": 151,
+  "edges": 421,
+  "events": 7
  },
  "entities": [
   {
@@ -1404,6 +1404,14 @@
    "by": "claude",
    "date": "2026-08-19",
    "rationale": "requiring a grounded: <fact.id> comment on every literal would make the script semantic but puts friction on every line of UI code. --explain makes wrong-but-same-valued matches visible and the invention lens judges them, at a fraction of the cost."
+  },
+  {
+   "id": "art.g6fixture",
+   "class": "Artifact",
+   "label": "grounded_fixture.kt",
+   "path": "test/grounded_fixture.kt",
+   "kind": "test",
+   "node": "T1.1"
   }
  ],
  "edges": [
@@ -4766,6 +4774,14 @@
    "at": "2026-08-19",
    "by": "claude",
    "confidence": "high"
+  },
+  {
+   "from": "art.g6fixture",
+   "rel": "enforces",
+   "to": "claim.noai",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
   }
  ],
  "events": [
@@ -4827,6 +4843,14 @@
    "at": "2026-08-19",
    "actor": "founder",
    "detail": "20 alpha and tracking facts added (193 to 213). grounded_check gained --explain so a same-valued wrong match is visible. The invention lens now requires the RIGHT fact, not merely a same-valued one.",
+   "node": "T1.1"
+  },
+  {
+   "id": "ev.0007",
+   "type": "gate_failed",
+   "at": "2026-08-19",
+   "actor": "claude",
+   "detail": "Self-testing the alpha-facts fix revealed grounded_check's number pattern matched none of 16.dp, 0.75f, 14.sp or 1_000. Gate G6 was effectively inert against real Compose code. Fixed, plus ARGB colour normalisation shared by gate and explain, plus a regression fixture.",
    "node": "T1.1"
   }
  ]
