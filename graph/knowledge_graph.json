@@ -312,9 +312,9 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 189,
-  "edges": 466,
-  "events": 24
+  "entities": 212,
+  "edges": 490,
+  "events": 35
  },
  "entities": [
   {
@@ -1672,6 +1672,170 @@
    "label": "reads_check.py \u2014 gate G10",
    "path": "scripts/reads_check.py",
    "kind": "script",
+   "node": "T4.1"
+  },
+  {
+   "id": "fail.t41.behavior_contract",
+   "class": "Failure",
+   "label": "FEATURES and STATE_MACHINE disagreed on SUS manual disarm and the anonymous civic-signal boundary",
+   "node": "T4.1",
+   "gate": "G7"
+  },
+  {
+   "id": "q.t41.cross_hour_interval",
+   "class": "Question",
+   "label": "T4.1 active AUTO_ZONE session crosses into an interval-table n/a cell",
+   "node": "T4.1",
+   "status": "blocked"
+  },
+  {
+   "id": "fail.t41.spec_round1",
+   "class": "Failure",
+   "label": "T4.1 first spec verifier rejected four recovery and interval edge cases",
+   "node": "T4.1",
+   "gate": "G9"
+  },
+  {
+   "id": "fail.t41.invention_round1",
+   "class": "Failure",
+   "label": "T4.1 first invention verifier found a wrong-but-same-valued synthetic fixture literal",
+   "node": "T4.1",
+   "gate": "G9"
+  },
+  {
+   "id": "d.t41.freeze_arm_band",
+   "class": "Decision",
+   "label": "Freeze AUTO_ZONE hour band at arm until resolution",
+   "by": "founder",
+   "date": "2026-08-20",
+   "rationale": "Prevents active sessions from crashing or silently disarming after crossing into a current-band n/a cell; MANUAL remains fixed at 10 minutes and recovery trusts the persisted absolute deadline."
+  },
+  {
+   "id": "d.t41.engine_plumbing",
+   "class": "Decision",
+   "label": "Keep T4.1 persistence explicit through intent-only arm and absolute-deadline commands",
+   "by": "codex",
+   "date": "2026-08-20",
+   "rationale": "PersistSessionArm captures the founder-approved frozen band and original arm time; ScheduleTimer carries the exact deadline, so T4.2 performs local persistence without duplicating timing policy or adding personal data to EngineContext."
+  },
+  {
+   "id": "ver.t41.spec.round1",
+   "class": "Verification",
+   "label": "T4.1 spec verifier round 1 rejected four interval and recovery edge cases",
+   "node": "T4.1",
+   "kill": "true",
+   "confidence": "0.96"
+  },
+  {
+   "id": "ver.t41.boundary.round1",
+   "class": "Verification",
+   "label": "T4.1 boundary verifier round 1 passed with no findings",
+   "node": "T4.1",
+   "kill": "false",
+   "confidence": "0.98"
+  },
+  {
+   "id": "ver.t41.invention.round1",
+   "class": "Verification",
+   "label": "T4.1 invention verifier round 1 rejected wrong-same-valued fixture provenance",
+   "node": "T4.1",
+   "kill": "true",
+   "confidence": "0.99"
+  },
+  {
+   "id": "ver.t41.invention.round2",
+   "class": "Verification",
+   "label": "T4.1 invention verifier round 2 passed semantic provenance",
+   "node": "T4.1",
+   "kill": "false",
+   "confidence": "0.99"
+  },
+  {
+   "id": "ver.t41.spec.round3",
+   "class": "Verification",
+   "label": "T4.1 final spec verifier passed the frozen-band engine",
+   "node": "T4.1",
+   "kill": "false",
+   "confidence": "0.98"
+  },
+  {
+   "id": "ver.t41.boundary.round3",
+   "class": "Verification",
+   "label": "T4.1 final boundary verifier passed with no findings",
+   "node": "T4.1",
+   "kill": "false",
+   "confidence": "0.98"
+  },
+  {
+   "id": "ver.t41.invention.round3",
+   "class": "Verification",
+   "label": "T4.1 invention verifier round 3 rejected stale declared fact cardinality",
+   "node": "T4.1",
+   "kill": "true",
+   "confidence": "0.99"
+  },
+  {
+   "id": "ver.t41.invention.round4",
+   "class": "Verification",
+   "label": "T4.1 final invention verifier passed all semantic provenance",
+   "node": "T4.1",
+   "kill": "false",
+   "confidence": "0.99"
+  },
+  {
+   "id": "fail.t41.invention_round3",
+   "class": "Failure",
+   "label": "T4.1 invention verifier found spec_graph declared 248 facts while containing 279",
+   "node": "T4.1",
+   "gate": "G9"
+  },
+  {
+   "id": "fail.t41.g1_stale_classes",
+   "class": "Failure",
+   "label": "T4.1 G1 found stale duplicate transformed class copies confined to generated app/build output",
+   "node": "T4.1",
+   "gate": "G1"
+  },
+  {
+   "id": "art.t41.session_types",
+   "class": "Artifact",
+   "label": "T4.1 pure SessionState, SessionEvent, Command and persistence contracts",
+   "node": "T4.1"
+  },
+  {
+   "id": "art.t41.rules",
+   "class": "Artifact",
+   "label": "T4.1 frozen deterministic session Rules table",
+   "node": "T4.1"
+  },
+  {
+   "id": "art.t41.arming_evaluator",
+   "class": "Artifact",
+   "label": "T4.1 automatic and manual arming evaluator",
+   "node": "T4.1"
+  },
+  {
+   "id": "art.t41.interval_calculator",
+   "class": "Artifact",
+   "label": "T4.1 frozen-band check-in interval calculator",
+   "node": "T4.1"
+  },
+  {
+   "id": "art.t41.dwell_evaluator",
+   "class": "Artifact",
+   "label": "T4.1 pure entry and exit dwell evaluator",
+   "node": "T4.1"
+  },
+  {
+   "id": "art.t41.session_engine",
+   "class": "Artifact",
+   "label": "T4.1 exhaustive pure JVM session transition reducer",
+   "node": "T4.1"
+  },
+  {
+   "id": "art.t41.engine_tests",
+   "class": "Artifact",
+   "label": "T4.1 RulesTest and SessionEngineTest with 37 passing timing-rule cases",
    "node": "T4.1"
   }
  ],
@@ -5403,6 +5567,198 @@
    "at": "2026-08-19",
    "by": "claude",
    "confidence": "high"
+  },
+  {
+   "from": "fail.t41.behavior_contract",
+   "rel": "caused_by",
+   "to": "doc.features",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.t41.behavior_contract",
+   "rel": "caused_by",
+   "to": "doc.state-machine",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.t41.spec_round1",
+   "rel": "caused_by",
+   "to": "q.t41.cross_hour_interval",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "0.96"
+  },
+  {
+   "from": "fail.t41.spec_round1",
+   "rel": "caused_by",
+   "to": "doc.state-machine",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "0.96"
+  },
+  {
+   "from": "fail.t41.spec_round1",
+   "rel": "caused_by",
+   "to": "doc.business-rules",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "0.96"
+  },
+  {
+   "from": "d.t41.freeze_arm_band",
+   "rel": "motivated_by",
+   "to": "q.t41.cross_hour_interval",
+   "at": "2026-08-20",
+   "by": "founder",
+   "confidence": "1.0"
+  },
+  {
+   "from": "d.t41.freeze_arm_band",
+   "rel": "supersedes",
+   "to": "q.t41.cross_hour_interval",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "ver.t41.spec.round1",
+   "rel": "contradicts",
+   "to": "node.T4.1",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "node.T4.1",
+   "rel": "verified_by",
+   "to": "ver.t41.boundary.round1",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "ver.t41.invention.round1",
+   "rel": "contradicts",
+   "to": "node.T4.1",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "node.T4.1",
+   "rel": "verified_by",
+   "to": "ver.t41.invention.round2",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "node.T4.1",
+   "rel": "verified_by",
+   "to": "ver.t41.spec.round3",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "node.T4.1",
+   "rel": "verified_by",
+   "to": "ver.t41.boundary.round3",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "ver.t41.invention.round3",
+   "rel": "contradicts",
+   "to": "node.T4.1",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "node.T4.1",
+   "rel": "verified_by",
+   "to": "ver.t41.invention.round4",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.t41.invention_round3",
+   "rel": "caused_by",
+   "to": "node.T4.1",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.t41.g1_stale_classes",
+   "rel": "caused_by",
+   "to": "node.T4.1",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t41.session_types",
+   "rel": "produced_by",
+   "to": "node.T4.1",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t41.rules",
+   "rel": "produced_by",
+   "to": "node.T4.1",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t41.arming_evaluator",
+   "rel": "produced_by",
+   "to": "node.T4.1",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t41.interval_calculator",
+   "rel": "produced_by",
+   "to": "node.T4.1",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t41.dwell_evaluator",
+   "rel": "produced_by",
+   "to": "node.T4.1",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t41.session_engine",
+   "rel": "produced_by",
+   "to": "node.T4.1",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t41.engine_tests",
+   "rel": "produced_by",
+   "to": "node.T4.1",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
   }
  ],
  "events": [
@@ -5662,6 +6018,139 @@
    "at": "2026-08-20",
    "actor": "codex",
    "detail": "T4.1 second unblock: Commands are intent-only and carry no personal data; Rules defined; reads_check extended to close the type contract; decision-rights table added so implementation shape is decided rather than blocked on.",
+   "node": "T4.1"
+  },
+  {
+   "id": "ev.0025",
+   "type": "spec_amended",
+   "at": "2026-08-20",
+   "actor": "codex",
+   "detail": "Added 22 cited T4.1 hour-band, demo, display-risk, and PIN facts already stated in BUSINESS_RULES and TEST_PLAN",
+   "node": "T4.1"
+  },
+  {
+   "id": "ev.0026",
+   "type": "spec_amended",
+   "at": "2026-08-20",
+   "actor": "codex",
+   "detail": "T4.1 behavior contract corrected: manual disarm from both check-ins resolves locally with no outbound effects; anonymous civic signal begins at FAMILY_ESCALATED and detailed incident begins at SOS_ACTIVE",
+   "node": "T4.1",
+   "refs": [
+    "fail.t41.behavior_contract"
+   ]
+  },
+  {
+   "id": "ev.0027",
+   "type": "blocked",
+   "at": "2026-08-20",
+   "actor": "codex",
+   "detail": "T4.1 verifier exposed unspecified behavior when an armed AUTO_ZONE session crosses into an n/a interval band; three other spec findings and the invention finding were corrected",
+   "refs": [
+    "q.t41.cross_hour_interval",
+    "fail.t41.spec_round1",
+    "fail.t41.invention_round1"
+   ],
+   "node": "T4.1"
+  },
+  {
+   "id": "ev.0028",
+   "type": "unblocked",
+   "at": "2026-08-20",
+   "actor": "codex",
+   "detail": "Founder selected FREEZE_AT_ARM for active AUTO_ZONE sessions; current-band n/a cells cannot disarm an existing session",
+   "refs": [
+    "q.t41.cross_hour_interval",
+    "d.t41.freeze_arm_band"
+   ],
+   "node": "T4.1"
+  },
+  {
+   "id": "ev.0029",
+   "type": "spec_amended",
+   "at": "2026-08-20",
+   "actor": "codex",
+   "detail": "Canonicalized armedHourBand persistence, frozen-band rescheduling, absolute SHADOW deadlines, fresh-arm current-band evaluation, and silent hour changes",
+   "refs": [
+    "d.t41.freeze_arm_band",
+    "fail.t41.spec_round1"
+   ],
+   "node": "T4.1"
+  },
+  {
+   "id": "ev.0030",
+   "type": "decision_made",
+   "at": "2026-08-20",
+   "actor": "codex",
+   "detail": "T4.1 keeps arm and deadline persistence explicit as local intent-only Commands, leaving repository execution to T4.2",
+   "refs": [
+    "d.t41.engine_plumbing"
+   ],
+   "node": "T4.1"
+  },
+  {
+   "id": "ev.0031",
+   "type": "verifier_killed",
+   "at": "2026-08-20",
+   "actor": "codex",
+   "detail": "T4.1 round 1 spec and invention lenses rejected four timing/recovery defects and one wrong-same-valued fixture provenance match",
+   "refs": [
+    "ver.t41.spec.round1",
+    "ver.t41.invention.round1",
+    "fail.t41.spec_round1",
+    "fail.t41.invention_round1"
+   ],
+   "node": "T4.1"
+  },
+  {
+   "id": "ev.0032",
+   "type": "verifier_killed",
+   "at": "2026-08-20",
+   "actor": "codex",
+   "detail": "T4.1 invention round 3 rejected stale spec-graph cardinality: declared 248 while containing 279 facts",
+   "refs": [
+    "ver.t41.invention.round3",
+    "fail.t41.invention_round3"
+   ],
+   "node": "T4.1"
+  },
+  {
+   "id": "ev.0033",
+   "type": "verifier_passed",
+   "at": "2026-08-20",
+   "actor": "codex",
+   "detail": "T4.1 final fresh spec and boundary round 3 plus invention round 4 returned kill=false with no findings",
+   "refs": [
+    "ver.t41.spec.round3",
+    "ver.t41.boundary.round3",
+    "ver.t41.invention.round4"
+   ],
+   "node": "T4.1"
+  },
+  {
+   "id": "ev.0034",
+   "type": "gate_failed",
+   "at": "2026-08-20",
+   "actor": "codex",
+   "detail": "T4.1 G1 first attempt found stale duplicate transformed classes in generated app/build output; Gradle clean removed them and the complete rerun passed",
+   "refs": [
+    "fail.t41.g1_stale_classes"
+   ],
+   "node": "T4.1"
+  },
+  {
+   "id": "ev.0035",
+   "type": "node_completed",
+   "at": "2026-08-20",
+   "actor": "codex",
+   "detail": "T4.1 shipped the pure JVM session engine with FREEZE_AT_ARM, absolute-deadline recovery, local-only pre-family states and all ten gates passing",
+   "refs": [
+    "art.t41.session_engine",
+    "art.t41.engine_tests",
+    "d.t41.freeze_arm_band",
+    "ver.t41.spec.round3",
+    "ver.t41.boundary.round3",
+    "ver.t41.invention.round4"
+   ],
    "node": "T4.1"
   }
  ]

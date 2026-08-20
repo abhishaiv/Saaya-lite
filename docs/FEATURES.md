@@ -29,11 +29,18 @@ between her and an institutional record.
 | Precise location | never | never | never | **yes** |
 | Identity | never | never | never | **yes** |
 | Session history | never | never | never | **yes** |
-| Anonymised record | no | **yes** | no | yes |
+| Anonymised record | no | no | **yes** | **yes** |
 | Route reconstructable | **no** | **no** | **no** | within one incident only |
 
+Nothing leaves the phone during Shadow or either SUS/check-in state. Entering family
+escalation writes one anonymous zone/hour civic signal; despite its internal name,
+`WriteSusEvent` is triggered there, not during either check-in. It contains no precise
+location, identity, UID, device ID, session ID, favourites, minutes or seconds. A detailed
+state-visible incident is created only when SOS begins.
+
 **How the SUS record is actually anonymised**, not just labelled so:
-- It snaps to its **zone**, never a coordinate. "Zone 7, 04:12", not "17.71042, 83.30401".
+- It snaps to its **zone** and integer hour, never a coordinate or fine time: "Zone 7,
+  hour 4", not "17.71042, 83.30401 at 04:12".
 - It carries **no session id**, so two events in the same zone cannot be linked as one
   woman's journey.
 - It carries no name, no device id, no contact list.

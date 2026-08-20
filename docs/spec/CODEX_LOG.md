@@ -29,12 +29,12 @@ marketing, and these judges build with Codex daily.
 
 | Metric | Value |
 |---|---|
-| Tasks run through Codex | 2 |
+| Tasks run through Codex | 3 |
 | Tasks accepted with no correction | 0 |
-| Tasks needing correction | 2 |
-| Estimated hours saved | ~0.5 net |
-| Where Codex was clearly better than hand-writing | Mechanical theme/icon scaffold; three-way parser fan-out; exhaustive asset joins, coordinate anchors and repeatable gate evidence |
-| Where Codex was clearly worse | Initial dependency completeness, 8 GB memory sizing, Material default-role closure, the too-narrow coordinate repair recommendation and Java test-API compatibility |
+| Tasks needing correction | 3 |
+| Estimated hours saved | ~1.5 net |
+| Where Codex was clearly better than hand-writing | Mechanical theme/icon scaffold; three-way parser fan-out; exhaustive asset joins and coordinate anchors; pure transition reducer with 37 timing-rule tests; adversarial recovery and provenance checks |
+| Where Codex was clearly worse | Initial dependency completeness, 8 GB memory sizing, Material default-role closure, the too-narrow coordinate repair recommendation, first-pass recovery semantics and provenance-graph bookkeeping |
 
 ## Decisions to record here specifically
 
@@ -119,3 +119,42 @@ records the final delta and provenance rather than rewriting it.
 **Verdict:** Saved modest time. Parallel parser transcription and exhaustive mechanical
 checks were fast and caught a real specification defect, but the incomplete repair
 recommendation and one test-API mistake consumed part of that gain.
+
+### T4.1 - Session engine, pure JVM          2026-08-20, ~210 minutes active
+
+**Asked:** Implement the complete session state machine as a deterministic JVM engine with
+zero Android imports, exact arming, dwell, check-in, family and SOS timing, process-death
+recovery, intent-only commands and the corrected on-device trust boundary. Freeze the
+AUTO_ZONE hour band at arm, persist absolute deadlines, run all ten gates and continue only
+after fresh spec, boundary and invention lenses pass.
+
+**Produced:** Flat `SessionState`, exhaustive `SessionEvent`, intent-only `Command`, `Rules`,
+`ArmingEvaluator`, `IntervalCalculator`, `DwellEvaluator` and `SessionEngine` types, plus 31
+engine and 6 rules tests. AUTO_ZONE captures `armedHourBand` exactly once; MANUAL stays at ten
+minutes; every scheduled timer carries its absolute epoch-millisecond deadline; recovery
+restores that deadline or fires immediately when overdue; and invalid persisted AUTO_ZONE
+data uses the existing recovery-error path.
+
+**Shipped:** A pure Kotlin domain engine with no Android imports, personal data or pre-SOS
+backend effects. The complete project assembles and lints cleanly, all 39 unit tests pass,
+G6 reports 22 grounded Kotlin files with zero violations, G10 closes 51 referenced types,
+and the final APK installs and cold-launches on `saaya_api35`. Fresh final spec and boundary
+lenses passed at 0.98 confidence and the fresh invention lens passed at 0.99.
+
+**Needed correcting:** The initial contract omitted definitions for `Command`,
+`PersistedSession`, `Rules` and `EngineResult.outcome`, and the source documents disagreed on
+manual disarm and when anything becomes state-visible; founder amendments closed those
+gaps. Spec verifier round 1 then killed four real defects: current-band `n/a` could crash an
+active session, SHADOW recovery recomputed rather than restored its deadline, ZoneExited had
+an undocumented current-zone guard, and overdue recovery advanced without restarting the
+foreground service. The founder selected `FREEZE_AT_ARM`, which resolved the behavioral
+choice and is now a semantic fact. Invention round 1 also caught an inert `0.5` fixture
+default that passed G6 only by matching the wrong fact. After those fixes, the final
+invention round caught one more audit defect: `spec_graph.json` declared 248 facts while
+containing 279. The header was synchronized and a fresh verifier passed. G1's first final
+rerun found only stale duplicate transformed classes under generated `app/build`; `clean`
+removed them and the full assemble/lint/test rerun passed.
+
+**Verdict:** Saved about one net hour. Codex wrote and tested the broad deterministic engine
+quickly and its adversarial passes found consequential spec and recovery defects, although
+the first implementation and provenance bookkeeping both needed correction.

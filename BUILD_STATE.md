@@ -8,8 +8,8 @@ Regenerate with `python3 scripts/render_build_state.py`.
 | Field | Value |
 |---|---|
 | Mode | **single continuous run**, order below |
-| Next node | **T1.1** - Scaffold, theme, manifest privacy flags |
-| Nodes complete | 0 of 22 |
+| Next node | **T4.2** - Foreground service, geofencing, alarms, recovery |
+| Nodes complete | 3 of 22 |
 | Total work | 45.0 h |
 
 ## Node ledger
@@ -19,9 +19,9 @@ hour 14 rather than hour 24. Reasoning in `docs/spec/GRAPH_ENGINEERING.md`.
 
 | # | Node | Title | Risk | Shape | Cum h | Verify | Status |
 |---|---|---|---|---|---|---|---|
-| 1 | `T1.1` | Scaffold, theme, manifest privacy flags | low | serial | 2.0 | spec | pending |
-| 2 | `T2.1` | Zone parsing to typed Zone/ZoneCard/PoliceStation | low | diamond | 3.5 | spec | pending |
-| 3 | `T4.1` | Session engine, pure JVM, no Android imports | HIGH | serial | 6.5 | spec, boundary, invention | pending |
+| 1 | `T1.1` | Scaffold, theme, manifest privacy flags | low | serial | 2.0 | spec | complete |
+| 2 | `T2.1` | Zone parsing to typed Zone/ZoneCard/PoliceStation | low | diamond | 3.5 | spec | complete |
+| 3 | `T4.1` | Session engine, pure JVM, no Android imports | HIGH | serial | 6.5 | spec, boundary, invention | complete |
 | 4 | `T4.2` | Foreground service, geofencing, alarms, recovery | HIGHEST | serial | 9.5 | spec, boundary, invention | pending |
 | 5 | `T1.2` | Firebase wiring, anonymous auth (project already exists) | low | serial | 10.5 | spec | pending |
 | 6 | `T8.1` | Seed zones to Firestore | low | serial | 11.0 | spec | pending |
@@ -64,3 +64,5 @@ as a fact in `graph/spec_graph.json` if it is a value.
 | 2026-08-19 | T1.1 | core-splashscreen version, and permission to add it | 1.0.1, added to the closed list in ARCHITECTURE.md | `dep.splashscreen` |
 | 2026-08-19 | T1.1 | six theme alphas + label tracking frozen in prose, never facts | added, plus 14 more of the same class found by scanning | `alpha.*`, `type.label.tracking` |
 | 2026-08-19 | T1.1 | the Saaya mark for ic_launcher_foreground | real brand SVGs committed at `assets/brand/`; split specified in ICONOGRAPHY.md | 6 `color.icon.*` facts |
+| 2026-08-20 | T4.1 | F14 disarm behavior and the anonymous civic-signal boundary contradicted the transition table | check-ins may disarm locally with no outbound effect; anonymous civic signal begins at family escalation and detailed incident only at SOS | `cooldown.manual`, `boundary.*` |
+| 2026-08-20 | T4.1 | active AUTO_ZONE sessions could cross into an interval-table n/a band although BUSINESS_RULES said that could not occur | freeze `armedHourBand` at arm until resolution; MANUAL remains 10 min; recovery uses the persisted absolute deadline | `session.auto_zone.hour_band_policy` |

@@ -57,7 +57,12 @@ Time from arming (or from the last `OK`) until check-in 1 appears.
 | **MODERATE** | **12 min** | n/a | n/a |
 | **MANUAL** (any zone or none) | **10 min**, always | | |
 
-Cells marked n/a cannot occur, because the arming matrix does not arm there.
+Cells marked n/a cannot start a new `AUTO_ZONE` session, because the arming matrix does not
+arm there. An already-active `AUTO_ZONE` session freezes the hour band captured when it
+armed as `armedHourBand`, and uses that band for every later check-in reschedule until the
+session reaches `RESOLVED`. Crossing into a current-band n/a cell never disarms or interrupts
+that session. After resolution, a new arming attempt evaluates the current hour band normally.
+`MANUAL` sessions never use `armedHourBand` and remain fixed at 10 minutes in every band.
 
 This is the concrete difference from T-Safe's fixed 15-minute timer, so it must be
 visible in the UI: the check-in screen states why it checked when it did.

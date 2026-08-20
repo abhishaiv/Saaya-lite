@@ -4,7 +4,8 @@ with zero Android imports, so every rule here is unit-testable on the JVM.
 
 `fun onEvent(state: SessionState, event: SessionEvent, ctx: EngineContext): EngineResult`
 
-`EngineContext` carries `now: Instant`, `zone: Zone?`, `hourBand: HourBand`, `config: Rules`.
+`EngineContext` carries `now: Instant`, `zone: Zone?`, the current `hourBand: HourBand`,
+the frozen `armedHourBand: HourBand?`, and `rules: Rules`.
 
 **`java.time` on minSdk 24.** `Instant` and friends require API 26. We keep `java.time` in
 the domain because it is expressive and testable, and enable **core library desugaring** so
@@ -58,20 +59,22 @@ The state is never parameterised; the outcome rides alongside it.
 
 | From | Event | Guard | To | Commands |
 |---|---|---|---|---|
-| `IDLE` | `ZoneEntered` | arming matrix says yes AND no cooldown active | `SHADOW` | `ScheduleTimer(CHECKIN, interval)`, show arm banner, start FGS |
+| `IDLE` | `ZoneEntered` | arming matrix says yes AND no cooldown active | `SHADOW` | capture `armedHourBand=current hourBand`, `ScheduleTimer(CHECKIN, interval)`, persist its absolute deadline, show arm banner, start FGS |
 | `IDLE` | `ZoneEntered` | matrix says no, or cooldown | `IDLE` | none, and **do not notify her**. Silence is correct here. |
-| `IDLE` | `ManualArm` | - | `SHADOW` | `ScheduleTimer(CHECKIN, 10 min)`, start FGS |
+| `IDLE` | `ManualArm` | - | `SHADOW` | keep `armedHourBand=null`, `ScheduleTimer(CHECKIN, 10 min)`, persist its absolute deadline, start FGS |
 | `SHADOW` | `CheckInTimerFired` | - | `CHECKIN_1` | `ShowCheckIn(90, GENTLE)`, `ScheduleTimer(CD1, 90)` |
 | `SHADOW` | `ZoneExited` | armMode = AUTO_ZONE | `RESOLVED(DISARMED)` | `CancelTimer(CHECKIN)`, stop FGS, log `ZONE_EXIT` |
 | `SHADOW` | `ZoneExited` | armMode = MANUAL | `SHADOW` | none. Manual arming is not zone-bound. |
 | `SHADOW` | `ManualDisarm` | - | `RESOLVED(DISARMED)` | cancel timers, stop FGS, start 45 min cooldown for this zone |
 | `SHADOW` | `HelpNowTapped` | - | `SOS_ACTIVE` | see SOS entry below |
-| `CHECKIN_1` | `OkTapped` | - | `SHADOW` | `CancelTimer(CD1)`, `ScheduleTimer(CHECKIN, interval)`, 20 min cooldown |
+| `CHECKIN_1` | `OkTapped` | - | `SHADOW` | `CancelTimer(CD1)`, `ScheduleTimer(CHECKIN, interval from armedHourBand)`, persist its absolute deadline, 20 min cooldown |
 | `CHECKIN_1` | `CountdownExpired(1)` | - | `CHECKIN_2` | `ShowCheckIn(60, URGENT)`, `PlayUrgentAlert`, `ScheduleTimer(CD2, 60)` |
 | `CHECKIN_1` | `HelpNowTapped` | - | `SOS_ACTIVE` | see SOS entry |
+| `CHECKIN_1` | `ManualDisarm` | - | `RESOLVED(DISARMED)` | `CancelTimer(CD1)`, `HideCheckIn`, stop FGS, start 45 min cooldown for this zone |
 | `CHECKIN_2` | `OkTapped` | - | `SHADOW` | as above |
 | `CHECKIN_2` | `CountdownExpired(2)` | - | `FAMILY_ESCALATED` | `WriteSusEvent(...)`, `NotifyFamily(...)`, `ScheduleTimer(CANCEL, 60)` |
 | `CHECKIN_2` | `HelpNowTapped` | - | `SOS_ACTIVE` | see SOS entry |
+| `CHECKIN_2` | `ManualDisarm` | - | `RESOLVED(DISARMED)` | `CancelTimer(CD2)`, `HideCheckIn`, stop FGS, start 45 min cooldown for this zone |
 | `FAMILY_ESCALATED` | `CancelTapped` | - | `RESOLVED(CANCELLED)` | `CancelTimer(CANCEL)`, patch SUS outcome to `CANCELLED_BY_USER`, notify contacts of the cancel |
 | `FAMILY_ESCALATED` | `CountdownExpired(cancel)` | - | `SOS_ACTIVE` | `WriteSosIncident(trigger=LADDER_LAPSE)`, patch SUS outcome to `ESCALATED_TO_SOS`, `RequirePinToStop` |
 | `FAMILY_ESCALATED` | `HelpNowTapped` | - | `SOS_ACTIVE` | as above but `trigger=MANUAL_HELP_BUTTON` |
@@ -80,6 +83,17 @@ The state is never parameterised; the outcome rides alongside it.
 | any | `AppKilledRestart` | - | see recovery | |
 
 **Every other (state, event) pair is a no-op.** Log it at debug level and do not crash.
+
+Manual disarm from either check-in writes no SUS event or SOS incident, notifies nobody,
+requires no PIN, and records only the local `DISARMED` outcome. Only an active SOS is
+PIN-protected.
+
+For every active `AUTO_ZONE` session, `armedHourBand` is non-null and remains the band
+captured on the `IDLE -> SHADOW` transition. It governs every later `CHECKIN` reschedule;
+the current wall-clock band does not replace it. For every `MANUAL` session,
+`armedHourBand` is null and the fixed 10-minute interval applies. `armedAt` remains the
+original session-arm time after “I’m OK”. Merely changing hour bands emits no command, write,
+notification or interruption.
 
 ## SOS entry, common block
 
@@ -103,7 +117,7 @@ The service is `START_STICKY` and Android will kill it. On restart:
 | Persisted state | Action |
 |---|---|
 | `IDLE` or `RESOLVED` | nothing |
-| `SHADOW` | re-register geofences, recompute the next check-in from `armedAt` + interval. If already overdue, fire `CheckInTimerFired` immediately. |
+| `SHADOW` | re-register geofences and restore the next check-in from persisted `deadlineEpochMs`. Never recompute it from `armedAt` or current rules. If already overdue, fire `CheckInTimerFired` immediately. |
 | `CHECKIN_1` / `CHECKIN_2` | recompute remaining countdown from the persisted deadline. **If the deadline already passed while dead, advance the ladder immediately.** Do not silently reset the countdown. |
 | `FAMILY_ESCALATED` | recompute the cancel window. If it lapsed while dead, **go straight to SOS.** |
 | `SOS_ACTIVE` | resume SOS, keep requiring the PIN, re-show the notification. |
@@ -124,6 +138,7 @@ dies mid-ladder is more likely to be a real emergency, not less.
 | She uninstalls mid-SOS | Out of scope. Do not attempt to prevent. |
 | Clock change or DST | Use monotonic elapsed time for countdowns, wall clock only for hour bands. |
 | Demo mode toggled mid-session | Applies to the **next** timer only. Never retroactively shortens a running countdown. |
+| Active `AUTO_ZONE` session crosses hour bands | Keep `armedHourBand` frozen until `RESOLVED`. A current-band n/a cell cannot disarm it; a later new session still evaluates the current band normally. |
 
 ## Test hooks required
 
@@ -173,6 +188,7 @@ data class EngineContext(
     val now: Instant,
     val zone: Zone?,
     val hourBand: HourBand,
+    val armedHourBand: HourBand?,
     val rules: Rules,
     val armMode: ArmMode,
     val armedAt: Instant?,
@@ -232,7 +248,11 @@ sealed interface Command {
     data class PatchSosStatus(val status: SosStatus) : Command
 
     // timers
-    data class ScheduleTimer(val id: TimerId, val delaySec: Int) : Command
+    data class ScheduleTimer(
+        val id: TimerId,
+        val delaySec: Int,
+        val deadlineEpochMs: Long
+    ) : Command
     data class CancelTimer(val id: TimerId) : Command
 
     // service and sensing
@@ -243,7 +263,12 @@ sealed interface Command {
 
     // local bookkeeping
     data class LogSessionEvent(val type: String, val detail: String? = null) : Command
-    data class StartCooldown(val zoneId: String, val minutes: Int) : Command
+    data class PersistSessionArm(
+        val armMode: ArmMode,
+        val armedHourBand: HourBand?,
+        val armedAtEpochMs: Long
+    ) : Command
+    data class StartZoneCooldown(val zoneId: String, val minutes: Int) : Command
 
     // alerts and gating
     data object PlayUrgentAlert : Command
@@ -262,6 +287,7 @@ data class PersistedSession(
     val state: SessionState,
     val armMode: ArmMode,
     val zoneId: String?,
+    val armedHourBand: HourBand?,
     val armedAtEpochMs: Long,
     val deadlineEpochMs: Long?,       // absolute, so a countdown can be recomputed
     val susEventWritten: Boolean,
@@ -272,6 +298,13 @@ data class PersistedSession(
 `susEventWritten` exists so the SOS entry block knows whether to write a catch-up SUS event
 when she skipped the ladder with Help Now. `hasFavourite` exists so the family step can
 render `family_no_contact` without the engine touching a repository.
+
+`deadlineEpochMs` is written whenever any `CHECKIN` timer is scheduled or rescheduled.
+`ScheduleTimer` carries that absolute deadline so the service persists the engine's value
+rather than reconstructing it from a later wall-clock band or changed `Rules` instance.
+`armedHourBand` is required when recovering an active `AUTO_ZONE` session and must be null
+for `MANUAL`; a missing AUTO_ZONE value is invalid persisted data and follows the existing
+recovery error path. Recovery never invents a replacement band.
 
 **The engine takes `EngineContext` and returns `EngineResult`. It reads nothing else and
 touches no IO.** That is what makes every rule in `BUSINESS_RULES.md` testable on the JVM.

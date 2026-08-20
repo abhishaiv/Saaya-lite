@@ -25,6 +25,8 @@ protect the submission's claims**, so they are not optional.
 | Full ladder | `SHADOW` -> `CHECKIN_1` -> `CHECKIN_2` -> `FAMILY_ESCALATED` -> `SOS_ACTIVE` at exactly 90 / 60 / 60 s |
 | `OK` at step 1 | returns to `SHADOW`, cancels CD1, reschedules, applies the 20 min cooldown |
 | `OK` at step 2 | same |
+| Manual disarm at step 1 | `RESOLVED(DISARMED)`; exact commands are `CancelTimer(CD1)`, `HideCheckIn`, `StopForegroundService`, `StartZoneCooldown(45)`; no write, notification or PIN command |
+| Manual disarm at step 2 | `RESOLVED(DISARMED)`; exact commands are `CancelTimer(CD2)`, `HideCheckIn`, `StopForegroundService`, `StartZoneCooldown(45)`; no write, notification or PIN command |
 | Cancel in the family window | `RESOLVED(CANCELLED)`, emits the SUS outcome patch to `CANCELLED_BY_USER` |
 | Help Now from `SHADOW` | straight to `SOS_ACTIVE`, **and also emits a SUS event** so the civic layer is not blind |
 | SOS is sticky | every event except `PinAccepted` leaves it in `SOS_ACTIVE` |
@@ -35,6 +37,13 @@ protect the submission's claims**, so they are not optional.
 | Exit dwell | disarming does not fire before 180 s continuous non-containment |
 | Cooldown after manual disarm | re-entry within 45 min does not re-arm |
 | Demo divisor | with `DEMO`, ladder totals 35 s and the written payloads are byte-identical to `NORMAL` |
+| Frozen band reschedule | MODERATE armed in `NIGHT_DEEP`, then `OkTapped` during `DAWN`, remains `SHADOW` and reschedules for 12 min |
+| Active crossing | entering a current-band n/a cell does not disarm or interrupt an active session |
+| Frozen-band recovery | process recovery retains persisted `armedHourBand` and uses the absolute `deadlineEpochMs` |
+| Overdue SHADOW recovery | a passed persisted deadline immediately advances as `CheckInTimerFired` |
+| Fresh n/a attempt | after resolution, a new MODERATE + `DAWN` arming attempt stays `IDLE` |
+| Manual across bands | every band reschedules a MANUAL session at 10 min with `armedHourBand=null` |
+| Hour change silence | changing the current band alone emits no backend command, notification or user interruption |
 
 ### `AnonymiserTest` - **the trust boundary, and the most important test in the build**
 | Test | Assertion |
@@ -42,7 +51,9 @@ protect the submission's claims**, so they are not optional.
 | SUS payload keys | exactly the allowed set. Assert `latitude`, `longitude`, `sessionId`, `uid`, `deviceId` are **absent** |
 | SUS carries no fine time | `dateLocal` is a date and `hourLocal` is an integer hour. No minutes, no seconds. |
 | Two SUS events from one session | contain nothing that links them |
-| Nothing writes before family escalation | drive `IDLE`->`SHADOW`->`CHECKIN_1`->`CHECKIN_2` and assert **zero** write commands |
+| Nothing writes before family escalation | drive `IDLE`->`SHADOW`->`CHECKIN_1`->`CHECKIN_2` and assert **zero** backend-write commands |
+| Family boundary | entering `FAMILY_ESCALATED` emits exactly one anonymous `WriteSusEvent` intent and no `WriteSosIncident` |
+| SOS boundary | entering `SOS_ACTIVE` emits `WriteSosIncident`; this is the first detailed state-visible incident |
 | SOS payload | contains precise location and uid, and `contactsNotified` is an Int, never names |
 
 ### `QueueTest`
