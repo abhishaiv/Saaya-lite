@@ -312,8 +312,8 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 143,
-  "edges": 409,
+  "entities": 145,
+  "edges": 412,
   "events": 1
  },
  "entities": [
@@ -1348,6 +1348,22 @@
    "path": "AGENTS.md",
    "tier": "0",
    "always_read": "True"
+  },
+  {
+   "id": "doc.assets-readme",
+   "class": "Document",
+   "label": "assets/README.md",
+   "path": "assets/README.md",
+   "tier": "2",
+   "always_read": "False"
+  },
+  {
+   "id": "d.selfcontained",
+   "class": "Decision",
+   "label": "Commit the Vizag dataset so the repo is self-contained",
+   "by": "claude",
+   "date": "2026-08-19",
+   "rationale": "the spec pointed at an absolute path on one Mac, so T2.1 would have failed on any fresh clone. Committing it also makes the evidence chain inspectable by a reviewer."
   }
  ],
  "edges": [
@@ -4619,6 +4635,30 @@
    "from": "doc.readme",
    "rel": "specifies",
    "to": "d.repo-targeting",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.assets-readme",
+   "rel": "read_by",
+   "to": "node.T2.1",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.assets-readme",
+   "rel": "hosted_in",
+   "to": "repo.saaya-lite",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.selfcontained",
+   "rel": "enables",
+   "to": "claim.nokeys",
    "at": "2026-08-19",
    "by": "claude",
    "confidence": "high"

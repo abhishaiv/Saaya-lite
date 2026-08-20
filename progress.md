@@ -960,3 +960,32 @@ lie in a project whose whole posture is that claims are checkable.
 **Final sweep: 24 checks across the build graph, spec graph, knowledge graph and
 cross-file consistency. All pass.** 39 documents, 22 nodes, 185 frozen facts, 143 entities,
 409 provenanced edges, zero orphans, zero dead references, zero uncovered spec values.
+
+## 2026-08-19 - Sixth defect: the repo was not self-contained
+
+Founder asked what he needs to hand Codex at the start. Checking that surfaced a blocking
+defect the earlier audits missed, because they only checked what was in the repo rather than
+what was missing from it.
+
+**The three Vizag data files were never committed.** The spec told Codex to copy them from
+`/Users/abhishai/Desktop/Women Safety App/WomenSafetyApp/Resources/`, an absolute path on one
+Mac. On a fresh clone anywhere else, `T2.1` - node two - fails immediately, and every
+downstream node with it. Every audit I ran passed because they all verified references
+*within* the repo and none asked whether the repo could stand alone.
+
+Committed all three into `assets/`, verified the counts against the spec assertions on the
+way in (24 zones with the right tier split, 19 cards, 37 stations). Wrote `assets/README.md`
+carrying the parse assertions, the lon/lat gotcha, and the provenance statement.
+
+**Also removed the last reason to need the Saaya iOS repo.** Several docs cited
+`AppTheme.swift` and `SUSCheckInCardView.swift` as sources. Those citations are provenance
+and are correct, but they read like instructions to go and open files that will not exist.
+All 33 values taken from that source are already extracted into `spec_graph.json` as facts,
+and the strings are already in COPY.md marked (iOS verbatim). Said so explicitly in
+SPEC_README so Codex does not go hunting.
+
+One absolute path remains, deliberately: the `sdk.dir` example in SECRETS_AND_ACCESS.md,
+which is illustrating what a machine-local file looks like.
+
+The repository is now genuinely self-contained: clone it on any machine and every input the
+build needs is present.

@@ -119,7 +119,7 @@ These have a reason behind them that is not obvious from the code. Do not "impro
 
 ## Source data, already audited and present
 
-Copy from `/Users/abhishai/Desktop/Women Safety App/WomenSafetyApp/Resources/`:
+Copy from `assets/` in this repo:
 
 | File | Contents |
 |---|---|
@@ -150,3 +150,12 @@ no user tap. If M6 ever requires a tap, F33 is broken regardless of what any scr
 
 A task is done when: it compiles, it runs on a real Android device, its acceptance
 criteria in `TEST_PLAN.md` pass, and its entry is written in `CODEX_LOG.md`.
+
+
+## The Saaya iOS source is not required
+
+**You do not need the Saaya iOS source.** Every value taken from it is already extracted
+into `graph/spec_graph.json` as a fact (33 of them), and every string taken from it is
+already in `COPY.md` marked "(iOS verbatim)". The `sourced_from` fields naming
+`AppTheme.swift` and `SUSCheckInCardView.swift` are provenance, not instructions to go and
+read them. That repository is not required to build this one.

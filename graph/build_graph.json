@@ -86,7 +86,8 @@
    ],
    "reads": [
     "DATA_MODEL.md",
-    "TEST_PLAN.md"
+    "TEST_PLAN.md",
+    "assets/README.md"
    ],
    "extra_gates": [
     "ZoneParsingTest"
