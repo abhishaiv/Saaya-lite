@@ -312,9 +312,9 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 171,
-  "edges": 446,
-  "events": 18
+  "entities": 185,
+  "edges": 462,
+  "events": 22
  },
  "entities": [
   {
@@ -1548,6 +1548,102 @@
    "by": "claude",
    "date": "2026-08-19",
    "rationale": "the cite-and-propose path confirmed DATA_MODEL.md:47 said 83.1, and it did. It could not confirm 83.1 was correct, and it was not. Only the anchor principle catches that: a measurement from outside the documents beat the document. Approving a citation is not approving a fact."
+  },
+  {
+   "id": "art.t21.zone_type",
+   "class": "Artifact",
+   "label": "T2.1 typed Zone model and strict GeoJSON parser",
+   "node": "T2.1"
+  },
+  {
+   "id": "art.t21.zone_card_type",
+   "class": "Artifact",
+   "label": "T2.1 typed ZoneCard model and JSON parser",
+   "node": "T2.1"
+  },
+  {
+   "id": "art.t21.police_station_type",
+   "class": "Artifact",
+   "label": "T2.1 typed PoliceStation model and JSON parser",
+   "node": "T2.1"
+  },
+  {
+   "id": "art.t21.assets_bundled",
+   "class": "Artifact",
+   "label": "T2.1 byte-identical Vizag heatmap, zone-card and police-point Android assets",
+   "node": "T2.1"
+  },
+  {
+   "id": "art.t21.zone_loader",
+   "class": "Artifact",
+   "label": "T2.1 ZoneLoader with count, tier, join and district-envelope assertions",
+   "node": "T2.1"
+  },
+  {
+   "id": "art.t21.zone_parsing_test",
+   "class": "Artifact",
+   "label": "T2.1 ZoneParsingTest over audited assets and all 189 coordinates",
+   "node": "T2.1"
+  },
+  {
+   "id": "anchor.t21.coordinate_envelope",
+   "class": "Anchor",
+   "label": "189 frozen-asset coordinates fit the district envelope and zero swapped centroids pass",
+   "node": "T2.1",
+   "coordinates": "189",
+   "outside": "0",
+   "swapped_centroids_passing": "0"
+  },
+  {
+   "id": "ver.t21.spec.round1",
+   "class": "Verification",
+   "label": "T2.1 spec verifier round 1 rejected the stale build-graph coordinate contract",
+   "node": "T2.1",
+   "kill": "true",
+   "confidence": "0.99"
+  },
+  {
+   "id": "ver.t21.invention.round1",
+   "class": "Verification",
+   "label": "T2.1 invention verifier passed semantic fact provenance",
+   "node": "T2.1",
+   "kill": "false",
+   "confidence": "0.99"
+  },
+  {
+   "id": "ver.t21.spec.round2",
+   "class": "Verification",
+   "label": "T2.1 spec verifier round 2 passed with no findings",
+   "node": "T2.1",
+   "kill": "false",
+   "confidence": "0.99"
+  },
+  {
+   "id": "fail.t21.g1_stale_classes",
+   "class": "Failure",
+   "label": "T2.1 G1 found stale duplicate transformed class copies confined to generated app/build output",
+   "node": "T2.1",
+   "gate": "G1"
+  },
+  {
+   "id": "fail.t21.test_readstring",
+   "class": "Failure",
+   "label": "T2.1 test helper used Files.readString outside AGP's exposed unit-test API surface",
+   "node": "T2.1",
+   "gate": "G3"
+  },
+  {
+   "id": "fail.t21.spec_round1",
+   "class": "Failure",
+   "label": "T2.1 first spec verifier rejected the stale tight coordinate bounds in build_graph.json",
+   "node": "T2.1",
+   "gate": "G9"
+  },
+  {
+   "id": "dev.t21.pre_gate_commit",
+   "class": "Deviation",
+   "label": "Founder coordinate-correction commit captured in-progress T2.1 artifacts before all gates passed",
+   "node": "T2.1"
   }
  ],
  "edges": [
@@ -5118,6 +5214,134 @@
    "at": "2026-08-19",
    "by": "claude",
    "confidence": "high"
+  },
+  {
+   "from": "art.t21.zone_type",
+   "rel": "produced_by",
+   "to": "node.T2.1",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t21.zone_card_type",
+   "rel": "produced_by",
+   "to": "node.T2.1",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t21.police_station_type",
+   "rel": "produced_by",
+   "to": "node.T2.1",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t21.assets_bundled",
+   "rel": "produced_by",
+   "to": "node.T2.1",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t21.zone_loader",
+   "rel": "produced_by",
+   "to": "node.T2.1",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t21.zone_parsing_test",
+   "rel": "produced_by",
+   "to": "node.T2.1",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "node.T2.1",
+   "rel": "verified_by",
+   "to": "anchor.t21.coordinate_envelope",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "node.T2.1",
+   "rel": "verified_by",
+   "to": "ver.t21.invention.round1",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "node.T2.1",
+   "rel": "verified_by",
+   "to": "ver.t21.spec.round2",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "ver.t21.spec.round1",
+   "rel": "contradicts",
+   "to": "node.T2.1",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t21.zone_type",
+   "rel": "verified_by",
+   "to": "anchor.t21.coordinate_envelope",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t21.assets_bundled",
+   "rel": "verified_by",
+   "to": "anchor.t21.coordinate_envelope",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.t21.g1_stale_classes",
+   "rel": "caused_by",
+   "to": "node.T2.1",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.t21.test_readstring",
+   "rel": "caused_by",
+   "to": "art.t21.zone_parsing_test",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.t21.spec_round1",
+   "rel": "caused_by",
+   "to": "node.T2.1",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "dev.t21.pre_gate_commit",
+   "rel": "contradicts",
+   "to": "node.T2.1",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
   }
  ],
  "events": [
@@ -5306,6 +5530,61 @@
    "at": "2026-08-20",
    "actor": "codex",
    "detail": "Added approved T2.1 zone coordinate parse bounds from DATA_MODEL.md:47",
+   "node": "T2.1"
+  },
+  {
+   "id": "ev.0019",
+   "type": "spec_amended",
+   "at": "2026-08-20",
+   "actor": "codex",
+   "detail": "T2.1 replaced the measured coordinate box with the founder-approved Visakhapatnam district envelope after checking all 189 frozen-asset coordinates",
+   "refs": [
+    "d.envelope",
+    "fail.coordrange",
+    "lim.citation"
+   ],
+   "node": "T2.1"
+  },
+  {
+   "id": "ev.0020",
+   "type": "verifier_killed",
+   "at": "2026-08-20",
+   "actor": "codex",
+   "detail": "T2.1 spec round 1 rejected the stale tight coordinate bounds still present in the build graph merge contract",
+   "refs": [
+    "ver.t21.spec.round1",
+    "fail.t21.spec_round1"
+   ],
+   "node": "T2.1"
+  },
+  {
+   "id": "ev.0021",
+   "type": "verifier_passed",
+   "at": "2026-08-20",
+   "actor": "codex",
+   "detail": "T2.1 invention round 1 and spec round 2 returned kill=false at 0.99 confidence with no findings",
+   "refs": [
+    "ver.t21.invention.round1",
+    "ver.t21.spec.round2"
+   ],
+   "node": "T2.1"
+  },
+  {
+   "id": "ev.0022",
+   "type": "node_completed",
+   "at": "2026-08-20",
+   "actor": "codex",
+   "detail": "T2.1 completed: three disjoint parsers, typed models, byte-identical assets and the grounded ZoneLoader passed all gates and the 189-coordinate anchor",
+   "refs": [
+    "art.t21.zone_type",
+    "art.t21.zone_card_type",
+    "art.t21.police_station_type",
+    "art.t21.assets_bundled",
+    "art.t21.zone_loader",
+    "art.t21.zone_parsing_test",
+    "anchor.t21.coordinate_envelope",
+    "ver.t21.spec.round2"
+   ],
    "node": "T2.1"
   }
  ]

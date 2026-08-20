@@ -9,10 +9,10 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
 object ZoneParser {
-    private const val MIN_LATITUDE = 17.6 // grounded: zone.coordinate.lat.min
-    private const val MAX_LATITUDE = 17.9 // grounded: zone.coordinate.lat.max
-    private const val MIN_LONGITUDE = 83.1 // grounded: zone.coordinate.lon.min
-    private const val MAX_LONGITUDE = 83.5 // grounded: zone.coordinate.lon.max
+    private const val MIN_LATITUDE = 17.4 // grounded: zone.coordinate.lat.min
+    private const val MAX_LATITUDE = 18.1 // grounded: zone.coordinate.lat.max
+    private const val MIN_LONGITUDE = 82.9 // grounded: zone.coordinate.lon.min
+    private const val MAX_LONGITUDE = 83.7 // grounded: zone.coordinate.lon.max
 
     private val decoder = Json {
         ignoreUnknownKeys = true
@@ -58,13 +58,11 @@ object ZoneParser {
                 longitude = coordinate.first(),
             )
         }
-        val polygonMean = LatLng(
-            latitude = polygon.map(LatLng::latitude).average(),
-            longitude = polygon.map(LatLng::longitude).average(),
-        )
-        polygonMean.requireInsideApprovedBounds(
-            label = "Polygon mean for '${properties.stationId}'",
-        )
+        polygon.forEach { vertex ->
+            vertex.requireInsideApprovedBounds(
+                label = "Polygon vertex for '${properties.stationId}'",
+            )
+        }
 
         val centroid = LatLng(
             latitude = properties.latitude,

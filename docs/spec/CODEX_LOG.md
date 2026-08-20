@@ -29,12 +29,12 @@ marketing, and these judges build with Codex daily.
 
 | Metric | Value |
 |---|---|
-| Tasks run through Codex | 1 |
+| Tasks run through Codex | 2 |
 | Tasks accepted with no correction | 0 |
-| Tasks needing correction | 1 |
-| Estimated hours saved | 0 net |
-| Where Codex was clearly better than hand-writing | Mechanical theme, adaptive-icon and Gradle scaffold transcription; repeatable gate evidence |
-| Where Codex was clearly worse | Initial dependency completeness, 8 GB memory sizing, Material default-role closure and commit hygiene |
+| Tasks needing correction | 2 |
+| Estimated hours saved | ~0.5 net |
+| Where Codex was clearly better than hand-writing | Mechanical theme/icon scaffold; three-way parser fan-out; exhaustive asset joins, coordinate anchors and repeatable gate evidence |
+| Where Codex was clearly worse | Initial dependency completeness, 8 GB memory sizing, Material default-role closure, the too-narrow coordinate repair recommendation and Java test-API compatibility |
 
 ## Decisions to record here specifically
 
@@ -85,3 +85,37 @@ inside this product node.
 
 **Verdict:** Neutral on elapsed time. Codex produced and mechanically verified a broad
 scaffold, but its first-pass omissions and machine-memory advice consumed the saved time.
+
+### T2.1 - Zone parsing to typed models          2026-08-20, ~75 minutes active
+
+**Asked:** Bundle the three audited Vizag assets and parse them through a true three-worker
+diamond into typed `Zone`, `ZoneCard` and `PoliceStation` models. Merge only after the
+ownership guard, assert the exact dataset counts and joins, catch GeoJSON coordinate swaps,
+and persist every verifier verdict.
+
+**Produced:** Three disjoint parser/model pairs and manifests, a pure Kotlin `ZoneLoader`,
+byte-identical Android asset copies, and `ZoneParsingTest`. The merge asserts 24 zones,
+19 cards, 37 stations, the 6/9/4/5 tier split, exact non-safe card joins and the corrected
+Visakhapatnam district envelope. `domain/` has zero Android imports.
+
+**Shipped:** A clean debug build and lint pass; two passing JVM tests over all three bundled
+assets; an external anchor checking 24 centroids plus 165 polygon vertices with zero outside
+the envelope and zero swapped centroids passing; and grounded provenance comments that bind
+the ambiguous 24/19/37 literals to `zones.total`, `cards.total` and `stations.total`. The
+supplemental invention verifier and fresh spec round 2 both returned `kill=false` at 0.99.
+
+**Needed correcting:** The original four coordinate facts faithfully transcribed
+`DATA_MODEL.md`, but the document's tight box was false against the frozen asset. The first
+repair recommendation—lowering only the longitude minimum to 83.0975—was also too narrow;
+34 polygon vertices would still have failed. The founder supplied a district envelope that
+survives data corrections, and the parser now validates every centroid and vertex. G1 also
+found stale `… 2.class` copies confined to generated output, removed by Gradle `clean`; the
+first test helper used Java 11 `Files.readString`, replaced with a buffered reader. Spec
+verifier round 1 then killed a stale copy of the old bounds in `build_graph.json`; that
+resume-contract defect was fixed before round 2. The founder's correction commit captured
+the in-progress source before all gates, so history was preserved and the completion commit
+records the final delta and provenance rather than rewriting it.
+
+**Verdict:** Saved modest time. Parallel parser transcription and exhaustive mechanical
+checks were fast and caught a real specification defect, but the incomplete repair
+recommendation and one test-API mistake consumed part of that gain.

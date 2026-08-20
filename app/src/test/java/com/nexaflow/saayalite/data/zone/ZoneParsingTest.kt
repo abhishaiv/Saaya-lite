@@ -39,17 +39,12 @@ class ZoneParsingTest {
     }
 
     @Test
-    fun parsedCentroidsAndPolygonMeansStayInsideVizagBounds() {
+    fun parsedCentroidsAndVerticesStayInsideDistrictEnvelope() {
         val dataset = loadBundledDataset()
 
         dataset.zones.forEach { zone ->
             assertInsideApprovedBounds(zone.centroid)
-            assertInsideApprovedBounds(
-                LatLng(
-                    latitude = zone.polygon.map(LatLng::latitude).average(),
-                    longitude = zone.polygon.map(LatLng::longitude).average(),
-                ),
-            )
+            zone.polygon.forEach(::assertInsideApprovedBounds)
         }
     }
 
@@ -58,7 +53,7 @@ class ZoneParsingTest {
     }
 
     private fun assertInsideApprovedBounds(point: LatLng) {
-        assertTrue(point.latitude in 17.6..17.9) // grounded: zone.coordinate.lat.min/max
-        assertTrue(point.longitude in 83.1..83.5) // grounded: zone.coordinate.lon.min/max
+        assertTrue(point.latitude in 17.4..18.1) // grounded: zone.coordinate.lat.min/max
+        assertTrue(point.longitude in 82.9..83.7) // grounded: zone.coordinate.lon.min/max
     }
 }
