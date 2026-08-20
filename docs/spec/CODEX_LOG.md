@@ -40,7 +40,9 @@ marketing, and these judges build with Codex daily.
 
 These are asked for elsewhere in the spec and must land in this file:
 
-- [ ] T1.2: the Firebase project id
+- [x] T1.2: the Firebase project id — **`saaya-lite`** (project number `799647753855`, region
+      `asia-south1`, anonymous auth only, both `com.nexaflow.saayalite` and
+      `.debug` registered, `app/google-services.json` in place and gitignored)
 - [ ] T2.2: osmdroid or Google Maps, and why
 - [ ] T9.1: Telugu strings verified by the founder, yes or no
 - [ ] T9.2: raw output of V7 (the no-AI grep) and V8 (the manifest check)

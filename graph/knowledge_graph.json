@@ -312,9 +312,9 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 145,
-  "edges": 412,
-  "events": 1
+  "entities": 146,
+  "edges": 414,
+  "events": 2
  },
  "entities": [
   {
@@ -1364,6 +1364,14 @@
    "by": "claude",
    "date": "2026-08-19",
    "rationale": "the spec pointed at an absolute path on one Mac, so T2.1 would have failed on any fresh clone. Committing it also makes the evidence chain inspectable by a reviewer."
+  },
+  {
+   "id": "art.firebase",
+   "class": "Artifact",
+   "label": "Firebase project saaya-lite",
+   "path": "app/google-services.json",
+   "kind": "config",
+   "node": "T1.2"
   }
  ],
  "edges": [
@@ -4662,6 +4670,22 @@
    "at": "2026-08-19",
    "by": "claude",
    "confidence": "high"
+  },
+  {
+   "from": "art.firebase",
+   "rel": "produced_by",
+   "to": "node.T1.2",
+   "at": "2026-08-19",
+   "by": "founder",
+   "confidence": "high"
+  },
+  {
+   "from": "art.firebase",
+   "rel": "enables",
+   "to": "claim.nokeys",
+   "at": "2026-08-19",
+   "by": "founder",
+   "confidence": "high"
   }
  ],
  "events": [
@@ -4675,6 +4699,17 @@
     "d.graph",
     "d.verifier"
    ]
+  },
+  {
+   "id": "ev.0002",
+   "type": "anchor_taken",
+   "at": "2026-08-19",
+   "actor": "founder",
+   "detail": "Firebase project saaya-lite created: Firestore asia-south1, anonymous auth only, both Android packages registered, google-services.json in place",
+   "refs": [
+    "art.firebase"
+   ],
+   "node": "T1.2"
   }
  ]
 }

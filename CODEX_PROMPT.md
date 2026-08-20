@@ -155,14 +155,19 @@ continue the node loop exactly as before.
 
 ---
 
-## FIRST, ONCE: get the repo
+## SETUP STATUS (as of 2026-08-19)
 
-```bash
-gh repo clone abhishaiv/Saaya-lite && cd Saaya-lite
-```
+| Item | State |
+|---|---|
+| Repository | cloned and configured, remote `origin` = github.com/abhishaiv/Saaya-lite |
+| Firebase project `saaya-lite` | created. Firestore `asia-south1`, anonymous auth only |
+| Both Android apps registered | `com.nexaflow.saayalite` and `.debug` |
+| `app/google-services.json` | in place, contains both packages, gitignored |
+| Vizag dataset | committed at `assets/` |
+| **Web app for the console** | **not yet registered.** Needed at `T8.2` (node 7), not before. |
 
-Everything below runs inside that clone. The specification is already committed there;
-you are adding application code to it, node by node.
+Work in the existing directory. Do not clone again: `google-services.json` is gitignored
+and would not come with a fresh clone.
 
 ## FOUNDER NOTES
 
@@ -185,8 +190,8 @@ likely to sink the build clear early:
 6. `T9.1` — read the Telugu. Codex cannot judge it.
 7. `T9.2` — the V7 no-AI grep and V8 manifest outputs
 
-**Before you start:** create the Firebase project per `docs/spec/SETUP.md`. It is needed
-at node 5.
+**Firebase is done.** The one remaining setup item is a **Web** app registration for the
+console's `firebase-config.js`, needed at `T8.2` (node 7). Codex will stop and ask.
 
 **The failure mode to watch for.** Codex inventing a plausible number instead of stopping.
 The grounded checker catches it mechanically now, so the tell has changed: watch for Codex

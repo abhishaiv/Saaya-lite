@@ -23,7 +23,7 @@ hour 14 rather than hour 24. Reasoning in `docs/spec/GRAPH_ENGINEERING.md`.
 | 2 | `T2.1` | Zone parsing to typed Zone/ZoneCard/PoliceStation | low | diamond | 3.5 | spec | pending |
 | 3 | `T4.1` | Session engine, pure JVM, no Android imports | HIGH | serial | 6.5 | spec, boundary, invention | pending |
 | 4 | `T4.2` | Foreground service, geofencing, alarms, recovery | HIGHEST | serial | 9.5 | spec, boundary, invention | pending |
-| 5 | `T1.2` | Firebase wiring, anonymous auth | low | serial | 10.5 | spec | pending |
+| 5 | `T1.2` | Firebase wiring, anonymous auth (project already exists) | low | serial | 10.5 | spec | pending |
 | 6 | `T8.1` | Seed zones to Firestore | low | serial | 11.0 | spec | pending |
 | 7 | `T8.2` | Console: the live demo link | HIGH | serial | 14.0 | spec, boundary, invention | pending |
 | 8 | `T1.3` | Component library C1 to C14 | med | diamond | 17.0 | spec, invention | pending |

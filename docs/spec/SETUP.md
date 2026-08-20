@@ -1,7 +1,25 @@
 # Saaya Lite - Environment Setup
 Do this once, at T1.2. Every step is explicit so nothing is guessed.
 
-## Firebase project
+## Firebase project — DONE 2026-08-19
+
+| Field | Value |
+|---|---|
+| Project id | `saaya-lite` |
+| Project number | `799647753855` |
+| Storage bucket | `saaya-lite.firebasestorage.app` |
+| Region | `asia-south1` (Mumbai) |
+| Auth | Anonymous only |
+| Release app | `com.nexaflow.saayalite` — `1:799647753855:android:f1ac1d7d789de1fd17014a` |
+| Debug app | `com.nexaflow.saayalite.debug` — `1:799647753855:android:19c7be4f0fed48bb17014a` |
+| `app/google-services.json` | **in place**, contains BOTH packages, gitignored |
+
+**Still outstanding, needed at `T8.2` (node 7), not before:** register a **Web** app in
+Project settings → Your apps → Add app → Web, and paste its config into
+`console/firebase-config.js`. The console uses the Firebase **web** SDK, which needs its own
+app registration; the Android app ids above will not work for it.
+
+## Firebase project — original steps
 
 **A NEW project. Never the Saaya production project.**
 

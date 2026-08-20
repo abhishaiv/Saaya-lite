@@ -222,7 +222,7 @@
   "T1.2": {
    "id": "T1.2",
    "seq": 5,
-   "title": "Firebase wiring, anonymous auth",
+   "title": "Firebase wiring, anonymous auth (project already exists)",
    "hours": 1.0,
    "requires": [
     "T1.1"
@@ -250,7 +250,8 @@
    ],
    "verify_command": "spawn spec as fresh-context subagents; merge verdicts in code",
    "shape": "serial",
-   "fanout": null
+   "fanout": null,
+   "note": "The Firebase project is already created and app/google-services.json is already in place with BOTH package names. Do NOT create a project. Verify anonymous sign-in returns a uid against project 'saaya-lite', write one doc to a _smoke collection, read it back, delete it."
   },
   "T8.1": {
    "id": "T8.1",
@@ -1058,5 +1059,17 @@
    "docs/SCOPE.md"
   ],
   "rule": "Re-read these at the START of EVERY node, in addition to the node's `reads` array. The DROP step discards node context, which would otherwise drop the contract itself. These four are small and they are what stop scope drift across a long run."
+ },
+ "setup_done": {
+  "firebase_project": "saaya-lite",
+  "project_number": "799647753855",
+  "region": "asia-south1",
+  "auth": "anonymous only",
+  "android_apps": [
+   "com.nexaflow.saayalite",
+   "com.nexaflow.saayalite.debug"
+  ],
+  "google_services_json": "app/google-services.json (present, gitignored)",
+  "outstanding": "Web app registration for console/firebase-config.js, needed at T8.2 only"
  }
 }
