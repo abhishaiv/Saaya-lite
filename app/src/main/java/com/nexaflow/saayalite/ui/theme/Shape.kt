@@ -19,7 +19,9 @@ object SaayaShapeTokens {
 }
 
 val SaayaMaterialShapes = Shapes(
+    extraSmall = SaayaShapeTokens.SmallControl,
     small = SaayaShapeTokens.SmallControl,
     medium = SaayaShapeTokens.Control,
     large = SaayaShapeTokens.Card,
+    extraLarge = SaayaShapeTokens.Card,
 )

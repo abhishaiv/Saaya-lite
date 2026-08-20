@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.SaayaLite" parent="android:style/Theme.Material.NoActionBar">
+    <style name="Theme.SaayaLite.Base" parent="android:style/Theme.Material.NoActionBar">
         <item name="android:colorAccent">@color/saaya_icon_pin_highlight</item>
         <item name="android:navigationBarColor">@color/saaya_background</item>
         <item name="android:statusBarColor">@color/saaya_background</item>
@@ -8,6 +8,8 @@
         <item name="android:windowBackground">@color/saaya_background</item>
         <item name="android:windowLightStatusBar">false</item>
     </style>
+
+    <style name="Theme.SaayaLite" parent="Theme.SaayaLite.Base" />
 
     <style name="Theme.SaayaLite.Starting" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">@color/saaya_background</item>

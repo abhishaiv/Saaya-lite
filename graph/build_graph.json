@@ -62,11 +62,37 @@
    ],
    "risk": "low",
    "cumulative_hours": 2.0,
-   "status": "pending",
-   "run_id": null,
-   "gates_passed": [],
-   "artifacts": [],
-   "corrections": [],
+   "status": "complete",
+   "run_id": "run.T1.1.2026-08-20.001",
+   "gates_passed": [
+    "G1_assembleDebug",
+    "G2_lintDebug",
+    "G3_testDebugUnitTest",
+    "G4_no_tests_named_for_T1.1",
+    "G5_acceptance_api35_emulator",
+    "G6_grounded_with_explain",
+    "G7_non_negotiables",
+    "G8_runs_on_api35_emulator",
+    "G9_spec_verifier_round2_pass",
+    "aapt2_allowbackup_false"
+   ],
+   "artifacts": [
+    "art.t11.gradle_project",
+    "art.t11.theme_tokens",
+    "art.t11.manifest_privacy",
+    "art.t11.adaptive_icon",
+    "art.t11.splash"
+   ],
+   "corrections": [
+    "Resolved androidx.core:core-ktx 1.15.0, which requires compileSdk 35, to the latest prior stable 1.x release 1.13.1 whose AAR declares minCompileSdk 34.",
+    "Corrected the AndroidX SplashScreen extension import and API-27-qualified navigation-bar theme inheritance.",
+    "Completed the closed dependency set and architecture package skeleton omitted by the partial scaffold.",
+    "Founder replaced the rejected 2 GiB/1 GiB memory advice with an 8 GB-machine profile: Gradle 1536 MiB/768 MiB, Kotlin daemon 1536 MiB, two workers, no parallel build.",
+    "First spec verifier killed the node for Material default role leaks, v27 style loss, adaptive-icon centring, and disabled wrapper URL validation; all were corrected and round 2 passed.",
+    "Font assets remain owned by T1.3's explicit fonts_bundled artifact; all current Material typography roles now map to the frozen Saaya scale.",
+    "Founder commits captured early T1.1 artifacts before the gates; history was preserved and the completion commit records final corrections and provenance without rewriting those commits.",
+    "Record-time uniqueness audit found historical duplicate knowledge-graph event IDs; append-only history was preserved, the unique node_completed event is ev.0016, and the allocator defect was recorded as dev.kg.event_id_collisions."
+   ],
    "verify_lenses": [
     "spec"
    ],

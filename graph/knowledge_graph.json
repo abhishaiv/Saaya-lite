@@ -312,9 +312,9 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 154,
-  "edges": 424,
-  "events": 13
+  "entities": 166,
+  "edges": 441,
+  "events": 16
  },
  "entities": [
   {
@@ -1435,6 +1435,82 @@
    "by": "founder",
    "date": "2026-08-19",
    "rationale": "G5/G8 said 'real device' without qualification, which would have blocked every UI gate on hardware. T4.2 still demands a real phone: an emulator will report a geofence success where a Xiaomi will not, and that anchor is the product's central claim."
+  },
+  {
+   "id": "art.t11.gradle_project",
+   "class": "Artifact",
+   "label": "Android Gradle 8.9 single-module scaffold with the closed dependency catalog",
+   "node": "T1.1"
+  },
+  {
+   "id": "art.t11.theme_tokens",
+   "class": "Artifact",
+   "label": "Closed Saaya dark color, typography, shape and spacing theme",
+   "node": "T1.1"
+  },
+  {
+   "id": "art.t11.manifest_privacy",
+   "class": "Artifact",
+   "label": "Packaged manifest backup exclusions and HTTPS-only network policy",
+   "node": "T1.1"
+  },
+  {
+   "id": "art.t11.adaptive_icon",
+   "class": "Artifact",
+   "label": "Saaya v2 adaptive and monochrome launcher icon from the committed master",
+   "node": "T1.1"
+  },
+  {
+   "id": "art.t11.splash",
+   "class": "Artifact",
+   "label": "AndroidX core-splashscreen integration with the Saaya mark",
+   "node": "T1.1"
+  },
+  {
+   "id": "ver.t11.spec.round1",
+   "class": "Verification",
+   "label": "T1.1 spec verifier round 1 rejected six findings",
+   "node": "T1.1",
+   "kill": "true",
+   "confidence": "0.99"
+  },
+  {
+   "id": "ver.t11.spec.round2",
+   "class": "Verification",
+   "label": "T1.1 spec verifier round 2 passed with no findings",
+   "node": "T1.1",
+   "kill": "false",
+   "confidence": "0.99"
+  },
+  {
+   "id": "fail.t11.core_compile_sdk",
+   "class": "Failure",
+   "label": "AndroidX Core 1.15.0 required compileSdk 35 while the build is frozen at 34",
+   "node": "T1.1"
+  },
+  {
+   "id": "fail.t11.g1_oom",
+   "class": "Failure",
+   "label": "T1.1 G1 exhausted the default JVM heap during KSP",
+   "node": "T1.1"
+  },
+  {
+   "id": "fail.t11.spec_round1",
+   "class": "Failure",
+   "label": "T1.1 first spec verifier rejected incomplete theme closure and artifact safety",
+   "node": "T1.1"
+  },
+  {
+   "id": "dev.t11.pre_gate_commits",
+   "class": "Deviation",
+   "label": "Founder fact and memory commits captured early T1.1 artifacts before all gates passed",
+   "node": "T1.1"
+  },
+  {
+   "id": "dev.kg.event_id_collisions",
+   "class": "Deviation",
+   "label": "Knowledge graph has historical duplicate event IDs and the length-based allocator minted another collision during T1.1 record",
+   "node": "T1.1"
   }
  ],
  "edges": [
@@ -4829,6 +4905,142 @@
    "at": "2026-08-19",
    "by": "founder",
    "confidence": "high"
+  },
+  {
+   "from": "art.t11.gradle_project",
+   "rel": "produced_by",
+   "to": "node.T1.1",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t11.theme_tokens",
+   "rel": "produced_by",
+   "to": "node.T1.1",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t11.manifest_privacy",
+   "rel": "produced_by",
+   "to": "node.T1.1",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t11.adaptive_icon",
+   "rel": "produced_by",
+   "to": "node.T1.1",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t11.splash",
+   "rel": "produced_by",
+   "to": "node.T1.1",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "node.T1.1",
+   "rel": "verified_by",
+   "to": "ver.t11.spec.round2",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "node.T1.1",
+   "rel": "verified_by",
+   "to": "anchor.t11.allowbackup",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t11.manifest_privacy",
+   "rel": "verified_by",
+   "to": "anchor.t11.allowbackup",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t11.manifest_privacy",
+   "rel": "enables",
+   "to": "claim.boundary",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t11.gradle_project",
+   "rel": "respects",
+   "to": "con.nodeps",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t11.splash",
+   "rel": "respects",
+   "to": "con.nodeps",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "ver.t11.spec.round1",
+   "rel": "contradicts",
+   "to": "node.T1.1",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.t11.core_compile_sdk",
+   "rel": "caused_by",
+   "to": "doc.build-config",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.t11.g1_oom",
+   "rel": "caused_by",
+   "to": "node.T1.1",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.t11.spec_round1",
+   "rel": "caused_by",
+   "to": "node.T1.1",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "dev.t11.pre_gate_commits",
+   "rel": "contradicts",
+   "to": "node.T1.1",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "dev.kg.event_id_collisions",
+   "rel": "contradicts",
+   "to": "doc.graph-engineering",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
   }
  ],
  "events": [
@@ -4955,6 +5167,46 @@
    "detail": "TEST_PLAN now distinguishes emulator-sufficient gates from hardware-required anchors. T4.2 remains hardware-only.",
    "refs": [
     "d.emulator-policy"
+   ],
+   "node": "T1.1"
+  },
+  {
+   "id": "ev.0014",
+   "type": "verifier_killed",
+   "at": "2026-08-20",
+   "actor": "codex",
+   "detail": "T1.1 spec round 1 rejected six findings: Material role defaults, v27 theme loss, icon safe-zone placement and wrapper validation",
+   "refs": [
+    "ver.t11.spec.round1",
+    "fail.t11.spec_round1"
+   ],
+   "node": "T1.1"
+  },
+  {
+   "id": "ev.0015",
+   "type": "verifier_passed",
+   "at": "2026-08-20",
+   "actor": "codex",
+   "detail": "T1.1 spec round 2 returned kill=false at 0.99 confidence with no findings after all six corrections",
+   "refs": [
+    "ver.t11.spec.round2"
+   ],
+   "node": "T1.1"
+  },
+  {
+   "id": "ev.0016",
+   "type": "node_completed",
+   "at": "2026-08-20",
+   "actor": "codex",
+   "detail": "T1.1 completed: Gradle scaffold, closed Saaya theme, manifest privacy, adaptive icon and AndroidX splash passed all gates and the allowBackup anchor",
+   "refs": [
+    "art.t11.gradle_project",
+    "art.t11.theme_tokens",
+    "art.t11.manifest_privacy",
+    "art.t11.adaptive_icon",
+    "art.t11.splash",
+    "ver.t11.spec.round2",
+    "anchor.t11.allowbackup"
    ],
    "node": "T1.1"
   }

@@ -55,11 +55,18 @@ object SaayaType {
 // T1.3 wires the bundled Poppins and Noto Sans Telugu font families into these exact styles.
 val SaayaTypography = Typography(
     displayLarge = SaayaType.Display,
+    displayMedium = SaayaType.Display,
+    displaySmall = SaayaType.Display,
     headlineLarge = SaayaType.Title,
+    headlineMedium = SaayaType.Headline,
+    headlineSmall = SaayaType.Headline,
     titleLarge = SaayaType.CardTitle,
     titleMedium = SaayaType.Headline,
+    titleSmall = SaayaType.Headline,
     bodyLarge = SaayaType.Body,
     bodyMedium = SaayaType.CardBody,
     bodySmall = SaayaType.Caption,
+    labelLarge = SaayaType.Label,
+    labelMedium = SaayaType.Label,
     labelSmall = SaayaType.Label,
 )

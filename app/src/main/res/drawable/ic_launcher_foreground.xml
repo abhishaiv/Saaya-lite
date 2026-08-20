@@ -6,6 +6,9 @@
     android:viewportWidth="1024"
     android:viewportHeight="1024">
 
+    <!-- The viewport scales the master to 108 dp. Moving it 80 source units centres the
+         pin: canvas centre 512 minus the source pin's vertical midpoint 432. -->
+    <group android:translateY="80">
     <!-- Ambient violet field from saaya-icon-v2.svg. -->
     <path android:pathData="M842,372A330,330 0,1 1,182 372A330,330 0,1 1,842 372Z">
         <aapt:attr name="android:fillColor">
@@ -99,4 +102,5 @@
             </gradient>
         </aapt:attr>
     </path>
+    </group>
 </vector>
