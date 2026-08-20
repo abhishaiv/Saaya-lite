@@ -167,6 +167,8 @@ sealed interface SessionEvent {
     data class AppKilledRestart(val persisted: PersistedSession) : SessionEvent
 }
 
+// NOTHING PERSONAL ENTERS HERE. No favourites, no coordinates, no message text.
+// If a rule appears to need one, the rule belongs in the service, not the engine.
 data class EngineContext(
     val now: Instant,
     val zone: Zone?,
@@ -180,31 +182,76 @@ data class EngineContext(
     val susEventWritten: Boolean
 )
 
+// The frozen constants the engine reads. Every value comes from BUSINESS_RULES.md and has
+// a fact in graph/spec_graph.json. Rules.DEFAULT is the production instance; tests inject
+// a variant to drive the ladder in milliseconds instead of minutes.
+data class Rules(
+    val checkIn1Sec: Int,
+    val checkIn2Sec: Int,
+    val cancelWindowSec: Int,
+    val enterDwellSec: Int,
+    val exitDwellSec: Int,
+    val manualDisarmCooldownMin: Int,
+    val okCooldownMin: Int,
+    val manualIntervalMin: Int,
+    val demoDivisor: Int,
+    val intervals: Map<Pair<RiskTier, HourBand>, Int>,
+    val armingMatrix: Map<Pair<RiskTier, HourBand>, Boolean>,
+    val samplingShadowSec: Int,
+    val samplingSosSec: Int
+) {
+    companion object { val DEFAULT: Rules get() = TODO("populate from BUSINESS_RULES.md; every value must have a spec_graph fact") }
+}
+
 data class EngineResult(
     val state: SessionState,
     val commands: List<Command>,
     val outcome: Outcome? = null      // non-null ONLY when state == RESOLVED
 )
 
-// --- Commands. The engine DECIDES these; the service PERFORMS them. ---
-// Duplicated here deliberately: this is the type-contract document, and T4.1 reads it.
+// --- Commands: INTENT ONLY. ---
+// The engine decides WHAT should happen. It never constructs a payload, because building a
+// family message needs her favourites and building a SUS event needs a zone lookup, and
+// pulling either into EngineContext would enlarge the pure engine AND the trust surface.
+// The service and data layers construct payloads from repositories when they perform the
+// command. No Command carries personal data. That is the rule; obey it over convenience.
 sealed interface Command {
-    data class ShowCheckIn(val countdownSec: Int, val urgency: Urgency) : Command
-    data class NotifyFamily(val payload: FamilyPayload) : Command
-    data class WriteSusEvent(val event: SusEvent) : Command
+    // ladder UI
+    data class ShowCheckIn(val step: Int, val countdownSec: Int, val urgency: Urgency) : Command
+    data object HideCheckIn : Command
+    data class ShowArmBanner(val zoneId: String, val band: HourBand) : Command
+    data object ShowFamilyScreen : Command
+    data object ShowSos : Command
+
+    // outbound effects. The service builds the payload; the engine only says "now".
+    data object NotifyFamily : Command
+    data object CancelFamilyNotification : Command
+    data object WriteSusEvent : Command
     data class PatchSusOutcome(val outcome: SusOutcome) : Command
     data class WriteSosIncident(val trigger: SosTrigger) : Command
     data class PatchSosStatus(val status: SosStatus) : Command
+
+    // timers
     data class ScheduleTimer(val id: TimerId, val delaySec: Int) : Command
     data class CancelTimer(val id: TimerId) : Command
-    data class LogSessionEvent(val type: String, val detail: String?) : Command
-    data class StartCooldown(val zoneId: String, val minutes: Int) : Command
-    data object PlayUrgentAlert : Command
-    data object RequirePinToStop : Command
+
+    // service and sensing
     data object StartForegroundService : Command
     data object StopForegroundService : Command
+    data class SetLocationSampling(val intervalSec: Int) : Command
+    data object ReRegisterGeofences : Command
+
+    // local bookkeeping
+    data class LogSessionEvent(val type: String, val detail: String? = null) : Command
+    data class StartCooldown(val zoneId: String, val minutes: Int) : Command
+
+    // alerts and gating
+    data object PlayUrgentAlert : Command
+    data object RequirePinToStop : Command
+    data class ShowPermissionWarning(val permission: String) : Command
 }
 
+enum class Urgency { GENTLE, URGENT, CRITICAL }
 enum class SosTrigger { LADDER_LAPSE, MANUAL_HELP_BUTTON }
 enum class SosStatus { ACTIVE, STOPPED }
 enum class SusOutcome { PENDING, CANCELLED_BY_USER, ESCALATED_TO_SOS, RESOLVED_LATE }

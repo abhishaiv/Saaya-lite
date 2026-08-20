@@ -45,4 +45,23 @@ if gaps:
     print("Add the doc to that node's `reads` in graph/build_graph.json.")
     print("Do NOT remove entries from NEED to make this pass.")
     sys.exit(1)
+# --- second check: does the type contract reference a type it never defines? ---
+import re
+sm=open(os.path.join(R,"docs/spec/STATE_MACHINE.md"),encoding="utf-8").read()
+blocks="\n".join(re.findall(r"```kotlin(.*?)```", sm, re.S))
+blocks=re.sub(r"//.*", "", blocks)   # comments are prose, not type references
+defined=set(re.findall(r"(?:data class|class|enum class|sealed interface|data object|object)\s+(\w+)", blocks))
+KNOWN={"Int","String","Long","Boolean","Double","Float","List","Map","Set","Instant","Unit","Any"}
+referenced=set(re.findall(r":\s*([A-Z]\w+)", blocks)) | set(re.findall(r"<([A-Z]\w+)>", blocks))
+unresolved=sorted(referenced - defined - KNOWN)
+# types defined in DATA_MODEL are legitimately external to the engine contract
+dm=open(os.path.join(R,"docs/spec/DATA_MODEL.md"),encoding="utf-8").read()
+dm_types=set(re.findall(r"(?:data class|enum class)\s+(\w+)", dm))
+unresolved=[u for u in unresolved if u not in dm_types]
+if unresolved:
+    print("UNRESOLVED TYPES in STATE_MACHINE.md:", ", ".join(unresolved))
+    print("  Referenced by the type contract but defined nowhere it or DATA_MODEL can see.")
+    print("  Define them, or remove the reference. This is what blocked T4.1 twice.")
+    sys.exit(1)
 print(f"reads complete: {len(g['order'])} nodes, every one can see what it needs")
+print(f"type contract closed: {len(defined)} types defined, 0 unresolved")

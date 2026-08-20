@@ -1364,3 +1364,40 @@ until it passes.
 Ten gates now. The graph has caught: an inert G6, colliding event ids, a coordinate range
 that excluded real data, and now 19 nodes reading less than they need. Every one found by
 Codex stopping rather than guessing.
+
+## 2026-08-19 - Blocking too often. Fixed the cause, not the instance.
+
+Founder: we are getting blocked too often, reduce it to necessary red flags only. Seven
+blocks in three nodes. Most found real defects and were worth it, but several were
+**implementation shape**, which Codex may decide, and stopping for those buys nothing.
+
+**Adopted Codex's design recommendation, which was better than my spec.** Commands are now
+**intent-only**. The engine says `NotifyFamily`, not `NotifyFamily(payload)`. Building a
+family message needs her favourites and building a SUS event needs a zone lookup, so
+payload-carrying commands would have pulled personal data into `EngineContext` and enlarged
+both the pure engine and the trust surface. The service constructs payloads from
+repositories when it performs the command. `EngineContext` now carries a comment saying
+nothing personal enters it, and that a rule appearing to need one belongs in the service.
+
+Added the command cases Codex asked for: `ShowArmBanner`, `CancelFamilyNotification`,
+`SetLocationSampling` for the 5-second SOS rate, `ShowPermissionWarning`,
+`ReRegisterGeofences` for recovery.
+
+**Wrote a decision-rights table**, which is the actual fix. One test:
+
+> Could this choice change what Meera experiences, or what the state receives?
+
+No, and it is decided, recorded as a `Decision`, and the run continues: internal type
+shapes, a command case for an effect the spec already requires, naming, which API to use,
+test structure. Yes or unsure, and it stops: a product value missing from spec_graph,
+anything crossing the trust boundary, contradicting specs, a new dependency, a credential or
+device, three gate failures, or a spec document it believes is wrong.
+
+Bias stated plainly: continue on plumbing, stop on behaviour. A wrong internal type name
+costs a rename; a wrong escalation timing costs the product's central claim.
+
+**Extended `reads_check.py` to close the type contract**, which Codex also asked for. It now
+parses STATE_MACHINE's Kotlin blocks and fails if a referenced type is defined nowhere. It
+caught `Rules` on its first run - referenced by `EngineContext` and never defined anywhere,
+the third instance of this exact class. Defined it. Also had to strip comments before
+scanning, because my own prose was being read as a type.

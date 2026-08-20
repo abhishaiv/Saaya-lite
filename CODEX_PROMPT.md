@@ -204,6 +204,24 @@ afterwards. They are what prove the trust boundary holds.
 
 ---
 
+## DECIDE OR STOP
+
+Before you block, apply this test:
+
+> **Could this choice change what Meera experiences, or what the state receives?**
+
+**No** — decide it yourself, record a `Decision` via `kg.py`, mention it in one line, and
+keep going. Internal type shapes, a `Command` case for an effect the spec already requires,
+naming, which API to use, test structure: all yours.
+
+**Yes, or unsure** — stop. A product value missing from `spec_graph`, anything crossing the
+trust boundary, two specs contradicting each other, a new dependency, a credential or
+device, three gate failures, or a spec document you believe is wrong.
+
+Full table in `SPEC_README.md`. Bias toward continuing on plumbing and stopping on
+behaviour: a wrong internal type name costs a rename, a wrong escalation timing costs the
+product's central claim.
+
 ## RUN CONTINUOUSLY - stop only for these
 
 **Do not pause for approval after a completed node.** Finish it, commit, push, report in one

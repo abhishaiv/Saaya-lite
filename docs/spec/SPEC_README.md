@@ -212,3 +212,47 @@ parser met the actual data and the assertion failed.
 So: **approving a citation is not approving a fact.** When a proposed value can be checked
 against a frozen asset, a real device, or a build output, check it there too. A document is
 evidence of intent, not of truth.
+
+---
+
+## Decision rights: what to decide yourself, and what to stop for
+
+Seven blocks in the first three nodes. Most were real defects and finding them early was
+worth it. But several were **implementation shape**, which you may decide, and stopping for
+those costs a round trip for nothing.
+
+### Decide it yourself. Record it. Keep going.
+
+Add a `Decision` entity via `kg.py`, mention it in one line of your report, and continue:
+
+- The **shape of an internal type** the spec names but does not fully specify: parameter
+  lists, whether something is a data class or an object, nullability of internal fields.
+- **Adding a `Command` case** for an effect the specification already requires. If
+  `STATE_MACHINE` says the arm banner appears, a command for it is implementation.
+- **Naming** of files, classes and functions inside the stated package layout.
+- **Which Kotlin idiom or platform API** to use for a specified behaviour.
+- **Test structure** beyond the cases `TEST_PLAN` names.
+- Anything with **no user-visible and no state-visible consequence.**
+
+### Stop. These are the red flags.
+
+- A **product value** not in `spec_graph`: a number, colour, string, timing, threshold. This
+  never relaxes.
+- Anything that changes **what she sees**, or **what leaves the device**. The trust boundary
+  is not an implementation detail.
+- **Two specification documents contradicting each other** on behaviour.
+- A **new dependency**, or any change to the closed list.
+- A **credential, a device, or an irreversible action**.
+- **A gate failing three times.**
+- You believe a specification document is **wrong**. Say so. Four times now that has been
+  correct.
+
+### The test
+
+> Could this choice change what Meera experiences, or what the state receives?
+
+**No** → decide it, record it, keep going.
+**Yes, or unsure** → stop.
+
+Bias toward continuing on plumbing and toward stopping on behaviour. A wrong internal type
+name costs a rename. A wrong escalation timing costs the product's central claim.

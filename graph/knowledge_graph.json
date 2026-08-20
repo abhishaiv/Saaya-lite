@@ -314,7 +314,7 @@
  "counts": {
   "entities": 189,
   "edges": 466,
-  "events": 23
+  "events": 24
  },
  "entities": [
   {
@@ -5654,6 +5654,14 @@
    "at": "2026-08-20",
    "actor": "codex",
    "detail": "T4.1 unblock: Command and PersistedSession defined in STATE_MACHINE, outcome added to EngineResult, RESOLVED(X) notation explained, core library desugaring added for java.time on minSdk 24, and 19 nodes given the reads they were missing. New gate G10 (reads_check.py).",
+   "node": "T4.1"
+  },
+  {
+   "id": "ev.0024",
+   "type": "spec_amended",
+   "at": "2026-08-20",
+   "actor": "codex",
+   "detail": "T4.1 second unblock: Commands are intent-only and carry no personal data; Rules defined; reads_check extended to close the type contract; decision-rights table added so implementation shape is decided rather than blocked on.",
    "node": "T4.1"
   }
  ]
