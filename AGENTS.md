@@ -59,7 +59,9 @@ For each node in graph/build_graph.json order:
               {lens, kill, confidence, findings:[{file,line,what,why_it_matters,spec_ref}]}"
              spec       does it contradict, ignore or "improve on" the spec
              boundary   can anything identifying leak before SOS
-             invention  does every literal trace to graph/spec_graph.json
+             invention  does every literal trace to the RIGHT fact in spec_graph.json.
+                        A same-valued fact governing something else is NOT provenance.
+                        Run `grounded_check.py --explain <files>` to see what matched.
            MERGE verdicts IN CODE. Any kill rejects the node.
            A verifier that fails to run is a KILL, never a pass.
 

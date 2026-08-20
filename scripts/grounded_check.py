@@ -49,7 +49,29 @@ def check(path):
             if v not in NUMS: bad.append((i,m.group(1),"number"))
     return bad
 
+def explain(path):
+    """Report the fact id every literal matched. Value-matching is necessary, not
+    sufficient: a literal can match a fact that governs something else entirely. This
+    makes that visible so the `invention` verifier lens can judge it."""
+    try: lines=open(path,encoding='utf-8',errors='ignore').read().splitlines()
+    except: return
+    for i,ln in enumerate(lines,1):
+        if SKIP_LINE.match(ln) or EXEMPT.search(ln): continue
+        for m in HEX_RE.finditer(ln):
+            hx=("#"+(m.group(1) or m.group(2))).upper()
+            print(f"  {path}:{i}  {hx:>10}  ->  {COLORS.get(hx,'UNGROUNDED')}")
+        for m in NUM_RE.finditer(ln):
+            try: v=float(m.group(1))
+            except: continue
+            if v in TRIVIAL: continue
+            ids=NUMS.get(v)
+            print(f"  {path}:{i}  {m.group(1):>10}  ->  {', '.join(ids) if ids else 'UNGROUNDED'}")
+
 def main():
+    if "--explain" in sys.argv:
+        for a in sys.argv[1:]:
+            if a.endswith((".kt",".kts",".js",".mjs",".xml")): explain(a)
+        return
     if "--staged" in sys.argv:
         out=subprocess.run(["git","diff","--cached","--name-only"],capture_output=True,text=True).stdout
         paths=[p for p in out.split() if p.endswith((".kt",".kts",".js",".mjs"))]

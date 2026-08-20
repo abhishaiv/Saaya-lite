@@ -62,4 +62,5 @@ as a fact in `graph/spec_graph.json` if it is a value.
 |---|---|---|---|---|
 | 2026-08-19 | T1.1 | Gradle wrapper version | 8.9 (AGP 8.7.3 needs 8.9+) | `build.gradle.wrapper` |
 | 2026-08-19 | T1.1 | core-splashscreen version, and permission to add it | 1.0.1, added to the closed list in ARCHITECTURE.md | `dep.splashscreen` |
+| 2026-08-19 | T1.1 | six theme alphas + label tracking frozen in prose, never facts | added, plus 14 more of the same class found by scanning | `alpha.*`, `type.label.tracking` |
 | 2026-08-19 | T1.1 | the Saaya mark for ic_launcher_foreground | real brand SVGs committed at `assets/brand/`; split specified in ICONOGRAPHY.md | 6 `color.icon.*` facts |

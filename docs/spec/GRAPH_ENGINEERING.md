@@ -499,3 +499,27 @@ refactor, a rename across call sites, a migration touching every caller - then t
 are genuinely overlapping and no contract can make them disjoint. Isolate that node.
 
 We have no such node. If one is ever added, isolate it. **Do not widen the contracts to fit.**
+
+---
+
+## A known limit of gate G6, and how it is covered
+
+`grounded_check.py` matches a literal **by value**. It can prove a number is one the founder
+decided; it cannot prove it is the *right* one. `0.75` passes whether it is `alpha.textOnCard`
+or `motion.spring.damping`, because both exist.
+
+This surfaced on the second block at `T1.1`, when Codex was offered three same-valued but
+semantically unrelated facts as provenance for theme alphas and **refused them**. That was
+the correct call and it is the behaviour to preserve.
+
+Value-matching is **necessary, not sufficient**. The coverage is layered:
+
+| Layer | Catches |
+|---|---|
+| `grounded_check.py` | a literal that matches **no** fact. Mechanical, zero tokens. |
+| `grounded_check.py --explain` | prints the fact id each literal matched, so a wrong-but-same-valued match is **visible** rather than silent |
+| the `invention` verifier lens | whether the matched fact actually governs that use. This is judgement, which is why it is an agent and not a script. |
+
+Do not try to make the script semantic. Requiring a `// grounded: <fact.id>` comment on every
+literal would work, but the friction lands on every line of UI code, and the verifier already
+covers it at a fraction of the cost.

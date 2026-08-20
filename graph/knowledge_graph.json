@@ -312,9 +312,9 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 149,
-  "edges": 419,
-  "events": 4
+  "entities": 150,
+  "edges": 420,
+  "events": 6
  },
  "entities": [
   {
@@ -1396,6 +1396,14 @@
    "by": "founder",
    "date": "2026-08-19",
    "rationale": "Codex correctly refused to invent a wrapper version, add an unlisted dependency, or draw a placeholder mark. All three are now facts or committed assets, and the specs amended before building rather than after."
+  },
+  {
+   "id": "d.g6-limit",
+   "class": "Decision",
+   "label": "G6 stays value-based; semantic correctness is the verifier's job",
+   "by": "claude",
+   "date": "2026-08-19",
+   "rationale": "requiring a grounded: <fact.id> comment on every literal would make the script semantic but puts friction on every line of UI code. --explain makes wrong-but-same-valued matches visible and the invention lens judges them, at a fraction of the cost."
   }
  ],
  "edges": [
@@ -4750,6 +4758,14 @@
    "at": "2026-08-19",
    "by": "founder",
    "confidence": "high"
+  },
+  {
+   "from": "d.g6-limit",
+   "rel": "enforces",
+   "to": "claim.noai",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
   }
  ],
  "events": [
@@ -4795,6 +4811,22 @@
    "refs": [
     "d.t11-unblock"
    ],
+   "node": "T1.1"
+  },
+  {
+   "id": "ev.0005",
+   "type": "blocked",
+   "at": "2026-08-19",
+   "actor": "codex",
+   "detail": "T1.1 second block: six theme tokens frozen in DESIGN_SYSTEM prose but never facts. Codex refused three same-valued but semantically unrelated facts as provenance.",
+   "node": "T1.1"
+  },
+  {
+   "id": "ev.0007",
+   "type": "unblocked",
+   "at": "2026-08-19",
+   "actor": "founder",
+   "detail": "20 alpha and tracking facts added (193 to 213). grounded_check gained --explain so a same-valued wrong match is visible. The invention lens now requires the RIGHT fact, not merely a same-valued one.",
    "node": "T1.1"
   }
  ]

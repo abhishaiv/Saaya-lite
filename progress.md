@@ -1065,3 +1065,37 @@ app background: `#191230` versus `#0B0B0F`.
 BUILD_STATE, and both a `blocked` and an `unblocked` event in the knowledge graph with the
 decision entity between them. The audit trail shows what Codex asked, what was decided, and
 that the specification was amended before building rather than after.
+
+## 2026-08-19 - T1.1 blocked again, and Codex caught a limit in my own gate
+
+Second block on T1.1, and a sharper one. Six theme tokens are frozen in DESIGN_SYSTEM.md as
+prose - surface `@ 6%`, elevated `@ 10%`, textOnCard `@ 75%`, secondary `@ 60%`, tertiary
+`@ 40%`, label `+0.5 sp tracking` - and none of them ever became facts.
+
+**The part that matters is what Codex refused.** Three of those values would have passed G6
+anyway, because `motion.spring.damping` is 0.75, `dim.scrim` is 0.4 and
+`grade.border.opacity` is 0.5. It declined to use them, on the grounds that a same-valued
+fact governing something unrelated is not valid provenance. That is the intent of the gate
+rather than its mechanism, and it is exactly the judgement the invention lens exists for,
+arriving unprompted.
+
+**It exposed a real limit I had not written down.** `grounded_check.py` matches by value. It
+can prove a number is one the founder decided; it cannot prove it is the right one.
+
+Three responses, none of which is "make the script semantic":
+
+- Added the six facts, then **scanned for the whole class** rather than fixing only what was
+  reported. Found 14 more prose-frozen alphas across COMPONENT_LIBRARY, MAP_SPEC,
+  MOTION_SPEC and STATES_CATALOGUE. 20 facts added, 193 to 213.
+- Added `grounded_check.py --explain`, which prints the fact id every literal matched. A
+  wrong-but-same-valued match is now **visible** instead of silent, which is what the
+  verifier needs to judge it.
+- Sharpened the `invention` lens: it now asks whether a literal traces to the **right** fact,
+  not merely a same-valued one, and tells the verifier to run `--explain`.
+
+Recorded the limit honestly in GRAPH_ENGINEERING with the reasoning for not fixing it in the
+script: requiring a `// grounded: <fact.id>` comment on every literal would work, but the
+friction lands on every line of UI code and the verifier already covers it far more cheaply.
+
+Two blocks on node one, both legitimate, both finding things no audit of mine had. The
+protocol is earning its keep before a line of Kotlin exists.

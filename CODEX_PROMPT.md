@@ -118,7 +118,9 @@ The lenses:
 
 - `spec` — does it contradict, ignore or "improve on" the specification
 - `boundary` — can anything identifying leak before SOS
-- `invention` — does every literal trace to `graph/spec_graph.json`
+- `invention` — does every literal trace to the **right** fact in `graph/spec_graph.json`. A
+  same-valued fact governing something else is not provenance. Use
+  `python3 scripts/grounded_check.py --explain <files>` to see exactly what each matched.
 
 **Merge the verdicts in code, not in a model. Any kill rejects the node.** A verifier that
 fails to run is a **kill**, never a pass. When you fix, dedupe against every finding seen

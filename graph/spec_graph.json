@@ -3,7 +3,7 @@
  "kind": "knowledge_graph",
  "note": "Domain facts with provenance. Never merge with build_graph.json - different truth standards.",
  "rule": "Every numeric or colour literal in source must trace to a fact id here, or the grounded checker fails the node.",
- "count": 193,
+ "count": 213,
  "facts": [
   {
    "id": "ladder.cd1",
@@ -1933,6 +1933,206 @@
    "means": "Penumbra, the emissive aura",
    "sourced_from": "Branding/SVG/saaya-icon-v2.svg (brand bible v1.5 s4)",
    "governs": "ICONOGRAPHY.md",
+   "frozen": true
+  },
+  {
+   "id": "alpha.surface",
+   "kind": "number",
+   "value": 0.06,
+   "unit": "alpha",
+   "means": "surface: white over the map",
+   "sourced_from": "DESIGN_SYSTEM.md, founder 2026-08-18",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "alpha.surfaceElevated",
+   "kind": "number",
+   "value": 0.1,
+   "unit": "alpha",
+   "means": "surfaceElevated: raised cards and dialogs",
+   "sourced_from": "DESIGN_SYSTEM.md, founder 2026-08-18",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "alpha.textOnCard",
+   "kind": "number",
+   "value": 0.75,
+   "unit": "alpha",
+   "means": "textOnCard: card body text. From iOS.",
+   "sourced_from": "DESIGN_SYSTEM.md, founder 2026-08-18",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "alpha.textSecondary",
+   "kind": "number",
+   "value": 0.6,
+   "unit": "alpha",
+   "means": "textSecondary",
+   "sourced_from": "DESIGN_SYSTEM.md, founder 2026-08-18",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "alpha.textTertiary",
+   "kind": "number",
+   "value": 0.4,
+   "unit": "alpha",
+   "means": "textTertiary: decorative only, never carries meaning alone",
+   "sourced_from": "DESIGN_SYSTEM.md, founder 2026-08-18",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "type.label.tracking",
+   "kind": "number",
+   "value": 0.5,
+   "unit": "sp",
+   "means": "label style letter tracking",
+   "sourced_from": "DESIGN_SYSTEM.md, founder 2026-08-18",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "alpha.ring.track",
+   "kind": "number",
+   "value": 0.12,
+   "unit": "alpha",
+   "means": "CountdownRing track: white",
+   "sourced_from": "DESIGN_SYSTEM.md, founder 2026-08-18",
+   "governs": "COMPONENT_LIBRARY.md",
+   "frozen": true
+  },
+  {
+   "id": "alpha.chip.fill",
+   "kind": "number",
+   "value": 0.2,
+   "unit": "alpha",
+   "means": "ZoneChip fill: the zone's own colour",
+   "sourced_from": "DESIGN_SYSTEM.md, founder 2026-08-18",
+   "governs": "COMPONENT_LIBRARY.md",
+   "frozen": true
+  },
+  {
+   "id": "alpha.handle",
+   "kind": "number",
+   "value": 0.3,
+   "unit": "alpha",
+   "means": "sheet drag handle: white",
+   "sourced_from": "DESIGN_SYSTEM.md, founder 2026-08-18",
+   "governs": "COMPONENT_LIBRARY.md",
+   "frozen": true
+  },
+  {
+   "id": "alpha.disabled",
+   "kind": "number",
+   "value": 0.3,
+   "unit": "alpha",
+   "means": "disabled control opacity",
+   "sourced_from": "DESIGN_SYSTEM.md, founder 2026-08-18",
+   "governs": "COMPONENT_LIBRARY.md",
+   "frozen": true
+  },
+  {
+   "id": "alpha.secondaryBtn",
+   "kind": "number",
+   "value": 0.9,
+   "unit": "alpha",
+   "means": "TextOnly button: danger",
+   "sourced_from": "DESIGN_SYSTEM.md, founder 2026-08-18",
+   "governs": "COMPONENT_LIBRARY.md",
+   "frozen": true
+  },
+  {
+   "id": "alpha.floating",
+   "kind": "number",
+   "value": 0.92,
+   "unit": "alpha",
+   "means": "floating controls over the map: cardFill",
+   "sourced_from": "DESIGN_SYSTEM.md, founder 2026-08-18",
+   "governs": "COMPONENT_LIBRARY.md",
+   "frozen": true
+  },
+  {
+   "id": "alpha.map.halo",
+   "kind": "number",
+   "value": 0.08,
+   "unit": "alpha",
+   "means": "Shadow breathing halo on her dot",
+   "sourced_from": "MAP_SPEC.md, founder 2026-08-18",
+   "governs": "MAP_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "alpha.map.accuracy",
+   "kind": "number",
+   "value": 0.12,
+   "unit": "alpha",
+   "means": "location accuracy circle fill",
+   "sourced_from": "MAP_SPEC.md, founder 2026-08-18",
+   "governs": "MAP_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "alpha.map.station",
+   "kind": "number",
+   "value": 0.7,
+   "unit": "alpha",
+   "means": "station glyph: textSecondary",
+   "sourced_from": "MAP_SPEC.md, founder 2026-08-18",
+   "governs": "MAP_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "alpha.map.label",
+   "kind": "number",
+   "value": 0.8,
+   "unit": "alpha",
+   "means": "zone label: textPrimary",
+   "sourced_from": "MAP_SPEC.md, founder 2026-08-18",
+   "governs": "MAP_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "alpha.map.dotring",
+   "kind": "number",
+   "value": 0.9,
+   "unit": "alpha",
+   "means": "white ring around her location dot",
+   "sourced_from": "MAP_SPEC.md, founder 2026-08-18",
+   "governs": "MAP_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "alpha.shimmer.lo",
+   "kind": "number",
+   "value": 0.06,
+   "unit": "alpha",
+   "means": "skeleton shimmer, low",
+   "sourced_from": "MOTION_SPEC.md, founder 2026-08-18",
+   "governs": "MOTION_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "alpha.shimmer.hi",
+   "kind": "number",
+   "value": 0.12,
+   "unit": "alpha",
+   "means": "skeleton shimmer, high",
+   "sourced_from": "MOTION_SPEC.md, founder 2026-08-18",
+   "governs": "MOTION_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "alpha.locked",
+   "kind": "number",
+   "value": 0.3,
+   "unit": "alpha",
+   "means": "PIN boxes while locked out",
+   "sourced_from": "STATES_CATALOGUE.md, founder 2026-08-18",
+   "governs": "STATES_CATALOGUE.md",
    "frozen": true
   }
  ]
