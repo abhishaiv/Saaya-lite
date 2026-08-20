@@ -1298,3 +1298,30 @@ output, it must be checked there too. A document is evidence of intent, not of t
 
 Recorded as a `Failure` against DATA_MODEL.md - my document, not Codex's work - with the
 decision superseding it.
+
+## 2026-08-19 - T2.1 complete, verified independently. Switching to continuous running.
+
+Codex finished T2.1 at b49f65a. Verified rather than accepted, and everything holds:
+all three commit trailers present this time including `Node:`, 24 zones with the exact tier
+split, 19 cards all joining to a zone, 37 stations, and **189 coordinates re-checked by me
+against the corrected envelope with zero outside**. Knowledge graph clean at 185 entities and
+462 edges. Worktree in sync.
+
+**verifications.jsonl is now populated**, which it was not at T1.1: 5 verdicts, 2 of them
+kills. `codex_contribution.py` reads 2 of 22 nodes, 3 Codex commits, 18 Kotlin files, 806
+lines, 5 verifier runs, 2 killing verdicts. The submission's evidence is accumulating in a
+machine-readable form rather than in prose.
+
+Note for future runs: G6 across every tracked `.kt` file reports failures, but they are
+`test/grounded_fixture.kt`, which is ungrounded **on purpose** as G6's own regression test.
+Production Kotlin is clean: 14 files, zero ungrounded literals. Added a comment so nobody
+mistakes the fixture for a real failure.
+
+**Founder decision: stop pausing after every node.** Codex had been waiting for approval each
+time, which AGENTS never required. Written in explicitly: finish, commit, push, report in a
+line or two, start the next node. Stop only for a real BLOCKED, three gate failures, a human
+gate, an anchor that needs the founder, or a belief that a spec document is wrong. Also told
+to batch cite-and-propose lists across a node rather than stopping at each value.
+
+Next is T4.1, the session engine - pure JVM, no device, and the highest-value logic in the
+build. Then T4.2, which will stop for the hardware anchor.
