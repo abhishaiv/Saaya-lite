@@ -3,7 +3,7 @@
  "kind": "knowledge_graph",
  "note": "Domain facts with provenance. Never merge with build_graph.json - different truth standards.",
  "rule": "Every numeric or colour literal in source must trace to a fact id here, or the grounded checker fails the node.",
- "count": 213,
+ "count": 238,
  "facts": [
   {
    "id": "ladder.cd1",
@@ -2133,6 +2133,256 @@
    "means": "PIN boxes while locked out",
    "sourced_from": "STATES_CATALOGUE.md, founder 2026-08-18",
    "governs": "STATES_CATALOGUE.md",
+   "frozen": true
+  },
+  {
+   "id": "type.display.lineheight",
+   "kind": "number",
+   "value": 40,
+   "unit": "sp",
+   "means": "display line height",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "type.title.lineheight",
+   "kind": "number",
+   "value": 30,
+   "unit": "sp",
+   "means": "title line height",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "type.cardTitle.lineheight",
+   "kind": "number",
+   "value": 26,
+   "unit": "sp",
+   "means": "cardTitle line height",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "type.headline.lineheight",
+   "kind": "number",
+   "value": 24,
+   "unit": "sp",
+   "means": "headline line height",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "type.body.lineheight",
+   "kind": "number",
+   "value": 24,
+   "unit": "sp",
+   "means": "body line height",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "type.cardBody.lineheight",
+   "kind": "number",
+   "value": 20,
+   "unit": "sp",
+   "means": "cardBody line height",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "type.caption.lineheight",
+   "kind": "number",
+   "value": 18,
+   "unit": "sp",
+   "means": "caption line height",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "type.label.lineheight",
+   "kind": "number",
+   "value": 14,
+   "unit": "sp",
+   "means": "label line height",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "scale.14",
+   "kind": "number",
+   "value": 14,
+   "unit": "dp",
+   "means": "spacing scale step",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "scale.16",
+   "kind": "number",
+   "value": 16,
+   "unit": "dp",
+   "means": "spacing scale step",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "scale.22",
+   "kind": "number",
+   "value": 22,
+   "unit": "dp",
+   "means": "spacing scale step",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "scale.24",
+   "kind": "number",
+   "value": 24,
+   "unit": "dp",
+   "means": "spacing scale step",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "scale.30",
+   "kind": "number",
+   "value": 30,
+   "unit": "dp",
+   "means": "spacing scale step",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "build.compileSdk",
+   "kind": "number",
+   "value": 34,
+   "unit": "api",
+   "means": "compileSdk",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "BUILD_CONFIG.md",
+   "frozen": true
+  },
+  {
+   "id": "dim.focus.ring",
+   "kind": "number",
+   "value": 2,
+   "unit": "dp",
+   "means": "keyboard/switch focus ring width",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "COMPONENT_LIBRARY.md",
+   "frozen": true
+  },
+  {
+   "id": "dim.focus.offset",
+   "kind": "number",
+   "value": 2,
+   "unit": "dp",
+   "means": "focus ring offset from the element",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "COMPONENT_LIBRARY.md",
+   "frozen": true
+  },
+  {
+   "id": "dim.btn.indicator",
+   "kind": "number",
+   "value": 20,
+   "unit": "dp",
+   "means": "loading indicator inside a button",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "COMPONENT_LIBRARY.md",
+   "frozen": true
+  },
+  {
+   "id": "dim.border.hairline",
+   "kind": "number",
+   "value": 1,
+   "unit": "dp",
+   "means": "ghost button and chip border",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "COMPONENT_LIBRARY.md",
+   "frozen": true
+  },
+  {
+   "id": "dim.target.gap",
+   "kind": "number",
+   "value": 8,
+   "unit": "dp",
+   "means": "minimum separation between adjacent touch targets",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "COMPONENT_LIBRARY.md",
+   "frozen": true
+  },
+  {
+   "id": "a11y.announce.60",
+   "kind": "number",
+   "value": 60,
+   "unit": "s",
+   "means": "countdown announcement point",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "ACCESSIBILITY_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "a11y.announce.30",
+   "kind": "number",
+   "value": 30,
+   "unit": "s",
+   "means": "countdown announcement point",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "ACCESSIBILITY_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "a11y.announce.10",
+   "kind": "number",
+   "value": 10,
+   "unit": "s",
+   "means": "countdown announcement point",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "ACCESSIBILITY_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "a11y.announce.every",
+   "kind": "number",
+   "value": 5,
+   "unit": "s",
+   "means": "below this, announce every second",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "ACCESSIBILITY_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "a11y.contrast.body",
+   "kind": "number",
+   "value": 4.5,
+   "unit": "ratio",
+   "means": "minimum contrast for body text",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "ACCESSIBILITY_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "a11y.contrast.large",
+   "kind": "number",
+   "value": 3.0,
+   "unit": "ratio",
+   "means": "minimum contrast for large text",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "ACCESSIBILITY_SPEC.md",
    "frozen": true
   }
  ]

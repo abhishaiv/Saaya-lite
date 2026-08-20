@@ -169,7 +169,10 @@ for nothing else. A gate is permission; an anchor is a measurement. Both are req
 Breaking one means the work is wrong even if it compiles.
 
 1. **No AI, no ML, no model calls in the product.** Every decision is a stated rule.
-2. **Never invent a value.** Every literal traces to `graph/spec_graph.json`. A missing
+2. **Never invent a value.** But a value **already written in a specification document** is
+   a transcription, not an invention: batch those with `<doc>:<line>` citations and propose
+   them in one message rather than blocking one at a time. See "Proposing a fact" in
+   `SPEC_README.md`. Anything requiring a choice is still a full BLOCKED. Every literal traces to `graph/spec_graph.json`. A missing
    value is a spec bug: STOP and report. A new fact is the founder's decision, not yours.
 3. **No third-party API keys exist here.** If you think you need one, something has drifted:
    read `docs/spec/SECRETS_AND_ACCESS.md` and STOP.

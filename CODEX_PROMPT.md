@@ -176,7 +176,10 @@ Breaking one means the work is wrong even if it compiles.
 
 1. **No AI, no ML, no model calls in the product.** Every decision is a stated rule. This is
    a submission claim, verified by a grep.
-2. **Never invent a value.** Every numeric and colour literal must trace to one of the 185
+2. **Never invent a value.** But a value **already written in a specification document** is
+   a transcription, not an invention: batch those with `<doc>:<line>` citations and propose
+   them in one message rather than blocking one at a time. See "Proposing a fact" in
+   `SPEC_README.md`. Anything requiring a choice is still a full BLOCKED. Every numeric and colour literal must trace to one of the 185
    facts in `graph/spec_graph.json`. A missing value is a **spec bug**: stop and report it.
    **Never widen the `TRIVIAL` set** in the checker to make a failure go away.
 3. **There are no third-party API keys in this project.** If you think you need one,

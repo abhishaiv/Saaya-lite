@@ -314,7 +314,7 @@
  "counts": {
   "entities": 151,
   "edges": 421,
-  "events": 7
+  "events": 9
  },
  "entities": [
   {
@@ -4851,6 +4851,22 @@
    "at": "2026-08-19",
    "actor": "claude",
    "detail": "Self-testing the alpha-facts fix revealed grounded_check's number pattern matched none of 16.dp, 0.75f, 14.sp or 1_000. Gate G6 was effectively inert against real Compose code. Fixed, plus ARGB colour normalisation shared by gate and explain, plus a regression fixture.",
+   "node": "T1.1"
+  },
+  {
+   "id": "ev.0008",
+   "type": "blocked",
+   "at": "2026-08-19",
+   "actor": "codex",
+   "detail": "T1.1 third block: compileSdk, 8 type line heights, 5 spacing-scale steps. Same class as the second block.",
+   "node": "T1.1"
+  },
+  {
+   "id": "ev.0010",
+   "type": "spec_amended",
+   "at": "2026-08-19",
+   "actor": "founder",
+   "detail": "Generated type scale, spacing scale and build table facts mechanically from their tables (227 facts). Added a cite-and-propose path so a value already stated in a doc is a batched proposal, not a full block.",
    "node": "T1.1"
   }
  ]

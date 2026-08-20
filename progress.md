@@ -1121,3 +1121,39 @@ regression test.
 The lesson worth keeping: I tested the checker against the literals I happened to write,
 not against the literals the codebase would actually contain. Codex's block is what led me
 to look.
+
+## 2026-08-19 - Third block on T1.1, and a process fix instead of a third patch
+
+Codex blocked again: `compileSdk`, eight typography line heights, five spacing-scale steps.
+Correct again, and the same class as the second block.
+
+**The honest read is that I built the fact table opportunistically.** I added type sizes but
+not line heights. I added spacing steps 4, 8, 12, 20, 32, 48 but not 14, 16, 22, 24, 30 -
+which are the ones that exist *because iOS uses them* and are called out in the doc as the
+values to use exactly. I added minSdk and targetSdk but not compileSdk. Patching the fifteen
+would have invited a fourth block.
+
+**Generated them mechanically instead.** Parsed the type-scale table, the spacing-scale line
+and the build table directly out of the documents, so every row produces its facts rather
+than the ones I happened to notice. 213 to 227.
+
+**Then wrote a semantic sweep and learned its limits.** It compares each table value against
+the facts sharing that value and asks whether any of them relate to the row label. It
+reported 57, and most were false positives: `diameter 88 dp` maps correctly to
+`dim.ring.card`, the heuristic just could not connect "diameter" with "ring". Semantic
+matching is not automatable, which is exactly why the invention lens is an agent and not a
+script. It did surface real gaps though - the focus ring, the in-button loading indicator,
+the accessibility announcement points - so eleven more facts. 238 total.
+
+**The process fix matters more than the facts.** Three blocks, all correct, all for a value
+already frozen in a document and never turned into a fact. The rule was never "do not
+transcribe a stated value", it was **"do not invent a value"**, and those are different.
+
+Added a narrow path between them: when a value is written in a spec doc, absent from
+spec_graph, involves no choice, and can be cited as `<doc>:<line>`, Codex batches them into
+one proposal with citations rather than blocking one at a time. The founder replies
+`approved`, Codex adds them with the citation as provenance and continues.
+
+The citation is the entire safeguard. The founder is confirming a transcription, not
+authorising a guess. Anything involving a choice, or any value not written down, is still a
+full BLOCKED.

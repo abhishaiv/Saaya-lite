@@ -159,3 +159,39 @@ into `graph/spec_graph.json` as a fact (33 of them), and every string taken from
 already in `COPY.md` marked "(iOS verbatim)". The `sourced_from` fields naming
 `AppTheme.swift` and `SUSCheckInCardView.swift` are provenance, not instructions to go and
 read them. That repository is not required to build this one.
+
+---
+
+## Proposing a fact for a value the specification already states
+
+Three times at `T1.1` the build blocked on the same thing: a value **already frozen in a
+specification document** that had never been turned into a fact. Each block was correct, and
+each cost a round trip for something that required no decision.
+
+The rule was never "do not transcribe a stated value". It is **"do not invent a value"**.
+Those are different, so there is now a narrow path between them.
+
+**When, and only when, all four hold:**
+
+1. The value is **written in a specification document** — a table cell, a stated rule.
+2. It is **absent** from `graph/spec_graph.json`, or present only under an id that governs
+   something else (`grounded_check.py --explain` shows you which).
+3. You are **not** choosing between options. There is no design decision to make.
+4. You can cite it as **`<doc>:<line>`**.
+
+**Then:** batch them, do not block one at a time. Post a single list:
+
+```
+PROPOSED FACTS (values already stated, no decision needed)
+  <fact.id>  <value> <unit>  "<meaning>"   <- DOC.md:LINE
+  ...
+Blocking on approval.
+```
+
+The founder replies `approved` (or corrects individual entries). Then **you** add them with
+the doc-and-line as `sourced_from`, record a `spec_amended` event, and continue.
+
+**This is not permission to invent.** If a value is not written in a document, or if two
+readings are possible, that is a real BLOCKED and it goes through the full format. The
+citation is the whole safeguard: the founder is confirming a transcription, not authorising
+a guess.
