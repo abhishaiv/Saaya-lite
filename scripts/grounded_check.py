@@ -21,7 +21,10 @@ for f in G["facts"]:
     elif isinstance(v,(int,float)): NUMS.setdefault(float(v),[]).append(f["id"])
 
 # Literals that are structurally trivial and never encode a product decision.
-TRIVIAL={0.0,1.0,2.0,3.0,-1.0,100.0,1000.0,0.5,10.0,60.0,24.0,1024.0,255.0,4.0,8.0,16.0,32.0}
+TRIVIAL={0.0,1.0,2.0,3.0,-1.0}
+# Deliberately tiny. An earlier, wider set let common UI numbers (8, 16, 24, 32, 100)
+# bypass the check entirely, which is exactly where an agent invents values. Anything
+# else must trace to spec_graph.json or carry an explicit GROUNDED-EXEMPT reason.
 SKIP_LINE=re.compile(r'^\s*(//|\*|/\*|#)')
 # Anything on a line carrying this marker is exempt, with the reason required after it.
 EXEMPT=re.compile(r'GROUNDED-EXEMPT:\s*\S+')

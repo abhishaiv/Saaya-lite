@@ -915,3 +915,48 @@ now rather than at E9 is the difference between evidence and recollection.
 was written with Claude and frozen; Codex builds every line of the application against it,
 gated mechanically and checked by adversarial verifiers. That is a more sophisticated Codex
 workflow than a chat transcript, it is true, and stating it first means nobody discovers it.
+
+## 2026-08-19 - Pre-handover audit: five defects found and fixed
+
+Founder asked for a thorough check for failure points before handing to Codex. Went hunting
+for problems rather than re-running the checks I knew passed. Found five.
+
+**1. `verify_command` pointed at a deleted script.** When native subagent fan-out replaced
+the orchestration script, `scripts/verify_node.py` was deleted but every node in
+`build_graph.json` still carried `"verify_command": "python3 scripts/verify_node.py <node>"`.
+Codex would have hit a missing file at T4.1, the third node. Now describes the native action.
+
+**2. The grounded checker had a coverage hole covering 33 values.** This was the serious one.
+`grounded_check.py` is gate G6, the thing that makes "we did not invent this number"
+mechanical. Extracted every value stated in the nine value-bearing spec docs and compared
+against `spec_graph.json`: **33 distinct values were specified but had no fact.** Motion
+durations (200ms, 340ms, 1200ms), every responsive breakpoint (320, 360, 480), several
+component dimensions, and `#FFFFFF` / `#000000` themselves. G6 could not check any of them,
+which is precisely where a coding agent invents values. Added 70 facts; spec_graph went from
+115 to 185. Re-ran the extraction: **0 uncovered.**
+
+**3. The TRIVIAL bypass was too wide.** It skipped 0,1,2,3,-1,100,1000,0.5,10,60,24,1024,
+255,4,8,16,32. But 8, 16, 24 and 32 are the most common numbers in Android UI code and sit
+squarely on our spacing scale, so an invented padding passed silently. Narrowed to
+{-1,0,1,2,3} - genuinely structural only. Self-tested: it now catches an invented 47 and 137
+while passing a real 90, 24 and 16. With 185 facts the narrowing is safe, and GROUNDED-EXEMPT
+remains for real structural literals.
+
+**4. `README.md` was still wired as an agent input.** After the reviewer/agent split it kept
+`read_by` edges to all 22 nodes, so Codex would have reloaded a reviewer-facing document at
+every single node. Removed, and reclassified as `specifies`.
+
+**5. CODEX_TASKS.md contradicted the execution order.** It lists tasks in the original evening
+order under E1-E9 headings, while the graph runs risk-first. Same 22 nodes, different
+sequence. Codex reads that file at every node and would have seen an implied order fighting
+the graph. Added a banner at the top stating the graph owns the order, showing the real
+sequence, and explaining the E-headings survive only because BUILD_PLAN's cut order refers to
+them.
+
+Also made `scripts/render_build_state.py` actually regenerate BUILD_STATE.md instead of
+printing a message about it - it had been a stub claiming to be a renderer, which is a small
+lie in a project whose whole posture is that claims are checkable.
+
+**Final sweep: 24 checks across the build graph, spec graph, knowledge graph and
+cross-file consistency. All pass.** 39 documents, 22 nodes, 185 frozen facts, 143 entities,
+409 provenanced edges, zero orphans, zero dead references, zero uncovered spec values.

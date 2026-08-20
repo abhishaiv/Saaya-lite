@@ -3,7 +3,7 @@
  "kind": "knowledge_graph",
  "note": "Domain facts with provenance. Never merge with build_graph.json - different truth standards.",
  "rule": "Every numeric or colour literal in source must trace to a fact id here, or the grounded checker fails the node.",
- "count": 115,
+ "count": 185,
  "facts": [
   {
    "id": "ladder.cd1",
@@ -1153,6 +1153,706 @@
    "means": "police points",
    "sourced_from": "vizag_police_points.json",
    "governs": "BUSINESS_RULES.md",
+   "frozen": true
+  },
+  {
+   "id": "motion.120ms",
+   "kind": "number",
+   "value": 120,
+   "unit": "ms",
+   "means": "button press down",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "MOTION_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "motion.150ms",
+   "kind": "number",
+   "value": 150,
+   "unit": "ms",
+   "means": "zone stroke thicken / splash fade",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "MOTION_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "motion.160ms",
+   "kind": "number",
+   "value": 160,
+   "unit": "ms",
+   "means": "ladder card exit",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "MOTION_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "motion.180ms",
+   "kind": "number",
+   "value": 180,
+   "unit": "ms",
+   "means": "scrim fade in, button release",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "MOTION_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "motion.200ms",
+   "kind": "number",
+   "value": 200,
+   "unit": "ms",
+   "means": "standard transition",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "MOTION_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "motion.250ms",
+   "kind": "number",
+   "value": 250,
+   "unit": "ms",
+   "means": "toast slide",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "MOTION_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "motion.280ms",
+   "kind": "number",
+   "value": 280,
+   "unit": "ms",
+   "means": "sheet present",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "MOTION_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "motion.300ms",
+   "kind": "number",
+   "value": 300,
+   "unit": "ms",
+   "means": "screen push/pop, arm banner",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "MOTION_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "motion.320ms",
+   "kind": "number",
+   "value": 320,
+   "unit": "ms",
+   "means": "ladder card entry",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "MOTION_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "motion.340ms",
+   "kind": "number",
+   "value": 340,
+   "unit": "ms",
+   "means": "bottom sheet expand",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "MOTION_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "motion.400ms",
+   "kind": "number",
+   "value": 400,
+   "unit": "ms",
+   "means": "map camera to zone",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "MOTION_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "motion.1000ms",
+   "kind": "number",
+   "value": 1000,
+   "unit": "ms",
+   "means": "countdown tick, exactly one second",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "MOTION_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "motion.1200ms",
+   "kind": "number",
+   "value": 1200,
+   "unit": "ms",
+   "means": "skeleton shimmer loop",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "MOTION_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "motion.sos",
+   "kind": "number",
+   "value": 0,
+   "unit": "ms",
+   "means": "SOS entry. instant, never animated",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "MOTION_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "motion.spring.damping",
+   "kind": "number",
+   "value": 0.75,
+   "unit": "ratio",
+   "means": "spring damping",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "MOTION_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "motion.spring.stiffness",
+   "kind": "number",
+   "value": 380,
+   "unit": "n",
+   "means": "spring stiffness",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "MOTION_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "motion.springsoft.damping",
+   "kind": "number",
+   "value": 0.85,
+   "unit": "ratio",
+   "means": "soft spring damping",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "MOTION_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "motion.springsoft.stiffness",
+   "kind": "number",
+   "value": 240,
+   "unit": "n",
+   "means": "soft spring stiffness",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "MOTION_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "bp.320",
+   "kind": "number",
+   "value": 320,
+   "unit": "dp",
+   "means": "compact small floor, design must not break",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "RESPONSIVE_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "bp.359",
+   "kind": "number",
+   "value": 359,
+   "unit": "dp",
+   "means": "compact small ceiling",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "RESPONSIVE_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "bp.360",
+   "kind": "number",
+   "value": 360,
+   "unit": "dp",
+   "means": "primary target width",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "RESPONSIVE_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "bp.411",
+   "kind": "number",
+   "value": 411,
+   "unit": "dp",
+   "means": "compact ceiling",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "RESPONSIVE_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "bp.412",
+   "kind": "number",
+   "value": 412,
+   "unit": "dp",
+   "means": "compact large floor",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "RESPONSIVE_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "bp.479",
+   "kind": "number",
+   "value": 479,
+   "unit": "dp",
+   "means": "compact large ceiling",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "RESPONSIVE_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "bp.480",
+   "kind": "number",
+   "value": 480,
+   "unit": "dp",
+   "means": "medium floor, max content width on tablets",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "RESPONSIVE_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "bp.599",
+   "kind": "number",
+   "value": 599,
+   "unit": "dp",
+   "means": "medium ceiling",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "RESPONSIVE_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "bp.600",
+   "kind": "number",
+   "value": 600,
+   "unit": "dp",
+   "means": "expanded floor",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "RESPONSIVE_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "resp.pad.small",
+   "kind": "number",
+   "value": 16,
+   "unit": "dp",
+   "means": "screen padding under 360dp",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "RESPONSIVE_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "resp.pad.default",
+   "kind": "number",
+   "value": 20,
+   "unit": "dp",
+   "means": "screen padding 360-479",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "RESPONSIVE_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "resp.pad.large",
+   "kind": "number",
+   "value": 24,
+   "unit": "dp",
+   "means": "screen padding 480+",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "RESPONSIVE_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "resp.card.margin.small",
+   "kind": "number",
+   "value": 20,
+   "unit": "dp",
+   "means": "LadderCard margin under 360dp",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "RESPONSIVE_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "resp.card.pad.small",
+   "kind": "number",
+   "value": 18,
+   "unit": "dp",
+   "means": "card padding under 360dp",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "RESPONSIVE_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "resp.ring.small",
+   "kind": "number",
+   "value": 72,
+   "unit": "dp",
+   "means": "countdown ring under 360dp",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "RESPONSIVE_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "resp.btn.small",
+   "kind": "number",
+   "value": 64,
+   "unit": "dp",
+   "means": "BigActionButton under 360dp",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "RESPONSIVE_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "resp.display.small",
+   "kind": "number",
+   "value": 30,
+   "unit": "sp",
+   "means": "display type under 360dp",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "RESPONSIVE_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "resp.peek.small",
+   "kind": "number",
+   "value": 148,
+   "unit": "dp",
+   "means": "sheet peek under 360dp",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "RESPONSIVE_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "resp.maxwidth",
+   "kind": "number",
+   "value": 420,
+   "unit": "dp",
+   "means": "LadderCard max width on 480+",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "RESPONSIVE_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "resp.fontscale.max",
+   "kind": "number",
+   "value": 2.0,
+   "unit": "x",
+   "means": "must survive to this font scale",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "RESPONSIVE_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "perf.frame",
+   "kind": "number",
+   "value": 32,
+   "unit": "ms",
+   "means": "no frame may exceed this during the ladder",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "RESPONSIVE_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "perf.fps",
+   "kind": "number",
+   "value": 60,
+   "unit": "fps",
+   "means": "target frame rate",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "RESPONSIVE_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "perf.coldstart",
+   "kind": "number",
+   "value": 2.5,
+   "unit": "s",
+   "means": "cold start to Home on a 2GB device",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "RESPONSIVE_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "perf.apk",
+   "kind": "number",
+   "value": 25,
+   "unit": "MB",
+   "means": "APK ceiling, reasonable not tuned",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "RESPONSIVE_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "perf.memory",
+   "kind": "number",
+   "value": 150,
+   "unit": "MB",
+   "means": "resident memory ceiling",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "RESPONSIVE_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "dim.pill.height",
+   "kind": "number",
+   "value": 36,
+   "unit": "dp",
+   "means": "StatusPill height",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "COMPONENT_LIBRARY.md",
+   "frozen": true
+  },
+  {
+   "id": "dim.pill.radius",
+   "kind": "number",
+   "value": 18,
+   "unit": "dp",
+   "means": "StatusPill radius",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "COMPONENT_LIBRARY.md",
+   "frozen": true
+  },
+  {
+   "id": "dim.chip.height",
+   "kind": "number",
+   "value": 24,
+   "unit": "dp",
+   "means": "ZoneChip height",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "COMPONENT_LIBRARY.md",
+   "frozen": true
+  },
+  {
+   "id": "dim.disclosure.border",
+   "kind": "number",
+   "value": 3,
+   "unit": "dp",
+   "means": "DisclosureBanner left border",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "COMPONENT_LIBRARY.md",
+   "frozen": true
+  },
+  {
+   "id": "dim.handle.w",
+   "kind": "number",
+   "value": 32,
+   "unit": "dp",
+   "means": "sheet drag handle width",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "COMPONENT_LIBRARY.md",
+   "frozen": true
+  },
+  {
+   "id": "dim.handle.h",
+   "kind": "number",
+   "value": 4,
+   "unit": "dp",
+   "means": "sheet drag handle height",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "COMPONENT_LIBRARY.md",
+   "frozen": true
+  },
+  {
+   "id": "dim.pin.w",
+   "kind": "number",
+   "value": 56,
+   "unit": "dp",
+   "means": "PIN box width",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "COMPONENT_LIBRARY.md",
+   "frozen": true
+  },
+  {
+   "id": "dim.pin.h",
+   "kind": "number",
+   "value": 64,
+   "unit": "dp",
+   "means": "PIN box height",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "COMPONENT_LIBRARY.md",
+   "frozen": true
+  },
+  {
+   "id": "dim.pin.dot",
+   "kind": "number",
+   "value": 12,
+   "unit": "dp",
+   "means": "PIN filled dot",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "COMPONENT_LIBRARY.md",
+   "frozen": true
+  },
+  {
+   "id": "dim.ring.stroke",
+   "kind": "number",
+   "value": 6,
+   "unit": "dp",
+   "means": "countdown ring stroke",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "COMPONENT_LIBRARY.md",
+   "frozen": true
+  },
+  {
+   "id": "dim.mapctl",
+   "kind": "number",
+   "value": 48,
+   "unit": "dp",
+   "means": "MapControlButton size",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "COMPONENT_LIBRARY.md",
+   "frozen": true
+  },
+  {
+   "id": "dim.station.pin",
+   "kind": "number",
+   "value": 28,
+   "unit": "dp",
+   "means": "station pin circle",
+   "sourced_from": "MAP_SPEC.md",
+   "governs": "MAP_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "dim.station.glyph",
+   "kind": "number",
+   "value": 20,
+   "unit": "dp",
+   "means": "station glyph",
+   "sourced_from": "MAP_SPEC.md",
+   "governs": "MAP_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "map.zone.stroke",
+   "kind": "number",
+   "value": 1.5,
+   "unit": "dp",
+   "means": "zone polygon stroke",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "MAP_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "map.zone.stroke.sel",
+   "kind": "number",
+   "value": 3,
+   "unit": "dp",
+   "means": "selected zone stroke",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "MAP_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "map.zone.glow",
+   "kind": "number",
+   "value": 6,
+   "unit": "dp",
+   "means": "zone glow stroke beneath",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "MAP_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "type.h2",
+   "kind": "number",
+   "value": 26,
+   "unit": "sp",
+   "means": "card title on wide layouts",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "sheet.expanded",
+   "kind": "number",
+   "value": 55,
+   "unit": "pct",
+   "means": "bottom sheet expanded height",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "scale.4",
+   "kind": "number",
+   "value": 4,
+   "unit": "dp",
+   "means": "spacing scale step",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "scale.8",
+   "kind": "number",
+   "value": 8,
+   "unit": "dp",
+   "means": "spacing scale step",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "scale.12",
+   "kind": "number",
+   "value": 12,
+   "unit": "dp",
+   "means": "spacing scale step",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "scale.20",
+   "kind": "number",
+   "value": 20,
+   "unit": "dp",
+   "means": "spacing scale step",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "scale.32",
+   "kind": "number",
+   "value": 32,
+   "unit": "dp",
+   "means": "spacing scale step",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "scale.48",
+   "kind": "number",
+   "value": 48,
+   "unit": "dp",
+   "means": "spacing scale step",
+   "sourced_from": "founder 2026-08-18",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "color.white",
+   "kind": "color",
+   "value": "#FFFFFF",
+   "unit": "hex",
+   "means": "pure white, text and rings",
+   "sourced_from": "iOS AppTheme.swift",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "color.black",
+   "kind": "color",
+   "value": "#000000",
+   "unit": "hex",
+   "means": "pure black, scrim base",
+   "sourced_from": "iOS AppTheme.swift",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true
+  },
+  {
+   "id": "color.tile.land",
+   "kind": "color",
+   "value": "#0E0E10",
+   "unit": "hex",
+   "means": "CARTO Dark Matter land",
+   "sourced_from": "CARTO Dark Matter",
+   "governs": "MAP_SPEC.md",
    "frozen": true
   }
  ]

@@ -84,7 +84,7 @@ If the run dies, resume from `graph/build_graph.json`, never from the transcript
 
 ### always_read
 
-- `README.md`
+- `AGENTS.md` (this file)
 - `docs/spec/SPEC_README.md`
 - `docs/FEATURES.md`
 - `docs/SCOPE.md`
@@ -235,7 +235,7 @@ a value), then continue. The spec stays the single source of truth.
 All 38 documents. Every one is a `Document` entity in the knowledge graph, wired to
 the nodes that read it. Query with `python3 scripts/kg.py query <name>`.
 
-**Always (in `always_read`):** `README.md`, `docs/spec/SPEC_README.md`, `docs/FEATURES.md`,
+**Always (in `always_read`):** `AGENTS.md`, `docs/spec/SPEC_README.md`, `docs/FEATURES.md`,
 `docs/SCOPE.md`
 
 **Per node:** whatever the node's `reads` array names. Never more.

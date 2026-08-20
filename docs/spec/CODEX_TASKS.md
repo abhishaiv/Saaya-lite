@@ -1,4 +1,21 @@
 # Saaya Lite - Codex Task List
+
+> ## THE ORDER IN THIS FILE IS NOT THE EXECUTION ORDER
+>
+> **`graph/build_graph.json` owns the order.** Find your node by **id**, never by position
+> on this page. The `E1 ... E9` headings below are the original evening grouping, kept only
+> because `BUILD_PLAN.md`'s cut order refers to them.
+>
+> The graph runs **risk-first**, which is deliberately different:
+>
+> ```
+> T1.1 -> T2.1 -> T4.1 -> T4.2 -> T1.2 -> T8.1 -> T8.2 -> T1.3
+>    ... T9.0 -> T9.1 -> T9.2
+> ```
+>
+> The two most dangerous nodes clear early, and the required live demo link exists by
+> hour 14 rather than hour 24. Reasoning in `GRAPH_ENGINEERING.md`.
+
 Atomic, ordered, each with acceptance criteria. **Execute in order.** Do not batch two
 tasks into one prompt: the log entry per task is a submission deliverable.
 

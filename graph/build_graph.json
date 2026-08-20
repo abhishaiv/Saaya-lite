@@ -66,7 +66,7 @@
    "verify_lenses": [
     "spec"
    ],
-   "verify_command": "code gates only",
+   "verify_command": "spawn spec as fresh-context subagents; merge verdicts in code",
    "shape": "serial",
    "fanout": null
   },
@@ -101,7 +101,7 @@
    "verify_lenses": [
     "spec"
    ],
-   "verify_command": "code gates only",
+   "verify_command": "spawn spec as fresh-context subagents; merge verdicts in code",
    "shape": "diamond",
    "fanout": {
     "split": "one worker per bundled asset file",
@@ -175,7 +175,7 @@
     "boundary",
     "invention"
    ],
-   "verify_command": "python3 scripts/verify_node.py T4.1",
+   "verify_command": "spawn spec, boundary, invention as fresh-context subagents; merge verdicts in code",
    "shape": "serial",
    "fanout": null
   },
@@ -214,7 +214,7 @@
     "boundary",
     "invention"
    ],
-   "verify_command": "python3 scripts/verify_node.py T4.2",
+   "verify_command": "spawn spec, boundary, invention as fresh-context subagents; merge verdicts in code",
    "shape": "serial",
    "fanout": null
   },
@@ -247,7 +247,7 @@
    "verify_lenses": [
     "spec"
    ],
-   "verify_command": "code gates only",
+   "verify_command": "spawn spec as fresh-context subagents; merge verdicts in code",
    "shape": "serial",
    "fanout": null
   },
@@ -278,7 +278,7 @@
    "verify_lenses": [
     "spec"
    ],
-   "verify_command": "code gates only",
+   "verify_command": "spawn spec as fresh-context subagents; merge verdicts in code",
    "shape": "serial",
    "fanout": null
   },
@@ -316,7 +316,7 @@
     "boundary",
     "invention"
    ],
-   "verify_command": "python3 scripts/verify_node.py T8.2",
+   "verify_command": "spawn spec, boundary, invention as fresh-context subagents; merge verdicts in code",
    "shape": "serial",
    "fanout": null
   },
@@ -353,7 +353,7 @@
     "spec",
     "invention"
    ],
-   "verify_command": "code gates only",
+   "verify_command": "spawn spec, invention as fresh-context subagents; merge verdicts in code",
    "shape": "diamond",
    "fanout": {
     "split": "one worker per component C1-C14",
@@ -428,7 +428,7 @@
     "spec",
     "invention"
    ],
-   "verify_command": "code gates only",
+   "verify_command": "spawn spec, invention as fresh-context subagents; merge verdicts in code",
    "shape": "serial",
    "fanout": null
   },
@@ -465,7 +465,7 @@
     "spec",
     "invention"
    ],
-   "verify_command": "code gates only",
+   "verify_command": "spawn spec, invention as fresh-context subagents; merge verdicts in code",
    "shape": "serial",
    "fanout": null
   },
@@ -500,7 +500,7 @@
    "verify_lenses": [
     "spec"
    ],
-   "verify_command": "code gates only",
+   "verify_command": "spawn spec as fresh-context subagents; merge verdicts in code",
    "shape": "serial",
    "fanout": null
   },
@@ -538,7 +538,7 @@
     "spec",
     "invention"
    ],
-   "verify_command": "code gates only",
+   "verify_command": "spawn spec, invention as fresh-context subagents; merge verdicts in code",
    "shape": "serial",
    "fanout": null
   },
@@ -580,7 +580,7 @@
     "boundary",
     "invention"
    ],
-   "verify_command": "python3 scripts/verify_node.py T5.1",
+   "verify_command": "spawn spec, boundary, invention as fresh-context subagents; merge verdicts in code",
    "shape": "serial",
    "fanout": null
   },
@@ -618,7 +618,7 @@
     "spec",
     "invention"
    ],
-   "verify_command": "code gates only",
+   "verify_command": "spawn spec, invention as fresh-context subagents; merge verdicts in code",
    "shape": "serial",
    "fanout": null
   },
@@ -654,7 +654,7 @@
     "spec",
     "invention"
    ],
-   "verify_command": "code gates only",
+   "verify_command": "spawn spec, invention as fresh-context subagents; merge verdicts in code",
    "shape": "serial",
    "fanout": null
   },
@@ -694,7 +694,7 @@
     "boundary",
     "invention"
    ],
-   "verify_command": "python3 scripts/verify_node.py T7.1",
+   "verify_command": "spawn spec, boundary, invention as fresh-context subagents; merge verdicts in code",
    "shape": "serial",
    "fanout": null
   },
@@ -734,7 +734,7 @@
     "boundary",
     "invention"
    ],
-   "verify_command": "python3 scripts/verify_node.py T7.2",
+   "verify_command": "spawn spec, boundary, invention as fresh-context subagents; merge verdicts in code",
    "shape": "serial",
    "fanout": null
   },
@@ -767,7 +767,7 @@
    "verify_lenses": [
     "spec"
    ],
-   "verify_command": "code gates only",
+   "verify_command": "spawn spec as fresh-context subagents; merge verdicts in code",
    "shape": "serial",
    "fanout": null
   },
@@ -800,7 +800,7 @@
     "spec",
     "invention"
    ],
-   "verify_command": "code gates only",
+   "verify_command": "spawn spec, invention as fresh-context subagents; merge verdicts in code",
    "shape": "serial",
    "fanout": null
   },
@@ -832,7 +832,7 @@
    "verify_lenses": [
     "spec"
    ],
-   "verify_command": "code gates only",
+   "verify_command": "spawn spec as fresh-context subagents; merge verdicts in code",
    "shape": "serial",
    "fanout": null
   },
@@ -874,7 +874,7 @@
     "spec",
     "invention"
    ],
-   "verify_command": "code gates only",
+   "verify_command": "spawn spec, invention as fresh-context subagents; merge verdicts in code",
    "shape": "diamond",
    "fanout": {
     "split": "one worker per screen S1-S13",
@@ -941,7 +941,7 @@
     "boundary",
     "invention"
    ],
-   "verify_command": "python3 scripts/verify_node.py T9.2",
+   "verify_command": "spawn spec, boundary, invention as fresh-context subagents; merge verdicts in code",
    "shape": "diamond+cycle",
    "fanout": {
     "split": "one worker per submission check V1-V8",
