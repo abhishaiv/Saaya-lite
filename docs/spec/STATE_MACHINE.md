@@ -6,6 +6,12 @@ with zero Android imports, so every rule here is unit-testable on the JVM.
 
 `EngineContext` carries `now: Instant`, `zone: Zone?`, `hourBand: HourBand`, `config: Rules`.
 
+**`java.time` on minSdk 24.** `Instant` and friends require API 26. We keep `java.time` in
+the domain because it is expressive and testable, and enable **core library desugaring** so
+it runs on API 24. See `BUILD_CONFIG.md` §1c. Do not substitute `Long` epoch millis in the
+domain signatures; do use absolute epoch millis in `PersistedSession`, because that is what
+crosses into Room.
+
 ---
 
 ## States
@@ -41,6 +47,12 @@ No other transition may write to Firestore. This is a correctness requirement.
 | `AppKilledRestart` | service restart, see recovery |
 
 ---
+
+## Reading the transition table
+
+`RESOLVED(CANCELLED)` is shorthand. `SessionState` is a plain enum, so it means:
+**`state = RESOLVED` and `outcome = Outcome.CANCELLED` in the returned `EngineResult`.**
+The state is never parameterised; the outcome rides alongside it.
 
 ## Transition table
 
@@ -168,7 +180,46 @@ data class EngineContext(
     val susEventWritten: Boolean
 )
 
-data class EngineResult(val state: SessionState, val commands: List<Command>)
+data class EngineResult(
+    val state: SessionState,
+    val commands: List<Command>,
+    val outcome: Outcome? = null      // non-null ONLY when state == RESOLVED
+)
+
+// --- Commands. The engine DECIDES these; the service PERFORMS them. ---
+// Duplicated here deliberately: this is the type-contract document, and T4.1 reads it.
+sealed interface Command {
+    data class ShowCheckIn(val countdownSec: Int, val urgency: Urgency) : Command
+    data class NotifyFamily(val payload: FamilyPayload) : Command
+    data class WriteSusEvent(val event: SusEvent) : Command
+    data class PatchSusOutcome(val outcome: SusOutcome) : Command
+    data class WriteSosIncident(val trigger: SosTrigger) : Command
+    data class PatchSosStatus(val status: SosStatus) : Command
+    data class ScheduleTimer(val id: TimerId, val delaySec: Int) : Command
+    data class CancelTimer(val id: TimerId) : Command
+    data class LogSessionEvent(val type: String, val detail: String?) : Command
+    data class StartCooldown(val zoneId: String, val minutes: Int) : Command
+    data object PlayUrgentAlert : Command
+    data object RequirePinToStop : Command
+    data object StartForegroundService : Command
+    data object StopForegroundService : Command
+}
+
+enum class SosTrigger { LADDER_LAPSE, MANUAL_HELP_BUTTON }
+enum class SosStatus { ACTIVE, STOPPED }
+enum class SusOutcome { PENDING, CANCELLED_BY_USER, ESCALATED_TO_SOS, RESOLVED_LATE }
+
+// --- What survives process death. Written to Room, read on service restart. ---
+data class PersistedSession(
+    val sessionId: String,
+    val state: SessionState,
+    val armMode: ArmMode,
+    val zoneId: String?,
+    val armedAtEpochMs: Long,
+    val deadlineEpochMs: Long?,       // absolute, so a countdown can be recomputed
+    val susEventWritten: Boolean,
+    val outcome: Outcome? = null
+)
 ```
 
 `susEventWritten` exists so the SOS entry block knows whether to write a catch-up SUS event

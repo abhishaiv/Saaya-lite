@@ -124,38 +124,38 @@
    ],
    "risk": "low",
    "cumulative_hours": 3.5,
-    "status": "complete",
-    "run_id": "run.T2.1.2026-08-20.001",
-    "gates_passed": [
-      "fanout_check_three_workers",
-      "G1_assembleDebug",
-      "G2_lintDebug",
-      "G3_testDebugUnitTest",
-      "G4_ZoneParsingTest",
-      "G5_acceptance_24_19_37_and_189_coordinate_anchor",
-      "G6_grounded_with_explain",
-      "G7_non_negotiables",
-      "G8_pure_jvm_no_affected_screen",
-      "G9_spec_verifier_round2_pass",
-      "invention_verifier_supplemental_pass"
-    ],
-    "artifacts": [
-      "art.t21.zone_type",
-      "art.t21.zone_card_type",
-      "art.t21.police_station_type",
-      "art.t21.assets_bundled",
-      "art.t21.zone_loader",
-      "art.t21.zone_parsing_test"
-    ],
-    "corrections": [
-      "The cite-and-propose transcription was faithful to DATA_MODEL.md but the measured coordinate box was wrong against the frozen asset; the founder replaced it with the 17.4..18.1 / 82.9..83.7 district envelope.",
-      "The initial repair recommendation of lowering only the centroid longitude minimum to 83.0975 was too narrow because 34 polygon vertices also exceeded the old box; the final parser validates all 24 centroids and all 165 vertices.",
-      "G1 found stale duplicate transformed class copies ending in ' 2.class' only under generated app/build output; ./gradlew clean removed them and the clean rebuild passed.",
-      "The first JVM test helper used Files.readString, which AGP did not expose on its unit-test API surface; a buffered reader replaced it.",
-      "The first spec verifier killed a stale 17.6..17.9 / 83.1..83.5 merge contract in build_graph.json; it was corrected and fresh round 2 passed at 0.99 confidence.",
-      "The founder's coordinate-correction commit captured the in-progress T2.1 artifacts before all gates passed; history was preserved and this completion commit records the final delta and provenance.",
-      "Grounded explain lists multiple same-valued facts for 24 and 19, so the merge constants explicitly bind those literals to zones.total and cards.total; 37 binds to stations.total."
-    ],
+   "status": "complete",
+   "run_id": "run.T2.1.2026-08-20.001",
+   "gates_passed": [
+    "fanout_check_three_workers",
+    "G1_assembleDebug",
+    "G2_lintDebug",
+    "G3_testDebugUnitTest",
+    "G4_ZoneParsingTest",
+    "G5_acceptance_24_19_37_and_189_coordinate_anchor",
+    "G6_grounded_with_explain",
+    "G7_non_negotiables",
+    "G8_pure_jvm_no_affected_screen",
+    "G9_spec_verifier_round2_pass",
+    "invention_verifier_supplemental_pass"
+   ],
+   "artifacts": [
+    "art.t21.zone_type",
+    "art.t21.zone_card_type",
+    "art.t21.police_station_type",
+    "art.t21.assets_bundled",
+    "art.t21.zone_loader",
+    "art.t21.zone_parsing_test"
+   ],
+   "corrections": [
+    "The cite-and-propose transcription was faithful to DATA_MODEL.md but the measured coordinate box was wrong against the frozen asset; the founder replaced it with the 17.4..18.1 / 82.9..83.7 district envelope.",
+    "The initial repair recommendation of lowering only the centroid longitude minimum to 83.0975 was too narrow because 34 polygon vertices also exceeded the old box; the final parser validates all 24 centroids and all 165 vertices.",
+    "G1 found stale duplicate transformed class copies ending in ' 2.class' only under generated app/build output; ./gradlew clean removed them and the clean rebuild passed.",
+    "The first JVM test helper used Files.readString, which AGP did not expose on its unit-test API surface; a buffered reader replaced it.",
+    "The first spec verifier killed a stale 17.6..17.9 / 83.1..83.5 merge contract in build_graph.json; it was corrected and fresh round 2 passed at 0.99 confidence.",
+    "The founder's coordinate-correction commit captured the in-progress T2.1 artifacts before all gates passed; history was preserved and this completion commit records the final delta and provenance.",
+    "Grounded explain lists multiple same-valued facts for 24 and 19, so the merge constants explicitly bind those literals to zones.total and cards.total; 37 binds to stations.total."
+   ],
    "verify_lenses": [
     "spec"
    ],
@@ -193,7 +193,7 @@
     "shared_files_written_by_merge": [
      "data/zone/ZoneLoader.kt"
     ],
-      "merge": "code: assert 24/19/37 counts and every centroid plus polygon vertex inside lat 17.4-18.1 lon 82.9-83.7; then write the single ZoneLoader that composes the three parsers"
+    "merge": "code: assert 24/19/37 counts and every centroid plus polygon vertex inside lat 17.4-18.1 lon 82.9-83.7; then write the single ZoneLoader that composes the three parsers"
    }
   },
   "T4.1": {
@@ -214,7 +214,9 @@
     "STATE_MACHINE.md",
     "BUSINESS_RULES.md",
     "TEST_PLAN.md",
-    "PROBLEM.md"
+    "PROBLEM.md",
+    "ARCHITECTURE.md",
+    "BUILD_CONFIG.md"
    ],
    "extra_gates": [
     "RulesTest",
@@ -255,7 +257,8 @@
    "reads": [
     "ANDROID_PLATFORM.md",
     "STATE_MACHINE.md",
-    "BUSINESS_RULES.md"
+    "BUSINESS_RULES.md",
+    "ARCHITECTURE.md"
    ],
    "extra_gates": [
     "device_arms_with_no_tap",
@@ -398,7 +401,8 @@
     "COMPONENT_LIBRARY.md",
     "DESIGN_SYSTEM.md",
     "ICONOGRAPHY.md",
-    "MOTION_SPEC.md"
+    "MOTION_SPEC.md",
+    "ARCHITECTURE.md"
    ],
    "extra_gates": [
     "component_gallery"
@@ -473,7 +477,10 @@
     "MAP_SPEC.md",
     "SCREENS.md",
     "RESPONSIVE_SPEC.md",
-    "STATES_CATALOGUE.md"
+    "STATES_CATALOGUE.md",
+    "ARCHITECTURE.md",
+    "COMPONENT_LIBRARY.md",
+    "DESIGN_SYSTEM.md"
    ],
    "extra_gates": [
     "zones_render_offline"
@@ -512,7 +519,10 @@
     "SCREENS.md",
     "COPY.md",
     "COMPONENT_LIBRARY.md",
-    "MOTION_SPEC.md"
+    "MOTION_SPEC.md",
+    "ARCHITECTURE.md",
+    "DESIGN_SYSTEM.md",
+    "STATE_MACHINE.md"
    ],
    "extra_gates": [],
    "risk": "med",
@@ -548,7 +558,8 @@
     "BUSINESS_RULES.md",
     "COPY.md",
     "COMPONENT_LIBRARY.md",
-    "STATES_CATALOGUE.md"
+    "STATES_CATALOGUE.md",
+    "ARCHITECTURE.md"
    ],
    "extra_gates": [],
    "risk": "low",
@@ -583,7 +594,10 @@
     "ANDROID_PLATFORM.md",
     "BUSINESS_RULES.md",
     "COMPONENT_LIBRARY.md",
-    "ACCESSIBILITY_SPEC.md"
+    "ACCESSIBILITY_SPEC.md",
+    "ARCHITECTURE.md",
+    "DATA_MODEL.md",
+    "COPY.md"
    ],
    "extra_gates": [
     "PinStorageTest"
@@ -624,7 +638,8 @@
     "COMPONENT_LIBRARY.md",
     "INTERACTION_SPEC.md",
     "MOTION_SPEC.md",
-    "ACCESSIBILITY_SPEC.md"
+    "ACCESSIBILITY_SPEC.md",
+    "ARCHITECTURE.md"
    ],
    "extra_gates": [
     "checkin2_over_lockscreen"
@@ -665,7 +680,8 @@
     "SCREENS.md",
     "COPY.md",
     "COMPONENT_LIBRARY.md",
-    "INTERACTION_SPEC.md"
+    "INTERACTION_SPEC.md",
+    "ARCHITECTURE.md"
    ],
    "extra_gates": [],
    "risk": "med",
@@ -698,7 +714,8 @@
    "reads": [
     "ARCHITECTURE.md",
     "BUSINESS_RULES.md",
-    "TEST_PLAN.md"
+    "TEST_PLAN.md",
+    "DATA_MODEL.md"
    ],
    "extra_gates": [
     "QueueTest",
@@ -740,7 +757,9 @@
     "STATE_MACHINE.md",
     "COMPONENT_LIBRARY.md",
     "MOTION_SPEC.md",
-    "INTERACTION_SPEC.md"
+    "INTERACTION_SPEC.md",
+    "ARCHITECTURE.md",
+    "COPY.md"
    ],
    "extra_gates": [],
    "risk": "HIGH",
@@ -777,7 +796,8 @@
    "reads": [
     "DATA_MODEL.md",
     "TEST_PLAN.md",
-    "PROBLEM.md"
+    "PROBLEM.md",
+    "ARCHITECTURE.md"
    ],
    "extra_gates": [
     "AnonymiserTest",
@@ -815,7 +835,8 @@
     "SCREENS.md",
     "COPY.md",
     "COMPONENT_LIBRARY.md",
-    "OPERATING_MODEL.md"
+    "OPERATING_MODEL.md",
+    "ARCHITECTURE.md"
    ],
    "extra_gates": [],
    "risk": "low",

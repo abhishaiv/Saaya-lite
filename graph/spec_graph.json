@@ -3,7 +3,7 @@
  "kind": "knowledge_graph",
  "note": "Domain facts with provenance. Never merge with build_graph.json - different truth standards.",
  "rule": "Every numeric or colour literal in source must trace to a fact id here, or the grounded checker fails the node.",
- "count": 247,
+ "count": 248,
  "facts": [
   {
    "id": "ladder.cd1",
@@ -2476,6 +2476,16 @@
    "unit": "version",
    "means": "androidx.core:core-ktx. 1.15.0 requires compileSdk 35; this is the latest stable compatible with 34.",
    "sourced_from": "codex 2026-08-19, resolution rule at T1.1",
+   "governs": "BUILD_CONFIG.md",
+   "frozen": true
+  },
+  {
+   "id": "dep.desugar",
+   "kind": "string",
+   "value": "2.0.4",
+   "unit": "version",
+   "means": "com.android.tools:desugar_jdk_libs. Core library desugaring so java.time works on minSdk 24.",
+   "sourced_from": "founder 2026-08-19, BLOCKED on T4.1",
    "governs": "BUILD_CONFIG.md",
    "frozen": true
   }

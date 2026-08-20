@@ -40,6 +40,8 @@ app/
 // domain/engine
 data class EngineResult(val state: SessionState, val commands: List<Command>)
 
+// CANONICAL DEFINITION LIVES IN STATE_MACHINE.md, which is the type-contract document
+// and is what T4.1 reads. This copy is illustrative; if they ever differ, that one wins.
 sealed interface Command {
   data class ShowCheckIn(val countdownSec: Int, val urgency: Urgency) : Command
   data class NotifyFamily(val payload: FamilyPayload) : Command
@@ -96,6 +98,7 @@ submission claim, so it must actually be true.
 | `org.osmdroid:osmdroid-android:6.1.20` | map rendering. **Decided, see `MAP_SPEC.md`.** |
 | `kotlinx-serialization-json` | asset parsing |
 | `androidx.core:core-splashscreen:1.0.1` | the platform splash API. Added 2026-08-19 by founder decision when T1.1 blocked on it. |
+| `com.android.tools:desugar_jdk_libs:2.0.4` | core library desugaring, so `java.time` works on minSdk 24. Added 2026-08-19 when T4.1 blocked on it. |
 
 **Map choice is decided: osmdroid with CARTO Dark Matter tiles.** Founder decision
 2026-08-18. No API key, no billing account, no quota, so nothing in the build depends on a

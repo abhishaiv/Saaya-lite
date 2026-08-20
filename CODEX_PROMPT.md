@@ -44,7 +44,7 @@ come with a fresh clone.
 
 ## Read these first, in full, in this order
 
-1. `AGENTS.md` — the loop, the 9 gates, the hard rules, the document map
+1. `AGENTS.md` — the loop, the 10 gates, the hard rules, the document map
 2. `docs/spec/GRAPH_ENGINEERING.md` — why the graph, the node protocol, the verifier
    diamond, frozen nodes, anchors, the knowledge graph
 3. `docs/spec/SPEC_README.md` — precedence when documents disagree, the 12
@@ -97,7 +97,7 @@ from memory of a document you read earlier.
   capped at 5. Dedupe against **every finding seen**, not only the confirmed ones, or it
   will not converge.
 
-**4. GATE** — the 9 gates in `AGENTS.md`, plus the node's `extra_gates`, plus:
+**4. GATE** — the 10 gates in `AGENTS.md`, plus the node's `extra_gates`, plus:
 
 ```bash
 python3 scripts/grounded_check.py <changed files>
@@ -150,7 +150,7 @@ python3 scripts/kg.py context <id> --depth 2
 ordinary long session, quality degrades before it visibly breaks, and you will start
 inventing values that look plausible.
 
-**8. COMMIT** — one commit for this node, only after all 9 gates pass.
+**8. COMMIT** — one commit for this node, only after all 10 gates pass.
 
 ```
 Subject:  <node id> <what it did>

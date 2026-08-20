@@ -312,9 +312,9 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 185,
-  "edges": 462,
-  "events": 22
+  "entities": 189,
+  "edges": 466,
+  "events": 23
  },
  "entities": [
   {
@@ -1644,6 +1644,35 @@
    "class": "Deviation",
    "label": "Founder coordinate-correction commit captured in-progress T2.1 artifacts before all gates passed",
    "node": "T2.1"
+  },
+  {
+   "id": "fail.typecontract",
+   "class": "Failure",
+   "label": "STATE_MACHINE referenced Command and PersistedSession without defining them, and RESOLVED(X) contradicted a plain enum",
+   "node": "T4.1",
+   "gate": "G3"
+  },
+  {
+   "id": "fail.readsgap",
+   "class": "Failure",
+   "label": "19 nodes could not see a document defining what they must build; T4.1 was the first to hit it",
+   "node": "T4.1",
+   "gate": "G3"
+  },
+  {
+   "id": "fail.desugar",
+   "class": "Failure",
+   "label": "java.time in the domain against minSdk 24, with no core library desugaring in the closed dependency list",
+   "node": "T4.1",
+   "gate": "G3"
+  },
+  {
+   "id": "art.readscheck",
+   "class": "Artifact",
+   "label": "reads_check.py \u2014 gate G10",
+   "path": "scripts/reads_check.py",
+   "kind": "script",
+   "node": "T4.1"
   }
  ],
  "edges": [
@@ -5342,6 +5371,38 @@
    "at": "2026-08-20",
    "by": "codex",
    "confidence": "high"
+  },
+  {
+   "from": "fail.typecontract",
+   "rel": "caused_by",
+   "to": "doc.state-machine",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.readsgap",
+   "rel": "caused_by",
+   "to": "doc.graph-engineering",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.desugar",
+   "rel": "caused_by",
+   "to": "doc.architecture",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "art.readscheck",
+   "rel": "produced_by",
+   "to": "node.T4.1",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
   }
  ],
  "events": [
@@ -5586,6 +5647,14 @@
     "ver.t21.spec.round2"
    ],
    "node": "T2.1"
+  },
+  {
+   "id": "ev.0023",
+   "type": "spec_amended",
+   "at": "2026-08-20",
+   "actor": "codex",
+   "detail": "T4.1 unblock: Command and PersistedSession defined in STATE_MACHINE, outcome added to EngineResult, RESOLVED(X) notation explained, core library desugaring added for java.time on minSdk 24, and 19 nodes given the reads they were missing. New gate G10 (reads_check.py).",
+   "node": "T4.1"
   }
  ]
 }

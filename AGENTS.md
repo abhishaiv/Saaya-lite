@@ -50,7 +50,7 @@ For each node in graph/build_graph.json order:
              diamond+cycle  as diamond, then loop until 2 consecutive rounds surface
                             nothing new, cap 5. Dedupe against every finding SEEN.
 
-4. GATE    the 9 gates below plus the node's `extra_gates`. Code, zero model tokens.
+4. GATE    the 10 gates below plus the node's `extra_gates`. Code, zero model tokens.
 
 5. VERIFY  spawn this node's `verify_lenses` as SUBAGENTS, concurrently, FRESH CONTEXT:
              "You are an adversarial verifier. Lens: <LENS>. You did NOT write this code
@@ -95,7 +95,7 @@ Re-read these at the START of EVERY node, in addition to the node's `reads` arra
 
 ---
 
-## THE 9 GATES
+## THE 10 GATES
 
 A node is not done until every one passes. Stop at the first failure.
 
@@ -109,6 +109,7 @@ A node is not done until every one passes. Stop at the first failure.
 | G6 | **Grounded** | `python3 scripts/grounded_check.py <files>` exits 0. Every numeric and colour literal traces to a fact in `graph/spec_graph.json`. **Never widen the TRIVIAL set to silence a failure.** |
 | G7 | Non-negotiables | re-read the 12 in `SPEC_README.md`; none broken |
 | G8 | Runs on device | installs, and the affected screen behaves as `SCREENS.md` describes |
+| G10 | **Reads complete** | `python3 scripts/reads_check.py` exits 0. A node that cannot see the document defining what it must build will block, and correctly: the fault is the graph's. |
 | G9 | **Verified** | every lens in `verify_lenses` ran fresh-context and none returned kill |
 
 **Fails 3 times: STOP and report.** Never work around a gate, disable a test, or lower an
@@ -211,7 +212,7 @@ Breaking one means the work is wrong even if it compiles.
 iOS-verbatim strings, the trust boundary, every fact in `graph/spec_graph.json`.
 
 **Git.** Branch `main`. **One commit per completed node**, never per file, and only after
-all 9 gates pass. Subject line is the node id and what it did: `T4.1 session engine with
+all 10 gates pass. Subject line is the node id and what it did: `T4.1 session engine with
 full transition table`. Body says which gates passed and what needed correcting. Push after
 each node so the founder can follow along. Never commit `google-services.json`,
 `local.properties`, a keystore, or anything in `.gitignore`.

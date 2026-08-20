@@ -26,6 +26,7 @@ firebaseBom        = "33.7.0"
 googleServices     = "4.4.2"
 osmdroid           = "6.1.20"
 splashscreen       = "1.0.1"        # androidx.core:core-splashscreen
+desugarJdkLibs     = "2.0.4"        # core library desugaring; java.time on minSdk 24
 kotlinxSerialization = "1.7.3"
 coroutines         = "1.9.0"
 junit              = "4.13.2"
@@ -67,6 +68,24 @@ builds slower and less reliable rather than more.
 **If a build still runs out of memory**, the escalation order is in the comments at the top
 of `gradle.properties`. Raise `kotlin.daemon.jvmargs` **first**, because KSP is where the
 pressure is. Raising the Gradle heap first is the common mistake.
+
+## 1c. Core library desugaring — required, not optional
+
+`minSdk` is 24 and the domain layer uses `java.time`, which needs API 26. Rather than raise
+`minSdk` (F31 is about reach on low-end phones) or swap the domain to epoch millis (which
+would make every timing rule harder to read), enable desugaring:
+
+```kotlin
+android {
+    compileOptions { isCoreLibraryDesugaringEnabled = true }
+}
+dependencies {
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
+}
+```
+
+An explicit, named addition to the closed dependency list, resolved 2026-08-19 when `T4.1`
+blocked on it. Fact: `dep.desugar`.
 
 ## 2. `app/build.gradle.kts` essentials
 

@@ -1325,3 +1325,42 @@ to batch cite-and-propose lists across a node rather than stopping at each value
 
 Next is T4.1, the session engine - pure JVM, no device, and the highest-value logic in the
 build. Then T4.2, which will stop for the hardware anchor.
+
+## 2026-08-19 - T4.1 blocked on my type contract, and it uncovered 19 more
+
+Codex hit T4.1, the session engine, and reported four defects. All four were mine.
+
+**1. `Command` was never visible to it.** It IS defined - in ARCHITECTURE.md - but T4.1's
+`reads` array was `[STATE_MACHINE, BUSINESS_RULES, TEST_PLAN, PROBLEM]`. ARCHITECTURE was not
+in it. The bounded-subgraph rule worked exactly as designed and the node genuinely could not
+see its own type contract. Moved the canonical definition into STATE_MACHINE, which is the
+type-contract document, and marked the ARCHITECTURE copy as illustrative.
+
+**2. `PersistedSession` was referenced and never defined.** Now defined, with absolute
+epoch-millis deadlines, because that is what crosses into Room and survives process death.
+
+**3. `RESOLVED(CANCELLED)` contradicted a plain enum.** The transition table wrote states as
+if parameterised while `SessionState` is a flat enum and `EngineResult` had nowhere to put an
+`Outcome`. Added `outcome: Outcome?` and a stated rule for reading the notation.
+
+**4. `java.time` against minSdk 24.** `Instant` needs API 26. Rather than raise minSdk, which
+would cost the low-end reach F31 exists for, or swap the domain to epoch millis, which would
+make every timing rule harder to read, enabled core library desugaring and added
+`desugar_jdk_libs` to the closed list explicitly.
+
+**Then the important part.** Defect 1 is a class, not an incident, so I audited every node
+for it: does each one read the documents that define what it must produce? **19 nodes were
+missing at least one.** T3.2 builds the PIN storage without reading DATA_MODEL. T7.1 builds
+the SOS screen without reading COPY, which holds every string in it. T2.2 builds the map
+without COMPONENT_LIBRARY or DESIGN_SYSTEM. T7.2 builds the anonymiser without ARCHITECTURE.
+
+Every one of those would have been a stop, and the founder has just asked for continuous
+running, so each would have cost a round trip.
+
+Fixed all 19 and wrote `scripts/reads_check.py` as **gate G10**, so the class cannot come
+back silently. Its failure message says to add the doc to the node, not to trim the mapping
+until it passes.
+
+Ten gates now. The graph has caught: an inert G6, colliding event ids, a coordinate range
+that excluded real data, and now 19 nodes reading less than they need. Every one found by
+Codex stopping rather than guessing.
