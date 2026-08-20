@@ -204,6 +204,27 @@ afterwards. They are what prove the trust boundary holds.
 
 ---
 
+## RUN CONTINUOUSLY - stop only for these
+
+**Do not pause for approval after a completed node.** Finish it, commit, push, report in one
+or two lines, and start the next one. The founder is not reviewing every node.
+
+**Stop and wait only when:**
+
+| Stop | Why |
+|---|---|
+| **BLOCKED** | the spec is silent, or a value needs a decision. Full format. |
+| **A gate fails 3 times** | do not spend a fourth attempt |
+| **A human gate** | before `T8.1`, before `T8.2`, after `T9.0`, after `T9.2`. Permission, not measurement. |
+| **An anchor needs the founder** | `T4.2` hardware, `T9.1` Telugu, `T9.2` V7/V8 output |
+| **You believe a spec document is wrong** | say so; three times now that has been correct |
+
+Everything else, keep going. A node that passes its nine gates and its verifiers is done, and
+the next node starts immediately.
+
+**Batch your proposals.** If several values need the cite-and-propose path, collect them
+across the node and post one list rather than stopping at each.
+
 ## Human gates — stop and wait
 
 Four points where a mistake cannot be undone. Stop, explain, and wait for me. **Ask
