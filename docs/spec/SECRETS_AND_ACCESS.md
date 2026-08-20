@@ -50,7 +50,7 @@ debug builds fail to authenticate, with an error that does not say why.
 
 | Item | Check |
 |---|---|
-| JDK 17 | `java -version` |
+| JDK 17 | Present via Homebrew at `/opt/homebrew/opt/openjdk@17`. Note `java` is **not** on PATH and `/usr/libexec/java_home` does not see it, but Gradle finds it. If a tool cannot, export `JAVA_HOME=$(brew --prefix openjdk@17)/libexec/openjdk.jdk/Contents/Home`. |
 | Android SDK, API 34 platform + build-tools 34.0.0 | via Android Studio SDK Manager |
 | Node 20+ | `node -v`, needed only for the seed script |
 | Firebase CLI | `npm i -g firebase-tools` then `firebase login` (interactive, browser) |

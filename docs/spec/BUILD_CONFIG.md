@@ -13,7 +13,7 @@ agp                = "8.7.3"
 kotlin             = "2.0.21"
 ksp                = "2.0.21-1.0.28"
 composeBom         = "2024.12.01"
-coreKtx            = "1.15.0"
+coreKtx            = "1.13.1"      # 1.15.0 requires compileSdk 35; latest stable compatible with compileSdk 34.
 lifecycle          = "2.8.7"
 activityCompose    = "1.9.3"
 navigationCompose  = "2.8.5"
@@ -47,6 +47,26 @@ If a version above fails to resolve or is incompatible with the installed toolch
 
 `securityCrypto` is deliberately pinned to an alpha because the 1.0.0 stable line is
 deprecated. This is intentional, do not "fix" it.
+
+## 1b. `gradle.properties` — build memory
+
+Committed at the repository root. Set on 2026-08-19 after `T1.1` exhausted Gradle's 512 MiB
+default during KSP.
+
+| Setting | Value | Why |
+|---|---|---|
+| `org.gradle.jvmargs` | `-Xmx1536m -XX:MaxMetaspaceSize=768m` | `build.gradle.heap`, `build.gradle.metaspace` |
+| `kotlin.daemon.jvmargs` | `-Xmx1536m` | `build.kotlin.daemon.heap`. **KSP runs in the Kotlin daemon**, not the Gradle daemon. |
+| `org.gradle.workers.max` | `2` | `build.workers.max`. 8 cores but 8 GB. |
+| `org.gradle.parallel` | `false` | parallelism is not the bottleneck at this size |
+
+**These are deliberately not the usual 2g heap / 1g metaspace advice.** That is sized for a
+16 GB machine. The founder's is 8 GB, and over-allocating causes swap thrashing, which makes
+builds slower and less reliable rather than more.
+
+**If a build still runs out of memory**, the escalation order is in the comments at the top
+of `gradle.properties`. Raise `kotlin.daemon.jvmargs` **first**, because KSP is where the
+pressure is. Raising the Gradle heap first is the common mistake.
 
 ## 2. `app/build.gradle.kts` essentials
 

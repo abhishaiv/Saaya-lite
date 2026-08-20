@@ -21,3 +21,11 @@ local.properties
 
 # Fan-out worker scratch (manifests are regenerated per node)
 build/fanout/
+
+# Build crash artefacts. A 719 MB JVM heap dump from the T1.1 OOM was swept into a
+# commit by `git add -A` on 2026-08-19 and rejected by GitHub. These are never wanted.
+*.hprof
+*.heapdump
+hs_err_pid*.log
+replay_pid*.log
+.kotlin/

@@ -1157,3 +1157,36 @@ one proposal with citations rather than blocking one at a time. The founder repl
 The citation is the entire safeguard. The founder is confirming a transcription, not
 authorising a guess. Anything involving a choice, or any value not written down, is still a
 full BLOCKED.
+
+## 2026-08-19 - Build memory, sized for the machine rather than the blog post
+
+Fourth block on T1.1, and a different class: G1 failed three times with an OOM during KSP on
+Gradle's 512 MiB default. Codex correctly identified this as a real founder decision rather
+than a transcription proposal, and used the full BLOCKED format. The protocol added an hour
+ago is being applied correctly.
+
+**Did not take the recommended option.** Codex proposed 2 GiB heap and 1 GiB metaspace, which
+is the standard advice and is sized for a 16 GB machine. This one has **8 GB, with about 1 GB
+free at the time of the block** and a Gradle daemon already resident. Allocating 2g plus a
+Kotlin daemon on top would push it into swap, which makes builds slower and less reliable
+rather than more. Set 1536m heap, 768m metaspace, workers capped at 2.
+
+**And corrected something Codex missed.** The failure was during KSP, and **KSP runs in the
+Kotlin daemon, not the Gradle daemon.** Raising only `org.gradle.jvmargs`, which is what
+options 1 and 2 both described, might not have fixed it. `kotlin.daemon.jvmargs` is set to
+1536m as well, and BUILD_CONFIG says plainly that it is the one to raise first if there is a
+next time.
+
+Wrote the escalation ladder into the top of `gradle.properties` rather than leaving it as
+advice in a chat: close other applications, stop stale daemons, raise the Kotlin daemon
+first, only then the Gradle heap, and do not put both at 2g on this machine.
+
+**Also resolved a latent trap.** `java` is not on PATH and `/usr/libexec/java_home` cannot
+see any JDK, yet a Gradle daemon was running fine on Homebrew's openjdk@17. Gradle finds it;
+a future tool might not. Documented the location and the `JAVA_HOME` export in
+SECRETS_AND_ACCESS so it is never a mystery.
+
+Four blocks on node one. Every one legitimate, and between them they have found a
+contradiction in my dependency list, a missing brand asset, forty-five missing facts, a gate
+that did not work at all, and now a build that could not run on the founder's actual
+hardware. None of these would have been cheaper to find later.

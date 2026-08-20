@@ -312,9 +312,9 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 151,
-  "edges": 421,
-  "events": 9
+  "entities": 152,
+  "edges": 422,
+  "events": 11
  },
  "entities": [
   {
@@ -1412,6 +1412,14 @@
    "path": "test/grounded_fixture.kt",
    "kind": "test",
    "node": "T1.1"
+  },
+  {
+   "id": "d.buildmem",
+   "class": "Decision",
+   "label": "Gradle 1536m/768m and Kotlin daemon 1536m, not the usual 2g/1g",
+   "by": "founder",
+   "date": "2026-08-19",
+   "rationale": "the 2g/1g recommendation is sized for a 16 GB machine. This one is 8 GB with about 1 GB free, where over-allocating causes swap thrashing and makes builds less reliable. KSP runs in the Kotlin daemon, so that is the one that had to be raised."
   }
  ],
  "edges": [
@@ -4782,6 +4790,14 @@
    "at": "2026-08-19",
    "by": "claude",
    "confidence": "high"
+  },
+  {
+   "from": "d.buildmem",
+   "rel": "respects",
+   "to": "con.nodeps",
+   "at": "2026-08-19",
+   "by": "founder",
+   "confidence": "high"
   }
  ],
  "events": [
@@ -4867,6 +4883,25 @@
    "at": "2026-08-19",
    "actor": "founder",
    "detail": "Generated type scale, spacing scale and build table facts mechanically from their tables (227 facts). Added a cite-and-propose path so a value already stated in a doc is a batched proposal, not a full block.",
+   "node": "T1.1"
+  },
+  {
+   "id": "ev.0010",
+   "type": "gate_failed",
+   "at": "2026-08-19",
+   "actor": "codex",
+   "detail": "T1.1 G1 failed three times: OOM during KSP on Gradle's 512 MiB default heap",
+   "node": "T1.1"
+  },
+  {
+   "id": "ev.0012",
+   "type": "unblocked",
+   "at": "2026-08-19",
+   "actor": "founder",
+   "detail": "gradle.properties committed: Gradle 1536m/768m, Kotlin daemon 1536m, workers capped at 2. Sized for 8 GB rather than the 16 GB default advice. Escalation ladder documented in-file.",
+   "refs": [
+    "d.buildmem"
+   ],
    "node": "T1.1"
   }
  ]
