@@ -1222,3 +1222,42 @@ than to discover it after a green tick.
 
 An AVD `saaya_api35` already exists, so T1.1 can finish immediately. Also documented that
 `adb` and `emulator` are present but not on PATH, the same latent trap as the JDK.
+
+## 2026-08-19 - T1.1 COMPLETE. First node shipped.
+
+Codex finished T1.1 and pushed 4c81187. Verified rather than taken on trust.
+
+**All nine gates pass, and the allowBackup anchor is confirmed on the built APK.** Emulator
+install, cold launch, system bars, adaptive icon derived from the real v2 master. The first
+verifier round killed six issues; round two returned `kill=false` at 0.99.
+
+**The verifier earned its place immediately.** Six kills on the first node: a wrong
+SplashScreen import, an API-27 style that dropped base items, an incomplete dependency and
+package scaffold, unclosed Material colour/type/shape roles, an off-centre adaptive pin, and
+disabled wrapper URL validation. Every one of those would have compiled and passed the
+mechanical gates. Gates catch what is measurable; the skeptic caught what was merely wrong.
+
+**Codex found a defect I introduced.** The version catalog pinned `androidx.core:core-ktx`
+at 1.15.0, which requires compileSdk 35, while we target 34. The resolution rule in
+BUILD_CONFIG handled it exactly as written: resolve to the latest stable in the same major
+line, record it, update the catalog. It landed on 1.13.1 and documented why. Recorded as a
+`Failure` entity against my document, not its work, plus a `dep.corektx` fact so the catalog
+and the graph agree.
+
+**And it found a bug in my own tooling.** `kg.py` generated event ids as `len(events)+1`,
+which collides whenever two events are appended in a single run - which I did repeatedly.
+16 events, 11 unique ids. Fixed the generator to use max-existing-suffix plus one, renumbered
+the existing events while keeping their old ids under a `was` field so nothing was silently
+rewritten, and **added a duplicate-id check to `kg.py check`** so the class cannot come back
+quietly. Recorded as a `Failure` against GRAPH_ENGINEERING.
+
+**One thing to tighten:** the commit carries `Built-with:` and `Verified-by:` but not
+`Node:`. Minor, but README documents grepping the trailers, so a missing one is a broken
+claim. Noted in AGENTS.
+
+**The log is honest in the way that matters.** It lists six things Codex got wrong, and
+states plainly that its own 2 GiB / 1 GiB memory recommendation was wrong for this machine
+and missed that KSP pressures the Kotlin daemon. That is the tone the submission needs, and
+it is arriving unprompted.
+
+21 of 22 nodes remain. Next: T2.1, zone parsing, a 3-worker diamond.

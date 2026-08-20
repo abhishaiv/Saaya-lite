@@ -312,9 +312,9 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 166,
-  "edges": 441,
-  "events": 16
+  "entities": 168,
+  "edges": 443,
+  "events": 17
  },
  "entities": [
   {
@@ -1511,6 +1511,20 @@
    "class": "Deviation",
    "label": "Knowledge graph has historical duplicate event IDs and the length-based allocator minted another collision during T1.1 record",
    "node": "T1.1"
+  },
+  {
+   "id": "fail.corektx",
+   "class": "Failure",
+   "label": "Version catalog pinned coreKtx 1.15.0 against compileSdk 34",
+   "node": "T1.1",
+   "gate": "G1"
+  },
+  {
+   "id": "fail.kgids",
+   "class": "Failure",
+   "label": "kg.py generated event ids as len(events)+1, colliding when two events were appended in one run",
+   "node": "T1.1",
+   "gate": "none"
   }
  ],
  "edges": [
@@ -5041,6 +5055,22 @@
    "at": "2026-08-20",
    "by": "codex",
    "confidence": "high"
+  },
+  {
+   "from": "fail.corektx",
+   "rel": "caused_by",
+   "to": "doc.build-config",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.kgids",
+   "rel": "caused_by",
+   "to": "doc.graph-engineering",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
   }
  ],
  "events": [
@@ -5078,7 +5108,7 @@
    "node": "T1.1"
   },
   {
-   "id": "ev.0005",
+   "id": "ev.0004",
    "type": "unblocked",
    "at": "2026-08-19",
    "actor": "founder",
@@ -5086,7 +5116,8 @@
    "refs": [
     "d.t11-unblock"
    ],
-   "node": "T1.1"
+   "node": "T1.1",
+   "was": "ev.0005"
   },
   {
    "id": "ev.0005",
@@ -5097,12 +5128,13 @@
    "node": "T1.1"
   },
   {
-   "id": "ev.0007",
+   "id": "ev.0006",
    "type": "unblocked",
    "at": "2026-08-19",
    "actor": "founder",
    "detail": "20 alpha and tracking facts added (193 to 213). grounded_check gained --explain so a same-valued wrong match is visible. The invention lens now requires the RIGHT fact, not merely a same-valued one.",
-   "node": "T1.1"
+   "node": "T1.1",
+   "was": "ev.0007"
   },
   {
    "id": "ev.0007",
@@ -5121,12 +5153,13 @@
    "node": "T1.1"
   },
   {
-   "id": "ev.0010",
+   "id": "ev.0009",
    "type": "spec_amended",
    "at": "2026-08-19",
    "actor": "founder",
    "detail": "Generated type scale, spacing scale and build table facts mechanically from their tables (227 facts). Added a cite-and-propose path so a value already stated in a doc is a batched proposal, not a full block.",
-   "node": "T1.1"
+   "node": "T1.1",
+   "was": "ev.0010"
   },
   {
    "id": "ev.0010",
@@ -5137,7 +5170,7 @@
    "node": "T1.1"
   },
   {
-   "id": "ev.0012",
+   "id": "ev.0011",
    "type": "unblocked",
    "at": "2026-08-19",
    "actor": "founder",
@@ -5145,7 +5178,8 @@
    "refs": [
     "d.buildmem"
    ],
-   "node": "T1.1"
+   "node": "T1.1",
+   "was": "ev.0012"
   },
   {
    "id": "ev.0012",
@@ -5160,7 +5194,7 @@
    "node": "T1.1"
   },
   {
-   "id": "ev.0014",
+   "id": "ev.0013",
    "type": "spec_amended",
    "at": "2026-08-19",
    "actor": "founder",
@@ -5168,7 +5202,8 @@
    "refs": [
     "d.emulator-policy"
    ],
-   "node": "T1.1"
+   "node": "T1.1",
+   "was": "ev.0014"
   },
   {
    "id": "ev.0014",
@@ -5208,6 +5243,14 @@
     "ver.t11.spec.round2",
     "anchor.t11.allowbackup"
    ],
+   "node": "T1.1"
+  },
+  {
+   "id": "ev.0017",
+   "type": "node_completed",
+   "at": "2026-08-20",
+   "actor": "codex",
+   "detail": "T1.1 complete: 9 gates, allowBackup anchor taken, 6 verifier kills corrected, round 2 kill=false at 0.99",
    "node": "T1.1"
   }
  ]

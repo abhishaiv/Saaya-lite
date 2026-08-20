@@ -21,7 +21,7 @@ Why the constraints exist
   - never delete: supersede. History is the point.
   - only an Anchor or Verification may verify a Claim. Self-assertion is not verification.
 """
-import json,os,sys,datetime,difflib
+import json,os,sys,datetime,difflib,re
 P=os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),"graph/knowledge_graph.json")
 def load(): return json.load(open(P))
 def save(k):
@@ -70,7 +70,8 @@ def main():
     elif c=="event":
         typ,detail=sys.argv[2],sys.argv[3]
         if typ not in k["event_types"]: sys.exit(f"unknown event type. Declared: {k['event_types']}")
-        ev={"id":"ev.%04d"%(len(k["events"])+1),"type":typ,"at":today(),"actor":"codex","detail":detail}
+        nxt=1+max([int(re.sub(r"\D","",x["id"]) or 0) for x in k["events"]] or [0])
+        ev={"id":"ev.%04d"%nxt,"type":typ,"at":today(),"actor":"codex","detail":detail}
         for kv in sys.argv[4:]:
             key,_,val=kv.partition("=")
             ev[key]=val.split(",") if key=="refs" else val
@@ -91,6 +92,9 @@ def main():
                     print("DOMAIN",x); bad+=1
                 if "*" not in rng and ent[x["to"]]["class"] not in rng:
                     print("RANGE",x); bad+=1
+        evids=[e["id"] for e in k["events"]]
+        dupe=[i for i in set(evids) if evids.count(i)>1]
+        if dupe: print("DUPLICATE EVENT IDS",sorted(dupe)); bad+=len(dupe)
         # a Claim verified by anything other than an Anchor or Verification is self-assertion
         for x in k["edges"]:
             if x["rel"]=="verified_by" and x["to"] in ent and ent[x["to"]]["class"] not in ("Anchor","Verification"):

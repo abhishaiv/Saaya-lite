@@ -3,7 +3,7 @@
  "kind": "knowledge_graph",
  "note": "Domain facts with provenance. Never merge with build_graph.json - different truth standards.",
  "rule": "Every numeric or colour literal in source must trace to a fact id here, or the grounded checker fails the node.",
- "count": 242,
+ "count": 243,
  "facts": [
   {
    "id": "ladder.cd1",
@@ -2422,6 +2422,16 @@
    "unit": "count",
    "means": "org.gradle.workers.max. 8 cores but 8 GB; caps peak memory.",
    "sourced_from": "founder 2026-08-19, BLOCKED on T1.1 (G1 OOM during KSP)",
+   "governs": "BUILD_CONFIG.md",
+   "frozen": true
+  },
+  {
+   "id": "dep.corektx",
+   "kind": "string",
+   "value": "1.13.1",
+   "unit": "version",
+   "means": "androidx.core:core-ktx. 1.15.0 requires compileSdk 35; this is the latest stable compatible with 34.",
+   "sourced_from": "codex 2026-08-19, resolution rule at T1.1",
    "governs": "BUILD_CONFIG.md",
    "frozen": true
   }
