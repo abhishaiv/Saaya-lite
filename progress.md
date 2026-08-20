@@ -1261,3 +1261,40 @@ and missed that KSP pressures the Kotlin daemon. That is the tone the submission
 it is arriving unprompted.
 
 21 of 22 nodes remain. Next: T2.1, zone parsing, a 3-worker diamond.
+
+## 2026-08-19 - T2.1 blocked: my coordinate range was wrong, and worse than reported
+
+Codex hit G3 twice on the zone parser: Sabbavaram's centroid is 83.0975 and my asserted
+minimum was 83.1. It stopped before spending the third attempt and asked.
+
+**Checked the asset rather than accepting the framing, and it is worse than one outlier.**
+Centroids span 17.6210..17.8983 and 83.0975..83.4554, so only Sabbavaram breaches. But
+**polygon vertices span 17.5700..17.9500 and 83.0400..83.5400, and 34 of the 165 fall outside
+my range entirely.** Codex's recommended fix, setting the minimum to the exact 83.0975, would
+have passed the centroid check and then broken again the moment vertices were validated. It
+fixed the symptom it could see.
+
+**Chose a meaningful bound over a measured one.** The check exists to catch a `[lon, lat]`
+swap, and a swap is wrong by about 65 degrees, so the bound does not need to be tight - it
+needs to survive a data correction. Set the **Visakhapatnam district envelope**: lat
+17.4..18.1, lon 82.9..83.7. Verified against the asset: 189 coordinates, centroids and
+vertices, zero outside. Verified it still does its job: zero of 24 swapped centroids pass.
+
+A box measured off today's asset would be brittle. "Is this plausibly Visakhapatnam district"
+is a bound that means something.
+
+**And it exposed a real limit in the protocol I wrote an hour ago.** Those four bounds were
+proposed by Codex under the cite-and-propose path, cited to DATA_MODEL.md:47, and I approved
+them after verifying the citation. The citation was accurate. **The document was wrong.** I
+had written that range from approximation rather than computing it, and a faithful
+transcription of a wrong document produces wrong facts.
+
+What caught it was the anchor principle: a measurement from outside the documents. The parser
+met the actual data and the assertion failed.
+
+Documented in SPEC_README as "the limit of a citation": approving a citation is not approving
+a fact. Where a proposed value can be checked against a frozen asset, a device or a build
+output, it must be checked there too. A document is evidence of intent, not of truth.
+
+Recorded as a `Failure` against DATA_MODEL.md - my document, not Codex's work - with the
+decision superseding it.

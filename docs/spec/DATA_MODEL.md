@@ -44,8 +44,22 @@ enum class RiskTier { HIGH, ELEVATED, MODERATE, SAFE }
 ```
 
 **GeoJSON gotcha:** coordinates are `[longitude, latitude]`. Getting this backwards puts
-Vizag in the Indian Ocean. Assert `lat in 17.6..17.9 && lon in 83.1..83.5` on parse and
-fail loudly.
+Vizag in the Indian Ocean. Assert every parsed coordinate — **centroids and polygon
+vertices alike** — falls inside the Visakhapatnam district envelope:
+
+```
+lat in 17.4 .. 18.1     lon in 82.9 .. 83.7
+```
+
+**Why an envelope and not the measured extremes.** The check exists to catch a `[lon, lat]`
+swap, and a swap is wrong by about 65 degrees, so the bound does not need to be tight. It
+needs to be *meaningful*: "is this plausibly Visakhapatnam district" is a bound that survives
+a data correction, where a box measured off the current asset does not.
+
+Corrected 2026-08-19 at `T2.1`. The original `17.6..17.9 / 83.1..83.5` was written from
+approximation and was **wrong against the frozen asset**: Sabbavaram's centroid is 83.0975,
+and 34 of the 165 polygon vertices fall outside it entirely (vertices span
+17.5700..17.9500, 83.0400..83.5400). Facts: `zone.coordinate.lat.min` and siblings.
 
 **Tier counts, use as a parse assertion:** HIGH 6, MODERATE 9, ELEVATED 4, SAFE 5, total 24.
 

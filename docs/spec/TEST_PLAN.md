@@ -50,8 +50,8 @@ Backoff sequence is 5/15/60/300/900 s; `SOS_INCIDENT` is drained before any `SUS
 after 20 attempts the status is `FAILED_PERMANENT` and it surfaces in UI state.
 
 ### `ZoneParsingTest`
-24 features parse; tier counts are HIGH 6, MODERATE 9, ELEVATED 4, SAFE 5; every centroid
-falls inside `lat 17.6..17.9, lon 83.1..83.5` (**catches the GeoJSON lon/lat swap**); all
+24 features parse; tier counts are HIGH 6, MODERATE 9, ELEVATED 4, SAFE 5; every centroid **and every polygon vertex**
+falls inside the district envelope `lat 17.4..18.1, lon 82.9..83.7` (**catches the GeoJSON lon/lat swap**); all
 19 non-safe zones join to a `zone_info_cards.json` entry; all 37 stations parse with a phone.
 
 ## Layer 2: instrumented tests (device) - **two only**

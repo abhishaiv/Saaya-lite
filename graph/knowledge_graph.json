@@ -312,9 +312,9 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 168,
-  "edges": 443,
-  "events": 17
+  "entities": 171,
+  "edges": 446,
+  "events": 18
  },
  "entities": [
   {
@@ -1525,6 +1525,29 @@
    "label": "kg.py generated event ids as len(events)+1, colliding when two events were appended in one run",
    "node": "T1.1",
    "gate": "none"
+  },
+  {
+   "id": "fail.coordrange",
+   "class": "Failure",
+   "label": "DATA_MODEL's coordinate range was written from approximation and excluded real data: Sabbavaram's centroid and 34 of 165 polygon vertices",
+   "node": "T2.1",
+   "gate": "G3"
+  },
+  {
+   "id": "d.envelope",
+   "class": "Decision",
+   "label": "Use a Visakhapatnam district envelope (17.4-18.1, 82.9-83.7), not the measured extremes",
+   "by": "founder",
+   "date": "2026-08-19",
+   "rationale": "the check exists to catch a [lon,lat] swap, which is wrong by ~65 degrees, so the bound need not be tight. A meaningful 'is this plausibly Vizag district' bound survives a data correction; a box measured off the current asset does not, and Codex's recommended 83.0975 would have broken again the moment vertices were validated."
+  },
+  {
+   "id": "lim.citation",
+   "class": "Decision",
+   "label": "Citation verifies transcription, not truth",
+   "by": "claude",
+   "date": "2026-08-19",
+   "rationale": "the cite-and-propose path confirmed DATA_MODEL.md:47 said 83.1, and it did. It could not confirm 83.1 was correct, and it was not. Only the anchor principle catches that: a measurement from outside the documents beat the document. Approving a citation is not approving a fact."
   }
  ],
  "edges": [
@@ -5071,6 +5094,30 @@
    "at": "2026-08-19",
    "by": "claude",
    "confidence": "high"
+  },
+  {
+   "from": "fail.coordrange",
+   "rel": "caused_by",
+   "to": "doc.data-model",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.envelope",
+   "rel": "supersedes",
+   "to": "fail.coordrange",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "lim.citation",
+   "rel": "respects",
+   "to": "con.mocklabel",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
   }
  ],
  "events": [
@@ -5252,6 +5299,14 @@
    "actor": "codex",
    "detail": "T1.1 complete: 9 gates, allowBackup anchor taken, 6 verifier kills corrected, round 2 kill=false at 0.99",
    "node": "T1.1"
+  },
+  {
+   "id": "ev.0018",
+   "type": "spec_amended",
+   "at": "2026-08-20",
+   "actor": "codex",
+   "detail": "Added approved T2.1 zone coordinate parse bounds from DATA_MODEL.md:47",
+   "node": "T2.1"
   }
  ]
 }

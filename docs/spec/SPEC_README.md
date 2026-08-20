@@ -195,3 +195,20 @@ the doc-and-line as `sourced_from`, record a `spec_amended` event, and continue.
 readings are possible, that is a real BLOCKED and it goes through the full format. The
 citation is the whole safeguard: the founder is confirming a transcription, not authorising
 a guess.
+
+### The limit of a citation, learned at T2.1
+
+The cite-and-propose path confirms a value is **written in a document**. It cannot confirm
+the document is **right**.
+
+At `T2.1` four coordinate-bound facts were proposed, cited to `DATA_MODEL.md:47`, and
+approved. The citation was accurate. The document was wrong: the range had been written from
+approximation and excluded a real centroid plus 34 of 165 polygon vertices in the frozen
+asset. The approval was faithful and the facts were still wrong.
+
+What caught it was the **anchor principle** — a measurement from outside the documents. The
+parser met the actual data and the assertion failed.
+
+So: **approving a citation is not approving a fact.** When a proposed value can be checked
+against a frozen asset, a real device, or a build output, check it there too. A document is
+evidence of intent, not of truth.

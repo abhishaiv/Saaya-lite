@@ -3,7 +3,7 @@
  "kind": "knowledge_graph",
  "note": "Domain facts with provenance. Never merge with build_graph.json - different truth standards.",
  "rule": "Every numeric or colour literal in source must trace to a fact id here, or the grounded checker fails the node.",
- "count": 243,
+ "count": 247,
  "facts": [
   {
    "id": "ladder.cd1",
@@ -1074,6 +1074,50 @@
    "sourced_from": "founder 2026-08-18",
    "governs": "MAP_SPEC.md",
    "frozen": true
+  },
+  {
+   "id": "zone.coordinate.lat.min",
+   "kind": "number",
+   "value": 17.4,
+   "unit": "deg",
+   "means": "minimum  latitude \u2014 Visakhapatnam district envelope, covers centroids AND polygon vertices",
+   "sourced_from": "founder 2026-08-19, corrected at T2.1 against the audited asset",
+   "governs": "DATA_MODEL.md",
+   "frozen": true,
+   "was": 17.6
+  },
+  {
+   "id": "zone.coordinate.lat.max",
+   "kind": "number",
+   "value": 18.1,
+   "unit": "deg",
+   "means": "maximum  latitude \u2014 Visakhapatnam district envelope, covers centroids AND polygon vertices",
+   "sourced_from": "founder 2026-08-19, corrected at T2.1 against the audited asset",
+   "governs": "DATA_MODEL.md",
+   "frozen": true,
+   "was": 17.9
+  },
+  {
+   "id": "zone.coordinate.lon.min",
+   "kind": "number",
+   "value": 82.9,
+   "unit": "deg",
+   "means": "minimum  longitude \u2014 Visakhapatnam district envelope, covers centroids AND polygon vertices",
+   "sourced_from": "founder 2026-08-19, corrected at T2.1 against the audited asset",
+   "governs": "DATA_MODEL.md",
+   "frozen": true,
+   "was": 83.1
+  },
+  {
+   "id": "zone.coordinate.lon.max",
+   "kind": "number",
+   "value": 83.7,
+   "unit": "deg",
+   "means": "maximum  longitude \u2014 Visakhapatnam district envelope, covers centroids AND polygon vertices",
+   "sourced_from": "founder 2026-08-19, corrected at T2.1 against the audited asset",
+   "governs": "DATA_MODEL.md",
+   "frozen": true,
+   "was": 83.5
   },
   {
    "id": "zones.total",

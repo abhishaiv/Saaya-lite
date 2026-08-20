@@ -10,7 +10,7 @@ Three files, copied into `app/src/main/assets/` at node `T2.1`. **Do not regener
 | `vizag_police_points.json` | 37 stations with published landline numbers and addresses. |
 
 **Parse assertions** (`ZoneParsingTest`): 24 zones — HIGH 6, MODERATE 9, ELEVATED 4, SAFE 5;
-19 cards; 37 stations; every centroid within `lat 17.6..17.9, lon 83.1..83.5`.
+19 cards; 37 stations; every centroid and vertex within `lat 17.4..18.1, lon 82.9..83.7`.
 
 GeoJSON coordinates are `[longitude, latitude]`. Reading them the other way round puts
 Visakhapatnam in the Indian Ocean, which is what the range assertion catches.
