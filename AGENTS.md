@@ -13,8 +13,8 @@ Saaya Lite is a native Android app for the Build What Moves India hackathon (sub
 **The one claim the whole build exists to prove:** she never presses anything, and what
 reaches the state is legible anyway.
 
-A complete specification already exists: **38 documents, 115 frozen facts,
-139 knowledge-graph entities, 366 provenanced edges.**
+A complete specification already exists: **41 documents, 185 frozen facts,
+147 knowledge-graph entities, 366 provenanced edges.**
 You are implementing it, not designing it.
 
 ---
@@ -232,7 +232,7 @@ a value), then continue. The spec stays the single source of truth.
 
 ## DOCUMENT MAP
 
-All 38 documents. Every one is a `Document` entity in the knowledge graph, wired to
+All 41 documents. Every one is a `Document` entity in the knowledge graph, wired to
 the nodes that read it. Query with `python3 scripts/kg.py query <name>`.
 
 **Always (in `always_read`):** `AGENTS.md`, `docs/spec/SPEC_README.md`, `docs/FEATURES.md`,

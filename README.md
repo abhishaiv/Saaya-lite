@@ -127,7 +127,7 @@ grep "allowBackup" app/src/main/AndroidManifest.xml     # must be false
 python3 scripts/grounded_check.py app/src/main/java
 ```
 
-The last one is worth a note: **115 frozen facts** in
+The last one is worth a note: **185 frozen facts** in
 [`graph/spec_graph.json`](graph/spec_graph.json) hold every number, colour and dimension in
 the product, each traced to whoever decided it. A literal in the source that does not trace
 to one of them fails the build. It is how "we did not invent this value" stops being a claim.
@@ -149,10 +149,10 @@ to one of them fails the build. It is how "we did not invent this value" stops b
 | Path | What |
 |---|---|
 | [`AGENTS.md`](AGENTS.md) | the build agent's manual: the node loop, the 9 gates, the hard rules |
-| `docs/` | the specification. 38 documents. Start with `PROBLEM.md`, `SCOPE.md`, `FEATURES.md` |
+| `docs/` | the specification. 41 documents. Start with `PROBLEM.md`, `SCOPE.md`, `FEATURES.md` |
 | `docs/spec/CODEX_LOG.md` | what Codex did at each node, including what needed correcting |
 | `graph/build_graph.json` | the 22-node execution DAG: shapes, gates, verifier tiers, status |
-| `graph/spec_graph.json` | 115 frozen facts. Every value in the product, with provenance |
+| `graph/spec_graph.json` | 185 frozen facts. Every value in the product, with provenance |
 | `graph/knowledge_graph.json` | 141 entities, 405 provenanced edges, 16-class ontology |
 | `scripts/` | the mechanical gates: grounded, fan-out isolation, knowledge graph |
 | `progress.md` | the unedited decision log, including the mistakes |

@@ -989,3 +989,42 @@ which is illustrating what a machine-local file looks like.
 
 The repository is now genuinely self-contained: clone it on any machine and every input the
 build needs is present.
+
+## 2026-08-19 - Firebase live; prompt file made attachable
+
+Founder completed the Firebase setup and sent two `google-services.json` downloads.
+
+**Only one was usable.** File (1) carried a single client, `com.nexaflow.saayalite`. File (2)
+carried both, including `com.nexaflow.saayalite.debug`. Installing the first would have
+failed debug authentication with the error that does not explain itself, which is precisely
+the gotcha SETUP.md warns about. Verified the correct one on the way in: both packages
+present, project `saaya-lite` / `799647753855`, and confirmed gitignored so it cannot be
+committed.
+
+Recorded the project across SETUP.md, CODEX_LOG.md's open-decisions checklist, the build
+graph's new `setup_done` block, and the knowledge graph as an `Artifact` plus an
+`anchor_taken` event. **Rewrote T1.2**: the project now exists, so the node verifies
+anonymous sign-in against it rather than trying to create one. Left as it was, Codex would
+have gone looking for a console it cannot reach.
+
+**One setup item remains and it is not urgent:** a Web app registration for
+`console/firebase-config.js`. The console uses the Firebase web SDK, which needs its own app
+id; the Android ones will not work for it. Needed at T8.2, node 7, around hour 14.
+
+**CODEX_PROMPT.md restructured to be attached rather than pasted.** It was a document
+containing a prompt inside a code fence, wrapped in founder-facing notes. Attached directly,
+Codex would read the wrapper and the founder notes as instructions to itself. The file is now
+the instruction, top to bottom, with no wrapper, and it opens by asking whether this is a
+start or a resume so the same file serves both.
+
+The founder-facing content moved to `docs/FOUNDER_RUNBOOK.md`: the anchors in execution order
+with rough timings, the four human gates, the outstanding Web app, what to watch for, and the
+follow-along commands. Split out specifically so nothing founder-facing sits inside a file
+the agent reads as instruction.
+
+**Caught three stale counts while verifying the prompt's claims.** The document count said
+39 when there are 41 (assets/README.md and FOUNDER_RUNBOOK.md were added since), and the
+reviewer README still said 115 frozen facts in two places after the spec graph grew to 185.
+Small, but the README is the reviewer-facing document and a wrong number there is exactly
+the kind of thing that makes someone doubt the rest. Added a check that compares every
+stated count against the live graph files; all consistent now.

@@ -312,8 +312,8 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 146,
-  "edges": 414,
+  "entities": 147,
+  "edges": 416,
   "events": 2
  },
  "entities": [
@@ -1372,6 +1372,14 @@
    "path": "app/google-services.json",
    "kind": "config",
    "node": "T1.2"
+  },
+  {
+   "id": "doc.founder-runbook",
+   "class": "Document",
+   "label": "FOUNDER_RUNBOOK.md",
+   "path": "docs/FOUNDER_RUNBOOK.md",
+   "tier": "9",
+   "always_read": "False"
   }
  ],
  "edges": [
@@ -4685,6 +4693,22 @@
    "to": "claim.nokeys",
    "at": "2026-08-19",
    "by": "founder",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.founder-runbook",
+   "rel": "hosted_in",
+   "to": "repo.saaya-lite",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.founder-runbook",
+   "rel": "specifies",
+   "to": "d.sequential",
+   "at": "2026-08-19",
+   "by": "claude",
    "confidence": "high"
   }
  ],
