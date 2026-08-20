@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ============================================================
+  Saaya app icon v2, 1024x1024 master.
+  Source of truth: Branding/SAAYA_BRAND_BIBLE.md (v1.5), section 4
+  ("Iconography, icon, imagery") and section 7 step 6.
+  Tokens: Branding/brand-tokens.css
+
+  The mark: her position as a confident violet pin (evolves the v1
+  shield-pin toward the map "you are here" silhouette), lit by one
+  soft top light, casting a Penumbra (#5A41AA) emissive aura, with a
+  short dashed breadcrumb trail fading beneath it. The shadow that
+  walks beside her, drawn as light, never as glass.
+
+  What changed vs v1 (saaya-icon.svg):
+    - Checkmark removed (bible: reads verified/done/banking, off-thesis).
+    - Shield-pin simplified to a single confident teardrop pin.
+    - Candy 3-stop gradient and heavy specular flattened to one
+      top-light gradient (refined single-source depth).
+    - Heavy blur stack replaced by one soft Penumbra aura.
+    - Added the dashed breadcrumb trail (the name made visible).
+    - Glyph enlarged to ~73% of canvas.
+
+  Palette (all from brand-tokens.css, no red anywhere; Ember is
+  reserved for SOS only):
+    ground   #191230 -> #0C0918   (icon aubergine, echoes Umbra Rise)
+    pin      #A78BFA -> #7C3AED  (Violet Lift to Saaya Violet, top light)
+    aura     #5A41AA   Penumbra, effect color only
+    trail    #A78BFA / #7C3AED / #5A41AA, fading
+
+  Legibility: pin is a large solid form; every trail dash is drawn at
+  30px or wider at 1024 (round-cap stroke), so nothing is a hairline.
+  For 120px and below use saaya-icon-v2-small.svg (trail dropped,
+  thicker geometry).
+
+  Standalone: no external references, no fonts, no scripts. Only
+  feGaussianBlur is used for the aura (Safari-safe).
+  ============================================================
+-->
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 1024 1024" width="1024" height="1024"
+     role="img" aria-label="Saaya app icon">
+  <title>Saaya app icon v2</title>
+
+  <defs>
+    <!-- Aubergine radial ground, harmonized with Umbra Rise (#1E1830). -->
+    <radialGradient id="ground" cx="50%" cy="42%" r="72%">
+      <stop offset="0%" stop-color="#191230"/>
+      <stop offset="62%" stop-color="#120C24"/>
+      <stop offset="100%" stop-color="#0C0918"/>
+    </radialGradient>
+
+    <!-- One top-light gradient on the pin: Violet Lift down to Saaya Violet.
+         Two named brand tokens, no dark candy base. -->
+    <linearGradient id="pinLight" gradientUnits="userSpaceOnUse"
+                    x1="512" y1="152" x2="512" y2="712">
+      <stop offset="0%" stop-color="#A78BFA"/>
+      <stop offset="100%" stop-color="#7C3AED"/>
+    </linearGradient>
+
+    <!-- Broad ambient aura field (emissive light, not glass). -->
+    <radialGradient id="ambient" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#7C3AED" stop-opacity="0.40"/>
+      <stop offset="45%" stop-color="#5A41AA" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#5A41AA" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Soft top sheen (single source highlight on the head). -->
+    <radialGradient id="sheen" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Soft aura blur (the one glow, kept gentle). -->
+    <filter id="auraBlur" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="24"/>
+    </filter>
+    <filter id="trailGlow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+  </defs>
+
+  <!-- Aubergine ground -->
+  <rect width="1024" height="1024" fill="url(#ground)"/>
+
+  <!-- Ambient violet aura field behind the pin -->
+  <circle cx="512" cy="372" r="330" fill="url(#ambient)"/>
+
+  <!-- Emissive Penumbra aura: blurred silhouette of the pin -->
+  <path d="M 344.2,482.9
+           A 208,208 0 1 1 679.8,482.9
+           C 609.3,579.1 542.2,670.8 512,712
+           C 481.8,670.8 414.7,579.1 344.2,482.9 Z"
+        fill="#5A41AA" opacity="0.6" filter="url(#auraBlur)"/>
+
+  <!-- Breadcrumb trail: soft glow layer -->
+  <g filter="url(#trailGlow)" fill="none" stroke-linecap="round" opacity="0.5">
+    <line x1="510.3" y1="750.1" x2="513.7" y2="773.9" stroke="#A78BFA" stroke-width="34"/>
+    <line x1="520.2" y1="815.7" x2="527.8" y2="836.3" stroke="#7C3AED" stroke-width="32"/>
+    <line x1="534.7" y1="875.5" x2="545.3" y2="892.5" stroke="#5A41AA" stroke-width="30"/>
+  </g>
+
+  <!-- Breadcrumb trail: solid dashes, fading with distance -->
+  <g fill="none" stroke-linecap="round">
+    <line x1="510.3" y1="750.1" x2="513.7" y2="773.9" stroke="#A78BFA" stroke-width="34" opacity="0.95"/>
+    <line x1="520.2" y1="815.7" x2="527.8" y2="836.3" stroke="#7C3AED" stroke-width="32" opacity="0.80"/>
+    <line x1="534.7" y1="875.5" x2="545.3" y2="892.5" stroke="#5A41AA" stroke-width="30" opacity="0.62"/>
+  </g>
+
+  <!-- The pin: her position, one confident form -->
+  <path d="M 344.2,482.9
+           A 208,208 0 1 1 679.8,482.9
+           C 609.3,579.1 542.2,670.8 512,712
+           C 481.8,670.8 414.7,579.1 344.2,482.9 Z"
+        fill="url(#pinLight)"/>
+
+  <!-- Single soft top-light sheen on the head -->
+  <ellipse cx="512" cy="292" rx="150" ry="96" fill="url(#sheen)"/>
+</svg>

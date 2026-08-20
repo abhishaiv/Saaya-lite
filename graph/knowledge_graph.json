@@ -312,9 +312,9 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 147,
-  "edges": 416,
-  "events": 2
+  "entities": 149,
+  "edges": 419,
+  "events": 4
  },
  "entities": [
   {
@@ -1380,6 +1380,22 @@
    "path": "docs/FOUNDER_RUNBOOK.md",
    "tier": "9",
    "always_read": "False"
+  },
+  {
+   "id": "doc.brand-readme",
+   "class": "Document",
+   "label": "brand/README.md",
+   "path": "assets/brand/README.md",
+   "tier": "2",
+   "always_read": "False"
+  },
+  {
+   "id": "d.t11-unblock",
+   "class": "Decision",
+   "label": "T1.1 unblock: Gradle 8.9, core-splashscreen 1.0.1, real brand icon",
+   "by": "founder",
+   "date": "2026-08-19",
+   "rationale": "Codex correctly refused to invent a wrapper version, add an unlisted dependency, or draw a placeholder mark. All three are now facts or committed assets, and the specs amended before building rather than after."
   }
  ],
  "edges": [
@@ -4710,6 +4726,30 @@
    "at": "2026-08-19",
    "by": "claude",
    "confidence": "high"
+  },
+  {
+   "from": "doc.brand-readme",
+   "rel": "read_by",
+   "to": "node.T1.1",
+   "at": "2026-08-19",
+   "by": "founder",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.brand-readme",
+   "rel": "hosted_in",
+   "to": "repo.saaya-lite",
+   "at": "2026-08-19",
+   "by": "founder",
+   "confidence": "high"
+  },
+  {
+   "from": "d.t11-unblock",
+   "rel": "respects",
+   "to": "con.nodeps",
+   "at": "2026-08-19",
+   "by": "founder",
+   "confidence": "high"
   }
  ],
  "events": [
@@ -4734,6 +4774,28 @@
     "art.firebase"
    ],
    "node": "T1.2"
+  },
+  {
+   "id": "ev.0003",
+   "type": "blocked",
+   "at": "2026-08-19",
+   "actor": "codex",
+   "detail": "T1.1 blocked: Gradle wrapper version, core-splashscreen version and its dependency-list reconciliation, and the ic_launcher_foreground asset",
+   "refs": [
+    "d.t11-unblock"
+   ],
+   "node": "T1.1"
+  },
+  {
+   "id": "ev.0005",
+   "type": "unblocked",
+   "at": "2026-08-19",
+   "actor": "founder",
+   "detail": "Gradle 8.9 and core-splashscreen 1.0.1 added as facts; ARCHITECTURE dependency list reconciled; real brand SVGs committed at assets/brand/ with the adaptive-icon split specified",
+   "refs": [
+    "d.t11-unblock"
+   ],
+   "node": "T1.1"
   }
  ]
 }

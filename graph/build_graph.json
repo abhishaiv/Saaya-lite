@@ -46,12 +46,16 @@
    "produces": [
     "gradle_project",
     "theme_tokens",
-    "manifest_privacy"
+    "manifest_privacy",
+    "adaptive_icon",
+    "splash"
    ],
    "reads": [
     "BUILD_CONFIG.md",
     "ARCHITECTURE.md",
-    "DESIGN_SYSTEM.md"
+    "DESIGN_SYSTEM.md",
+    "ICONOGRAPHY.md",
+    "brand/README.md"
    ],
    "extra_gates": [
     "aapt2_allowbackup_false"

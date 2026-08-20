@@ -1028,3 +1028,40 @@ reviewer README still said 115 frozen facts in two places after the spec graph g
 Small, but the README is the reviewer-facing document and a wrong number there is exactly
 the kind of thing that makes someone doubt the rest. Added a check that compares every
 stated count against the live graph files; all consistent now.
+
+## 2026-08-19 - T1.1 BLOCKED, and the system worked
+
+Codex blocked on the very first node with three needs. Every one was legitimate, and it
+refused the option it was offered to invent its way past them. That is the protocol working
+on its first real test.
+
+**1. Gradle wrapper version.** BUILD_CONFIG pinned AGP 8.7.3 but never named the wrapper.
+Resolved: Gradle 8.9, which is AGP 8.7's minimum. Now a fact, `build.gradle.wrapper`.
+
+**2. `androidx.core:core-splashscreen`.** A genuine contradiction I introduced: BUILD_CONFIG
+section 6 said to use the AndroidX splash API, while ARCHITECTURE's dependency list is closed
+and never listed it. Codex was right to refuse rather than quietly add a dependency. Resolved:
+1.0.1, added to the version catalog and named explicitly in ARCHITECTURE's list with the date
+and reason. Hand-rolling a splash Activity would have been worse in every way.
+
+**3. The icon.** ICONOGRAPHY said "the Saaya wordmark mark in brand #A78BFA" and no such
+asset existed anywhere in the repo. Went looking in the Saaya project and found a full brand
+system: `saaya-icon-v2.svg`, a 1024 master from brand bible v1.5, plus the wordmark and a
+small variant.
+
+Committed them to `assets/brand/`. **Deliberately did not commit `saaya-icon.svg`**, the v1
+that still carries a checkmark the bible removed, precisely so it cannot be picked up by
+mistake, and said so in the brand README.
+
+The master turned out to be layered in a way that makes the adaptive-icon split mechanical
+rather than a redraw: a full-bleed `<rect>` ground becomes `ic_launcher_background`, and the
+aura, trail and pin become `ic_launcher_foreground`. Specified that split in ICONOGRAPHY
+including the 72dp safe zone, the monochrome layer for Android 13 themed icons (pin
+silhouette only, because a gradient turns to mud when a launcher tints it flat), and the six
+colours read straight out of the asset. Noted that the icon ground is deliberately NOT the
+app background: `#191230` versus `#0B0B0F`.
+
+**Recorded properly rather than just fixed:** eight new facts, the amendments table in
+BUILD_STATE, and both a `blocked` and an `unblocked` event in the knowledge graph with the
+decision entity between them. The audit trail shows what Codex asked, what was decided, and
+that the specification was amended before building rather than after.

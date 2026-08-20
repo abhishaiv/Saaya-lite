@@ -95,6 +95,7 @@ submission claim, so it must actually be true.
 | Firebase BOM: Firestore, Auth (anonymous only) | the state view writes |
 | `org.osmdroid:osmdroid-android:6.1.20` | map rendering. **Decided, see `MAP_SPEC.md`.** |
 | `kotlinx-serialization-json` | asset parsing |
+| `androidx.core:core-splashscreen:1.0.1` | the platform splash API. Added 2026-08-19 by founder decision when T1.1 blocked on it. |
 
 **Map choice is decided: osmdroid with CARTO Dark Matter tiles.** Founder decision
 2026-08-18. No API key, no billing account, no quota, so nothing in the build depends on a

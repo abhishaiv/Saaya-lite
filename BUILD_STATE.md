@@ -60,4 +60,6 @@ as a fact in `graph/spec_graph.json` if it is a value.
 
 | Date | Node | What was missing | Decision | Fact id |
 |---|---|---|---|---|
-| | | | | |
+| 2026-08-19 | T1.1 | Gradle wrapper version | 8.9 (AGP 8.7.3 needs 8.9+) | `build.gradle.wrapper` |
+| 2026-08-19 | T1.1 | core-splashscreen version, and permission to add it | 1.0.1, added to the closed list in ARCHITECTURE.md | `dep.splashscreen` |
+| 2026-08-19 | T1.1 | the Saaya mark for ic_launcher_foreground | real brand SVGs committed at `assets/brand/`; split specified in ICONOGRAPHY.md | 6 `color.icon.*` facts |

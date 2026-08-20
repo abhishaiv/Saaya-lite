@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ============================================================
+  Saaya app icon v2, SMALL variant for 120px and below.
+  Source of truth: Branding/SAAYA_BRAND_BIBLE.md (v1.5), section 4.
+  Use this master for any raster export at 120px or smaller
+  (iOS 60pt @2x = 120, watch home/notification tiers, all favicons).
+  Use saaya-icon-v2.svg for 152px and up.
+
+  Simplifications vs the full master (so the mark survives tiny):
+    - The dashed breadcrumb trail is dropped (dashes vanish sub-60px).
+    - The pin is enlarged to ~76% of canvas so it fills the tile.
+    - Geometry is thicker and cleaner; one aura, one top light.
+  Everything else (aubergine ground, top-light pin, Penumbra aura,
+  no red) matches the master.
+
+  Standalone: no external references, only feGaussianBlur (Safari-safe).
+  ============================================================
+-->
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 1024 1024" width="1024" height="1024"
+     role="img" aria-label="Saaya app icon">
+  <title>Saaya app icon v2 (small)</title>
+
+  <defs>
+    <radialGradient id="ground" cx="50%" cy="42%" r="72%">
+      <stop offset="0%" stop-color="#191230"/>
+      <stop offset="62%" stop-color="#120C24"/>
+      <stop offset="100%" stop-color="#0C0918"/>
+    </radialGradient>
+
+    <linearGradient id="pinLight" gradientUnits="userSpaceOnUse"
+                    x1="512" y1="148" x2="512" y2="812">
+      <stop offset="0%" stop-color="#A78BFA"/>
+      <stop offset="100%" stop-color="#7C3AED"/>
+    </linearGradient>
+
+    <radialGradient id="ambient" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#7C3AED" stop-opacity="0.42"/>
+      <stop offset="45%" stop-color="#5A41AA" stop-opacity="0.24"/>
+      <stop offset="100%" stop-color="#5A41AA" stop-opacity="0"/>
+    </radialGradient>
+
+    <radialGradient id="sheen" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+
+    <filter id="auraBlur" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="26"/>
+    </filter>
+  </defs>
+
+  <!-- Aubergine ground -->
+  <rect width="1024" height="1024" fill="url(#ground)"/>
+
+  <!-- Ambient violet aura field -->
+  <circle cx="512" cy="392" r="360" fill="url(#ambient)"/>
+
+  <!-- Emissive Penumbra aura: blurred silhouette -->
+  <path d="M 313.4,533.8
+           A 244,244 0 1 1 710.6,533.8
+           C 627.2,650.7 547.7,761.9 512,812
+           C 476.3,761.9 396.8,650.7 313.4,533.8 Z"
+        fill="#5A41AA" opacity="0.62" filter="url(#auraBlur)"/>
+
+  <!-- The pin -->
+  <path d="M 313.4,533.8
+           A 244,244 0 1 1 710.6,533.8
+           C 627.2,650.7 547.7,761.9 512,812
+           C 476.3,761.9 396.8,650.7 313.4,533.8 Z"
+        fill="url(#pinLight)"/>
+
+  <!-- Single soft top-light sheen -->
+  <ellipse cx="512" cy="300" rx="172" ry="110" fill="url(#sheen)"/>
+</svg>

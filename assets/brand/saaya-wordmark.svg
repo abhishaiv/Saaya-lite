@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ============================================================
+  Saaya master wordmark, lowercase "saaya".
+  Source of truth: Branding/SAAYA_BRAND_BIBLE.md (v1.5), section 4.
+  Tokens: Branding/brand-tokens.css
+
+  WORKING MASTER, NOT FINAL ARTWORK.
+  This file sets the wordmark as live Fraunces text (font-family="Fraunces",
+  weight 500, the bible's "accent" weight). It is the working master used
+  to lock proportions, the aa tightening, and the three color contexts.
+  The PENDING professional step is outline conversion: a type designer
+  converts this text into drawn vector paths and cuts the shared-stroke
+  aa ligature by hand (see SVG/WORDMARK_SPEC.md, "aa-ligature construction").
+  Until that path artwork lands, this text master is authoritative for
+  spacing and color only, not for the finished glyph outlines.
+
+  Typeface reference (Google Fonts), load Fraunces before rendering this
+  master so the letterforms are correct:
+    https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500&display=swap
+  Fallback if Fraunces is unavailable is Georgia serif (approximate only,
+  do not treat the fallback rendering as the mark).
+
+  The custom move (documented, exact):
+    The two middle a's (the "aa" in s-a-a-y-a) are tightened so the two
+    bowls visually share a stroke. This is done with negative letter-spacing
+    on a <tspan> wrapping ONLY the first a. letter-spacing="-30" user units
+    at font-size 200 equals -0.15em. It pulls a2, y and a3 left as one rigid
+    unit, so ONLY the a1-to-a2 junction closes; the s-to-a1, a2-to-y and
+    y-to-a3 gaps are unchanged. On outline conversion this optical overlap
+    becomes one merged shared stroke (see the spec).
+
+  Canvas: sized to one wordmark with 0.5x cap-height padding on all sides.
+    Reference metrics at font-size 200 (Fraunces 500):
+      cap-height  approx 140 user units (approx 0.70em)
+      x-height    approx 106 user units (approx 0.53em)
+      descender   approx  44 user units (approx 0.22em, the y tail)
+    padding  = 0.5 x cap-height = 70 user units, every side.
+    viewBox  = 0 0 606 290.
+    baseline y = 176 (70 top padding + 106 x-height).
+    text is center-anchored at x=303 so it stays centered if advance
+    widths shift slightly under the real font.
+    (Exact left/right trim is finalized at the outline step; the text
+    master centers optically rather than trimming to the ink edge.)
+
+  Three color variants live as separate top-level groups, one color per
+  context (bible section 4, "one lockup, one color per context"):
+    wordmark-ink       #14101E  light surfaces (default visible)
+    wordmark-moonlight #F4F1FB  dark surfaces
+    wordmark-violet    #7C3AED  hero use, dark only
+  Only wordmark-ink renders by default; the other two carry
+  style="display:none". To use a variant, show that one group, place it
+  on the matching surface, and hide the rest. Never recolor the wordmark
+  to any hex outside these three. Never place it on SOS Ember red.
+  ============================================================
+-->
+<svg xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     viewBox="0 0 606 290" width="606" height="290"
+     role="img" aria-label="saaya">
+
+  <title>saaya wordmark (working text master)</title>
+
+  <style type="text/css">
+    /* Best-effort load of the master typeface when opened online.
+       The binding declaration is the comment above; this @import is a
+       convenience so the master previews correctly in a browser. */
+    @import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500&amp;display=swap");
+    .wm {
+      font-family: "Fraunces", Georgia, serif;
+      font-weight: 500;
+      font-style: normal;
+      font-size: 200px;
+      -webkit-font-smoothing: antialiased;
+    }
+  </style>
+
+  <defs>
+    <!-- Single source of truth for the letterforms and the aa tightening.
+         No fill here: color is inherited from each variant group below. -->
+    <text id="wm-text" class="wm" x="303" y="176" text-anchor="middle"
+          letter-spacing="0"
+        >s<tspan letter-spacing="-30">a</tspan>aya</text>
+  </defs>
+
+  <!-- Variant 1: Ink #14101E, for light surfaces. Default visible. -->
+  <g id="wordmark-ink" fill="#14101E">
+    <use href="#wm-text" xlink:href="#wm-text"/>
+  </g>
+
+  <!-- Variant 2: Moonlight #F4F1FB, for dark surfaces. Toggle on to use. -->
+  <g id="wordmark-moonlight" fill="#F4F1FB" style="display:none">
+    <use href="#wm-text" xlink:href="#wm-text"/>
+  </g>
+
+  <!-- Variant 3: Saaya Violet #7C3AED, hero use on DARK only. Toggle on to use. -->
+  <g id="wordmark-violet" fill="#7C3AED" style="display:none">
+    <use href="#wm-text" xlink:href="#wm-text"/>
+  </g>
+
+</svg>

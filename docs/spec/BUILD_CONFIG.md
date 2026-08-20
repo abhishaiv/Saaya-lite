@@ -8,6 +8,7 @@ file location.** If something here fails to resolve, follow the resolution rule 
 
 ```toml
 [versions]
+gradle             = "8.9"          # wrapper. AGP 8.7.3 requires 8.9 or newer.
 agp                = "8.7.3"
 kotlin             = "2.0.21"
 ksp                = "2.0.21-1.0.28"
@@ -24,6 +25,7 @@ playServicesLoc    = "21.3.0"
 firebaseBom        = "33.7.0"
 googleServices     = "4.4.2"
 osmdroid           = "6.1.20"
+splashscreen       = "1.0.1"        # androidx.core:core-splashscreen
 kotlinxSerialization = "1.7.3"
 coroutines         = "1.9.0"
 junit              = "4.13.2"
@@ -175,6 +177,15 @@ Everything we contact is HTTPS: CARTO tiles and Firestore. Cleartext is never ne
 disallowing it costs nothing and is another verifiable line in the honesty section.
 
 ## 6. Splash
+
+**Dependency:** `androidx.core:core-splashscreen:1.0.1`. This is an explicit, named addition
+to the closed dependency list, resolved on 2026-08-19 when T1.1 blocked on it. It is the
+platform's own splash API; hand-rolling a splash Activity is worse in every way.
+
+**Gradle wrapper:** `gradle-8.9-bin.zip`. Set it with
+`./gradlew wrapper --gradle-version 8.9 --distribution-type bin`, or write
+`gradle/wrapper/gradle-wrapper.properties` directly.
+
 
 Use the AndroidX **core-splashscreen** API, not a custom activity.
 

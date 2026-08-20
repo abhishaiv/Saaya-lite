@@ -3,7 +3,7 @@
  "kind": "knowledge_graph",
  "note": "Domain facts with provenance. Never merge with build_graph.json - different truth standards.",
  "rule": "Every numeric or colour literal in source must trace to a fact id here, or the grounded checker fails the node.",
- "count": 185,
+ "count": 193,
  "facts": [
   {
    "id": "ladder.cd1",
@@ -1853,6 +1853,86 @@
    "means": "CARTO Dark Matter land",
    "sourced_from": "CARTO Dark Matter",
    "governs": "MAP_SPEC.md",
+   "frozen": true
+  },
+  {
+   "id": "build.gradle.wrapper",
+   "kind": "string",
+   "value": "8.9",
+   "unit": "version",
+   "means": "Gradle wrapper. AGP 8.7.3 requires 8.9 or newer.",
+   "sourced_from": "founder 2026-08-19, BLOCKED on T1.1",
+   "governs": "BUILD_CONFIG.md",
+   "frozen": true
+  },
+  {
+   "id": "dep.splashscreen",
+   "kind": "string",
+   "value": "1.0.1",
+   "unit": "version",
+   "means": "androidx.core:core-splashscreen, stable",
+   "sourced_from": "founder 2026-08-19, BLOCKED on T1.1",
+   "governs": "BUILD_CONFIG.md",
+   "frozen": true
+  },
+  {
+   "id": "color.icon.ground.in",
+   "kind": "color",
+   "value": "#191230",
+   "unit": "hex",
+   "means": "adaptive icon ground, gradient centre",
+   "sourced_from": "Branding/SVG/saaya-icon-v2.svg (brand bible v1.5 s4)",
+   "governs": "ICONOGRAPHY.md",
+   "frozen": true
+  },
+  {
+   "id": "color.icon.ground.mid",
+   "kind": "color",
+   "value": "#120C24",
+   "unit": "hex",
+   "means": "adaptive icon ground, mid",
+   "sourced_from": "Branding/SVG/saaya-icon-v2.svg (brand bible v1.5 s4)",
+   "governs": "ICONOGRAPHY.md",
+   "frozen": true
+  },
+  {
+   "id": "color.icon.ground.out",
+   "kind": "color",
+   "value": "#0C0918",
+   "unit": "hex",
+   "means": "adaptive icon ground, outer",
+   "sourced_from": "Branding/SVG/saaya-icon-v2.svg (brand bible v1.5 s4)",
+   "governs": "ICONOGRAPHY.md",
+   "frozen": true
+  },
+  {
+   "id": "color.icon.pin.hi",
+   "kind": "color",
+   "value": "#A78BFA",
+   "unit": "hex",
+   "means": "pin gradient, lit edge",
+   "sourced_from": "Branding/SVG/saaya-icon-v2.svg (brand bible v1.5 s4)",
+   "governs": "ICONOGRAPHY.md",
+   "frozen": true
+  },
+  {
+   "id": "color.icon.pin.mid",
+   "kind": "color",
+   "value": "#7C3AED",
+   "unit": "hex",
+   "means": "pin gradient, body",
+   "sourced_from": "Branding/SVG/saaya-icon-v2.svg (brand bible v1.5 s4)",
+   "governs": "ICONOGRAPHY.md",
+   "frozen": true
+  },
+  {
+   "id": "color.icon.penumbra",
+   "kind": "color",
+   "value": "#5A41AA",
+   "unit": "hex",
+   "means": "Penumbra, the emissive aura",
+   "sourced_from": "Branding/SVG/saaya-icon-v2.svg (brand bible v1.5 s4)",
+   "governs": "ICONOGRAPHY.md",
    "frozen": true
   }
  ]
