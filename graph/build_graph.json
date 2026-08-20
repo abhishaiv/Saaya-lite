@@ -205,7 +205,8 @@
     "BUSINESS_RULES.md"
    ],
    "extra_gates": [
-    "device_arms_with_no_tap"
+    "device_arms_with_no_tap",
+    "hardware_only_no_emulator"
    ],
    "risk": "HIGHEST",
    "cumulative_hours": 9.5,
@@ -221,7 +222,8 @@
    ],
    "verify_command": "spawn spec, boundary, invention as fresh-context subagents; merge verdicts in code",
    "shape": "serial",
-   "fanout": null
+   "fanout": null,
+   "note": "ANCHOR REQUIRES REAL HARDWARE. An emulator will report geofence success where a real phone under Doze and OEM battery management will not. This anchor is the product's central claim; an emulator pass is worth nothing here."
   },
   "T1.2": {
    "id": "T1.2",

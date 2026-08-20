@@ -1190,3 +1190,35 @@ Four blocks on node one. Every one legitimate, and between them they have found 
 contradiction in my dependency list, a missing brand asset, forty-five missing facts, a gate
 that did not work at all, and now a build that could not run on the founder's actual
 hardware. None of these would have been cheaper to find later.
+
+## 2026-08-19 - First anchor taken, and the emulator question resolved
+
+T1.1 reached G5. **G1 to G4 pass, and `aapt2 dump xmltree` confirms `allowBackup=false` on
+the built APK.**
+
+That is the first anchor of the build, and it is the one that matters most out of the
+pre-handover audit. `allowBackup` defaults to true, and left alone Android would have backed
+up the Room database and shared preferences to Google Drive, pushing her favourites and the
+PIN hash off the device and making a claim in the write-up false. It is now verified fixed in
+the artifact rather than merely specified. Recorded as an `Anchor` entity with a `verified_by`
+edge from `claim.boundary` - the first time a claim in this project has been verified by
+something other than an assertion.
+
+The APK built at 15.9 MB, inside the 25 MB budget.
+
+**G5 then blocked on a real device, and that exposed a genuine ambiguity in my own spec.**
+G5 and G8 said "runs on device" without qualification. Taken literally, every UI gate would
+have stopped for hardware when an emulator would do, and there are a dozen of them.
+
+Resolved with a rule rather than a case-by-case answer: **if the gate tests what the app
+draws or decides, an emulator is sufficient. If it tests what Android does to the app, it
+needs hardware.** Written into TEST_PLAN with the per-node breakdown.
+
+**T4.2 is explicitly hardware-only**, and the build graph now carries a
+`hardware_only_no_emulator` gate and a note saying why: an emulator will report geofence
+success where a real phone under Doze and OEM battery management will not. That anchor is the
+product's central claim, so an emulator pass there is worth nothing. Better to say so now
+than to discover it after a green tick.
+
+An AVD `saaya_api35` already exists, so T1.1 can finish immediately. Also documented that
+`adb` and `emulator` are present but not on PATH, the same latent trap as the JDK.

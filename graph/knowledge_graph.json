@@ -312,9 +312,9 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 152,
-  "edges": 422,
-  "events": 11
+  "entities": 154,
+  "edges": 424,
+  "events": 13
  },
  "entities": [
   {
@@ -1420,6 +1420,21 @@
    "by": "founder",
    "date": "2026-08-19",
    "rationale": "the 2g/1g recommendation is sized for a 16 GB machine. This one is 8 GB with about 1 GB free, where over-allocating causes swap thrashing and makes builds less reliable. KSP runs in the Kotlin daemon, so that is the one that had to be raised."
+  },
+  {
+   "id": "anchor.t11.allowbackup",
+   "class": "Anchor",
+   "label": "aapt2 dump xmltree confirms allowBackup=false in the built APK",
+   "node": "T1.1",
+   "taken_by": "codex"
+  },
+  {
+   "id": "d.emulator-policy",
+   "class": "Decision",
+   "label": "Emulator suffices where the gate tests what the app draws or decides; hardware where it tests what Android does to the app",
+   "by": "founder",
+   "date": "2026-08-19",
+   "rationale": "G5/G8 said 'real device' without qualification, which would have blocked every UI gate on hardware. T4.2 still demands a real phone: an emulator will report a geofence success where a Xiaomi will not, and that anchor is the product's central claim."
   }
  ],
  "edges": [
@@ -4798,6 +4813,22 @@
    "at": "2026-08-19",
    "by": "founder",
    "confidence": "high"
+  },
+  {
+   "from": "claim.boundary",
+   "rel": "verified_by",
+   "to": "anchor.t11.allowbackup",
+   "at": "2026-08-19",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "d.emulator-policy",
+   "rel": "respects",
+   "to": "con.mocklabel",
+   "at": "2026-08-19",
+   "by": "founder",
+   "confidence": "high"
   }
  ],
  "events": [
@@ -4901,6 +4932,29 @@
    "detail": "gradle.properties committed: Gradle 1536m/768m, Kotlin daemon 1536m, workers capped at 2. Sized for 8 GB rather than the 16 GB default advice. Escalation ladder documented in-file.",
    "refs": [
     "d.buildmem"
+   ],
+   "node": "T1.1"
+  },
+  {
+   "id": "ev.0012",
+   "type": "anchor_taken",
+   "at": "2026-08-19",
+   "actor": "codex",
+   "detail": "T1.1: G1-G4 pass and aapt2 dump xmltree confirms allowBackup=false on the built APK. First anchor taken; the privacy defect found in the pre-handover audit is verified fixed in the artifact.",
+   "refs": [
+    "anchor.t11.allowbackup",
+    "claim.boundary"
+   ],
+   "node": "T1.1"
+  },
+  {
+   "id": "ev.0014",
+   "type": "spec_amended",
+   "at": "2026-08-19",
+   "actor": "founder",
+   "detail": "TEST_PLAN now distinguishes emulator-sufficient gates from hardware-required anchors. T4.2 remains hardware-only.",
+   "refs": [
+    "d.emulator-policy"
    ],
    "node": "T1.1"
   }

@@ -52,6 +52,8 @@ debug builds fail to authenticate, with an error that does not say why.
 |---|---|
 | JDK 17 | Present via Homebrew at `/opt/homebrew/opt/openjdk@17`. Note `java` is **not** on PATH and `/usr/libexec/java_home` does not see it, but Gradle finds it. If a tool cannot, export `JAVA_HOME=$(brew --prefix openjdk@17)/libexec/openjdk.jdk/Contents/Home`. |
 | Android SDK, API 34 platform + build-tools 34.0.0 | via Android Studio SDK Manager |
+| `adb` and `emulator` | present at `~/Library/Android/sdk/{platform-tools,emulator}` but **not on PATH**. Use full paths or export them. |
+| AVD `saaya_api35` | installed (android-35). Sufficient for every gate except the `T4.2` hardware anchor. |
 | Node 20+ | `node -v`, needed only for the seed script |
 | Firebase CLI | `npm i -g firebase-tools` then `firebase login` (interactive, browser) |
 | Codex CLI, authenticated | founder's own OpenAI account. Build tool only, not in the product. |

@@ -135,3 +135,43 @@ and would have passed anything. Found on 2026-08-19 while self-testing a differe
 | Invented | `0.37f`, `#FF123456` | be **flagged** |
 | Structural | `2` | be skipped |
 | Exempted | `7 // GROUNDED-EXEMPT: stride` | be skipped |
+
+---
+
+## Emulator or real hardware: which gate accepts which
+
+`G5` and `G8` say "runs on device". That was ambiguous, and it would have had every UI gate
+blocking for hardware when an emulator would do. Resolved 2026-08-19 at `T1.1`.
+
+**An emulator is sufficient** for anything that only exercises app logic and rendering:
+
+| Gate / node | Why an emulator is enough |
+|---|---|
+| `T1.1` G5, G8 | it installs and the themed screen renders |
+| `T2.2`, `T3.1`, `T3.2` | map, sheets, onboarding are pure UI |
+| `T5.1` | notification channels and the lock-screen full-screen intent behave correctly on an emulator |
+| `T6.1`, `T7.1`, `T7.3` | screens and state transitions |
+| `T6.2` | airplane mode is faithfully simulated |
+| `T9.1` | font scale, locale and layout |
+
+**Real hardware is required** where the emulator does not model the thing being tested:
+
+| Anchor | Why hardware |
+|---|---|
+| **`T4.2` — arms with no tap** | real geofence delivery under Doze, real background-location behaviour, real OEM battery management. An emulator will report success where a Xiaomi will not. **This is the product's central claim; an emulator pass here is worth nothing.** |
+| `T9.2` low-end pass | the emulator does not model a 2 GB device's actual thermal and memory behaviour |
+| OEM autostart check | only reproducible on Xiaomi, Oppo, Vivo, Realme, OnePlus |
+
+**The rule:** if the gate tests *what the app draws or decides*, an emulator is fine. If it
+tests *what Android does to the app*, it needs hardware.
+
+An AVD named `saaya_api35` (android-35) is already installed. Note the founder's machine has
+8 GB, and an emulator wants roughly 2 GB, so stop the Gradle daemon before booting it:
+
+```bash
+./gradlew --stop
+$HOME/Library/Android/sdk/emulator/emulator -avd saaya_api35 -no-snapshot-load &
+$HOME/Library/Android/sdk/platform-tools/adb wait-for-device
+```
+
+`adb` and `emulator` are **not on PATH**. Use the full paths above or export them.
