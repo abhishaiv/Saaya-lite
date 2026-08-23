@@ -312,8 +312,8 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 229,
-  "edges": 511,
+  "entities": 231,
+  "edges": 521,
   "events": 48
  },
  "entities": [
@@ -1104,8 +1104,8 @@
   {
    "id": "doc.android-platform",
    "class": "Document",
-   "label": "ANDROID_PLATFORM.md",
-   "path": "docs/spec/ANDROID_PLATFORM.md",
+   "label": "ANDROID_PLATFORM.md (archived)",
+   "path": "archive/android-kotlin:docs/spec/ANDROID_PLATFORM.archived.md",
    "tier": "2",
    "always_read": "False"
   },
@@ -1966,6 +1966,22 @@
    "by": "founder",
    "date": "2026-08-19",
    "rationale": "the brief now states reviewers will not download a mobile app and the submission must be a live browser link. Roughly 94% of the spec is platform-agnostic and transfers; only ANDROID_PLATFORM and BUILD_CONFIG are replaced. The Kotlin is archived on a branch, not deleted, since it is evidence of Codex's work."
+  },
+  {
+   "id": "doc.web-platform",
+   "class": "Document",
+   "label": "WEB_PLATFORM.md",
+   "path": "docs/spec/WEB_PLATFORM.md",
+   "tier": "2",
+   "always_read": "False"
+  },
+  {
+   "id": "doc.saaya-brand-bible",
+   "class": "Document",
+   "label": "SAAYA_BRAND_BIBLE.md",
+   "path": "assets/brand/SAAYA_BRAND_BIBLE.md",
+   "tier": "2",
+   "always_read": "False"
   }
  ],
  "edges": [
@@ -2738,14 +2754,6 @@
    "confidence": "high"
   },
   {
-   "from": "doc.android-platform",
-   "rel": "read_by",
-   "to": "node.T4.2",
-   "at": "2026-08-18",
-   "by": "claude",
-   "confidence": "high"
-  },
-  {
    "from": "doc.state-machine",
    "rel": "read_by",
    "to": "node.T4.2",
@@ -2978,14 +2986,6 @@
    "confidence": "high"
   },
   {
-   "from": "doc.android-platform",
-   "rel": "read_by",
-   "to": "node.T3.2",
-   "at": "2026-08-18",
-   "by": "claude",
-   "confidence": "high"
-  },
-  {
    "from": "doc.business-rules",
    "rel": "read_by",
    "to": "node.T3.2",
@@ -3011,14 +3011,6 @@
   },
   {
    "from": "doc.screens",
-   "rel": "read_by",
-   "to": "node.T5.1",
-   "at": "2026-08-18",
-   "by": "claude",
-   "confidence": "high"
-  },
-  {
-   "from": "doc.android-platform",
    "rel": "read_by",
    "to": "node.T5.1",
    "at": "2026-08-18",
@@ -6055,6 +6047,110 @@
    "to": "claim.nokeys",
    "at": "2026-08-19",
    "by": "founder",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.web-platform",
+   "rel": "hosted_in",
+   "to": "repo.saaya-lite",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.saaya-brand-bible",
+   "rel": "hosted_in",
+   "to": "repo.saaya-lite",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.web-platform",
+   "rel": "read_by",
+   "to": "node.T1.1",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.web-platform",
+   "rel": "read_by",
+   "to": "node.T4.2",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.web-platform",
+   "rel": "read_by",
+   "to": "node.T2.2",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.web-platform",
+   "rel": "read_by",
+   "to": "node.T3.2",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.web-platform",
+   "rel": "read_by",
+   "to": "node.T5.1",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.web-platform",
+   "rel": "read_by",
+   "to": "node.T6.2",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.saaya-brand-bible",
+   "rel": "read_by",
+   "to": "node.T1.1",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.web-platform",
+   "rel": "supersedes",
+   "to": "doc.android-platform",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.t41.invention_round1",
+   "rel": "caused_by",
+   "to": "doc.graph-engineering",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.t41.engine_plumbing",
+   "rel": "enables",
+   "to": "claim.no_press",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.t42.androidtest_names",
+   "rel": "enables",
+   "to": "claim.no_press",
+   "at": "2026-08-19",
+   "by": "claude",
    "confidence": "high"
   }
  ],

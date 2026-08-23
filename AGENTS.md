@@ -101,9 +101,9 @@ A node is not done until every one passes. Stop at the first failure.
 
 | # | Gate | Check |
 |---|---|---|
-| G1 | Compiles | `./gradlew assembleDebug` exits 0 |
-| G2 | Lint | `./gradlew lintDebug`, zero errors |
-| G3 | Tests | `./gradlew testDebugUnitTest` exits 0 |
+| G1 | Compiles | `npm run build` exits 0 |
+| G2 | Lint | `npx tsc --noEmit && npm run lint`, zero errors |
+| G3 | Tests | `npx vitest run` exits 0 |
 | G4 | New tests exist | the tests named in `TEST_PLAN.md` for this node are written and passing |
 | G5 | Acceptance | the node's "Done when" is literally true, checked by running it |
 | G6 | **Grounded** | `python3 scripts/grounded_check.py <files>` exits 0. Every numeric and colour literal traces to a fact in `graph/spec_graph.json`. **Never widen the TRIVIAL set to silence a failure.** |
@@ -126,7 +126,7 @@ Risk-first, not phase-first. Do not reorder it.
 |  1 | `T1.1` | Scaffold, theme, manifest privacy flags | low | serial | 2.0 |
 |  2 | `T2.1` | Zone parsing to typed Zone/ZoneCard/PoliceStation | low | diamond | 3.5 |
 |  3 | `T4.1` | Session engine, pure JVM, no Android imports | HIGH | serial | 6.5 |
-|  4 | `T4.2` | Foreground service, geofencing, alarms, recovery | HIGHEST | serial | 9.5 |
+|  4 | `T4.2` | Wake lock plus a visible page, geofencing, alarms, recovery | HIGHEST | serial | 9.5 |
 |  5 | `T1.2` | Firebase wiring, anonymous auth | low | serial | 10.5 |
 |  6 | `T8.1` | Seed zones to Firestore | low | serial | 11.0 |
 |  7 | `T8.2` | Console: the live demo link | HIGH | serial | 14.0 |
@@ -142,7 +142,7 @@ Risk-first, not phase-first. Do not reorder it.
 | 17 | `T7.2` | Anonymiser and the two Firestore writers | HIGHEST | serial | 37.5 |
 | 18 | `T7.3` | What the police see, in app | low | serial | 39.0 |
 | 19 | `T8.3` | Console live journey trigger | med | serial | 40.5 |
-| 20 | `T9.0` | Landing page with APK and video | low | serial | 41.5 |
+| 20 | `T9.0` | Landing page with deployed site and video | low | serial | 41.5 |
 | 21 | `T9.1` | Localisation, low-end, font scale, a11y | med | diamond | 43.5 |
 | 22 | `T9.2` | Verification sweep V1 to V8 | HIGH | diamond+cycle | 45.0 |
 
@@ -199,7 +199,7 @@ for nothing else. A gate is permission; an anchor is a measurement. Both are req
 |---|---|---|---|
 | T8.1 | before | Firestore rules and public read go live | public read is hard to un-publish; confirm every record is synthetic first |
 | T8.2 | before | console URL becomes reachable | this is the submission's live link; once shared it is judged |
-| T9.0 | after | APK published on the landing page | an installed APK cannot be recalled from a judge's phone |
+| T9.0 | after | deployed site published on the landing page | an installed deployed site cannot be recalled from a judge's phone |
 | T9.2 | after | submission | irreversible by definition |
 
 ---
@@ -297,17 +297,17 @@ the nodes that read it. Query with `python3 scripts/kg.py query <name>`.
 | `docs/spec/SECRETS_AND_ACCESS.md` | every key and config file. **There are none to obtain.** |
 | `docs/spec/BUILD_CONFIG.md` | Next.js, Vercel, versions, the closed list |
 | `docs/spec/ARCHITECTURE.md` | modules, layers, threading, DI, repositories |
-| `docs/spec/DATA_MODEL.md` | assets, Room, both Firestore payloads, rules, indexes |
+| `docs/spec/DATA_MODEL.md` | assets, IndexedDB, both Firestore payloads, rules, indexes |
 | `docs/spec/BUSINESS_RULES.md` | **every number in the product** |
 | `docs/spec/STATE_MACHINE.md` | states, events, transitions, recovery, full types |
 | `docs/spec/DESIGN_SYSTEM.md` | colour, Poppins scale, shape, the escalation grading |
-| `docs/spec/COMPONENT_LIBRARY.md` | 14 composables at exact dp, every state |
+| `docs/spec/COMPONENT_LIBRARY.md` | 14 components at exact px, every state |
 | `docs/spec/SCREENS.md` | 13 screens, layouts, navigation |
-| `docs/spec/MAP_SPEC.md` | osmdroid, CARTO tiles, zone rendering, offline |
+| `docs/spec/MAP_SPEC.md` | Leaflet, CARTO tiles, zone rendering, offline |
 | `docs/spec/ICONOGRAPHY.md` | Material Symbols Rounded, the SF Symbols mapping |
 | `docs/spec/MOTION_SPEC.md` | every animation, and the two that must never animate |
 | `docs/spec/INTERACTION_SPEC.md` | gestures, haptics, sound, back behaviour |
-| `docs/spec/RESPONSIVE_SPEC.md` | 320 dp up, portrait, font scale to 2.0x |
+| `docs/spec/RESPONSIVE_SPEC.md` | 320 px up, portrait, font scale to 2.0x |
 | `docs/spec/STATES_CATALOGUE.md` | loading, empty, error, offline, denied, all screens |
 | `docs/spec/ACCESSIBILITY_SPEC.md` | screen reader, focus, contrast, motor, cognitive |
 | `docs/spec/COPY.md` | every string, English and Telugu, locked vocabulary |

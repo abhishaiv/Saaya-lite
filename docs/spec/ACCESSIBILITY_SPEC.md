@@ -48,7 +48,7 @@ keyboard user can answer with one action.
 | `textTertiary` at 40% | decorative only, never the sole carrier of meaning |
 | Colour alone | **never** signals state. Every ladder rung carries a text label. |
 | Zone tiers | carry a text label in the chip, not only a fill colour |
-| Focus indicator | 2 dp `brandLight` ring, visible on every focusable element |
+| Focus indicator | 2 px `brandLight` ring, visible on every focusable element |
 | Font scale | works to 2.0x per `RESPONSIVE_SPEC.md` |
 
 Colour-blind check: our ladder runs lavender, amber, red. Under deuteranopia amber and red
@@ -57,7 +57,7 @@ Verify with a simulator on E9.
 
 ## Motor
 
-- 48 dp minimum targets, 8 dp separation.
+- 48 px minimum targets, 8 px separation.
 - Primary actions in the bottom third, reachable one-handed.
 - No gesture is the only way to do anything. Every swipe has a button equivalent.
 - No timed interaction other than the ladder itself, which is the product.
@@ -77,7 +77,7 @@ Verify with a simulator on E9.
 
 | Check | How |
 |---|---|
-| TalkBack, full journey | manual, onboarding through SOS, on E9 |
+| VoiceOver and TalkBack, full journey | manual, onboarding through SOS, on E9 |
 | Switch Access, check-in card | can she answer with one action |
 | Font scale 2.0 | every screen, no clipping |
 | Contrast | Accessibility Scanner on every screen, zero errors |

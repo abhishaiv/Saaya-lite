@@ -110,7 +110,7 @@ remains in force as insurance, not as an expectation.
 
 Scored directly by the brief, so these are build requirements.
 
-- Low-end phone. Min SDK 24, no heavy 3D map, small APK.
+- Low-end phone. Min SDK 24, no heavy 3D map, small deployed site.
 - Slow or dropped connection. Escalation queues locally and syncs when the network
   returns. Losing signal must never lose the escalation.
 - Low digital literacy. The primary path requires **zero taps**, which is the strongest

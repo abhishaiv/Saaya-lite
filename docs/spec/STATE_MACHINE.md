@@ -7,11 +7,11 @@ with zero Android imports, so every rule here is unit-testable on the JVM.
 `EngineContext` carries `now: Instant`, `zone: Zone?`, the current `hourBand: HourBand`,
 the frozen `armedHourBand: HourBand?`, and `rules: Rules`.
 
-**`java.time` on minSdk 24.** `Instant` and friends require API 26. We keep `java.time` in
+**`java.time` on the 320 px viewport floor.** `Instant` and friends require API 26. We keep `java.time` in
 the domain because it is expressive and testable, and enable **core library desugaring** so
 it runs on API 24. See `BUILD_CONFIG.md` §1c. Do not substitute `Long` epoch millis in the
 domain signatures; do use absolute epoch millis in `PersistedSession`, because that is what
-crosses into Room.
+crosses into IndexedDB.
 
 ---
 
@@ -39,8 +39,8 @@ No other transition may write to Firestore. This is a correctness requirement.
 | `ZoneExited(zoneId)` | polygon test + 180 s dwell |
 | `ManualArm` | user taps arm |
 | `ManualDisarm` | user taps "I am home" |
-| `CheckInTimerFired` | AlarmManager |
-| `CountdownExpired(step)` | AlarmManager |
+| `CheckInTimerFired` | an absolute deadline in IndexedDB |
+| `CountdownExpired(step)` | an absolute deadline in IndexedDB |
 | `OkTapped` | user |
 | `HelpNowTapped` | user |
 | `CancelTapped` | user |
@@ -145,184 +145,137 @@ dies mid-ladder is more likely to be a real emergency, not less.
 `SessionEngine` takes an injected `Clock` and `Rules`. `TEST_PLAN.md` drives the full
 ladder in milliseconds with a fake clock. **No test may use real `delay` or `Thread.sleep`.**
 
-
 ---
 
 ## Full type definitions
 
-Copy these exactly. Do not add cases, do not rename.
+Copy these exactly. Do not add cases, do not rename. **This is the type contract**; where it
+and any other document differ, this one wins.
 
-```kotlin
-enum class SessionState { IDLE, SHADOW, CHECKIN_1, CHECKIN_2, FAMILY_ESCALATED, SOS_ACTIVE, RESOLVED }
+```typescript
+export type SessionState =
+  | "IDLE" | "SHADOW" | "CHECKIN_1" | "CHECKIN_2"
+  | "FAMILY_ESCALATED" | "SOS_ACTIVE" | "RESOLVED";
 
-enum class Outcome { RESOLVED_OK, CANCELLED, ESCALATED_SOS, DISARMED }
+export type Outcome   = "RESOLVED_OK" | "CANCELLED" | "ESCALATED_SOS" | "DISARMED";
+export type ArmMode   = "AUTO_ZONE" | "MANUAL";
+export type Urgency   = "GENTLE" | "URGENT" | "CRITICAL";
+export type TimerId   = "CHECKIN" | "CD1" | "CD2" | "CANCEL";
+export type HourBand  = "NIGHT_DEEP" | "DAWN" | "DAY" | "NIGHT_EARLY" | "NIGHT_LATE";
+export type RiskTier  = "HIGH" | "ELEVATED" | "MODERATE" | "SAFE";
+export type SosTrigger = "LADDER_LAPSE" | "MANUAL_HELP_BUTTON";
+export type SosStatus  = "ACTIVE" | "STOPPED";
+export type SusOutcome = "PENDING" | "CANCELLED_BY_USER" | "ESCALATED_TO_SOS" | "RESOLVED_LATE";
 
-enum class ArmMode { AUTO_ZONE, MANUAL }
+export type SessionEvent =
+  | { kind: "ZoneEntered"; zoneId: string }
+  | { kind: "ZoneExited"; zoneId: string }
+  | { kind: "ManualArm" }
+  | { kind: "ManualDisarm" }
+  | { kind: "CheckInTimerFired" }
+  | { kind: "CountdownExpired"; timer: TimerId }
+  | { kind: "OkTapped" }
+  | { kind: "HelpNowTapped" }
+  | { kind: "CancelTapped" }
+  | { kind: "PinAccepted" }
+  | { kind: "PermissionRevoked"; permission: string }
+  | { kind: "AppKilledRestart"; persisted: PersistedSession };
 
-enum class Urgency { GENTLE, URGENT, CRITICAL }
+// COMMANDS: INTENT ONLY. The engine decides WHAT should happen; the UI and data layers
+// build any payload from their own stores when they perform it. NO Command carries
+// personal data. Building a family message needs her favourites and building a SUS event
+// needs a zone lookup; pulling either into EngineContext would enlarge the pure engine and
+// the trust surface at once. That rule outranks convenience.
+export type Command =
+  | { kind: "ShowCheckIn"; step: 1 | 2; countdownSec: number; urgency: Urgency }
+  | { kind: "HideCheckIn" }
+  | { kind: "ShowArmBanner"; zoneId: string; band: HourBand }
+  | { kind: "ShowFamilyScreen" }
+  | { kind: "ShowSos" }
+  | { kind: "NotifyFamily" }
+  | { kind: "CancelFamilyNotification" }
+  | { kind: "WriteSusEvent" }
+  | { kind: "PatchSusOutcome"; outcome: SusOutcome }
+  | { kind: "WriteSosIncident"; trigger: SosTrigger }
+  | { kind: "PatchSosStatus"; status: SosStatus }
+  | { kind: "ScheduleTimer"; id: TimerId; delaySec: number }
+  | { kind: "CancelTimer"; id: TimerId }
+  | { kind: "StartLocationWatch" }
+  | { kind: "StopLocationWatch" }
+  | { kind: "SetLocationSampling"; intervalSec: number }
+  | { kind: "RequestWakeLock" }
+  | { kind: "ReleaseWakeLock" }
+  | { kind: "LogSessionEvent"; type: string; detail?: string }
+  | { kind: "StartCooldown"; zoneId: string; minutes: number }
+  | { kind: "PlayUrgentAlert" }
+  | { kind: "RequirePinToStop" }
+  | { kind: "ShowPermissionWarning"; permission: string };
 
-enum class TimerId { CHECKIN, CD1, CD2, CANCEL }
-
-enum class HourBand { NIGHT_DEEP, DAWN, DAY, NIGHT_EARLY, NIGHT_LATE }
-
-enum class RiskTier { HIGH, ELEVATED, MODERATE, SAFE }
-
-sealed interface SessionEvent {
-    data class ZoneEntered(val zoneId: String) : SessionEvent
-    data class ZoneExited(val zoneId: String) : SessionEvent
-    data object ManualArm : SessionEvent
-    data object ManualDisarm : SessionEvent
-    data object CheckInTimerFired : SessionEvent
-    data class CountdownExpired(val timer: TimerId) : SessionEvent
-    data object OkTapped : SessionEvent
-    data object HelpNowTapped : SessionEvent
-    data object CancelTapped : SessionEvent
-    data object PinAccepted : SessionEvent
-    data class PermissionRevoked(val permission: String) : SessionEvent
-    data class AppKilledRestart(val persisted: PersistedSession) : SessionEvent
+// What survives a closed tab or a refresh. Persisted to IndexedDB.
+// Deadlines are ABSOLUTE epoch millis so a countdown is recomputed, never resumed.
+export interface PersistedSession {
+  sessionId: string;
+  state: SessionState;
+  armMode: ArmMode;
+  zoneId: string | null;
+  armedAtEpochMs: number;
+  deadlineEpochMs: number | null;
+  susEventWritten: boolean;
+  outcome?: Outcome;
 }
-
-// NOTHING PERSONAL ENTERS HERE. No favourites, no coordinates, no message text.
-// If a rule appears to need one, the rule belongs in the service, not the engine.
-data class EngineContext(
-    val now: Instant,
-    val zone: Zone?,
-    val hourBand: HourBand,
-    val armedHourBand: HourBand?,
-    val rules: Rules,
-    val armMode: ArmMode,
-    val armedAt: Instant?,
-    val deadline: Instant?,
-    val cooldowns: Map<String, Instant>,
-    val hasFavourite: Boolean,
-    val susEventWritten: Boolean
-)
 
 // The frozen constants the engine reads. Every value comes from BUSINESS_RULES.md and has
-// a fact in graph/spec_graph.json. Rules.DEFAULT is the production instance; tests inject
-// a variant to drive the ladder in milliseconds instead of minutes.
-data class Rules(
-    val checkIn1Sec: Int,
-    val checkIn2Sec: Int,
-    val cancelWindowSec: Int,
-    val enterDwellSec: Int,
-    val exitDwellSec: Int,
-    val manualDisarmCooldownMin: Int,
-    val okCooldownMin: Int,
-    val manualIntervalMin: Int,
-    val demoDivisor: Int,
-    val intervals: Map<Pair<RiskTier, HourBand>, Int>,
-    val armingMatrix: Map<Pair<RiskTier, HourBand>, Boolean>,
-    val samplingShadowSec: Int,
-    val samplingSosSec: Int
-) {
-    companion object { val DEFAULT: Rules get() = TODO("populate from BUSINESS_RULES.md; every value must have a spec_graph fact") }
+// a fact in graph/spec_graph.json. Tests inject a variant to drive the ladder in
+// milliseconds instead of minutes.
+export interface Rules {
+  checkIn1Sec: number;
+  checkIn2Sec: number;
+  cancelWindowSec: number;
+  enterDwellSec: number;
+  exitDwellSec: number;
+  manualDisarmCooldownMin: number;
+  okCooldownMin: number;
+  manualIntervalMin: number;
+  demoDivisor: number;
+  intervals: Record<string, number>;      // `${RiskTier}:${HourBand}` -> minutes
+  armingMatrix: Record<string, boolean>;  // `${RiskTier}:${HourBand}` -> arms?
+  samplingShadowSec: number;
+  samplingSosSec: number;
 }
 
-data class EngineResult(
-    val state: SessionState,
-    val commands: List<Command>,
-    val outcome: Outcome? = null      // non-null ONLY when state == RESOLVED
-)
-
-// --- Commands: INTENT ONLY. ---
-// The engine decides WHAT should happen. It never constructs a payload, because building a
-// family message needs her favourites and building a SUS event needs a zone lookup, and
-// pulling either into EngineContext would enlarge the pure engine AND the trust surface.
-// The service and data layers construct payloads from repositories when they perform the
-// command. No Command carries personal data. That is the rule; obey it over convenience.
-sealed interface Command {
-    // ladder UI
-    data class ShowCheckIn(val step: Int, val countdownSec: Int, val urgency: Urgency) : Command
-    data object HideCheckIn : Command
-    data class ShowArmBanner(val zoneId: String, val band: HourBand) : Command
-    data object ShowFamilyScreen : Command
-    data object ShowSos : Command
-
-    // outbound effects. The service builds the payload; the engine only says "now".
-    data object NotifyFamily : Command
-    data object CancelFamilyNotification : Command
-    data object WriteSusEvent : Command
-    data class PatchSusOutcome(val outcome: SusOutcome) : Command
-    data class WriteSosIncident(val trigger: SosTrigger) : Command
-    data class PatchSosStatus(val status: SosStatus) : Command
-
-    // timers
-    data class ScheduleTimer(
-        val id: TimerId,
-        val delaySec: Int,
-        val deadlineEpochMs: Long
-    ) : Command
-    data class CancelTimer(val id: TimerId) : Command
-
-    // service and sensing
-    data object StartForegroundService : Command
-    data object StopForegroundService : Command
-    data class SetLocationSampling(val intervalSec: Int) : Command
-    data object ReRegisterGeofences : Command
-
-    // local bookkeeping
-    data class LogSessionEvent(val type: String, val detail: String? = null) : Command
-    data class PersistSessionArm(
-        val armMode: ArmMode,
-        val armedHourBand: HourBand?,
-        val armedAtEpochMs: Long
-    ) : Command
-    data class StartZoneCooldown(val zoneId: String, val minutes: Int) : Command
-
-    // alerts and gating
-    data object PlayUrgentAlert : Command
-    data object RequirePinToStop : Command
-    data class ShowPermissionWarning(val permission: String) : Command
+// NOTHING PERSONAL ENTERS HERE. No favourites, no message text, no precise coordinate.
+// If a rule appears to need one, that rule belongs in the UI or data layer, not the engine.
+export interface EngineContext {
+  nowEpochMs: number;
+  zone: Zone | null;
+  hourBand: HourBand;
+  rules: Rules;
+  armMode: ArmMode;
+  armedAtEpochMs: number | null;
+  deadlineEpochMs: number | null;
+  cooldowns: Record<string, number>;   // zoneId -> epoch millis until which it may not re-arm
+  hasFavourite: boolean;
+  susEventWritten: boolean;
 }
 
-enum class Urgency { GENTLE, URGENT, CRITICAL }
-enum class SosTrigger { LADDER_LAPSE, MANUAL_HELP_BUTTON }
-enum class SosStatus { ACTIVE, STOPPED }
-enum class SusOutcome { PENDING, CANCELLED_BY_USER, ESCALATED_TO_SOS, RESOLVED_LATE }
+export interface EngineResult {
+  state: SessionState;
+  commands: Command[];
+  outcome?: Outcome;   // set ONLY when state === "RESOLVED"
+}
 
-// --- What survives process death. Written to Room, read on service restart. ---
-data class PersistedSession(
-    val sessionId: String,
-    val state: SessionState,
-    val armMode: ArmMode,
-    val zoneId: String?,
-    val armedHourBand: HourBand?,
-    val armedAtEpochMs: Long,
-    val deadlineEpochMs: Long?,       // absolute, so a countdown can be recomputed
-    val susEventWritten: Boolean,
-    val outcome: Outcome? = null
-)
+// The engine is this one function and nothing else.
+export function onEvent(
+  state: SessionState,
+  event: SessionEvent,
+  ctx: EngineContext
+): EngineResult;
 ```
 
-`susEventWritten` exists so the SOS entry block knows whether to write a catch-up SUS event
-when she skipped the ladder with Help Now. `hasFavourite` exists so the family step can
-render `family_no_contact` without the engine touching a repository.
-
-`deadlineEpochMs` is written whenever any `CHECKIN` timer is scheduled or rescheduled.
-`ScheduleTimer` carries that absolute deadline so the service persists the engine's value
-rather than reconstructing it from a later wall-clock band or changed `Rules` instance.
-`armedHourBand` is required when recovering an active `AUTO_ZONE` session and must be null
-for `MANUAL`; a missing AUTO_ZONE value is invalid persisted data and follows the existing
-recovery error path. Recovery never invents a replacement band.
-
-**The engine takes `EngineContext` and returns `EngineResult`. It reads nothing else and
-touches no IO.** That is what makes every rule in `BUSINESS_RULES.md` testable on the JVM.
-
-## Pre-arm service mode, outside the state machine
-
-`SaayaForegroundService` has a private `CANDIDATE` execution mode used only after a circular
-geofence ENTER. It is not a new `SessionState`: Home, map and `SessionEngine` stay `IDLE`,
-and candidate mode creates no session or product event. The service proves authoritative
-polygon containment using the 15-second, five-fix, 60-second monotonic policy in
-`WEB_PLATFORM.md`, then emits exactly one `ZoneEntered(zoneId)`.
-
-Only if the engine accepts that event and returns `SHADOW` does the service persist a
-session, capture `armedHourBand`, schedule the check-in and update its existing foreground
-notification from the candidate copy to the Shadow copy. An n/a matrix cell or cooldown
-leaves the engine quietly `IDLE`. Candidate process death discards dwell evidence and a
-recovered candidate starts the proof again; it cannot manufacture continuity across death.
-
+**`nowEpochMs`, not `Instant`.** The Android build used `java.time` and needed desugaring.
+On the web, epoch millis is the native currency, it serialises into IndexedDB unchanged, and
+it keeps `src/domain/` free of any date library. `HourBand` is still derived through a clock
+helper so tests can inject time.
 
 ## First launch and cold start, before any location fix
 

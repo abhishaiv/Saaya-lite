@@ -85,7 +85,7 @@ re-tessellate on every frame.
 
 ## S4. Zone detail sheet (F7, F8)
 
-Opens on zone tap. Bottom sheet, 14 dp radius, drag to dismiss.
+Opens on zone tap. Bottom sheet, 14 px radius, drag to dismiss.
 
 - Header: `area_name`, `ZoneChip` with `risk_level`.
 - Stat row: `incident_count` total, `women_safety_count` women-safety. Label the second
@@ -108,7 +108,7 @@ and motion come from `COMPONENT_LIBRARY.md` and `MOTION_SPEC.md`, not from this 
 
 Heads-up notification plus, if foregrounded, an in-app card.
 
-- `CountdownRing`, 90 s, **`brand` lavender `#A78BFA`**, card border 1.0 dp.
+- `CountdownRing`, 90 s, **`brand` lavender `#A78BFA`**, card border 1.0 px.
 - `checkin1_title`, and `checkin1_reason` stating **why it checked now** (zone, tier,
   hour). This is the visible proof of adaptive timing versus T-Safe's fixed clock.
 - `BigActionButton` = `cta_im_ok`.
@@ -119,14 +119,14 @@ Heads-up notification plus, if foregrounded, an in-app card.
 
 Full screen, over the lock screen, `setShowWhenLocked` + `setTurnScreenOn`.
 
-- `CountdownRing`, 60 s, **`amber` `#F09921`**, card border 1.5 dp.
+- `CountdownRing`, 60 s, **`amber` `#F09921`**, card border 1.5 px.
 - `checkin2_title`, `checkin2_body` stating exactly what happens at zero.
 - Alarm-stream sound, long vibration, high-importance channel that bypasses DND.
 - Same two actions. Back is consumed.
 
 ## S7. FamilyEscalation
 
-- **`danger` red `#FF3B30`**, card border 2.0 dp. This is the iOS L3 grading, where the copy is "Your favourites are being notified". `family_title`, `family_body`.
+- **`danger` red `#FF3B30`**, card border 2.0 px. This is the iOS L3 grading, where the copy is "Your favourites are being notified". `family_title`, `family_body`.
 - **The exact message that would be sent**, rendered in a card, per `BUSINESS_RULES.md` §8.
 - `DisclosureBanner`: `family_mock_disclosure` (F21), not removable.
 - `CountdownRing`, 60 s, **`danger`** (F20). `family_cancel_note` stating SOS follows.
@@ -184,7 +184,6 @@ Reachable from Settings, and clearly labelled, in both build types.
 
 While `DEMO` is active, the Home banner is visible so it appears in **every** screenshot
 and in the video. We never demo something that looks like production behaviour.
-
 
 ---
 

@@ -1,5 +1,5 @@
 # Saaya Lite - Component Library
-Every shared composable, at exact dp, in every state. Codex builds these first and screens
+Every shared component, at exact px, in every state. Codex builds these first and screens
 only compose them. **If a screen needs a control not in this file, stop and ask.**
 
 Tokens referenced come from `DESIGN_SYSTEM.md`. Motion from `MOTION_SPEC.md`.
@@ -10,25 +10,25 @@ Tokens referenced come from `DESIGN_SYSTEM.md`. Motion from `MOTION_SPEC.md`.
 
 | Variant | Fill | Text | Height | Radius | Type |
 |---|---|---|---|---|---|
-| `Primary` | `brand` | `#FFFFFF` | 56 dp | 14 dp | `body` SemiBold |
-| `Accent(color)` | the ladder accent | `#FFFFFF` | **50 dp** | 14 dp | 16 sp Bold |
-| `Ghost` | transparent, 1 dp `brand` border | `brand` | 56 dp | 14 dp | `body` SemiBold |
-| `Destructive` | `danger` | `#FFFFFF` | 56 dp | 14 dp | `body` SemiBold |
-| `TextOnly` | none | `danger` @ 90% | **34 dp** | none | 13 sp SemiBold |
+| `Primary` | `brand` | `#FFFFFF` | 56 px | 14 px | `body` SemiBold |
+| `Accent(color)` | the ladder accent | `#FFFFFF` | **50 px** | 14 px | 16 px Bold |
+| `Ghost` | transparent, 1 px `brand` border | `brand` | 56 px | 14 px | `body` SemiBold |
+| `Destructive` | `danger` | `#FFFFFF` | 56 px | 14 px | `body` SemiBold |
+| `TextOnly` | none | `danger` @ 90% | **34 px** | none | 13 px SemiBold |
 
-`Accent` at 50 dp and `TextOnly` at 34 dp are the iOS check-in card values. Do not round
-them to the 56 dp default.
+`Accent` at 50 px and `TextOnly` at 34 px are the iOS check-in card values. Do not round
+them to the 56 px default.
 
 | State | Treatment |
 |---|---|
 | default | as above |
 | pressed | scale 0.97 `spring`; fill darkens 8% (`brandDark` for Primary) |
 | disabled | fill @ 30%, text @ 40%, no press feedback, `enabled = false` |
-| focused | 2 dp `brandLight` ring, 2 dp offset. Required for keyboard and switch access. |
-| loading | fill retained, label replaced by a 20 dp indeterminate indicator in the text colour, button disabled, `contentDescription` becomes "Working" |
+| focused | 2 px `brandLight` ring, 2 px offset. Required for keyboard and switch access. |
+| loading | fill retained, label replaced by a 20 px indeterminate indicator in the text colour, button disabled, `contentDescription` becomes "Working" |
 
-Full width by default. Horizontal padding 20 dp. Minimum touch 48 dp even when the visual
-height is 34 dp: pad the touch target, do not grow the visual.
+Full width by default. Horizontal padding 20 px. Minimum touch 48 px even when the visual
+height is 34 px: pad the touch target, do not grow the visual.
 
 ---
 
@@ -36,7 +36,7 @@ height is 34 dp: pad the touch target, do not grow the visual.
 
 For actions pressed under stress: `I'm OK`, `Stop SOS`, `Cancel, I am fine`.
 
-Height **72 dp**, radius 14 dp, `display` type at 20 sp Bold, full width, fill is the
+Height **72 px**, radius 14 px, `display` type at 20 px Bold, full width, fill is the
 current ladder accent. Same state table as C1.
 
 **Live countdown suffix**, taken from iOS: the label renders `I'm OK  ·  42s` while a
@@ -55,23 +55,23 @@ Geometry is lifted from `SUSCheckInCardView.swift` and must not be redesigned.
 scrim: #000000 @ 40%, full screen, tap does NOT dismiss
 card:
   fill            #1F1F1F
-  radius          22 dp
-  padding         22 dp
-  horizontal margin 30 dp
-  border          accent @ 50%, stroke 1.0 / 1.5 / 2.0 dp by rung
-  content spacing 14 dp
-  vertical align  bottom, 44 dp above the bottom inset
+  radius          22 px
+  padding         22 px
+  horizontal margin 30 px
+  border          accent @ 50%, stroke 1.0 / 1.5 / 2.0 px by rung
+  content spacing 14 px
+  vertical align  bottom, 44 px above the bottom inset
 children, in order:
-  icon        40 dp, accent
-  title       20 sp Bold, textPrimary, centred
-  message     14 sp Regular, textOnCard (75%), centred
+  icon        40 px, accent
+  title       20 px Bold, textPrimary, centred
+  message     14 px Regular, textOnCard (75%), centred
   primary     BigActionButton or Accent button, accent fill
-  secondary   TextOnly, danger @ 90%, 34 dp
+  secondary   TextOnly, danger @ 90%, 34 px
 ```
 
 | State | Treatment |
 |---|---|
-| entering | scrim fades 180 ms; card scale 0.94 to 1.0, translate up 16 dp, `spring` |
+| entering | scrim fades 180 ms; card scale 0.94 to 1.0, translate up 16 px, `spring` |
 | visible | **static.** No pulse, no flash, no accent tween. |
 | answered | scale 0.96 + fade, 160 ms |
 | deadline passed | card removes itself; the ladder continues underneath |
@@ -87,12 +87,12 @@ Circular progress plus a numeral.
 
 | Property | Value |
 |---|---|
-| Diameter | 88 dp (in card), 140 dp (SOS full screen) |
+| Diameter | 88 px (in card), 140 px (SOS full screen) |
 | Track | `#FFFFFF` @ 12% |
 | Progress | current ladder accent |
-| Stroke | 6 dp, round cap |
+| Stroke | 6 px, round cap |
 | Direction | clockwise, depleting |
-| Numeral | `display` 34 sp Bold, `tnum`, centred |
+| Numeral | `display` 34 px Bold, `tnum`, centred |
 | Tick | `linear`, exactly 1000 ms. **Never eased.** |
 | Announce | `LiveRegion` polite at 60 s, 30 s, 10 s, then every second under 5 s |
 
@@ -102,10 +102,10 @@ At zero, hold at zero. Do not animate past, do not wrap.
 
 ## C5. `StatusPill`
 
-Floating over the map, top-left, 12 dp below the status bar inset.
+Floating over the map, top-left, 12 px below the status bar inset.
 
-Height 36 dp, radius 18 dp, horizontal padding 14 dp, fill `cardFill` @ 92%, 1 dp border in
-the current accent @ 40%. Leading icon 16 dp in the accent, then `label` type text.
+Height 36 px, radius 18 px, horizontal padding 14 px, fill `cardFill` @ 92%, 1 px border in
+the current accent @ 40%. Leading icon 16 px in the accent, then `label` type text.
 
 | Session state | Text | Accent |
 |---|---|---|
@@ -123,8 +123,8 @@ Text changes are instant. The pill itself never animates.
 
 ## C6. `ZoneChip`
 
-Tier badge. Height 24 dp, radius 10 dp, horizontal padding 10 dp, `label` type.
-Fill is the zone's own `color` at 20%, border 1 dp at the same colour full strength, text
+Tier badge. Height 24 px, radius 10 px, horizontal padding 10 px, `label` type.
+Fill is the zone's own `color` at 20%, border 1 px at the same colour full strength, text
 in that colour. `SAFE` uses `textSecondary`, since its data colour is transparent.
 
 ---
@@ -133,29 +133,29 @@ in that colour. `SAFE` uses `textSecondary`, since its data colour is transparen
 
 **Every mock and every prototype limitation uses this.** Never a subtle grey note.
 
-Fill `cardFill`, radius 14 dp, 3 dp left border in `amber`, padding 14 dp, leading 20 dp
-`info` icon in `amber`, `caption` type in `textOnCard`. Full width minus 20 dp screen
+Fill `cardFill`, radius 14 px, 3 px left border in `amber`, padding 14 px, leading 20 px
+`info` icon in `amber`, `caption` type in `textOnCard`. Full width minus 20 px screen
 padding. Never dismissible when it discloses a mock.
 
 ---
 
 ## C8. `SaayaBottomSheet`
 
-Peek 160 dp, expanded 55% of screen height, top radius 22 dp, fill `cardFill`, drag handle
-32 x 4 dp at `#FFFFFF` @ 30%, 8 dp from the top. `springSoft`. Follows the finger while
+Peek 160 px, expanded 55% of screen height, top radius 22 px, fill `cardFill`, drag handle
+32 x 4 px at `#FFFFFF` @ 30%, 8 px from the top. `springSoft`. Follows the finger while
 dragging. Dismiss threshold 40% of the drag range.
 
 ---
 
 ## C9. `PinEntryBox`
 
-Four boxes, each 56 x 64 dp, radius 14 dp, 12 dp apart, fill `surfaceElevated`.
-Empty shows nothing; filled shows a 12 dp `brand` dot, never the digit.
+Four boxes, each 56 x 64 px, radius 14 px, 12 px apart, fill `surfaceElevated`.
+Empty shows nothing; filled shows a 12 px `brand` dot, never the digit.
 
 | State | Treatment |
 |---|---|
-| active | 2 dp `brand` border on the current box |
-| error | 2 dp `danger` border on all four, **no shake animation** (see motion rule 1) |
+| active | 2 px `brand` border on the current box |
+| error | 2 px `danger` border on all four, **no shake animation** (see motion rule 1) |
 | locked | all four at 30% opacity, message below, countdown to unlock |
 
 Numeric keyboard only. No system clipboard paste. Never log, never screenshot: set
@@ -172,28 +172,28 @@ Used in zone detail and the police view. Two or three across, evenly weighted.
 
 ## C11. `SectionHeader`
 
-`label` type, `textSecondary`, 24 dp top padding, 8 dp bottom.
+`label` type, `textSecondary`, 24 px top padding, 8 px bottom.
 
 ---
 
 ## C12. `EmptyState`
 
-Centred, 32 dp icon in `textTertiary`, `headline` title, `caption` body, optional Ghost
+Centred, 32 px icon in `textTertiary`, `headline` title, `caption` body, optional Ghost
 button. Vertically centred in the available space, never top-aligned.
 
 ---
 
 ## C13. `MapControlButton`
 
-48 x 48 dp, radius 14 dp, fill `cardFill` @ 92%, 24 dp icon in `textPrimary`.
-Stacked vertically on the right with 12 dp gaps.
+48 x 48 px, radius 14 px, fill `cardFill` @ 92%, 24 px icon in `textPrimary`.
+Stacked vertically on the right with 12 px gaps.
 
 ---
 
 ## C14. `ArmBanner`
 
-Slides down from the top on auto-arm. Fill `cardFill`, radius 22 dp, 20 dp margin, padding
-16 dp, 1 dp `brand` border @ 40%. Leading 24 dp `shield` in `brand`.
+Slides down from the top on auto-arm. Fill `cardFill`, radius 22 px, 20 px margin, padding
+16 px, 1 px `brand` border @ 40%. Leading 24 px `shield` in `brand`.
 Title `headline`, body `caption` in `textOnCard`. Auto-hides after **6 s**, and the same
 content stays available in the bottom sheet afterwards.
 

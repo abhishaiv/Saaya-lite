@@ -2,14 +2,14 @@
 The hero surface. She opens the app to look at this, and the whole "a map she actually
 opens" argument depends on it looking deliberate rather than default.
 
-## Engine: osmdroid. No key, no billing, no quota.
+## Engine: Leaflet. No key, no billing, no quota.
 
 Founder decision 2026-08-18, replacing an earlier Google Maps choice, so that **nothing in
 the build depends on a credential that could fail on submission day.**
 
 | | |
 |---|---|
-| Library | `org.osmdroid:osmdroid-android:6.1.20` |
+| Library | `org.Leaflet:Leaflet-android:6.1.20` |
 | API key | **none required** |
 | Billing | **none** |
 | Quota risk | **none** |
@@ -30,14 +30,14 @@ low contrast is exactly what we want: the basemap is context, the zones are the 
 | Tile source | CARTO Dark Matter, `dark_all` (labels retained, she needs to orient) |
 | Retina | append `@2x` on `xhdpi` and above |
 | User agent | set `Configuration.getInstance().userAgentValue` to the package name. **Required.** OSM infrastructure blocks the default agent. |
-| Cache | osmdroid SQLite tile cache, 64 MB cap, so a repeated route is instant and cheap |
+| Cache | Leaflet SQLite tile cache, 64 MB cap, so a repeated route is instant and cheap |
 | Min zoom | 10 |
 | Max zoom | 17 |
 | Default | zoom 12.5, centred on `17.7100, 83.3000` |
 
 ### Attribution, non-negotiable
 
-`© OpenStreetMap contributors © CARTO`, 10 sp, `textTertiary`, bottom-left, above the
+`© OpenStreetMap contributors © CARTO`, 10 px, `textTertiary`, bottom-left, above the
 navigation inset, always visible. This is a licence condition, not a design choice. Do not
 hide it behind a sheet and do not shorten it.
 
@@ -48,9 +48,9 @@ hide it behind a sheet and do not shorten it.
 | Layer | Treatment |
 |---|---|
 | Fill | the zone's own `color` at its own `opacity` (typically 0.35) |
-| Stroke | same `color` at full strength, **1.5 dp** |
-| Stroke, selected | **3 dp**, plus fill opacity raised by 0.1 |
-| Glow | a second stroke beneath at 6 dp, same colour, 15% opacity, giving the soft bloom the deck screenshots have |
+| Stroke | same `color` at full strength, **1.5 px** |
+| Stroke, selected | **3 px**, plus fill opacity raised by 0.1 |
+| Glow | a second stroke beneath at 6 px, same colour, 15% opacity, giving the soft bloom the deck screenshots have |
 | Label | zone `area_name`, `label` type, `textPrimary` at 80%, centred on the centroid, **hidden below zoom 12** |
 | Draw order | glow, fill, stroke, label. Higher `risk_score` draws on top so a high zone is never buried under a moderate one. |
 
@@ -60,7 +60,7 @@ Precompute the polygon paths once at load. **Never re-tessellate per frame.**
 
 | Element | Treatment |
 |---|---|
-| Dot | 14 dp, `brand` `#A78BFA`, 2 dp `#FFFFFF` ring at 90% |
+| Dot | 14 px, `brand` `#A78BFA`, 2 px `#FFFFFF` ring at 90% |
 | Accuracy circle | `brand` at 12% fill, no stroke, only when accuracy is worse than 30 m |
 | Heading | **none.** No compass cone. It adds jitter and we never navigate. |
 | Pulse | **none while idle.** While `SHADOW`, a single slow 2 s breathing halo at 8% opacity. This is the only ambient animation in the product, and it is what makes "watching" legible without a word. |
@@ -69,13 +69,13 @@ Never auto-centre while she is panning. Offer a `MapControlButton` to recentre i
 
 ## Police stations
 
-Only within the visible bounds, and only above zoom 13. 20 dp `local_police` glyph in
-`textSecondary` at 70%, inside a 28 dp `cardFill` circle. Tap opens the station row from
+Only within the visible bounds, and only above zoom 13. 20 px `local_police` glyph in
+`textSecondary` at 70%, inside a 28 px `cardFill` circle. Tap opens the station row from
 the zone sheet. Never more than 12 on screen: rank by distance from centre and drop the rest.
 
 ## Controls
 
-Floating, per `COMPONENT_LIBRARY.md` C13. Right edge, 12 dp gaps, above the bottom sheet.
+Floating, per `COMPONENT_LIBRARY.md` C13. Right edge, 12 px gaps, above the bottom sheet.
 
 1. Recentre (`my_location`)
 2. What the police see (`visibility`)
@@ -112,9 +112,8 @@ Recorded so this is not relitigated mid-build.
 | Option | Why not |
 |---|---|
 | Google Maps SDK | Needs an API key and a billing account. A key or quota problem on submission day kills the live demo, and the brief requires everything to work without requesting access. |
-| MapLibre + OpenFreeMap | Genuinely good, vector, free, no key. Rejected only on time: it is a heavier Android integration than osmdroid and we have nine evenings. |
+| MapLibre + OpenFreeMap | Genuinely good, vector, free, no key. Rejected only on time: it is a heavier Android integration than Leaflet and we have nine evenings. |
 | No basemap, bundled vectors only | Cleanest and fully offline, but she cannot orient against real streets, which undercuts "check a stretch before you commit to it". |
-
 
 ---
 
@@ -126,7 +125,7 @@ Recorded so this is not relitigated mid-build.
 2. At zoom 12 to 13, draw **HIGH tier only**.
 3. At zoom 14 and above, draw HIGH, ELEVATED and MODERATE.
 4. Sort candidates by `risk_score` descending. Walk the list, measure each label's bounding
-   box, and **skip any label whose box intersects one already placed**, plus 4 dp padding.
+   box, and **skip any label whose box intersects one already placed**, plus 4 px padding.
 5. Placement is centroid-anchored, centred, single line. **Never wrap, never rotate, never
    draw a leader line.** If it does not fit, it is skipped.
 

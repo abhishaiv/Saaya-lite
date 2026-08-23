@@ -3,7 +3,7 @@
  "kind": "knowledge_graph",
  "note": "Domain facts with provenance. Never merge with build_graph.json - different truth standards.",
  "rule": "Every numeric or colour literal in source must trace to a fact id here, or the grounded checker fails the node.",
- "count": 304,
+ "count": 306,
  "facts": [
   {
    "id": "ladder.cd1",
@@ -1799,7 +1799,8 @@
    "sourced_from": "founder 2026-08-18",
    "governs": "RESPONSIVE_SPEC.md",
    "frozen": true,
-   "platform": "any"
+   "platform": "android",
+   "superseded_by": "web pivot 2026-08-19"
   },
   {
    "id": "perf.memory",
@@ -3380,6 +3381,28 @@
    "means": "Bengaluru demo day",
    "sourced_from": "buildwhatmovesindia.com/brief, fetched 2026-08-19",
    "governs": "SUBMISSION.md",
+   "frozen": true,
+   "platform": "any"
+  },
+  {
+   "id": "perf.bundle",
+   "kind": "number",
+   "value": 200,
+   "unit": "KB",
+   "means": "JS bundle ceiling, gzipped",
+   "sourced_from": "WEB_PLATFORM.md, founder 2026-08-19",
+   "governs": "WEB_PLATFORM.md",
+   "frozen": true,
+   "platform": "any"
+  },
+  {
+   "id": "perf.lighthouse",
+   "kind": "number",
+   "value": 85,
+   "unit": "score",
+   "means": "Lighthouse mobile performance floor",
+   "sourced_from": "WEB_PLATFORM.md, founder 2026-08-19",
+   "governs": "WEB_PLATFORM.md",
    "frozen": true,
    "platform": "any"
   }

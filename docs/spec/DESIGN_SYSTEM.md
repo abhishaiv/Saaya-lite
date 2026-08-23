@@ -24,21 +24,21 @@ Poppins Regular, Medium, SemiBold and Bold.
 | Map Medium 500 to | SemiBold 600. Do not ship a fourth weight. |
 | Telugu | **Noto Sans Telugu**. Poppins has no Telugu coverage and will tofu. |
 | Subsetting | Subset Poppins to **Latin basic**. The Google Fonts build carries Latin-Ext and Devanagari we never use, and dropping them cuts roughly 40 percent. |
-| Budget | All font assets combined under **250 KB**. Verify in the APK on E9. |
+| Budget | All font assets combined under **250 KB**. Verify in the deployed site on E9. |
 | Numerals | `fontFeatureSettings = "tnum"` on every countdown and stat, so digits do not jitter as they tick. |
 
 ### Scale
 
 | Style | Size | Weight | Line height | Use |
 |---|---|---|---|---|
-| `display` | 34 sp | Bold | 40 sp | SOS state, countdown numerals |
-| `title` | 24 sp | Bold | 30 sp | Screen titles |
-| `cardTitle` | 20 sp | Bold | 26 sp | Check-in card title. **From iOS, do not change.** |
-| `headline` | 18 sp | SemiBold | 24 sp | Zone name, section heads |
-| `body` | 16 sp | Regular | 24 sp | Default |
-| `cardBody` | 14 sp | Regular | 20 sp | Check-in card message. **From iOS.** |
-| `caption` | 13 sp | Regular | 18 sp | Secondary detail, the iOS secondary-button size |
-| `label` | 11 sp | SemiBold, +0.5 sp tracking, uppercase | 14 sp | Section labels, tier badges |
+| `display` | 34 px | Bold | 40 px | SOS state, countdown numerals |
+| `title` | 24 px | Bold | 30 px | Screen titles |
+| `cardTitle` | 20 px | Bold | 26 px | Check-in card title. **From iOS, do not change.** |
+| `headline` | 18 px | SemiBold | 24 px | Zone name, section heads |
+| `body` | 16 px | Regular | 24 px | Default |
+| `cardBody` | 14 px | Regular | 20 px | Check-in card message. **From iOS.** |
+| `caption` | 13 px | Regular | 18 px | Secondary detail, the iOS secondary-button size |
+| `label` | 11 px | SemiBold, +0.5 px tracking, uppercase | 14 px | Section labels, tier badges |
 
 ## Colour
 
@@ -76,9 +76,9 @@ safe `#00000000` which is not drawn.
 | Ladder step | Accent | Border stroke | Icon |
 |---|---|---|---|
 | `SHADOW` | `brand` `#A78BFA` | n/a, no card | `shield` |
-| `CHECKIN_1` | `brand` `#A78BFA` | **1.0 dp** | `verified_user` (filled shield with check) |
-| `CHECKIN_2` | `amber` `#F09921` | **1.5 dp** | `verified_user` |
-| `FAMILY_ESCALATED` | `danger` `#FF3B30` | **2.0 dp** | `gpp_maybe` (shield with exclamation) |
+| `CHECKIN_1` | `brand` `#A78BFA` | **1.0 px** | `verified_user` (filled shield with check) |
+| `CHECKIN_2` | `amber` `#F09921` | **1.5 px** | `verified_user` |
+| `FAMILY_ESCALATED` | `danger` `#FF3B30` | **2.0 px** | `gpp_maybe` (shield with exclamation) |
 | `SOS_ACTIVE` | `danger` `#FF3B30` | full-bleed, no card | `sos` |
 
 Border colour always equals the accent at **50% opacity**. Icon, border and primary button
@@ -92,21 +92,21 @@ surface is what separates them.
 
 | Element | Radius |
 |---|---|
-| Card, sheet, dialog | **22 dp** (from iOS `SUSCheckInCardView`) |
-| Button, chip, input | **14 dp** (iOS `AppTheme.cornerRadius`) |
-| Small control, badge | **10 dp** (iOS `cornerRadiusSmall`) |
-| Bottom sheet top corners | 22 dp, bottom square |
+| Card, sheet, dialog | **22 px** (from iOS `SUSCheckInCardView`) |
+| Button, chip, input | **14 px** (iOS `AppTheme.cornerRadius`) |
+| Small control, badge | **10 px** (iOS `cornerRadiusSmall`) |
+| Bottom sheet top corners | 22 px, bottom square |
 
 Warm direction means we favour the larger radius when in doubt. Never square a corner
 except the bottom edge of a sheet.
 
 ## Spacing
 
-4 dp scale: 4, 8, 12, 14, 16, 20, 22, 24, 30, 32, 48.
+4 px scale: 4, 8, 12, 14, 16, 20, 22, 24, 30, 32, 48.
 The 14, 22 and 30 values exist because iOS uses them: card content spacing 14, card padding
 22, card horizontal margin 30. **Use those three exactly for the check-in card.**
 
-Screen horizontal padding 20 dp. Minimum touch target **48 x 48 dp**, no exceptions.
+Screen horizontal padding 20 px. Minimum touch target **48 x 48 px**, no exceptions.
 
 ## Elevation
 
@@ -118,4 +118,4 @@ matching iOS. A card is `cardFill` over `scrim`. That is the entire depth model.
 Full-bleed map with floating controls (founder decision). Therefore:
 - Every primary action sits in the **bottom third**, reachable one-handed on a 6.7 inch phone.
 - Settings and secondary entry points may sit top-right, since they are never urgent.
-- The bottom sheet peek height is **160 dp**, expanded **55%** of screen height.
+- The bottom sheet peek height is **160 px**, expanded **55%** of screen height.

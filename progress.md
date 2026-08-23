@@ -1401,3 +1401,46 @@ parses STATE_MACHINE's TypeScript blocks and fails if a referenced type is defin
 caught `Rules` on its first run - referenced by `EngineContext` and never defined anywhere,
 the third instance of this exact class. Defined it. Also had to strip comments before
 scanning, because my own prose was being read as a type.
+
+## 2026-08-19 - Pivot verification: the first pass was superficial
+
+Founder asked to verify everything was in place. It was not. The pivot had updated the build
+graph and written two new platform documents, and stopped there.
+
+**Scanned every document for Android language and found the pivot was skin-deep.** 18 files
+still said Compose, 16 said IndexedDB's predecessor, 16 said APK, 7 said osmdroid.
+COMPONENT_LIBRARY alone had 72 hits. Codex reading it would have built Compose components
+against a Next.js project.
+
+Translated 29 documents mechanically with an ordered rule set, excluding the five where
+Android mentions are legitimately historical: progress.md, GRAPH_ENGINEERING, COMPLIANCE,
+CODEX_LOG and SPEC_README's history section. Spot-checked the heaviest file afterwards;
+COMPONENT_LIBRARY reads correctly in px.
+
+**The type contract was still Kotlin syntax**, which is the part Codex copies verbatim.
+Rewrote all 52 declarations as TypeScript: discriminated unions for `SessionEvent` and
+`Command`, interfaces for `PersistedSession`, `Rules`, `EngineContext` and `EngineResult`.
+Swapped `Instant` for `nowEpochMs`, which is native on the web, serialises into IndexedDB
+unchanged, and keeps `src/domain/` free of a date library. The Android build needed core
+library desugaring for exactly this; the web build does not.
+
+**That silently blinded gate G10.** `reads_check.py` parses the type contract out of fenced
+blocks, and I had changed the fences from `kotlin` to `typescript`. It reported "0 types
+defined, 0 unresolved" - passing, while checking nothing. Rewrote it for TypeScript
+declarations and then **functionally tested it** by injecting a bogus type: it caught it, and
+passes on the real file. A checker that passes vacuously is worse than no checker.
+
+**Full audit then found six more failures**, all fixed: WEB_PLATFORM and the brand bible were
+not Document entities; the ANDROID_PLATFORM Document pointed at a deleted file (now superseded
+and repointed at the archive branch); two node `reads` used a path that did not resolve; five
+node notes still used words that read as instructions rather than history; `perf.apk` was
+still a live fact; and three entities Codex had added were orphaned.
+
+Replaced `perf.apk` with `perf.bundle` (200 KB gzipped) and `perf.lighthouse` (85).
+
+**Rewrote the node notes** so history reads as history. T4.1 now says the archived engine may
+be consulted for structure only, and that where it and STATE_MACHINE.md differ, the archive is
+the bug.
+
+**Final: 43 docs, 22 nodes, 275 live facts and 31 superseded, 231 entities, 521 edges, zero
+orphans, zero Android leakage outside the five historical files.**

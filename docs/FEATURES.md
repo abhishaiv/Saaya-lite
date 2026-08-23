@@ -121,7 +121,7 @@ Without this stage there is no product, only an engine. Nobody installs an engin
 
 | # | Feature | Why it helps her | Status |
 |---|---|---|---|
-| F31 | Low-end phone, min SDK 24, small APK | The women most exposed are not on flagship phones. | Real |
+| F31 | Low-end phone, min SDK 24, small deployed site | The women most exposed are not on flagship phones. | Real |
 | F32 | Works on 3G and through drops | See F22. | Real |
 | F33 | Zero-tap primary path | The strongest accessibility property in the build. Low digital literacy stops being a barrier when correct usage is to do nothing. | Real |
 

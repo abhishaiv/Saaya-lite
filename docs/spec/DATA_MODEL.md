@@ -3,7 +3,7 @@
 ## Principle
 
 **Anything that could identify her stays on the device.** Contacts, PIN, session history
-and precise location live in Room and are never uploaded. Firestore receives exactly two
+and precise location live in IndexedDB and are never uploaded. Firestore receives exactly two
 things: an anonymised SUS event, and a full SOS incident.
 
 ---
@@ -20,7 +20,7 @@ things: an anonymised SUS event, and a full SOS incident.
 
 ### `Zone` (domain model)
 
-```kotlin
+```typescript
 data class Zone(
   val stationId: String,          // "dwaraka_police_station" - the primary key everywhere
   val stationName: String,        // "Dwaraka Police Station"
@@ -68,7 +68,7 @@ have no entry in `zone_info_cards.json`, which is why that file has 19 entries a
 
 ### `ZoneCard`
 
-```kotlin
+```typescript
 data class ZoneCard(
   val stationId: String, val areaName: String, val fullAreas: String,
   val riskLevel: String,      // "High Risk" - display string, use as-is
@@ -80,7 +80,7 @@ data class ZoneCard(
 
 ### `PoliceStation`
 
-```kotlin
+```typescript
 data class PoliceStation(
   val id: String,             // "PS-001"
   val name: String, val category: String, val locality: String,
@@ -93,7 +93,7 @@ data class PoliceStation(
 
 ---
 
-## Room (on device, never uploaded)
+## IndexedDB (on device, never uploaded)
 
 Database `saaya_lite.db`, version 1.
 
@@ -270,15 +270,14 @@ carries no real identity. In production this becomes role-based access with an a
 trail, which is stated in `PROBLEM.md` under the scale question. Say this in the write-up
 rather than letting a reviewer discover it.
 
-
 ---
 
-## Room migration policy
+## IndexedDB migration policy
 
 Database version **1**. There is no version 2 in a nine-evening build.
 
-```kotlin
-Room.databaseBuilder(ctx, SaayaDb::class.java, "saaya_lite.db")
+```typescript
+IndexedDB.databaseBuilder(ctx, SaayaDb::class.java, "saaya_lite.db")
     .fallbackToDestructiveMigration()
     .build()
 ```

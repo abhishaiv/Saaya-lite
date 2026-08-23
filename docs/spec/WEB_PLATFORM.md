@@ -5,7 +5,7 @@ brief confirmed reviewers will not download a mobile app.
 ## The honest limitation, stated first
 
 **A browser cannot arm in the background.** There is no Service Worker geolocation, no
-equivalent of a foreground service, and a backgrounded tab is throttled or frozen. Our
+equivalent of a wake lock plus a visible page, and a backgrounded tab is throttled or frozen. Our
 central claim is *she never presses anything, the zone arms it* - and on the web that only
 holds **while the page is open.**
 
@@ -31,7 +31,7 @@ Saying exactly where the browser stops is a better architecture answer than pret
 | Hosting | **Vercel**, deployed from the GitHub repo | named in the brief; push-to-deploy |
 | Map | **Leaflet** + the same CARTO Dark Matter tiles | no key, no billing, and the tile source is unchanged from `MAP_SPEC.md` |
 | State | React state + a reducer wrapping the pure engine | the engine is unchanged: pure TypeScript, no DOM |
-| Local storage | **IndexedDB** (favourites, session, queue), `localStorage` for flags | replaces Room |
+| Local storage | **IndexedDB** (favourites, session, queue), `localStorage` for flags | replaces IndexedDB |
 | PIN | **Web Crypto** `SHA-256` over salt+pin | replaces EncryptedSharedPreferences |
 | Backend | **Firestore**, same project `saaya-lite` | unchanged |
 | Fonts | Poppins + Noto Sans Telugu, self-hosted, `font-display: swap` | unchanged values |
@@ -42,8 +42,8 @@ Saying exactly where the browser stops is a better architecture answer than pret
 |---|---|---|
 | `FusedLocationProvider` | `navigator.geolocation.watchPosition` | `enableHighAccuracy: true` while armed. Sampling rates from `BUSINESS_RULES` still apply. |
 | Geofencing API | **point-in-polygon in JS, on every fix** | we already treat the polygon as authoritative; `geofence_radius_m` becomes a cheap pre-filter |
-| Foreground service | **Wake Lock API** + Page Visibility | `navigator.wakeLock.request('screen')` while armed, so the ladder keeps running |
-| `AlarmManager` | `setTimeout` + an **absolute deadline in IndexedDB** | on visibility change, recompute from the deadline. Never trust the timer to have run. |
+| Wake lock plus a visible page | **Wake Lock API** + Page Visibility | `navigator.wakeLock.request('screen')` while armed, so the ladder keeps running |
+| `an absolute deadline in IndexedDB` | `setTimeout` + an **absolute deadline in IndexedDB** | on visibility change, recompute from the deadline. Never trust the timer to have run. |
 | Notification channels | **Notification API** via Service Worker | `requireInteraction: true` for check-in 2 |
 | Full-screen intent | an in-page full-screen overlay | a browser cannot wake a locked phone. Disclosed. |
 | `allowBackup=false` | nothing leaves the device by default | favourites and the PIN hash live in IndexedDB and are never uploaded |

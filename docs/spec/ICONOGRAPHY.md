@@ -11,7 +11,7 @@ the iOS check-in card depends on.
 | Family | Material Symbols Rounded |
 | Weight axis | 400 default, **500** for icons inside filled buttons |
 | Fill axis | **1 (filled)** for state and status icons, **0 (outlined)** for navigation and utility |
-| Optical size | matches the rendered dp |
+| Optical size | matches the rendered px |
 | Grade | 0 |
 
 Subset to the icons listed below. The full variable font is roughly 4 MB and shipping it
@@ -42,12 +42,12 @@ whole would blow the F31 size goal on its own.
 
 | Context | Size |
 |---|---|
-| Card hero icon | **40 dp** (from iOS) |
-| List row leading | 24 dp |
-| Inline with body text | 20 dp |
-| Button leading | 20 dp |
-| Map control | 24 dp inside a 48 dp target |
-| Tier badge | 16 dp |
+| Card hero icon | **40 px** (from iOS) |
+| List row leading | 24 px |
+| Inline with body text | 20 px |
+| Button leading | 20 px |
+| Map control | 24 px inside a 48 px target |
+| Tier badge | 16 px |
 
 ## Rules
 
@@ -69,7 +69,7 @@ The mark is *her position as a confident violet pin*, lit from one soft top ligh
 Penumbra aura, with a short dashed breadcrumb trail fading beneath. The shadow that walks
 beside her, drawn as light.
 
-### Splitting it for an Android adaptive icon
+### Splitting it for an Android PWA icon set
 
 The master is layered so the split is mechanical, not a redraw:
 
@@ -79,13 +79,13 @@ The master is layered so the split is mechanical, not a redraw:
 | the ambient aura field, the breadcrumb trail, and the pin | `ic_launcher_foreground.xml` |
 
 1. **Background.** Radial gradient, centre `50% 42%`, radius `72%`:
-   `#191230` to `#120C24` to `#0C0918`. A `<vector>` with a gradient fill, full 108 dp bleed.
+   `#191230` to `#120C24` to `#0C0918`. A `<vector>` with a gradient fill, full 108 px bleed.
 2. **Foreground.** Everything except that rect, scaled and centred so the pin sits inside the
-   **72 dp safe zone** of the 108 dp canvas. The aura may extend past the safe zone but must
-   not reach the 108 dp edge, or launchers that mask aggressively will clip it.
-3. **Monochrome** (Android 13 themed icons). The pin silhouette only, solid, no gradient, no
+   **72 px safe zone** of the 108 px canvas. The aura may extend past the safe zone but must
+   not reach the 108 px edge, or launchers that mask aggressively will clip it.
+3. **Monochrome** (maskable PWA icons). The pin silhouette only, solid, no gradient, no
    aura, no trail. Themed icons are tinted flat by the launcher and a gradient turns to mud.
-4. Convert with Android Studio's *Vector Asset* import, or hand-author the `<vector>`. Do not
+4. Convert with your editor's *Vector Asset* import, or hand-author the `<vector>`. Do not
    ship a raster `ic_launcher_foreground`.
 
 ### Colours, all sourced from the asset

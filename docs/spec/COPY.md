@@ -98,7 +98,6 @@ demo video.
 | `saaya_urgent` | Urgent check-ins | HIGH, alarm sound, bypass DND |
 | `saaya_sos` | SOS | HIGH, ongoing, not dismissible |
 
-
 ## Vocabulary, locked 2026-08-18
 
 | Never say | Always say | Why |

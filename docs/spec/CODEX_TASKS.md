@@ -29,7 +29,7 @@ tasks into one prompt: the log entry per task is a submission deliverable.
 ## Standing preamble, prepend to every prompt
 
 ```
-You are building Saaya Lite, a native Android app in Kotlin + Jetpack Compose.
+You are building Saaya Lite, a native Android app in TypeScript + React.
 Read these first and follow them exactly:
   docs/spec/SPEC_README.md   (precedence order and non-negotiables)
   docs/FEATURES.md           (the scope contract)
@@ -40,7 +40,7 @@ Hard rules:
 - Never invent a number, threshold, colour or string. If one is missing, STOP and say so.
 - The trust boundary: nothing identifying leaves the device before SOS.
 - Do not add dependencies beyond those listed in ARCHITECTURE.md.
-- Match the existing code style. Kotlin official style, explicit types on public APIs.
+- Match the existing code style. TypeScript official style, explicit types on public APIs.
 - Write the JVM unit tests named in TEST_PLAN.md as part of the task, not later.
 ```
 
@@ -50,10 +50,10 @@ Hard rules:
 
 ### T1.1 Project skeleton
 **Reads:** `BUILD_CONFIG.md`, `ARCHITECTURE.md`, `DESIGN_SYSTEM.md`
-**Prompt:** Create the Gradle project: `applicationId com.nexaflow.saayalite`, minSdk 24,
-targetSdk 34, compileSdk 34, Kotlin JVM 17, Compose BOM, Material 3, Hilt, Room,
+**Prompt:** Create the npm project: `applicationId com.nexaflow.saayalite`, the 320 px viewport floor,
+targetSdk 34, compileSdk 34, TypeScript JVM 17, React BOM, Material 3, dependency wiring, IndexedDB,
 security-crypto, play-services-location, Firebase BOM (Firestore + Auth),
-kotlinx-serialization. Create the exact package tree from ARCHITECTURE.md with empty
+Create the exact package tree from ARCHITECTURE.md with empty
 placeholder files. Implement `ui/theme` fully from DESIGN_SYSTEM.md: every colour token,
 all seven type styles, the spacing scale, both corner radii. Dark theme only.
 Use the exact version catalog in `BUILD_CONFIG.md` §1. Apply every manifest privacy flag
@@ -61,7 +61,7 @@ from §5, including `allowBackup="false"`, the data extraction rules and the net
 security config. Add the splash per §6 and the `.gitignore` entries per §3.
 **No R8, no minification, no keystore.** Prototype posture, see `SPEC_README.md`.
 **Done when:** the app installs on a real device and shows a themed empty screen using
-`brand #A78BFA` on `background #0B0B0F`, **and** `manifest.xml` in the built APK shows
+`brand #A78BFA` on `background #0B0B0F`, **and** `manifest.xml` in the built deployed site shows
 `allowBackup="false"`. Verify the latter with `aapt2 dump xmltree`, do not assume it.
 
 ### T1.2 Firebase wiring
@@ -74,7 +74,7 @@ logged. **Record the Firebase project id in CODEX_LOG.md.**
 
 ### T1.3 Component library
 **Reads:** `COMPONENT_LIBRARY.md`, `DESIGN_SYSTEM.md`, `ICONOGRAPHY.md`, `MOTION_SPEC.md`
-**Prompt:** Build all 14 shared composables C1 to C14 exactly as specified, at the exact dp
+**Prompt:** Build all 14 shared components C1 to C14 exactly as specified, at the exact px
 values, with every listed state (default, pressed, disabled, focused, loading, error).
 Bundle Poppins subset to Latin basic in Regular 400, SemiBold 600 and Bold 700, and Noto
 Sans Telugu. Bundle Material Symbols Rounded subset to the icon list in `ICONOGRAPHY.md`.
@@ -101,8 +101,8 @@ ELEVATED 4, SAFE 5. Write `ZoneParsingTest`.
 
 ### T2.2 Map screen
 **Reads:** `MAP_SPEC.md`, `SCREENS.md` S3, `DESIGN_SYSTEM.md`, `COMPONENT_LIBRARY.md`, `RESPONSIVE_SPEC.md`, `STATES_CATALOGUE.md`
-**Prompt:** Home screen with a full-bleed dark map per `MAP_SPEC.md`: osmdroid, CARTO Dark
-Matter tiles, no API key. Set the osmdroid user agent to the package name or OSM will block
+**Prompt:** Home screen with a full-bleed dark map per `MAP_SPEC.md`: Leaflet, CARTO Dark
+Matter tiles, no API key. Set the Leaflet user agent to the package name or OSM will block
 the requests. Render the 19 non-SAFE zones with glow, fill, stroke and label in the draw
 order specified, ordered by `risk_score` so a high zone is never buried. **SAFE zones must
 not be drawn.** Her location dot per spec, with no heading cone. Attribution line
@@ -129,7 +129,7 @@ the nearest-station block using the Haversine rule in §9 with `ACTION_DIAL` (ne
 WEB_PLATFORM.md exactly: notifications, then foreground location after a rationale
 screen, then background location as a **separate** request after foreground is granted.
 Denial of background must not dead-end. PIN per §7: salted SHA-256 in
-EncryptedSharedPreferences, weak-PIN rejection, confirm step. Room entities for `contact`.
+EncryptedSharedPreferences, weak-PIN rejection, confirm step. IndexedDB stores for `contact`.
 **Done when:** M1 and M2 pass, and an instrumented test proves the plaintext PIN appears
 nowhere in prefs, the database or logcat.
 
@@ -148,12 +148,12 @@ every edge case. Write `RulesTest` and `SessionEngineTest` in full.
 no test sleeps. **Do this before any Android work tonight.** If the evening runs out, a
 tested engine with no service is a far better outcome than a service with no engine.
 
-### T4.2 Foreground service and geofencing
+### T4.2 Wake lock plus a visible page and geofencing
 **Reads:** `WEB_PLATFORM.md`, `STATE_MACHINE.md` (recovery)
 **Prompt:** `SaayaForegroundService` with `foregroundServiceType="location"`, calling
 `startForeground` within 5 seconds. Register geofences for the 19 non-SAFE zones using
 each `geofence_radius_m`, with `INITIAL_TRIGGER_ENTER`. On enter, run the real
-point-in-polygon test and apply the 60 s dwell before arming. AlarmManager for every
+point-in-polygon test and apply the 60 s dwell before arming. an absolute deadline in IndexedDB for every
 ladder timer, never coroutine delay. Persist absolute deadlines. Implement the recovery
 table. Boot receiver re-registers geofences.
 **Done when:** the D1 demo trigger arms a session with **no user tap**, and killing the
@@ -173,9 +173,9 @@ jumps and reset, plus the permanent labelled banner while demo speed is on.
 ### T5.1 Check-in screens
 **Reads:** `SCREENS.md` S5 S6, `WEB_PLATFORM.md` (notifications), `COPY.md`, `COMPONENT_LIBRARY.md` (C2, C3, C4), `INTERACTION_SPEC.md` (haptics and sound), `MOTION_SPEC.md`, `ACCESSIBILITY_SPEC.md`
 **Prompt:** Check-in 1 as a heads-up on `saaya_checkin` plus an in-app card, 90 s ring,
-`brand` lavender with a 1.0 dp card border, showing `checkin1_reason` with the actual zone,
+`brand` lavender with a 1.0 px card border, showing `checkin1_reason` with the actual zone,
 tier and hour. Check-in 2 full-screen over the lock screen on `saaya_urgent`, 60 s ring,
-`amber` with a 1.5 dp border, alarm sound,
+`amber` with a 1.5 px border, alarm sound,
 long vibration, DND bypass, `setShowWhenLocked` and `setTurnScreenOn`, with a graceful
 fallback if `USE_FULL_SCREEN_INTENT` is refused. Both wire `OkTapped` and `HelpNowTapped`
 into the engine. Countdown announcements at 60, 30 and 10 s via `LiveRegion`. Back is
@@ -186,7 +186,7 @@ consumed on check-in 2.
 
 ## E6 - Family escalation
 
-### T6.1 Escalation composer and screen
+### T6.1 Escalation builder and screen
 **Reads:** `BUSINESS_RULES.md` §8, `SCREENS.md` S7, `COPY.md`, `COMPONENT_LIBRARY.md` (C3, C4, C7), `INTERACTION_SPEC.md`
 **Prompt:** Build the family message exactly per §8, including the non-removable
 prototype disclosure line. Screen S7 with the rendered message, the 60 s amber ring, the
@@ -196,7 +196,7 @@ the write-up.
 
 ### T6.2 Offline queue
 **Reads:** `ARCHITECTURE.md` (queue), `BUSINESS_RULES.md` §11, `TEST_PLAN.md` (`QueueTest`)
-**Prompt:** Room `queued_event`, a flusher with the 5/15/60/300/900 s backoff plus a
+**Prompt:** IndexedDB `queued_event`, a flusher with the 5/15/60/300/900 s backoff plus a
 connectivity-regained trigger, SOS priority over SUS, `FAILED_PERMANENT` after 20 attempts
 surfaced in UI state. Every Firestore write goes through the queue, with no direct writes
 anywhere. Write `QueueTest`.
@@ -271,7 +271,7 @@ open at the end. Verify the documents genuinely exist in Firestore afterwards.
 ### T9.0 Landing page
 **Reads:** `SUBMISSION.md`
 **Prompt:** Build the static landing page at `console/build/index.html` per `SUBMISSION.md`.
-Same palette and Poppins as the console, under 100 KB. Three buttons: console, APK
+Same palette and Poppins as the console, under 100 KB. Three buttons: console, deployed site
 download with size and version shown, video. The working list and the mocked list side by
 side at equal prominence.
 **Done when:** the page loads logged out and all three links resolve.

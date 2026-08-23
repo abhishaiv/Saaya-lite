@@ -43,8 +43,8 @@ app registration; the Android app ids above will not work for it.
 | Tool | Version |
 |---|---|
 | JDK | 17 |
-| Android Studio | Ladybug or newer |
-| Android SDK | API 34 platform + build-tools 34.0.0 |
+| your editor | Ladybug or newer |
+| the Node toolchain | API 34 platform + build-tools 34.0.0 |
 | Firebase CLI | `npm i -g firebase-tools`, then `firebase login` |
 | Node | 20 or newer, for the seed script only |
 
@@ -100,7 +100,7 @@ Saaya Lite/
   firebase.json
   firestore.rules
   firestore.indexes.json
-  gradle/libs.versions.toml
+  gradle/package.json
   .gitignore
 ```
 

@@ -130,7 +130,7 @@ facing violence sought any help, and about **7%** went to police.
 - The state view is our own backend. **It is connected to no government system.**
 - Firestore read is public for the demo. In production this becomes role-based access with
   an audit trail.
-- Room uses destructive migration, correct for a prototype and wrong for a real product.
+- IndexedDB uses destructive migration, correct for a prototype and wrong for a real product.
 
 ### How it works safely at scale
 [section 6 of `../PROBLEM.md`, which separates what Lite enforces today from what full
@@ -190,7 +190,7 @@ We would rather be checked than believed.
 | # | Check | Done |
 |---|---|---|
 | 1 | Console loads, logged out, private window, phone, different network | |
-| 2 | APK downloads and installs on a clean device | |
+| 2 | deployed site downloads and installs on a clean device | |
 | 3 | Video plays with no sign-in, under 3:00 | |
 | 4 | Repo opens with no access request | |
 | 5 | No government logo anywhere, no implied endorsement | |

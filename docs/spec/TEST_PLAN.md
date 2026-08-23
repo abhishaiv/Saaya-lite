@@ -91,7 +91,7 @@ here moves to the manual script in layer 3.
 | `PinStorageTest` | the plaintext PIN appears nowhere in prefs, the database or logcat | we claim the PIN is never stored in the clear |
 | `RecoveryTest` | kill the process mid-`CHECKIN_2`, restart, the remaining countdown is correct; kill during `FAMILY_ESCALATED` past the window, restart, lands in `SOS_ACTIVE` | "process death must never rescue her from the ladder" is the behaviour most likely to be silently broken, and it cannot be tested on the JVM |
 
-Room round trips and notification channels are covered by the manual script instead.
+IndexedDB round trips and notification channels are covered by the manual script instead.
 
 ## Layer 3: manual device script (run on E9, record the result)
 
@@ -123,7 +123,7 @@ Room round trips and notification channels are covered by the manual script inst
 | # | Check |
 |---|---|
 | V1 | Console URL loads in a private window with no login |
-| V2 | APK downloads and installs from the landing page |
+| V2 | deployed site downloads and installs from the landing page |
 | V3 | Video plays without sign-in |
 | V4 | Repo link, if provided, opens without an access request |
 | V5 | No screen anywhere shows a government logo or implies endorsement |
@@ -146,15 +146,15 @@ python3 scripts/grounded_check.py test/grounded_fixture.kt   # must exit 1
 python3 scripts/grounded_check.py --explain test/grounded_fixture.kt
 ```
 
-The fixture covers every literal form real Compose code uses. It exists because the original
+The fixture covers every literal form real React code uses. It exists because the original
 pattern required a non-word, non-dot character after a number, which matched **none** of
-`16.dp`, `0.75f`, `14.sp` or `1_000` — so the gate was effectively inert against real Kotlin
+`16.px`, `0.75f`, `14.px` or `1_000` — so the gate was effectively inert against real TypeScript
 and would have passed anything. Found on 2026-08-19 while self-testing a different fix.
 
 | Form | Example | Must |
 |---|---|---|
-| Compose dimension | `16.dp` | be read as 16 |
-| Compose type size | `14.sp` | be read as 14 |
+| React dimension | `16.px` | be read as 16 |
+| React type size | `14.px` | be read as 14 |
 | Float suffix | `0.75f`, `13f` | be read as 0.75, 13 |
 | Underscored | `6_371_008.8` | be read as 6371008.8 |
 | ARGB colour | `0xFFA78BFA` | normalise to `#A78BFA` |
@@ -192,10 +192,10 @@ blocking for hardware when an emulator would do. Resolved 2026-08-19 at `T1.1`.
 tests *what Android does to the app*, it needs hardware.
 
 An AVD named `saaya_api35` (android-35) is already installed. Note the founder's machine has
-8 GB, and an emulator wants roughly 2 GB, so stop the Gradle daemon before booting it:
+8 GB, and an emulator wants roughly 2 GB, so stop the npm daemon before booting it:
 
 ```bash
-./gradlew --stop
+npm run --stop
 $HOME/Library/Android/sdk/emulator/emulator -avd saaya_api35 -no-snapshot-load &
 $HOME/Library/Android/sdk/platform-tools/adb wait-for-device
 ```

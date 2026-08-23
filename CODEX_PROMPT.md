@@ -1,6 +1,6 @@
 # Saaya Lite — build instruction
 
-You are building **Saaya Lite**: a native Android app in Kotlin and Jetpack Compose, for the
+You are building **Saaya Lite**: a native Android app in TypeScript and React, for the
 Build What Moves India hackathon.
 
 Repository: `https://github.com/abhishaiv/Saaya-lite` (public, branch `main`).
@@ -252,7 +252,7 @@ permission for nothing else.**
 |---|---|
 | before `T8.1` | Firestore rules and public read go live |
 | before `T8.2` | the console URL becomes reachable |
-| after `T9.0` | the APK is published on the landing page |
+| after `T9.0` | the deployed site is published on the landing page |
 | after `T9.2` | submission |
 
 ## Anchors — measurements only I can take

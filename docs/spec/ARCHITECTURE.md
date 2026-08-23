@@ -2,24 +2,24 @@
 
 ## Shape
 
-Single Gradle module, clean-ish layering. **Do not build a multi-module project.** At this
+Single npm module, clean-ish layering. **Do not build a multi-module project.** At this
 size it costs more than it returns and the build window is nine evenings.
 
 ```
 app/
-  di/                 Hilt modules
+  di/                 React context providers
   data/
-    local/            Room: entities, DAOs, database, EncryptedSharedPreferences
+    local/            IndexedDB: entities, store accessors, database, EncryptedSharedPreferences
     remote/           Firestore writers
     zone/             Zone loading from bundled assets
     repository/       The only thing ViewModels touch
   domain/
-    model/            Pure Kotlin models, no framework imports
+    model/            Pure TypeScript models, no framework imports
     engine/           SessionEngine, ArmingEvaluator, IntervalCalculator, Anonymiser
   service/            SaayaForegroundService, geofencing, notifications, alarms
   ui/
     theme/            Colours, type, spacing from DESIGN_SYSTEM.md
-    components/       Shared composables
+    components/       Shared components
     screens/          One package per screen
     navigation/       NavGraph, routes
   util/               Clock, formatters, locale
@@ -30,13 +30,13 @@ app/
 | Rule | Why |
 |---|---|
 | `domain/` has **zero Android imports** | The engine and the rules must be unit-testable on the JVM without a device. This is what lets us verify the trust boundary in `TEST_PLAN.md`. |
-| ViewModels talk to repositories only, never to Room or Firestore | One seam to fake in tests. |
+| ViewModels talk to repositories only, never to IndexedDB or Firestore | One seam to fake in tests. |
 | `SessionEngine` is a pure state machine | Input: events. Output: state plus a list of side-effect commands. It does **not** fire notifications, write Firestore or start services itself. |
 | The service executes commands, the engine decides them | Keeps every timing rule testable without Android. |
 
 ## The core decision: engine emits commands, service performs them
 
-```kotlin
+```typescript
 // domain/engine
 data class EngineResult(val state: SessionState, val commands: List<Command>)
 
@@ -62,15 +62,15 @@ tested against this function directly.
 
 | Concern | Choice |
 |---|---|
-| Location updates | `FusedLocationProviderClient` inside the foreground service |
-| Timers | `AlarmManager` with `setExactAndAllowWhileIdle`. **Not** coroutine `delay`, which does not survive Doze. |
-| Persistence | Room with suspend DAOs on `Dispatchers.IO` |
-| Firestore writes | Enqueued to Room first, then flushed. See the offline queue below. |
+| Location updates | `navigator.geolocation.watchPosition` inside the wake lock plus a visible page |
+| Timers | `an absolute deadline in IndexedDB` with `setExactAndAllowWhileIdle`. **Not** coroutine `delay`, which does not survive Doze. |
+| Persistence | IndexedDB with suspend store accessors on `Dispatchers.IO` |
+| Firestore writes | Enqueued to IndexedDB first, then flushed. See the offline queue below. |
 | UI | `StateFlow` exposed by ViewModels, collected with `collectAsStateWithLifecycle` |
 
 ## The offline queue is not optional
 
-F22 and F32. Every outbound write goes to Room `queued_event` first, then a flusher drains it.
+F22 and F32. Every outbound write goes to IndexedDB `queued_event` first, then a flusher drains it.
 
 ```
 Engine emits WriteSusEvent
@@ -89,49 +89,48 @@ submission claim, so it must actually be true.
 
 | Dependency | Purpose |
 |---|---|
-| Jetpack Compose (BOM) + Material 3 | UI |
-| Hilt | DI |
-| Room | local persistence and the offline queue |
+| React (BOM) + Material 3 | UI |
+| dependency wiring | DI |
+| IndexedDB | local persistence and the offline queue |
 | `androidx.security:security-crypto` | EncryptedSharedPreferences for the PIN hash |
 | `play-services-location` | fused location and geofencing |
 | Firebase BOM: Firestore, Auth (anonymous only) | the state view writes |
-| `org.osmdroid:osmdroid-android:6.1.20` | map rendering. **Decided, see `MAP_SPEC.md`.** |
-| `kotlinx-serialization-json` | asset parsing |
+| `org.Leaflet:Leaflet-android:6.1.20` | map rendering. **Decided, see `MAP_SPEC.md`.** |
+| _(none: `JSON.parse` is native)_ | asset parsing |
 | `androidx.core:core-splashscreen:1.0.1` | the platform splash API. Added 2026-08-19 by founder decision when T1.1 blocked on it. |
-| `com.android.tools:desugar_jdk_libs:2.0.4` | core library desugaring, so `java.time` works on minSdk 24. Added 2026-08-19 when T4.1 blocked on it. |
+| `com.android.tools:desugar_jdk_libs:2.0.4` | core library desugaring, so `java.time` works on the 320 px viewport floor. Added 2026-08-19 when T4.1 blocked on it. |
 
-**Map choice is decided: osmdroid with CARTO Dark Matter tiles.** Founder decision
+**Map choice is decided: Leaflet with CARTO Dark Matter tiles.** Founder decision
 2026-08-18. No API key, no billing account, no quota, so nothing in the build depends on a
 credential that could fail on submission day. Full specification in `MAP_SPEC.md`.
 Do not substitute Google Maps.
 
-Do not add: Retrofit (no REST API), WorkManager (AlarmManager is more precise for this),
+Do not add: Retrofit (no REST API), WorkManager (an absolute deadline in IndexedDB is more precise for this),
 any analytics SDK, any crash reporter that phones home, any AI or ML library.
 
 ## Build config
 
 | Setting | Value |
 |---|---|
-| `minSdk` | 24 |
+| `target floor` | 24 |
 | `targetSdk` | 34 |
 | `compileSdk` | 34 |
 | `applicationId` | `com.nexaflow.saayalite` |
-| Kotlin JVM target | 17 |
-| Build types | `debug` (demo trigger visible), `release` (demo trigger visible **and labelled**, since judges install the APK) |
+| TypeScript JVM target | 17 |
+| Build types | `debug` (demo trigger visible), `release` (demo trigger visible **and labelled**, since judges install the deployed site) |
 
 **Note on the demo trigger.** Unlike full Saaya, the demo affordance ships in release here,
-because a judge installing the APK must be able to reproduce the journey without walking
+because a judge installing the deployed site must be able to reproduce the journey without walking
 into a Vizag zone at 4 a.m. It is labelled on screen as a demo control. This is the
 opposite of the Saaya de-demo rule and it is deliberate, because the audience is different.
-
 
 ---
 
 ## Dependency injection: the complete module list
 
-Four Hilt modules. **Do not create a fifth without asking.**
+Four React context providers. **Do not create a fifth without asking.**
 
-```kotlin
+```typescript
 @Module @InstallIn(SingletonComponent::class)
 object AppModule {          // Clock, CoroutineScope, Dispatchers, Context-derived helpers
     @Provides fun clock(): Clock = Clock.system(ZoneId.of("Asia/Kolkata"))
@@ -140,7 +139,7 @@ object AppModule {          // Clock, CoroutineScope, Dispatchers, Context-deriv
 }
 
 @Module @InstallIn(SingletonComponent::class)
-object DataModule {         // Room database, all DAOs, EncryptedSharedPreferences
+object DataModule {         // IndexedDB store, all store accessors, EncryptedSharedPreferences
 }
 
 @Module @InstallIn(SingletonComponent::class)
@@ -157,7 +156,7 @@ what makes the entire ladder testable with a fake clock.
 
 ## Repository interfaces
 
-Six. ViewModels and the service touch **only** these, never Room or Firestore directly.
+Six. ViewModels and the service touch **only** these, never IndexedDB or Firestore directly.
 
 | Interface | Responsibility |
 |---|---|

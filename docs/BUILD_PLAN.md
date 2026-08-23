@@ -14,11 +14,11 @@ removed roughly **4.5 hours** of work that no judge would ever see:
 
 | Removed | Hours |
 |---|---|
-| R8 and ProGuard, including the evening it eventually costs when it breaks Room or serialization | ~1.5 |
+| R8 and ProGuard, including the evening it eventually costs when it breaks IndexedDB or serialization | ~1.5 |
 | Release keystore and signing config | ~0.5 |
 | Instrumented test layer, trimmed from five tests to two | ~1.5 |
 | Foldable support | ~0.5 |
-| APK size tuning | ~0.5 |
+| deployed site size tuning | ~0.5 |
 
 Then **+1.5 hours** for the console's live journey trigger (T8.3), so a judge can complete
 the journey from the live link with no install.
@@ -45,10 +45,10 @@ escalation, F23-F24 SOS with PIN, F29 the web console, F21 and F30 the disclosur
 
 ### E1 - Tue Aug 18: decisions and scaffold
 - Planning docs. **Done.**
-- Android project: Kotlin, Compose, min SDK 24, package, icon, Saaya theme.
+- Android project: TypeScript, React, min SDK 24, package, icon, Saaya theme.
 - New Firebase project, Firestore. Saaya production is never touched.
 - Git repo init. **CODEX_LOG.md started tonight, not later.**
-- **DoD:** an empty Compose app installs on a real Android phone and writes one test doc
+- **DoD:** an empty React app installs on a real Android phone and writes one test doc
   to the new Firestore.
 
 ### E2 - Wed Aug 19: the map (F6, F9)
@@ -66,7 +66,7 @@ escalation, F23-F24 SOS with PIN, F29 the web console, F21 and F30 the disclosur
 - **DoD:** a stranger completes onboarding in under 90 seconds and can read the map.
 
 ### E4 - Fri Aug 21: Shadow, the core claim (F10-F14)
-- Foreground service, location updates, zone entry and exit detection.
+- Wake lock plus a visible page, location updates, zone entry and exit detection.
 - Arming rules: zone risk crossed with hour of day.
 - "Why it woke" banner. Quiet persistent status. Manual arm. One-tap disarm.
 - **D1 demo trigger** to simulate zone entry, labelled on screen.
@@ -108,11 +108,11 @@ escalation, F23-F24 SOS with PIN, F29 the web console, F21 and F30 the disclosur
   trust boundary at SOS, the console, the disclosures.
 - Write-up against the brief's six questions, drawn from PROBLEM.md. Codex contribution
   section drawn from CODEX_LOG.md.
-- Signed APK. Landing page carrying the APK, the console link and the video.
+- Signed deployed site. Landing page carrying the deployed site, the console link and the video.
 - **DoD:** every link works from a logged-out private window with no access request.
 
 **E9 is overloaded and I am saying so in advance.** Polish, translation, video, write-up
-and the APK do not fit in three hours. If E1 through E8 hold, move the video and write-up
+and the deployed site do not fit in three hours. If E1 through E8 hold, move the video and write-up
 onto Sat Aug 22 or Sun Aug 23 alongside E5 and E6. If they do not hold, Telugu is cut
 first and E9 becomes submission-only.
 
@@ -122,7 +122,7 @@ first and E9 becomes submission-only.
 
 | Risk | Likelihood | Mitigation |
 |---|---|---|
-| **E4 overruns.** Android background location, battery optimisation, permission tiers | **High** | Foreground service with a persistent notification. D1 demo trigger so the video never depends on real geofencing. E5 is a weekend evening and absorbs the overrun. |
+| **E4 overruns.** Android background location, battery optimisation, permission tiers | **High** | Wake lock plus a visible page with a persistent notification. D1 demo trigger so the video never depends on real geofencing. E5 is a weekend evening and absorbs the overrun. |
 | **37 hours of work in 27 hours of evenings** | **High** | Codex velocity, per the founder's call. The fixed cut order as insurance. Two weekend days held in reserve. |
 | **E9 cannot hold polish plus submission** | **High** | Stated above. Move video and write-up to the weekend if E1-E8 hold. |
 | Codex log is thin by E9 | **High** | It is the only evidence for the tooling requirement. Log the same evening, every evening. |
@@ -136,13 +136,13 @@ first and E9 becomes submission-only.
 A real allocation, and now the only basis for the brief's tooling requirement as well as
 the answer to the schedule:
 
-- **E1** scaffold, Gradle, Compose navigation, Firebase wiring.
+- **E1** scaffold, npm, React navigation, Firebase wiring.
 - **E2** the crime-data to `zones.json` conversion script.
 - **E3** onboarding screens and the PIN flow.
-- **E4** geofence plumbing and the foreground service. The fiddliest boilerplate in the
+- **E4** geofence plumbing and the wake lock plus a visible page. The fiddliest boilerplate in the
   build and the evening most likely to overrun, so this is where Codex earns the most.
 - **E5** the session state machine.
-- **E6** the escalation composer and the offline queue.
+- **E6** the escalation builder and the offline queue.
 - **E7** the two Firestore write paths and the anonymisation rules.
 - **E8** the console.
 

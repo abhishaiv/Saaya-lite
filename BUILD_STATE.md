@@ -8,8 +8,8 @@ Regenerate with `python3 scripts/render_build_state.py`.
 | Field | Value |
 |---|---|
 | Mode | **single continuous run**, order below |
-| Next node | **T4.2** - Foreground service, geofencing, alarms, recovery |
-| Nodes complete | 3 of 22 |
+| Next node | **T1.1** - Scaffold: Next.js, TypeScript, theme tokens, Vercel |
+| Nodes complete | 0 of 22 |
 | Total work | 45.0 h |
 
 ## Node ledger
@@ -19,26 +19,26 @@ hour 14 rather than hour 24. Reasoning in `docs/spec/GRAPH_ENGINEERING.md`.
 
 | # | Node | Title | Risk | Shape | Cum h | Verify | Status |
 |---|---|---|---|---|---|---|---|
-| 1 | `T1.1` | Scaffold, theme, manifest privacy flags | low | serial | 2.0 | spec | complete |
-| 2 | `T2.1` | Zone parsing to typed Zone/ZoneCard/PoliceStation | low | diamond | 3.5 | spec | complete |
-| 3 | `T4.1` | Session engine, pure JVM, no Android imports | HIGH | serial | 6.5 | spec, boundary, invention | complete |
-| 4 | `T4.2` | Foreground service, geofencing, alarms, recovery | HIGHEST | serial | 9.5 | spec, boundary, invention | pending |
-| 5 | `T1.2` | Firebase wiring, anonymous auth (project already exists) | low | serial | 10.5 | spec | pending |
+| 1 | `T1.1` | Scaffold: Next.js, TypeScript, theme tokens, Vercel | low | serial | 2.0 | spec | pending |
+| 2 | `T2.1` | Zone parsing to typed Zone/ZoneCard/PoliceStation (TS) | low | diamond | 3.5 | spec | pending |
+| 3 | `T4.1` | Session engine, pure TypeScript, zero browser API | HIGH | serial | 6.5 | spec, boundary, invention | pending |
+| 4 | `T4.2` | Geolocation watch, arming, wake lock, tab lifecycle | HIGHEST | serial | 9.5 | spec, boundary, invention | pending |
+| 5 | `T1.2` | Firebase wiring, anonymous auth (project exists) | low | serial | 10.5 | spec | pending |
 | 6 | `T8.1` | Seed zones to Firestore | low | serial | 11.0 | spec | pending |
-| 7 | `T8.2` | Console: the live demo link | HIGH | serial | 14.0 | spec, boundary, invention | pending |
-| 8 | `T1.3` | Component library C1 to C14 | med | diamond | 17.0 | spec, invention | pending |
-| 9 | `T2.2` | Map screen, zones, her dot, offline | med | serial | 19.5 | spec, invention | pending |
+| 7 | `T8.2` | State view console route | HIGH | serial | 14.0 | spec, boundary, invention | pending |
+| 8 | `T1.3` | Component library C1 to C14 (React) | med | diamond | 17.0 | spec, invention | pending |
+| 9 | `T2.2` | Map screen: Leaflet, CARTO tiles, zones, her dot | med | serial | 19.5 | spec, invention | pending |
 | 10 | `T4.3` | Home session states, arm banner, demo panel | med | serial | 21.5 | spec, invention | pending |
 | 11 | `T3.1` | Zone detail sheet, nearest station | low | serial | 23.5 | spec | pending |
-| 12 | `T3.2` | Onboarding, permissions, favourites, PIN | med | serial | 26.5 | spec, invention | pending |
-| 13 | `T5.1` | Check-in 1 and 2, notifications, lock screen | HIGH | serial | 29.5 | spec, boundary, invention | pending |
-| 14 | `T6.1` | Family escalation composer and screen | med | serial | 31.5 | spec, invention | pending |
-| 15 | `T6.2` | Offline queue with backoff | med | serial | 33.0 | spec, invention | pending |
+| 12 | `T3.2` | Onboarding, permissions, favourites, PIN (Web Crypto) | med | serial | 26.5 | spec, invention | pending |
+| 13 | `T5.1` | Check-in 1 and 2, Notification API, full-screen overlay | HIGH | serial | 29.5 | spec, boundary, invention | pending |
+| 14 | `T6.1` | Family escalation builder and screen | med | serial | 31.5 | spec, invention | pending |
+| 15 | `T6.2` | Offline queue in IndexedDB with backoff | med | serial | 33.0 | spec, invention | pending |
 | 16 | `T7.1` | SOS screen and PIN entry | HIGH | serial | 35.5 | spec, boundary, invention | pending |
 | 17 | `T7.2` | Anonymiser and the two Firestore writers | HIGHEST | serial | 37.5 | spec, boundary, invention | pending |
-| 18 | `T7.3` | What the police see, in app | low | serial | 39.0 | spec | pending |
+| 18 | `T7.3` | What the police see, in the citizen app | low | serial | 39.0 | spec | pending |
 | 19 | `T8.3` | Console live journey trigger | med | serial | 40.5 | spec, invention | pending |
-| 20 | `T9.0` | Landing page with APK and video | low | serial | 41.5 | spec | pending |
+| 20 | `T9.0` | Submission page: video, summary, disclosures | low | serial | 41.5 | spec | pending |
 | 21 | `T9.1` | Localisation, low-end, font scale, a11y | med | diamond | 43.5 | spec, invention | pending |
 | 22 | `T9.2` | Verification sweep V1 to V8 | HIGH | diamond+cycle | 45.0 | spec, boundary, invention | pending |
 
@@ -49,9 +49,8 @@ Stop and wait. A gate is permission; an anchor is a measurement.
 | Node | When | Gate |
 |---|---|---|
 | T8.1 | before | Firestore rules and public read go live |
-| T8.2 | before | console URL becomes reachable |
-| T9.0 | after | APK published on the landing page |
-| T9.2 | after | submission |
+| T2.2 | before | the Vercel URL becomes publicly reachable |
+| T9.0 | after | submission form |
 
 ## Spec amendments
 
@@ -60,11 +59,4 @@ as a fact in `graph/spec_graph.json` if it is a value.
 
 | Date | Node | What was missing | Decision | Fact id |
 |---|---|---|---|---|
-| 2026-08-19 | T1.1 | Gradle wrapper version | 8.9 (AGP 8.7.3 needs 8.9+) | `build.gradle.wrapper` |
-| 2026-08-19 | T1.1 | core-splashscreen version, and permission to add it | 1.0.1, added to the closed list in ARCHITECTURE.md | `dep.splashscreen` |
-| 2026-08-19 | T1.1 | six theme alphas + label tracking frozen in prose, never facts | added, plus 14 more of the same class found by scanning | `alpha.*`, `type.label.tracking` |
-| 2026-08-19 | T1.1 | the Saaya mark for ic_launcher_foreground | real brand SVGs committed at `assets/brand/`; split specified in ICONOGRAPHY.md | 6 `color.icon.*` facts |
-| 2026-08-20 | T4.1 | F14 disarm behavior and the anonymous civic-signal boundary contradicted the transition table | check-ins may disarm locally with no outbound effect; anonymous civic signal begins at family escalation and detailed incident only at SOS | `cooldown.manual`, `boundary.*` |
-| 2026-08-20 | T4.1 | active AUTO_ZONE sessions could cross into an interval-table n/a band although BUSINESS_RULES said that could not occur | freeze `armedHourBand` at arm until resolution; MANUAL remains 10 min; recovery uses the persisted absolute deadline | `session.auto_zone.hour_band_policy` |
-| 2026-08-20 | T4.2 | continuous polygon dwell had no legal pre-arm executor because the FGS was forbidden while `IDLE` | add service-private `CANDIDATE`: 15 s high-accuracy sampling, five qualifying fixes over 60 s, visible privacy-safe notification, no SessionState or product write | `candidate.*` |
-| 2026-08-20 | T4.2 | the required direct battery-exemption action lacked its mandatory manifest permission and denial behavior | add `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS`; one-time explanation, deliberate direct request, non-blocking denial and settings-list fallback | `battery.optimization.*` |
+| | | | | |

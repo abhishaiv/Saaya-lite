@@ -113,7 +113,7 @@ The last row matters: someone holding her phone must not be able to reset their 
 
 ## 8. Escalation payload to family (F19)
 
-Composed on device. Never sent, per F21. Displayed exactly as it would be sent.
+Reactd on device. Never sent, per F21. Displayed exactly as it would be sent.
 
 ```
 Saaya alert - {name} may need help.
@@ -184,14 +184,13 @@ requires at least **five** qualifying in-polygon fixes spanning at least the exi
 **60 s** enter dwell on a monotonic clock. A qualifying outside fix resets the proof;
 accuracy worse than **100 m** is ignored. Process death resets the proof completely.
 
-
 ---
 
 ## 13. Constants and formats
 
 ### Haversine
 
-```kotlin
+```typescript
 const val EARTH_RADIUS_M = 6_371_008.8   // IUGG mean radius
 ```
 

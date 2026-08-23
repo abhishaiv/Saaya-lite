@@ -75,12 +75,12 @@ ongoing notification is not dismissible.
 
 ## Touch targets
 
-Minimum 48 x 48 dp everywhere. Where a visual element is smaller (the 34 dp TextOnly
-button, the 24 dp chip), expand the touch target with padding rather than growing the
-visual. Adjacent targets keep 8 dp of separation.
+Minimum 48 x 48 px everywhere. Where a visual element is smaller (the 34 px TextOnly
+button, the 24 px chip), expand the touch target with padding rather than growing the
+visual. Adjacent targets keep 8 px of separation.
 
 The `I'm OK` and `Stop SOS` buttons are the two most important targets in the product.
-Both are 72 dp tall and full width, positioned in the bottom third.
+Both are 72 px tall and full width, positioned in the bottom third.
 
 ## Input
 
@@ -99,7 +99,7 @@ never as a toast, never as a dialog.
 |---|---|
 | Incoming call during check-in | check-in continues underneath, countdown unaffected, re-presents when the call ends |
 | Incoming call during SOS | SOS continues, notification stays |
-| App backgrounded during ladder | everything continues; the service and AlarmManager own the timing |
+| App backgrounded during ladder | everything continues; the service and an absolute deadline in IndexedDB own the timing |
 | Screen off during check-in 2 | full-screen intent turns the screen on |
 | Battery saver enabled | detect and warn per `WEB_PLATFORM.md`. Never fail silently. |
 | Airplane mode | ladder unaffected, writes queue, UI states it is queued |

@@ -44,7 +44,7 @@ src/ui/                   components, theme tokens
 public/assets/            the three Vizag files, fonts
 ```
 
-`src/domain/` keeps the same rule the Kotlin had: **no platform imports.** It is plain
+`src/domain/` keeps the same rule the TypeScript had: **no platform imports.** It is plain
 TypeScript so `SessionEngine` stays a pure function testable under `vitest` with a fake
 clock, exactly as specified in `STATE_MACHINE.md`.
 

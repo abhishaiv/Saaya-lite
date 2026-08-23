@@ -23,11 +23,11 @@ Founder decision: **warm and springy, but SOS is instant.**
 
 | Element | Trigger | Motion | Duration |
 |---|---|---|---|
-| Screen push | navigation | slide in from end 24 dp + fade, `spring` | ~300 ms |
+| Screen push | navigation | slide in from end 24 px + fade, `spring` | ~300 ms |
 | Screen pop | back | reverse | ~300 ms |
 | Bottom sheet peek to expanded | drag or tap | `springSoft` translate | ~340 ms |
 | Bottom sheet dismiss | drag down past 40% | `springSoft`, follows the finger | tracks input |
-| Check-in card entry | state change | scrim fades `standard` 180 ms; card scales 0.94 to 1.0 and translates up 16 dp on `spring` | ~320 ms |
+| Check-in card entry | state change | scrim fades `standard` 180 ms; card scales 0.94 to 1.0 and translates up 16 px on `spring` | ~320 ms |
 | Check-in card exit | answered | scale to 0.96 + fade, `standard` | 160 ms |
 | Arm banner entry | auto-arm | slide down from top + fade, `spring` | ~300 ms |
 | Arm banner auto-hide | 6 s later | fade `standard` | 200 ms |
@@ -35,7 +35,7 @@ Founder decision: **warm and springy, but SOS is instant.**
 | Countdown numeral | every tick | **no animation.** `tnum` figures, straight swap | 0 |
 | Button press | touch down | scale to 0.97, `spring` | ~120 ms |
 | Button release | touch up | back to 1.0, `spring` | ~180 ms |
-| Zone tap | tap | polygon stroke 1 to 2 dp, `standard` | 150 ms |
+| Zone tap | tap | polygon stroke 1 to 2 px, `standard` | 150 ms |
 | Zone sheet | tap | as bottom sheet | ~340 ms |
 | Map camera to zone | tap | ease-in-out camera | 400 ms |
 | Ladder accent change | rung change | **none** | **0** |

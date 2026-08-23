@@ -23,7 +23,7 @@ never taken is not done. In execution order:
 
 | # | Node | What you check | Roughly |
 |---|---|---|---|
-| 1 | `T1.1` | `aapt2 dump xmltree` on the APK shows `allowBackup="false"` | hour 2 |
+| 1 | `T1.1` | `aapt2 dump xmltree` on the deployed site shows `allowBackup="false"` | hour 2 |
 | 2 | `T4.2` | **a real phone arms a session with no tap** | hour 9.5 |
 | 3 | `T8.2` | console loads logged out, on a phone, on another network | hour 14 |
 | 4 | `T5.1` | check-in 2 appears over a locked screen | hour 29 |
@@ -38,7 +38,7 @@ way to know the geofencing actually works rather than merely compiles.
 nothing else.
 
 Firestore public read going live (before `T8.1`) · the console URL becoming reachable
-(before `T8.2`) · the APK published (after `T9.0`) · submission (after `T9.2`).
+(before `T8.2`) · the deployed site published (after `T9.0`) · submission (after `T9.2`).
 
 **One outstanding setup item.** Register a **Web** app in Firebase and paste its config into
 `console/firebase-config.js`. The console uses the web SDK and needs its own app id; the

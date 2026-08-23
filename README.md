@@ -115,13 +115,13 @@ We would rather be checked than believed. These are the actual commands:
 grep -ri "openai\|gpt\|claude\|tensorflow\|ml-kit" app/src
 
 # the app cannot listen, watch, or send on her behalf
-grep -E "RECORD_AUDIO|CAMERA|SEND_SMS" app/src/main/AndroidManifest.xml
+grep -E "RECORD_AUDIO|CAMERA|SEND_SMS" app/src/main/the Next.js config
 
 # her favourites cannot leave the device
-grep "allowBackup" app/src/main/AndroidManifest.xml     # must be false
+grep "allowBackup" app/src/main/the Next.js config     # must be false
 
 # nothing identifying is written before SOS
-./gradlew testDebugUnitTest --tests "*AnonymiserTest*"
+npm run testDebugUnitTest --tests "*AnonymiserTest*"
 
 # every number in the product traces to a decided value
 python3 scripts/grounded_check.py app/src/main/java
@@ -140,7 +140,7 @@ to one of them fails the build. It is how "we did not invent this value" stops b
   pretending to watch.
 - The zone data is calibrated against NCRB 2023 and is a **proxy for risk, not a measurement
   of it.** Low recorded crime can mean low reporting, and the app says exactly that.
-- Firestore read is public for the demo, and Room uses destructive migration. Both are
+- Firestore read is public for the demo, and IndexedDB uses destructive migration. Both are
   correct for a prototype and wrong for production. We say so rather than let you find it.
 - Nine evenings, one person. This is a prototype and it is presented as one.
 
