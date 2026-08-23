@@ -121,7 +121,7 @@ something if committed, there isn't one.
 ## Android runtime permissions, the other kind of "permission"
 
 Requested from the user at runtime, not configured anywhere. Full detail and the required
-request **order** in `ANDROID_PLATFORM.md`.
+request **order** in `WEB_PLATFORM.md`.
 
 | Permission | When asked | If denied |
 |---|---|---|

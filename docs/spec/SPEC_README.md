@@ -13,7 +13,7 @@ Stop and ask rather than guessing, then the answer gets written into the spec.
 1b. **`SETUP.md`** - Firebase project, tooling, repo layout, deploy commands. Do once.
 1c. **`SECRETS_AND_ACCESS.md`** - keys, credentials, config files, runtime permissions.
      **No third-party API keys exist in this project.** If you think you need one, stop.
-2. **`BUILD_CONFIG.md`** - Gradle, pinned versions, signing, R8, manifest privacy flags.
+2. **`BUILD_CONFIG.md`** - Next.js, Vercel, pinned versions, the closed dependency list.
 2b. **`ARCHITECTURE.md`** - modules, layers, packages, threading.
 3. **`DATA_MODEL.md`** - Room entities, Firestore collections, security rules, seed data.
 4. **`BUSINESS_RULES.md`** - every number in the product. Arming matrix, timers, formulas.
@@ -35,7 +35,7 @@ Stop and ask rather than guessing, then the answer gets written into the spec.
 **Then:**
 
 15. **`COPY.md`** - every user-facing string, English and Telugu, plus locked vocabulary.
-16. **`ANDROID_PLATFORM.md`** - permissions, foreground service, notifications, battery.
+16. **`WEB_PLATFORM.md`** - geolocation, wake lock, tab lifecycle, browser limits.
 17. **`CONSOLE_SPEC.md`** - the web console, which is our live demo link.
 18. **`TEST_PLAN.md`** - acceptance criteria per feature.
 19. **`CODEX_TASKS.md`** - the ordered task list. This is what you actually execute.
@@ -256,3 +256,20 @@ Add a `Decision` entity via `kg.py`, mention it in one line of your report, and 
 
 Bias toward continuing on plumbing and toward stopping on behaviour. A wrong internal type
 name costs a rename. A wrong escalation timing costs the product's central claim.
+
+### Where the archived Android build lives
+
+Branch **`archive/android-kotlin`** holds the complete Android build: the scaffold, the zone
+parsers, the full session engine, the service classes, and the two spec documents it was
+built against. Nothing was deleted, and it stays as evidence of Codex's work.
+
+To consult it while porting:
+
+```bash
+git show archive/android-kotlin:app/src/main/java/com/nexaflow/saayalite/domain/engine/SessionEngine.kt
+git show archive/android-kotlin:docs/spec/ANDROID_PLATFORM.archived.md
+```
+
+**But `STATE_MACHINE.md` remains authoritative, not the Kotlin.** The engine passed ten
+gates and its verifiers, so it is a good reference for structure. It is not the spec. Where
+they differ, the spec wins, and the difference is a bug in the Kotlin, not in the spec.

@@ -452,8 +452,8 @@ guaranteed collision.
 
 | Node | Each worker owns | Merge writes |
 |---|---|---|
-| `T2.1` | its own parser and model file | `ZoneLoader.kt` |
-| `T1.3` | `ui/components/<Name>.kt` + a JSON manifest | `SaayaModifiers.kt`, `ComponentGallery.kt` |
+| `T2.1` | its own parser and model file | `zoneLoader.ts` |
+| `T1.3` | `src/ui/components/<Name>.tsx` + a JSON manifest | `saayaStyles.ts`, `ComponentGallery.tsx` |
 | `T9.1` | `build/fanout/T9.1/<Screen>.strings.json` | `strings.xml`, `values-te/strings.xml` |
 | `T9.2` | `build/fanout/T9.2/<Vn>.json` | `summary.json`, and **never any source file** |
 

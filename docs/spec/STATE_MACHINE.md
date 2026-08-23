@@ -1,5 +1,5 @@
 # Saaya Lite - Session State Machine
-The heart of the app. Implemented as a **pure function** in `domain/engine/SessionEngine.kt`
+The heart of the app. Implemented as a **pure function** in `src/domain/engine/sessionEngine.ts`
 with zero Android imports, so every rule here is unit-testable on the JVM.
 
 `fun onEvent(state: SessionState, event: SessionEvent, ctx: EngineContext): EngineResult`
@@ -134,7 +134,7 @@ dies mid-ladder is more likely to be a real emergency, not less.
 | Airplane mode at escalation | Everything queues. UI shows "queued, will send when connected". Ladder timing is unaffected. |
 | No contact configured | Ladder still runs. Family step shows "no contact set, add one" and proceeds to SOS on lapse. Never block the ladder on missing config. |
 | Location permission revoked mid-session | Move to `RESOLVED(DISARMED)`, show a persistent warning. Never pretend to watch when blind. |
-| Battery saver kills the service | Detect via missed heartbeat on next launch. Show an honest "Saaya was stopped by the system" notice with the settings deep link from `ANDROID_PLATFORM.md`. |
+| Battery saver kills the service | Detect via missed heartbeat on next launch. Show an honest "Saaya was stopped by the system" notice with the settings deep link from `WEB_PLATFORM.md`. |
 | She uninstalls mid-SOS | Out of scope. Do not attempt to prevent. |
 | Clock change or DST | Use monotonic elapsed time for countdowns, wall clock only for hour bands. |
 | Demo mode toggled mid-session | Applies to the **next** timer only. Never retroactively shortens a running countdown. |
@@ -315,7 +315,7 @@ touches no IO.** That is what makes every rule in `BUSINESS_RULES.md` testable o
 geofence ENTER. It is not a new `SessionState`: Home, map and `SessionEngine` stay `IDLE`,
 and candidate mode creates no session or product event. The service proves authoritative
 polygon containment using the 15-second, five-fix, 60-second monotonic policy in
-`ANDROID_PLATFORM.md`, then emits exactly one `ZoneEntered(zoneId)`.
+`WEB_PLATFORM.md`, then emits exactly one `ZoneEntered(zoneId)`.
 
 Only if the engine accepts that event and returns `SHADOW` does the service persist a
 session, capture `armedHourBand`, schedule the check-in and update its existing foreground

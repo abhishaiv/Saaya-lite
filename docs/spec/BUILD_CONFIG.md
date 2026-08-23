@@ -1,5 +1,5 @@
 # Saaya Lite - Build Configuration (web)
-Replaces the Android build config, archived as `BUILD_CONFIG.archived.md`.
+Replaces the Android build config, archived as `the git history and branch archive/android-kotlin`.
 
 ## Stack, pinned
 

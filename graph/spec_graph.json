@@ -13,7 +13,8 @@
    "means": "check-in 1 countdown",
    "sourced_from": "founder 2026-08-18",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "ladder.cd2",
@@ -23,7 +24,8 @@
    "means": "check-in 2 countdown",
    "sourced_from": "founder 2026-08-18",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "ladder.cancel",
@@ -33,7 +35,8 @@
    "means": "family cancel window",
    "sourced_from": "founder 2026-08-18",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "ladder.total",
@@ -43,7 +46,8 @@
    "means": "check-in 1 to SOS",
    "sourced_from": "derived: 90+60+60",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "demo.divisor",
@@ -53,7 +57,8 @@
    "means": "demo speed divisor",
    "sourced_from": "founder 2026-08-18",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "demo.total",
@@ -63,7 +68,8 @@
    "means": "ladder under demo speed",
    "sourced_from": "derived: 210/6",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "interval.high.deep",
@@ -73,7 +79,8 @@
    "means": "HIGH zone, NIGHT_DEEP",
    "sourced_from": "founder 2026-08-18",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "interval.high.late",
@@ -83,7 +90,8 @@
    "means": "HIGH, NIGHT_LATE or DAWN",
    "sourced_from": "founder 2026-08-18",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "interval.high.early",
@@ -93,7 +101,8 @@
    "means": "HIGH, NIGHT_EARLY",
    "sourced_from": "founder 2026-08-18",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "interval.elev.deep",
@@ -103,7 +112,8 @@
    "means": "ELEVATED, NIGHT_DEEP",
    "sourced_from": "founder 2026-08-18",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "interval.elev.other",
@@ -113,7 +123,8 @@
    "means": "ELEVATED, NIGHT_LATE or DAWN",
    "sourced_from": "founder 2026-08-18",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "interval.mod.deep",
@@ -123,7 +134,8 @@
    "means": "MODERATE, NIGHT_DEEP",
    "sourced_from": "founder 2026-08-18",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "interval.manual",
@@ -133,7 +145,8 @@
    "means": "manual arm, any zone",
    "sourced_from": "founder 2026-08-18",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "dwell.enter",
@@ -143,7 +156,8 @@
    "means": "continuous containment before arming",
    "sourced_from": "founder 2026-08-18",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "dwell.exit",
@@ -153,7 +167,8 @@
    "means": "continuous non-containment before disarm",
    "sourced_from": "founder 2026-08-18",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "cooldown.manual",
@@ -163,7 +178,8 @@
    "means": "after manual disarm, same zone",
    "sourced_from": "founder 2026-08-18",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "cooldown.ok",
@@ -173,7 +189,8 @@
    "means": "after RESOLVED_OK, same zone",
    "sourced_from": "founder 2026-08-18",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "pin.length",
@@ -183,7 +200,8 @@
    "means": "PIN length",
    "sourced_from": "founder 2026-08-18",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "pin.attempts",
@@ -193,7 +211,8 @@
    "means": "before lockout",
    "sourced_from": "founder 2026-08-18",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "pin.lockout",
@@ -203,7 +222,8 @@
    "means": "initial lockout, doubles to 15 min",
    "sourced_from": "founder 2026-08-18",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "pin.lockout.max",
@@ -213,7 +233,8 @@
    "means": "lockout ceiling",
    "sourced_from": "founder 2026-08-18",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "const.earth",
@@ -223,7 +244,8 @@
    "means": "IUGG mean earth radius, haversine",
    "sourced_from": "IUGG",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "const.tz",
@@ -233,7 +255,8 @@
    "means": "hardcoded timezone",
    "sourced_from": "founder 2026-08-18",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "dist.station.max",
@@ -243,7 +266,8 @@
    "means": "beyond this, no station in range",
    "sourced_from": "founder 2026-08-18",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "loc.accuracy.reject",
@@ -253,7 +277,8 @@
    "means": "discard fix for containment above this",
    "sourced_from": "founder 2026-08-18",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "loc.sample.shadow",
@@ -263,7 +288,8 @@
    "means": "location interval while SHADOW",
    "sourced_from": "founder 2026-08-18",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "loc.sample.sos",
@@ -273,7 +299,8 @@
    "means": "location interval while SOS_ACTIVE",
    "sourced_from": "founder 2026-08-18",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "loc.sample.idle.fg",
@@ -283,7 +310,8 @@
    "means": "location interval idle foreground",
    "sourced_from": "founder 2026-08-18",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "queue.backoff.0",
@@ -293,7 +321,8 @@
    "means": "queue retry step 1",
    "sourced_from": "founder 2026-08-18",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "queue.backoff.1",
@@ -303,7 +332,8 @@
    "means": "queue retry step 2",
    "sourced_from": "founder 2026-08-18",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "queue.backoff.2",
@@ -313,7 +343,8 @@
    "means": "queue retry step 3",
    "sourced_from": "founder 2026-08-18",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "queue.backoff.3",
@@ -323,7 +354,8 @@
    "means": "queue retry step 4",
    "sourced_from": "founder 2026-08-18",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "queue.backoff.4",
@@ -333,7 +365,8 @@
    "means": "queue retry step 5",
    "sourced_from": "founder 2026-08-18",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "queue.max_attempts",
@@ -343,7 +376,8 @@
    "means": "before FAILED_PERMANENT",
    "sourced_from": "founder 2026-08-18",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "color.brand",
@@ -353,7 +387,8 @@
    "means": "lavender accent",
    "sourced_from": "iOS AppTheme.swift",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "color.brandLight",
@@ -363,7 +398,8 @@
    "means": "hover",
    "sourced_from": "iOS AppTheme.swift",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "color.brandDark",
@@ -373,7 +409,8 @@
    "means": "pressed",
    "sourced_from": "iOS AppTheme.swift",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "color.background",
@@ -383,7 +420,8 @@
    "means": "app bg",
    "sourced_from": "iOS AppTheme.swift",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "color.cardFill",
@@ -393,7 +431,8 @@
    "means": "card fill, iOS Color(white:0.12)",
    "sourced_from": "iOS AppTheme.swift",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "color.safe",
@@ -403,7 +442,8 @@
    "means": "safe",
    "sourced_from": "iOS AppTheme.swift",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "color.amber",
@@ -413,7 +453,8 @@
    "means": "escalation, iOS AppTheme.amber",
    "sourced_from": "iOS AppTheme.swift",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "color.danger",
@@ -423,7 +464,8 @@
    "means": "SOS and high tier",
    "sourced_from": "iOS AppTheme.swift",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "color.zone.high",
@@ -433,7 +475,8 @@
    "means": "high tier fill",
    "sourced_from": "vizag_heatmap.geojson",
    "governs": "MAP_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "color.zone.moderate",
@@ -443,7 +486,8 @@
    "means": "moderate",
    "sourced_from": "vizag_heatmap.geojson",
    "governs": "MAP_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "color.zone.elevated",
@@ -453,7 +497,8 @@
    "means": "elevated",
    "sourced_from": "vizag_heatmap.geojson",
    "governs": "MAP_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "color.zone.safe",
@@ -463,7 +508,8 @@
    "means": "safe, NOT DRAWN",
    "sourced_from": "vizag_heatmap.geojson",
    "governs": "MAP_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "grade.checkin1.stroke",
@@ -473,7 +519,8 @@
    "means": "card border, rung 1",
    "sourced_from": "iOS SUSCheckInCardView.swift",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "grade.checkin2.stroke",
@@ -483,7 +530,8 @@
    "means": "card border, rung 2",
    "sourced_from": "iOS SUSCheckInCardView.swift",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "grade.family.stroke",
@@ -493,7 +541,8 @@
    "means": "card border, rung 3",
    "sourced_from": "iOS SUSCheckInCardView.swift",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "grade.border.opacity",
@@ -503,7 +552,8 @@
    "means": "border is accent at 50%",
    "sourced_from": "iOS SUSCheckInCardView.swift",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "dim.card.radius",
@@ -513,7 +563,8 @@
    "means": "card corner radius",
    "sourced_from": "iOS SUSCheckInCardView.swift",
    "governs": "COMPONENT_LIBRARY.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "dim.card.padding",
@@ -523,7 +574,8 @@
    "means": "card padding",
    "sourced_from": "iOS SUSCheckInCardView.swift",
    "governs": "COMPONENT_LIBRARY.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "dim.card.margin",
@@ -533,7 +585,8 @@
    "means": "card horizontal margin",
    "sourced_from": "iOS SUSCheckInCardView.swift",
    "governs": "COMPONENT_LIBRARY.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "dim.card.spacing",
@@ -543,7 +596,8 @@
    "means": "card content spacing",
    "sourced_from": "iOS SUSCheckInCardView.swift",
    "governs": "COMPONENT_LIBRARY.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "dim.card.bottom",
@@ -553,7 +607,8 @@
    "means": "card offset above bottom",
    "sourced_from": "iOS SUSCheckInCardView.swift",
    "governs": "COMPONENT_LIBRARY.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "dim.radius.control",
@@ -563,7 +618,8 @@
    "means": "button and chip radius",
    "sourced_from": "iOS AppTheme.cornerRadius",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "dim.radius.small",
@@ -573,7 +629,8 @@
    "means": "small control radius",
    "sourced_from": "iOS AppTheme.cornerRadiusSmall",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "dim.icon.hero",
@@ -583,7 +640,8 @@
    "means": "card hero icon",
    "sourced_from": "iOS SUSCheckInCardView.swift",
    "governs": "COMPONENT_LIBRARY.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "dim.btn.accent",
@@ -593,7 +651,8 @@
    "means": "accent button height",
    "sourced_from": "iOS SUSCheckInCardView.swift",
    "governs": "COMPONENT_LIBRARY.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "dim.btn.textonly",
@@ -603,7 +662,8 @@
    "means": "text-only button height",
    "sourced_from": "iOS SUSCheckInCardView.swift",
    "governs": "COMPONENT_LIBRARY.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "dim.btn.primary",
@@ -613,7 +673,8 @@
    "means": "primary button height",
    "sourced_from": "founder 2026-08-18",
    "governs": "COMPONENT_LIBRARY.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "dim.btn.big",
@@ -623,7 +684,8 @@
    "means": "BigActionButton height",
    "sourced_from": "founder 2026-08-18",
    "governs": "COMPONENT_LIBRARY.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "dim.touch.min",
@@ -633,7 +695,8 @@
    "means": "minimum touch target",
    "sourced_from": "Android a11y",
    "governs": "COMPONENT_LIBRARY.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "dim.scrim",
@@ -643,7 +706,8 @@
    "means": "black scrim behind cards",
    "sourced_from": "iOS SUSCheckInCardView.swift",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "dim.ring.card",
@@ -653,7 +717,8 @@
    "means": "countdown ring in card",
    "sourced_from": "founder 2026-08-18",
    "governs": "COMPONENT_LIBRARY.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "dim.ring.sos",
@@ -663,7 +728,8 @@
    "means": "countdown ring on SOS",
    "sourced_from": "founder 2026-08-18",
    "governs": "COMPONENT_LIBRARY.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "dim.armbanner.autohide",
@@ -673,7 +739,8 @@
    "means": "arm banner auto-hide",
    "sourced_from": "founder 2026-08-18",
    "governs": "COMPONENT_LIBRARY.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "dim.sheet.peek",
@@ -683,7 +750,8 @@
    "means": "bottom sheet peek",
    "sourced_from": "founder 2026-08-18",
    "governs": "COMPONENT_LIBRARY.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "type.display",
@@ -693,7 +761,8 @@
    "means": "display size",
    "sourced_from": "founder 2026-08-18 / iOS",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "type.title",
@@ -703,7 +772,8 @@
    "means": "title size",
    "sourced_from": "founder 2026-08-18 / iOS",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "type.cardTitle",
@@ -713,7 +783,8 @@
    "means": "cardTitle size",
    "sourced_from": "founder 2026-08-18 / iOS",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "type.headline",
@@ -723,7 +794,8 @@
    "means": "headline size",
    "sourced_from": "founder 2026-08-18 / iOS",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "type.body",
@@ -733,7 +805,8 @@
    "means": "body size",
    "sourced_from": "founder 2026-08-18 / iOS",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "type.cardBody",
@@ -743,7 +816,8 @@
    "means": "cardBody size",
    "sourced_from": "founder 2026-08-18 / iOS",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "type.caption",
@@ -753,7 +827,8 @@
    "means": "caption size",
    "sourced_from": "founder 2026-08-18 / iOS",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "type.label",
@@ -763,7 +838,8 @@
    "means": "label size",
    "sourced_from": "founder 2026-08-18 / iOS",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "notif.SHADOW_ONGOING",
@@ -773,7 +849,9 @@
    "means": "notification id",
    "sourced_from": "founder 2026-08-18",
    "governs": "ANDROID_PLATFORM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "android",
+   "superseded_by": "web pivot 2026-08-19"
   },
   {
    "id": "notif.CHECKIN_1",
@@ -783,7 +861,9 @@
    "means": "notification id",
    "sourced_from": "founder 2026-08-18",
    "governs": "ANDROID_PLATFORM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "android",
+   "superseded_by": "web pivot 2026-08-19"
   },
   {
    "id": "notif.CHECKIN_2",
@@ -793,7 +873,9 @@
    "means": "notification id",
    "sourced_from": "founder 2026-08-18",
    "governs": "ANDROID_PLATFORM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "android",
+   "superseded_by": "web pivot 2026-08-19"
   },
   {
    "id": "notif.FAMILY",
@@ -803,7 +885,9 @@
    "means": "notification id",
    "sourced_from": "founder 2026-08-18",
    "governs": "ANDROID_PLATFORM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "android",
+   "superseded_by": "web pivot 2026-08-19"
   },
   {
    "id": "notif.SOS_ONGOING",
@@ -813,7 +897,9 @@
    "means": "notification id",
    "sourced_from": "founder 2026-08-18",
    "governs": "ANDROID_PLATFORM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "android",
+   "superseded_by": "web pivot 2026-08-19"
   },
   {
    "id": "notif.QUEUE_FAILED",
@@ -823,7 +909,9 @@
    "means": "notification id",
    "sourced_from": "founder 2026-08-18",
    "governs": "ANDROID_PLATFORM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "android",
+   "superseded_by": "web pivot 2026-08-19"
   },
   {
    "id": "notif.SERVICE_KILLED",
@@ -833,7 +921,9 @@
    "means": "notification id",
    "sourced_from": "founder 2026-08-18",
    "governs": "ANDROID_PLATFORM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "android",
+   "superseded_by": "web pivot 2026-08-19"
   },
   {
    "id": "reqcode.TIMER_CHECKIN",
@@ -843,7 +933,9 @@
    "means": "PendingIntent request code",
    "sourced_from": "founder 2026-08-18",
    "governs": "ANDROID_PLATFORM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "android",
+   "superseded_by": "web pivot 2026-08-19"
   },
   {
    "id": "reqcode.TIMER_CD1",
@@ -853,7 +945,9 @@
    "means": "PendingIntent request code",
    "sourced_from": "founder 2026-08-18",
    "governs": "ANDROID_PLATFORM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "android",
+   "superseded_by": "web pivot 2026-08-19"
   },
   {
    "id": "reqcode.TIMER_CD2",
@@ -863,7 +957,9 @@
    "means": "PendingIntent request code",
    "sourced_from": "founder 2026-08-18",
    "governs": "ANDROID_PLATFORM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "android",
+   "superseded_by": "web pivot 2026-08-19"
   },
   {
    "id": "reqcode.TIMER_CANCEL",
@@ -873,7 +969,9 @@
    "means": "PendingIntent request code",
    "sourced_from": "founder 2026-08-18",
    "governs": "ANDROID_PLATFORM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "android",
+   "superseded_by": "web pivot 2026-08-19"
   },
   {
    "id": "reqcode.GEOFENCE",
@@ -883,7 +981,9 @@
    "means": "PendingIntent request code",
    "sourced_from": "founder 2026-08-18",
    "governs": "ANDROID_PLATFORM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "android",
+   "superseded_by": "web pivot 2026-08-19"
   },
   {
    "id": "reqcode.BOOT",
@@ -893,7 +993,9 @@
    "means": "PendingIntent request code",
    "sourced_from": "founder 2026-08-18",
    "governs": "ANDROID_PLATFORM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "android",
+   "superseded_by": "web pivot 2026-08-19"
   },
   {
    "id": "reqcode.ACTION_IM_OK",
@@ -903,7 +1005,9 @@
    "means": "PendingIntent request code",
    "sourced_from": "founder 2026-08-18",
    "governs": "ANDROID_PLATFORM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "android",
+   "superseded_by": "web pivot 2026-08-19"
   },
   {
    "id": "reqcode.ACTION_HELP_NOW",
@@ -913,7 +1017,9 @@
    "means": "PendingIntent request code",
    "sourced_from": "founder 2026-08-18",
    "governs": "ANDROID_PLATFORM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "android",
+   "superseded_by": "web pivot 2026-08-19"
   },
   {
    "id": "reqcode.ACTION_CANCEL",
@@ -923,7 +1029,9 @@
    "means": "PendingIntent request code",
    "sourced_from": "founder 2026-08-18",
    "governs": "ANDROID_PLATFORM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "android",
+   "superseded_by": "web pivot 2026-08-19"
   },
   {
    "id": "reqcode.OPEN_APP",
@@ -933,7 +1041,9 @@
    "means": "PendingIntent request code",
    "sourced_from": "founder 2026-08-18",
    "governs": "ANDROID_PLATFORM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "android",
+   "superseded_by": "web pivot 2026-08-19"
   },
   {
    "id": "build.minSdk",
@@ -943,7 +1053,9 @@
    "means": "minimum SDK",
    "sourced_from": "founder 2026-08-18",
    "governs": "BUILD_CONFIG.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "android",
+   "superseded_by": "web pivot 2026-08-19"
   },
   {
    "id": "build.targetSdk",
@@ -953,7 +1065,9 @@
    "means": "target SDK",
    "sourced_from": "founder 2026-08-18",
    "governs": "BUILD_CONFIG.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "android",
+   "superseded_by": "web pivot 2026-08-19"
   },
   {
    "id": "build.jvm",
@@ -963,7 +1077,9 @@
    "means": "JVM target",
    "sourced_from": "founder 2026-08-18",
    "governs": "BUILD_CONFIG.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "android",
+   "superseded_by": "web pivot 2026-08-19"
   },
   {
    "id": "build.versionCode",
@@ -973,7 +1089,9 @@
    "means": "version code",
    "sourced_from": "founder 2026-08-18",
    "governs": "BUILD_CONFIG.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "android",
+   "superseded_by": "web pivot 2026-08-19"
   },
   {
    "id": "font.budget",
@@ -983,7 +1101,8 @@
    "means": "all font assets combined",
    "sourced_from": "founder 2026-08-18",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "map.zoom.default",
@@ -993,7 +1112,8 @@
    "means": "default zoom",
    "sourced_from": "founder 2026-08-18",
    "governs": "MAP_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "map.zoom.min",
@@ -1003,7 +1123,8 @@
    "means": "min zoom",
    "sourced_from": "founder 2026-08-18",
    "governs": "MAP_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "map.zoom.max",
@@ -1013,7 +1134,8 @@
    "means": "max zoom",
    "sourced_from": "founder 2026-08-18",
    "governs": "MAP_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "map.label.hide_below",
@@ -1023,7 +1145,8 @@
    "means": "hide zone labels below",
    "sourced_from": "founder 2026-08-18",
    "governs": "MAP_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "map.tile.cache",
@@ -1033,7 +1156,8 @@
    "means": "osmdroid tile cache",
    "sourced_from": "founder 2026-08-18",
    "governs": "MAP_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "map.tile.timeout",
@@ -1043,7 +1167,8 @@
    "means": "before showing map-offline note",
    "sourced_from": "founder 2026-08-18",
    "governs": "MAP_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "map.dot",
@@ -1053,7 +1178,8 @@
    "means": "her location dot",
    "sourced_from": "founder 2026-08-18",
    "governs": "MAP_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "map.center.lat",
@@ -1063,7 +1189,8 @@
    "means": "default centre lat",
    "sourced_from": "founder 2026-08-18",
    "governs": "MAP_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "map.center.lon",
@@ -1073,7 +1200,8 @@
    "means": "default centre lon",
    "sourced_from": "founder 2026-08-18",
    "governs": "MAP_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "zone.coordinate.lat.min",
@@ -1084,7 +1212,8 @@
    "sourced_from": "founder 2026-08-19, corrected at T2.1 against the audited asset",
    "governs": "DATA_MODEL.md",
    "frozen": true,
-   "was": 17.6
+   "was": 17.6,
+   "platform": "any"
   },
   {
    "id": "zone.coordinate.lat.max",
@@ -1095,7 +1224,8 @@
    "sourced_from": "founder 2026-08-19, corrected at T2.1 against the audited asset",
    "governs": "DATA_MODEL.md",
    "frozen": true,
-   "was": 17.9
+   "was": 17.9,
+   "platform": "any"
   },
   {
    "id": "zone.coordinate.lon.min",
@@ -1106,7 +1236,8 @@
    "sourced_from": "founder 2026-08-19, corrected at T2.1 against the audited asset",
    "governs": "DATA_MODEL.md",
    "frozen": true,
-   "was": 83.1
+   "was": 83.1,
+   "platform": "any"
   },
   {
    "id": "zone.coordinate.lon.max",
@@ -1117,7 +1248,8 @@
    "sourced_from": "founder 2026-08-19, corrected at T2.1 against the audited asset",
    "governs": "DATA_MODEL.md",
    "frozen": true,
-   "was": 83.5
+   "was": 83.5,
+   "platform": "any"
   },
   {
    "id": "zones.total",
@@ -1127,7 +1259,8 @@
    "means": "zones in geojson",
    "sourced_from": "vizag_heatmap.geojson",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "zones.high",
@@ -1137,7 +1270,8 @@
    "means": "HIGH tier zones",
    "sourced_from": "vizag_heatmap.geojson",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "zones.moderate",
@@ -1147,7 +1281,8 @@
    "means": "MODERATE tier",
    "sourced_from": "vizag_heatmap.geojson",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "zones.elevated",
@@ -1157,7 +1292,8 @@
    "means": "ELEVATED tier",
    "sourced_from": "vizag_heatmap.geojson",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "zones.safe",
@@ -1167,7 +1303,8 @@
    "means": "SAFE tier, not drawn",
    "sourced_from": "vizag_heatmap.geojson",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "zones.drawn",
@@ -1177,7 +1314,8 @@
    "means": "zones actually rendered",
    "sourced_from": "derived: 24-5",
    "governs": "MAP_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "cards.total",
@@ -1187,7 +1325,8 @@
    "means": "zone_info_cards entries",
    "sourced_from": "zone_info_cards.json",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "stations.total",
@@ -1197,7 +1336,8 @@
    "means": "police points",
    "sourced_from": "vizag_police_points.json",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "motion.120ms",
@@ -1207,7 +1347,8 @@
    "means": "button press down",
    "sourced_from": "founder 2026-08-18",
    "governs": "MOTION_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "motion.150ms",
@@ -1217,7 +1358,8 @@
    "means": "zone stroke thicken / splash fade",
    "sourced_from": "founder 2026-08-18",
    "governs": "MOTION_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "motion.160ms",
@@ -1227,7 +1369,8 @@
    "means": "ladder card exit",
    "sourced_from": "founder 2026-08-18",
    "governs": "MOTION_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "motion.180ms",
@@ -1237,7 +1380,8 @@
    "means": "scrim fade in, button release",
    "sourced_from": "founder 2026-08-18",
    "governs": "MOTION_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "motion.200ms",
@@ -1247,7 +1391,8 @@
    "means": "standard transition",
    "sourced_from": "founder 2026-08-18",
    "governs": "MOTION_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "motion.250ms",
@@ -1257,7 +1402,8 @@
    "means": "toast slide",
    "sourced_from": "founder 2026-08-18",
    "governs": "MOTION_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "motion.280ms",
@@ -1267,7 +1413,8 @@
    "means": "sheet present",
    "sourced_from": "founder 2026-08-18",
    "governs": "MOTION_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "motion.300ms",
@@ -1277,7 +1424,8 @@
    "means": "screen push/pop, arm banner",
    "sourced_from": "founder 2026-08-18",
    "governs": "MOTION_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "motion.320ms",
@@ -1287,7 +1435,8 @@
    "means": "ladder card entry",
    "sourced_from": "founder 2026-08-18",
    "governs": "MOTION_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "motion.340ms",
@@ -1297,7 +1446,8 @@
    "means": "bottom sheet expand",
    "sourced_from": "founder 2026-08-18",
    "governs": "MOTION_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "motion.400ms",
@@ -1307,7 +1457,8 @@
    "means": "map camera to zone",
    "sourced_from": "founder 2026-08-18",
    "governs": "MOTION_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "motion.1000ms",
@@ -1317,7 +1468,8 @@
    "means": "countdown tick, exactly one second",
    "sourced_from": "founder 2026-08-18",
    "governs": "MOTION_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "motion.1200ms",
@@ -1327,7 +1479,8 @@
    "means": "skeleton shimmer loop",
    "sourced_from": "founder 2026-08-18",
    "governs": "MOTION_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "motion.sos",
@@ -1337,7 +1490,8 @@
    "means": "SOS entry. instant, never animated",
    "sourced_from": "founder 2026-08-18",
    "governs": "MOTION_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "motion.spring.damping",
@@ -1347,7 +1501,8 @@
    "means": "spring damping",
    "sourced_from": "founder 2026-08-18",
    "governs": "MOTION_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "motion.spring.stiffness",
@@ -1357,7 +1512,8 @@
    "means": "spring stiffness",
    "sourced_from": "founder 2026-08-18",
    "governs": "MOTION_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "motion.springsoft.damping",
@@ -1367,7 +1523,8 @@
    "means": "soft spring damping",
    "sourced_from": "founder 2026-08-18",
    "governs": "MOTION_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "motion.springsoft.stiffness",
@@ -1377,7 +1534,8 @@
    "means": "soft spring stiffness",
    "sourced_from": "founder 2026-08-18",
    "governs": "MOTION_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "bp.320",
@@ -1387,7 +1545,8 @@
    "means": "compact small floor, design must not break",
    "sourced_from": "founder 2026-08-18",
    "governs": "RESPONSIVE_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "bp.359",
@@ -1397,7 +1556,8 @@
    "means": "compact small ceiling",
    "sourced_from": "founder 2026-08-18",
    "governs": "RESPONSIVE_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "bp.360",
@@ -1407,7 +1567,8 @@
    "means": "primary target width",
    "sourced_from": "founder 2026-08-18",
    "governs": "RESPONSIVE_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "bp.411",
@@ -1417,7 +1578,8 @@
    "means": "compact ceiling",
    "sourced_from": "founder 2026-08-18",
    "governs": "RESPONSIVE_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "bp.412",
@@ -1427,7 +1589,8 @@
    "means": "compact large floor",
    "sourced_from": "founder 2026-08-18",
    "governs": "RESPONSIVE_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "bp.479",
@@ -1437,7 +1600,8 @@
    "means": "compact large ceiling",
    "sourced_from": "founder 2026-08-18",
    "governs": "RESPONSIVE_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "bp.480",
@@ -1447,7 +1611,8 @@
    "means": "medium floor, max content width on tablets",
    "sourced_from": "founder 2026-08-18",
    "governs": "RESPONSIVE_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "bp.599",
@@ -1457,7 +1622,8 @@
    "means": "medium ceiling",
    "sourced_from": "founder 2026-08-18",
    "governs": "RESPONSIVE_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "bp.600",
@@ -1467,7 +1633,8 @@
    "means": "expanded floor",
    "sourced_from": "founder 2026-08-18",
    "governs": "RESPONSIVE_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "resp.pad.small",
@@ -1477,7 +1644,8 @@
    "means": "screen padding under 360dp",
    "sourced_from": "founder 2026-08-18",
    "governs": "RESPONSIVE_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "resp.pad.default",
@@ -1487,7 +1655,8 @@
    "means": "screen padding 360-479",
    "sourced_from": "founder 2026-08-18",
    "governs": "RESPONSIVE_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "resp.pad.large",
@@ -1497,7 +1666,8 @@
    "means": "screen padding 480+",
    "sourced_from": "founder 2026-08-18",
    "governs": "RESPONSIVE_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "resp.card.margin.small",
@@ -1507,7 +1677,8 @@
    "means": "LadderCard margin under 360dp",
    "sourced_from": "founder 2026-08-18",
    "governs": "RESPONSIVE_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "resp.card.pad.small",
@@ -1517,7 +1688,8 @@
    "means": "card padding under 360dp",
    "sourced_from": "founder 2026-08-18",
    "governs": "RESPONSIVE_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "resp.ring.small",
@@ -1527,7 +1699,8 @@
    "means": "countdown ring under 360dp",
    "sourced_from": "founder 2026-08-18",
    "governs": "RESPONSIVE_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "resp.btn.small",
@@ -1537,7 +1710,8 @@
    "means": "BigActionButton under 360dp",
    "sourced_from": "founder 2026-08-18",
    "governs": "RESPONSIVE_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "resp.display.small",
@@ -1547,7 +1721,8 @@
    "means": "display type under 360dp",
    "sourced_from": "founder 2026-08-18",
    "governs": "RESPONSIVE_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "resp.peek.small",
@@ -1557,7 +1732,8 @@
    "means": "sheet peek under 360dp",
    "sourced_from": "founder 2026-08-18",
    "governs": "RESPONSIVE_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "resp.maxwidth",
@@ -1567,7 +1743,8 @@
    "means": "LadderCard max width on 480+",
    "sourced_from": "founder 2026-08-18",
    "governs": "RESPONSIVE_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "resp.fontscale.max",
@@ -1577,7 +1754,8 @@
    "means": "must survive to this font scale",
    "sourced_from": "founder 2026-08-18",
    "governs": "RESPONSIVE_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "perf.frame",
@@ -1587,7 +1765,8 @@
    "means": "no frame may exceed this during the ladder",
    "sourced_from": "founder 2026-08-18",
    "governs": "RESPONSIVE_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "perf.fps",
@@ -1597,7 +1776,8 @@
    "means": "target frame rate",
    "sourced_from": "founder 2026-08-18",
    "governs": "RESPONSIVE_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "perf.coldstart",
@@ -1607,7 +1787,8 @@
    "means": "cold start to Home on a 2GB device",
    "sourced_from": "founder 2026-08-18",
    "governs": "RESPONSIVE_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "perf.apk",
@@ -1617,7 +1798,8 @@
    "means": "APK ceiling, reasonable not tuned",
    "sourced_from": "founder 2026-08-18",
    "governs": "RESPONSIVE_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "perf.memory",
@@ -1627,7 +1809,8 @@
    "means": "resident memory ceiling",
    "sourced_from": "founder 2026-08-18",
    "governs": "RESPONSIVE_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "dim.pill.height",
@@ -1637,7 +1820,8 @@
    "means": "StatusPill height",
    "sourced_from": "founder 2026-08-18",
    "governs": "COMPONENT_LIBRARY.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "dim.pill.radius",
@@ -1647,7 +1831,8 @@
    "means": "StatusPill radius",
    "sourced_from": "founder 2026-08-18",
    "governs": "COMPONENT_LIBRARY.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "dim.chip.height",
@@ -1657,7 +1842,8 @@
    "means": "ZoneChip height",
    "sourced_from": "founder 2026-08-18",
    "governs": "COMPONENT_LIBRARY.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "dim.disclosure.border",
@@ -1667,7 +1853,8 @@
    "means": "DisclosureBanner left border",
    "sourced_from": "founder 2026-08-18",
    "governs": "COMPONENT_LIBRARY.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "dim.handle.w",
@@ -1677,7 +1864,8 @@
    "means": "sheet drag handle width",
    "sourced_from": "founder 2026-08-18",
    "governs": "COMPONENT_LIBRARY.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "dim.handle.h",
@@ -1687,7 +1875,8 @@
    "means": "sheet drag handle height",
    "sourced_from": "founder 2026-08-18",
    "governs": "COMPONENT_LIBRARY.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "dim.pin.w",
@@ -1697,7 +1886,8 @@
    "means": "PIN box width",
    "sourced_from": "founder 2026-08-18",
    "governs": "COMPONENT_LIBRARY.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "dim.pin.h",
@@ -1707,7 +1897,8 @@
    "means": "PIN box height",
    "sourced_from": "founder 2026-08-18",
    "governs": "COMPONENT_LIBRARY.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "dim.pin.dot",
@@ -1717,7 +1908,8 @@
    "means": "PIN filled dot",
    "sourced_from": "founder 2026-08-18",
    "governs": "COMPONENT_LIBRARY.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "dim.ring.stroke",
@@ -1727,7 +1919,8 @@
    "means": "countdown ring stroke",
    "sourced_from": "founder 2026-08-18",
    "governs": "COMPONENT_LIBRARY.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "dim.mapctl",
@@ -1737,7 +1930,8 @@
    "means": "MapControlButton size",
    "sourced_from": "founder 2026-08-18",
    "governs": "COMPONENT_LIBRARY.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "dim.station.pin",
@@ -1747,7 +1941,8 @@
    "means": "station pin circle",
    "sourced_from": "MAP_SPEC.md",
    "governs": "MAP_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "dim.station.glyph",
@@ -1757,7 +1952,8 @@
    "means": "station glyph",
    "sourced_from": "MAP_SPEC.md",
    "governs": "MAP_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "map.zone.stroke",
@@ -1767,7 +1963,8 @@
    "means": "zone polygon stroke",
    "sourced_from": "founder 2026-08-18",
    "governs": "MAP_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "map.zone.stroke.sel",
@@ -1777,7 +1974,8 @@
    "means": "selected zone stroke",
    "sourced_from": "founder 2026-08-18",
    "governs": "MAP_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "map.zone.glow",
@@ -1787,7 +1985,8 @@
    "means": "zone glow stroke beneath",
    "sourced_from": "founder 2026-08-18",
    "governs": "MAP_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "type.h2",
@@ -1797,7 +1996,8 @@
    "means": "card title on wide layouts",
    "sourced_from": "founder 2026-08-18",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "sheet.expanded",
@@ -1807,7 +2007,8 @@
    "means": "bottom sheet expanded height",
    "sourced_from": "founder 2026-08-18",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "scale.4",
@@ -1817,7 +2018,8 @@
    "means": "spacing scale step",
    "sourced_from": "founder 2026-08-18",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "scale.8",
@@ -1827,7 +2029,8 @@
    "means": "spacing scale step",
    "sourced_from": "founder 2026-08-18",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "scale.12",
@@ -1837,7 +2040,8 @@
    "means": "spacing scale step",
    "sourced_from": "founder 2026-08-18",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "scale.20",
@@ -1847,7 +2051,8 @@
    "means": "spacing scale step",
    "sourced_from": "founder 2026-08-18",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "scale.32",
@@ -1857,7 +2062,8 @@
    "means": "spacing scale step",
    "sourced_from": "founder 2026-08-18",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "scale.48",
@@ -1867,7 +2073,8 @@
    "means": "spacing scale step",
    "sourced_from": "founder 2026-08-18",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "color.white",
@@ -1877,7 +2084,8 @@
    "means": "pure white, text and rings",
    "sourced_from": "iOS AppTheme.swift",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "color.black",
@@ -1887,7 +2095,8 @@
    "means": "pure black, scrim base",
    "sourced_from": "iOS AppTheme.swift",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "color.tile.land",
@@ -1897,7 +2106,8 @@
    "means": "CARTO Dark Matter land",
    "sourced_from": "CARTO Dark Matter",
    "governs": "MAP_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "build.gradle.wrapper",
@@ -1907,7 +2117,9 @@
    "means": "Gradle wrapper. AGP 8.7.3 requires 8.9 or newer.",
    "sourced_from": "founder 2026-08-19, BLOCKED on T1.1",
    "governs": "BUILD_CONFIG.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "android",
+   "superseded_by": "web pivot 2026-08-19"
   },
   {
    "id": "dep.splashscreen",
@@ -1917,7 +2129,9 @@
    "means": "androidx.core:core-splashscreen, stable",
    "sourced_from": "founder 2026-08-19, BLOCKED on T1.1",
    "governs": "BUILD_CONFIG.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "android",
+   "superseded_by": "web pivot 2026-08-19"
   },
   {
    "id": "color.icon.ground.in",
@@ -1927,7 +2141,8 @@
    "means": "adaptive icon ground, gradient centre",
    "sourced_from": "Branding/SVG/saaya-icon-v2.svg (brand bible v1.5 s4)",
    "governs": "ICONOGRAPHY.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "color.icon.ground.mid",
@@ -1937,7 +2152,8 @@
    "means": "adaptive icon ground, mid",
    "sourced_from": "Branding/SVG/saaya-icon-v2.svg (brand bible v1.5 s4)",
    "governs": "ICONOGRAPHY.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "color.icon.ground.out",
@@ -1947,7 +2163,8 @@
    "means": "adaptive icon ground, outer",
    "sourced_from": "Branding/SVG/saaya-icon-v2.svg (brand bible v1.5 s4)",
    "governs": "ICONOGRAPHY.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "color.icon.pin.hi",
@@ -1957,7 +2174,8 @@
    "means": "pin gradient, lit edge",
    "sourced_from": "Branding/SVG/saaya-icon-v2.svg (brand bible v1.5 s4)",
    "governs": "ICONOGRAPHY.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "color.icon.pin.mid",
@@ -1967,7 +2185,8 @@
    "means": "pin gradient, body",
    "sourced_from": "Branding/SVG/saaya-icon-v2.svg (brand bible v1.5 s4)",
    "governs": "ICONOGRAPHY.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "color.icon.penumbra",
@@ -1977,7 +2196,8 @@
    "means": "Penumbra, the emissive aura",
    "sourced_from": "Branding/SVG/saaya-icon-v2.svg (brand bible v1.5 s4)",
    "governs": "ICONOGRAPHY.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "alpha.surface",
@@ -1987,7 +2207,8 @@
    "means": "surface: white over the map",
    "sourced_from": "DESIGN_SYSTEM.md, founder 2026-08-18",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "alpha.surfaceElevated",
@@ -1997,7 +2218,8 @@
    "means": "surfaceElevated: raised cards and dialogs",
    "sourced_from": "DESIGN_SYSTEM.md, founder 2026-08-18",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "alpha.textOnCard",
@@ -2007,7 +2229,8 @@
    "means": "textOnCard: card body text. From iOS.",
    "sourced_from": "DESIGN_SYSTEM.md, founder 2026-08-18",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "alpha.textSecondary",
@@ -2017,7 +2240,8 @@
    "means": "textSecondary",
    "sourced_from": "DESIGN_SYSTEM.md, founder 2026-08-18",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "alpha.textTertiary",
@@ -2027,7 +2251,8 @@
    "means": "textTertiary: decorative only, never carries meaning alone",
    "sourced_from": "DESIGN_SYSTEM.md, founder 2026-08-18",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "type.label.tracking",
@@ -2037,7 +2262,8 @@
    "means": "label style letter tracking",
    "sourced_from": "DESIGN_SYSTEM.md, founder 2026-08-18",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "alpha.ring.track",
@@ -2047,7 +2273,8 @@
    "means": "CountdownRing track: white",
    "sourced_from": "DESIGN_SYSTEM.md, founder 2026-08-18",
    "governs": "COMPONENT_LIBRARY.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "alpha.chip.fill",
@@ -2057,7 +2284,8 @@
    "means": "ZoneChip fill: the zone's own colour",
    "sourced_from": "DESIGN_SYSTEM.md, founder 2026-08-18",
    "governs": "COMPONENT_LIBRARY.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "alpha.handle",
@@ -2067,7 +2295,8 @@
    "means": "sheet drag handle: white",
    "sourced_from": "DESIGN_SYSTEM.md, founder 2026-08-18",
    "governs": "COMPONENT_LIBRARY.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "alpha.disabled",
@@ -2077,7 +2306,8 @@
    "means": "disabled control opacity",
    "sourced_from": "DESIGN_SYSTEM.md, founder 2026-08-18",
    "governs": "COMPONENT_LIBRARY.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "alpha.secondaryBtn",
@@ -2087,7 +2317,8 @@
    "means": "TextOnly button: danger",
    "sourced_from": "DESIGN_SYSTEM.md, founder 2026-08-18",
    "governs": "COMPONENT_LIBRARY.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "alpha.floating",
@@ -2097,7 +2328,8 @@
    "means": "floating controls over the map: cardFill",
    "sourced_from": "DESIGN_SYSTEM.md, founder 2026-08-18",
    "governs": "COMPONENT_LIBRARY.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "alpha.map.halo",
@@ -2107,7 +2339,8 @@
    "means": "Shadow breathing halo on her dot",
    "sourced_from": "MAP_SPEC.md, founder 2026-08-18",
    "governs": "MAP_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "alpha.map.accuracy",
@@ -2117,7 +2350,8 @@
    "means": "location accuracy circle fill",
    "sourced_from": "MAP_SPEC.md, founder 2026-08-18",
    "governs": "MAP_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "alpha.map.station",
@@ -2127,7 +2361,8 @@
    "means": "station glyph: textSecondary",
    "sourced_from": "MAP_SPEC.md, founder 2026-08-18",
    "governs": "MAP_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "alpha.map.label",
@@ -2137,7 +2372,8 @@
    "means": "zone label: textPrimary",
    "sourced_from": "MAP_SPEC.md, founder 2026-08-18",
    "governs": "MAP_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "alpha.map.dotring",
@@ -2147,7 +2383,8 @@
    "means": "white ring around her location dot",
    "sourced_from": "MAP_SPEC.md, founder 2026-08-18",
    "governs": "MAP_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "alpha.shimmer.lo",
@@ -2157,7 +2394,8 @@
    "means": "skeleton shimmer, low",
    "sourced_from": "MOTION_SPEC.md, founder 2026-08-18",
    "governs": "MOTION_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "alpha.shimmer.hi",
@@ -2167,7 +2405,8 @@
    "means": "skeleton shimmer, high",
    "sourced_from": "MOTION_SPEC.md, founder 2026-08-18",
    "governs": "MOTION_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "alpha.locked",
@@ -2177,7 +2416,8 @@
    "means": "PIN boxes while locked out",
    "sourced_from": "STATES_CATALOGUE.md, founder 2026-08-18",
    "governs": "STATES_CATALOGUE.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "type.display.lineheight",
@@ -2187,7 +2427,8 @@
    "means": "display line height",
    "sourced_from": "founder 2026-08-18",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "type.title.lineheight",
@@ -2197,7 +2438,8 @@
    "means": "title line height",
    "sourced_from": "founder 2026-08-18",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "type.cardTitle.lineheight",
@@ -2207,7 +2449,8 @@
    "means": "cardTitle line height",
    "sourced_from": "founder 2026-08-18",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "type.headline.lineheight",
@@ -2217,7 +2460,8 @@
    "means": "headline line height",
    "sourced_from": "founder 2026-08-18",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "type.body.lineheight",
@@ -2227,7 +2471,8 @@
    "means": "body line height",
    "sourced_from": "founder 2026-08-18",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "type.cardBody.lineheight",
@@ -2237,7 +2482,8 @@
    "means": "cardBody line height",
    "sourced_from": "founder 2026-08-18",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "type.caption.lineheight",
@@ -2247,7 +2493,8 @@
    "means": "caption line height",
    "sourced_from": "founder 2026-08-18",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "type.label.lineheight",
@@ -2257,7 +2504,8 @@
    "means": "label line height",
    "sourced_from": "founder 2026-08-18",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "scale.14",
@@ -2267,7 +2515,8 @@
    "means": "spacing scale step",
    "sourced_from": "founder 2026-08-18",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "scale.16",
@@ -2277,7 +2526,8 @@
    "means": "spacing scale step",
    "sourced_from": "founder 2026-08-18",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "scale.22",
@@ -2287,7 +2537,8 @@
    "means": "spacing scale step",
    "sourced_from": "founder 2026-08-18",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "scale.24",
@@ -2297,7 +2548,8 @@
    "means": "spacing scale step",
    "sourced_from": "founder 2026-08-18",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "scale.30",
@@ -2307,7 +2559,8 @@
    "means": "spacing scale step",
    "sourced_from": "founder 2026-08-18",
    "governs": "DESIGN_SYSTEM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "build.compileSdk",
@@ -2317,7 +2570,9 @@
    "means": "compileSdk",
    "sourced_from": "founder 2026-08-18",
    "governs": "BUILD_CONFIG.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "android",
+   "superseded_by": "web pivot 2026-08-19"
   },
   {
    "id": "dim.focus.ring",
@@ -2327,7 +2582,8 @@
    "means": "keyboard/switch focus ring width",
    "sourced_from": "founder 2026-08-18",
    "governs": "COMPONENT_LIBRARY.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "dim.focus.offset",
@@ -2337,7 +2593,8 @@
    "means": "focus ring offset from the element",
    "sourced_from": "founder 2026-08-18",
    "governs": "COMPONENT_LIBRARY.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "dim.btn.indicator",
@@ -2347,7 +2604,8 @@
    "means": "loading indicator inside a button",
    "sourced_from": "founder 2026-08-18",
    "governs": "COMPONENT_LIBRARY.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "dim.border.hairline",
@@ -2357,7 +2615,8 @@
    "means": "ghost button and chip border",
    "sourced_from": "founder 2026-08-18",
    "governs": "COMPONENT_LIBRARY.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "dim.target.gap",
@@ -2367,7 +2626,8 @@
    "means": "minimum separation between adjacent touch targets",
    "sourced_from": "founder 2026-08-18",
    "governs": "COMPONENT_LIBRARY.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "a11y.announce.60",
@@ -2377,7 +2637,8 @@
    "means": "countdown announcement point",
    "sourced_from": "founder 2026-08-18",
    "governs": "ACCESSIBILITY_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "a11y.announce.30",
@@ -2387,7 +2648,8 @@
    "means": "countdown announcement point",
    "sourced_from": "founder 2026-08-18",
    "governs": "ACCESSIBILITY_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "a11y.announce.10",
@@ -2397,7 +2659,8 @@
    "means": "countdown announcement point",
    "sourced_from": "founder 2026-08-18",
    "governs": "ACCESSIBILITY_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "a11y.announce.every",
@@ -2407,7 +2670,8 @@
    "means": "below this, announce every second",
    "sourced_from": "founder 2026-08-18",
    "governs": "ACCESSIBILITY_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "a11y.contrast.body",
@@ -2417,7 +2681,8 @@
    "means": "minimum contrast for body text",
    "sourced_from": "founder 2026-08-18",
    "governs": "ACCESSIBILITY_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "a11y.contrast.large",
@@ -2427,7 +2692,8 @@
    "means": "minimum contrast for large text",
    "sourced_from": "founder 2026-08-18",
    "governs": "ACCESSIBILITY_SPEC.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "build.gradle.heap",
@@ -2437,7 +2703,9 @@
    "means": "org.gradle.jvmargs -Xmx. Sized for an 8 GB machine, not the 2g default advice.",
    "sourced_from": "founder 2026-08-19, BLOCKED on T1.1 (G1 OOM during KSP)",
    "governs": "BUILD_CONFIG.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "android",
+   "superseded_by": "web pivot 2026-08-19"
   },
   {
    "id": "build.gradle.metaspace",
@@ -2447,7 +2715,9 @@
    "means": "org.gradle.jvmargs -XX:MaxMetaspaceSize",
    "sourced_from": "founder 2026-08-19, BLOCKED on T1.1 (G1 OOM during KSP)",
    "governs": "BUILD_CONFIG.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "android",
+   "superseded_by": "web pivot 2026-08-19"
   },
   {
    "id": "build.kotlin.daemon.heap",
@@ -2457,7 +2727,9 @@
    "means": "kotlin.daemon.jvmargs -Xmx. KSP runs here, not in the Gradle daemon.",
    "sourced_from": "founder 2026-08-19, BLOCKED on T1.1 (G1 OOM during KSP)",
    "governs": "BUILD_CONFIG.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "android",
+   "superseded_by": "web pivot 2026-08-19"
   },
   {
    "id": "build.workers.max",
@@ -2467,7 +2739,9 @@
    "means": "org.gradle.workers.max. 8 cores but 8 GB; caps peak memory.",
    "sourced_from": "founder 2026-08-19, BLOCKED on T1.1 (G1 OOM during KSP)",
    "governs": "BUILD_CONFIG.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "android",
+   "superseded_by": "web pivot 2026-08-19"
   },
   {
    "id": "dep.corektx",
@@ -2477,7 +2751,9 @@
    "means": "androidx.core:core-ktx. 1.15.0 requires compileSdk 35; this is the latest stable compatible with 34.",
    "sourced_from": "codex 2026-08-19, resolution rule at T1.1",
    "governs": "BUILD_CONFIG.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "android",
+   "superseded_by": "web pivot 2026-08-19"
   },
   {
    "id": "dep.desugar",
@@ -2487,7 +2763,9 @@
    "means": "com.android.tools:desugar_jdk_libs. Core library desugaring so java.time works on minSdk 24.",
    "sourced_from": "founder 2026-08-19, BLOCKED on T4.1",
    "governs": "BUILD_CONFIG.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "android",
+   "superseded_by": "web pivot 2026-08-19"
   },
   {
    "id": "hour.nightDeep.start",
@@ -2497,7 +2775,8 @@
    "means": "NIGHT_DEEP start",
    "sourced_from": "BUSINESS_RULES.md:16",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "hour.dawn.start",
@@ -2507,7 +2786,8 @@
    "means": "DAWN start",
    "sourced_from": "BUSINESS_RULES.md:17",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "hour.day.start",
@@ -2517,7 +2797,8 @@
    "means": "DAY start",
    "sourced_from": "BUSINESS_RULES.md:18",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "hour.nightEarly.start",
@@ -2527,7 +2808,8 @@
    "means": "NIGHT_EARLY start",
    "sourced_from": "BUSINESS_RULES.md:19",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "hour.nightLate.start",
@@ -2537,7 +2819,8 @@
    "means": "NIGHT_LATE start",
    "sourced_from": "BUSINESS_RULES.md:20",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "demo.normal.divisor",
@@ -2547,7 +2830,8 @@
    "means": "normal-mode timer divisor",
    "sourced_from": "BUSINESS_RULES.md:92",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "risk.multiplier.day",
@@ -2557,7 +2841,8 @@
    "means": "DAY display-risk multiplier",
    "sourced_from": "BUSINESS_RULES.md:152",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "risk.multiplier.nightEarly",
@@ -2567,7 +2852,8 @@
    "means": "NIGHT_EARLY display-risk multiplier",
    "sourced_from": "BUSINESS_RULES.md:153",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "risk.multiplier.dawn",
@@ -2577,7 +2863,8 @@
    "means": "DAWN display-risk multiplier",
    "sourced_from": "BUSINESS_RULES.md:154",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "risk.multiplier.nightLate",
@@ -2587,7 +2874,8 @@
    "means": "NIGHT_LATE display-risk multiplier",
    "sourced_from": "BUSINESS_RULES.md:155",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "risk.multiplier.nightDeep",
@@ -2597,7 +2885,8 @@
    "means": "NIGHT_DEEP display-risk multiplier",
    "sourced_from": "BUSINESS_RULES.md:156",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "risk.clamp.min",
@@ -2607,7 +2896,8 @@
    "means": "display-risk lower clamp",
    "sourced_from": "BUSINESS_RULES.md:158",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "risk.clamp.max",
@@ -2617,7 +2907,8 @@
    "means": "display-risk upper clamp",
    "sourced_from": "BUSINESS_RULES.md:158",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "risk.threshold.low",
@@ -2627,7 +2918,8 @@
    "means": "Low display-risk upper-exclusive threshold",
    "sourced_from": "BUSINESS_RULES.md:159",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "risk.threshold.moderate",
@@ -2637,7 +2929,8 @@
    "means": "Moderate display-risk upper-exclusive threshold",
    "sourced_from": "BUSINESS_RULES.md:159",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "risk.threshold.elevated",
@@ -2647,7 +2940,8 @@
    "means": "Elevated display-risk upper-exclusive threshold",
    "sourced_from": "BUSINESS_RULES.md:159",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "risk.example.input",
@@ -2657,7 +2951,8 @@
    "means": "display-risk test input",
    "sourced_from": "TEST_PLAN.md:17",
    "governs": "TEST_PLAN.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "risk.example.deepResult",
@@ -2667,7 +2962,8 @@
    "means": "NIGHT_DEEP display-risk test result",
    "sourced_from": "TEST_PLAN.md:17",
    "governs": "TEST_PLAN.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "pin.rejected.1234",
@@ -2677,7 +2973,8 @@
    "means": "explicitly rejected PIN",
    "sourced_from": "BUSINESS_RULES.md:104",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "pin.rejected.1111",
@@ -2687,7 +2984,8 @@
    "means": "explicitly rejected PIN",
    "sourced_from": "BUSINESS_RULES.md:104",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "pin.rejected.7777",
@@ -2697,7 +2995,8 @@
    "means": "repeated-digit PIN test fixture",
    "sourced_from": "TEST_PLAN.md:18",
    "governs": "TEST_PLAN.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "pin.accepted.4062",
@@ -2707,7 +3006,8 @@
    "means": "accepted PIN test fixture",
    "sourced_from": "TEST_PLAN.md:18",
    "governs": "TEST_PLAN.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "boundary.preFamily.backendWrites",
@@ -2717,7 +3017,8 @@
    "means": "backend-write commands before entering FAMILY_ESCALATED",
    "sourced_from": "TEST_PLAN.md:54",
    "governs": "TEST_PLAN.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "boundary.civicSignal.trigger",
@@ -2727,7 +3028,8 @@
    "means": "first state that emits the anonymous zone/hour civic signal",
    "sourced_from": "FEATURES.md:35-39; STATE_MACHINE.md:75",
    "governs": "STATE_MACHINE.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "boundary.detailedIncident.trigger",
@@ -2737,7 +3039,8 @@
    "means": "first state that creates a detailed state-visible incident",
    "sourced_from": "FEATURES.md:39; TEST_PLAN.md:56",
    "governs": "STATE_MACHINE.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "numeral.western.min",
@@ -2747,7 +3050,8 @@
    "means": "lowest allowed Western Arabic digit",
    "sourced_from": "BUSINESS_RULES.md:229",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "numeral.western.max",
@@ -2757,7 +3061,8 @@
    "means": "highest allowed Western Arabic digit",
    "sourced_from": "BUSINESS_RULES.md:229",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "ladder.step.checkin1",
@@ -2767,7 +3072,8 @@
    "means": "gentle check-in ladder step",
    "sourced_from": "BUSINESS_RULES.md:74",
    "governs": "STATE_MACHINE.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "ladder.step.checkin2",
@@ -2777,7 +3083,8 @@
    "means": "urgent check-in ladder step",
    "sourced_from": "BUSINESS_RULES.md:75",
    "governs": "STATE_MACHINE.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "boundary.civicSignal.count",
@@ -2787,7 +3094,8 @@
    "means": "anonymous civic signals emitted on entry to FAMILY_ESCALATED",
    "sourced_from": "TEST_PLAN.md:55",
    "governs": "TEST_PLAN.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "session.auto_zone.hour_band_policy",
@@ -2797,7 +3105,8 @@
    "means": "hour-band policy for every active AUTO_ZONE session",
    "sourced_from": "BUSINESS_RULES.md:60-65",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "candidate.mode.session_state",
@@ -2807,7 +3116,8 @@
    "means": "SessionEngine and user-facing state throughout pre-arm candidate evaluation",
    "sourced_from": "STATE_MACHINE.md:312-324",
    "governs": "STATE_MACHINE.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "candidate.sample.interval",
@@ -2817,7 +3127,8 @@
    "means": "high-accuracy location interval in service-private CANDIDATE mode",
    "sourced_from": "BUSINESS_RULES.md:171-177",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "candidate.sample.priority",
@@ -2827,7 +3138,8 @@
    "means": "location priority in service-private CANDIDATE mode",
    "sourced_from": "BUSINESS_RULES.md:171-177",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "candidate.fix.accuracy.max",
@@ -2837,7 +3149,8 @@
    "means": "maximum accuracy value for a candidate containment fix to qualify",
    "sourced_from": "BUSINESS_RULES.md:179-185",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "candidate.dwell.min_fixes",
@@ -2847,7 +3160,8 @@
    "means": "minimum qualifying in-polygon fixes before candidate dwell succeeds",
    "sourced_from": "BUSINESS_RULES.md:182-185",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "candidate.dwell.min_span",
@@ -2857,7 +3171,8 @@
    "means": "minimum monotonic span of candidate in-polygon dwell evidence",
    "sourced_from": "BUSINESS_RULES.md:182-185",
    "governs": "BUSINESS_RULES.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "candidate.privacy.effects",
@@ -2867,7 +3182,8 @@
    "means": "candidate privacy boundary before SessionEngine accepts ZoneEntered",
    "sourced_from": "ANDROID_PLATFORM.md:105-108",
    "governs": "ANDROID_PLATFORM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "candidate.notification.channel",
@@ -2877,7 +3193,8 @@
    "means": "notification channel reused by candidate foreground mode",
    "sourced_from": "ANDROID_PLATFORM.md:113-119",
    "governs": "ANDROID_PLATFORM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "candidate.notification.id",
@@ -2887,7 +3204,8 @@
    "means": "SHADOW_ONGOING notification id reused so candidate-to-shadow updates in place",
    "sourced_from": "ANDROID_PLATFORM.md:113-119",
    "governs": "ANDROID_PLATFORM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "candidate.notification.behavior",
@@ -2897,7 +3215,8 @@
    "means": "candidate notification importance, sound, persistence and action policy",
    "sourced_from": "ANDROID_PLATFORM.md:113-119",
    "governs": "ANDROID_PLATFORM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "candidate.recovery.dwell_policy",
@@ -2907,7 +3226,8 @@
    "means": "candidate dwell evidence recovery policy",
    "sourced_from": "ANDROID_PLATFORM.md:109-111",
    "governs": "ANDROID_PLATFORM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "candidate.transition.success",
@@ -2917,7 +3237,8 @@
    "means": "only engine event emitted after successful candidate polygon proof",
    "sourced_from": "ANDROID_PLATFORM.md:91-94",
    "governs": "STATE_MACHINE.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "battery.optimization.permission",
@@ -2927,7 +3248,8 @@
    "means": "permission required for the direct battery-optimization exemption request",
    "sourced_from": "ANDROID_PLATFORM.md:150-155",
    "governs": "ANDROID_PLATFORM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "battery.optimization.direct_action",
@@ -2937,7 +3259,8 @@
    "means": "settings action launched only after Meera deliberately taps Allow",
    "sourced_from": "ANDROID_PLATFORM.md:150-155",
    "governs": "ANDROID_PLATFORM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "battery.optimization.explanation_policy",
@@ -2947,7 +3270,8 @@
    "means": "Saaya explanation is shown once and the system dialog is never reopened automatically",
    "sourced_from": "ANDROID_PLATFORM.md:147-149",
    "governs": "ANDROID_PLATFORM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "battery.optimization.denial_policy",
@@ -2957,7 +3281,8 @@
    "means": "declining battery exemption leaves onboarding, map, arming and ladder usable",
    "sourced_from": "ANDROID_PLATFORM.md:156-159",
    "governs": "ANDROID_PLATFORM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "battery.optimization.fallback_action",
@@ -2967,7 +3292,8 @@
    "means": "settings-list fallback when the direct exemption action cannot be launched",
    "sourced_from": "ANDROID_PLATFORM.md:160-162",
    "governs": "ANDROID_PLATFORM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "battery.optimization.telemetry",
@@ -2977,7 +3303,8 @@
    "means": "battery-exemption choice writes no analytics or personal data",
    "sourced_from": "ANDROID_PLATFORM.md:160-162",
    "governs": "ANDROID_PLATFORM.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "sub.deadline",
@@ -2987,7 +3314,8 @@
    "means": "submission deadline. NO grace period.",
    "sourced_from": "buildwhatmovesindia.com/brief, fetched 2026-08-19",
    "governs": "SUBMISSION.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "sub.video.max",
@@ -2997,7 +3325,8 @@
    "means": "one video, no longer than two minutes",
    "sourced_from": "buildwhatmovesindia.com/brief, fetched 2026-08-19",
    "governs": "SUBMISSION.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "sub.video.citizen",
@@ -3007,7 +3336,8 @@
    "means": "first minute: demo as a citizen",
    "sourced_from": "buildwhatmovesindia.com/brief, fetched 2026-08-19",
    "governs": "SUBMISSION.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "sub.video.build",
@@ -3017,7 +3347,8 @@
    "means": "second minute: how you built it and why",
    "sourced_from": "buildwhatmovesindia.com/brief, fetched 2026-08-19",
    "governs": "SUBMISSION.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "sub.summary.max",
@@ -3027,7 +3358,8 @@
    "means": "project summary, under 250 words",
    "sourced_from": "buildwhatmovesindia.com/brief, fetched 2026-08-19",
    "governs": "SUBMISSION.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "sub.round2",
@@ -3037,7 +3369,8 @@
    "means": "Round 2 resubmission, same email",
    "sourced_from": "buildwhatmovesindia.com/brief, fetched 2026-08-19",
    "governs": "SUBMISSION.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   },
   {
    "id": "sub.finale",
@@ -3047,7 +3380,8 @@
    "means": "Bengaluru demo day",
    "sourced_from": "buildwhatmovesindia.com/brief, fetched 2026-08-19",
    "governs": "SUBMISSION.md",
-   "frozen": true
+   "frozen": true,
+   "platform": "any"
   }
  ]
 }

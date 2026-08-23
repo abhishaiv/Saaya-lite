@@ -2,7 +2,7 @@
 **Every number in the product lives here.** Codex must not invent a threshold, an interval
 or a formula. If a value is needed and absent, stop and ask.
 
-All values are `const` in one file: `domain/engine/Rules.kt`. Nothing hardcoded elsewhere.
+All values are `const` in one file: `src/domain/engine/rules.ts`. Nothing hardcoded elsewhere.
 
 ---
 

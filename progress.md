@@ -1312,7 +1312,7 @@ kills. `codex_contribution.py` reads 2 of 22 nodes, 3 Codex commits, 18 Kotlin f
 lines, 5 verifier runs, 2 killing verdicts. The submission's evidence is accumulating in a
 machine-readable form rather than in prose.
 
-Note for future runs: G6 across every tracked `.kt` file reports failures, but they are
+Note for future runs: G6 across every tracked `.ts` file reports failures, but they are
 `test/grounded_fixture.kt`, which is ungrounded **on purpose** as G6's own regression test.
 Production Kotlin is clean: 14 files, zero ungrounded literals. Added a comment so nobody
 mistakes the fixture for a real failure.
@@ -1397,7 +1397,7 @@ Bias stated plainly: continue on plumbing, stop on behaviour. A wrong internal t
 costs a rename; a wrong escalation timing costs the product's central claim.
 
 **Extended `reads_check.py` to close the type contract**, which Codex also asked for. It now
-parses STATE_MACHINE's Kotlin blocks and fails if a referenced type is defined nowhere. It
+parses STATE_MACHINE's TypeScript blocks and fails if a referenced type is defined nowhere. It
 caught `Rules` on its first run - referenced by `EngineContext` and never defined anywhere,
 the third instance of this exact class. Defined it. Also had to strip comments before
 scanning, because my own prose was being read as a type.

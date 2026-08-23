@@ -1,5 +1,5 @@
 # Saaya Lite - Web Platform
-Replaces `ANDROID_PLATFORM.md`, archived alongside this file. Written 2026-08-19 after the
+Replaces `WEB_PLATFORM.md`, archived alongside this file. Written 2026-08-19 after the
 brief confirmed reviewers will not download a mobile app.
 
 ## The honest limitation, stated first

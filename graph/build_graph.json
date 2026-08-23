@@ -132,30 +132,30 @@
      {
       "id": "zones",
       "owns": [
-       "data/zone/ZoneParser.kt",
-       "domain/model/Zone.kt"
+       "src/data/zone/zoneParser.ts",
+       "src/domain/model/zone.ts"
       ],
       "manifest": "build/fanout/T2.1/zones.json"
      },
      {
       "id": "cards",
       "owns": [
-       "data/zone/CardParser.kt",
-       "domain/model/ZoneCard.kt"
+       "src/data/zone/cardParser.ts",
+       "src/domain/model/zoneCard.ts"
       ],
       "manifest": "build/fanout/T2.1/cards.json"
      },
      {
       "id": "stations",
       "owns": [
-       "data/zone/StationParser.kt",
-       "domain/model/PoliceStation.kt"
+       "src/data/zone/stationParser.ts",
+       "src/domain/model/policeStation.ts"
       ],
       "manifest": "build/fanout/T2.1/stations.json"
      }
     ],
     "shared_files_written_by_merge": [
-     "data/zone/ZoneLoader.kt"
+     "data/zone/zoneLoader.ts"
     ],
     "merge": "code: assert 24/19/37 counts and every centroid plus polygon vertex inside lat 17.4-18.1 lon 82.9-83.7; then write the single ZoneLoader that composes the three parsers"
    },
@@ -402,7 +402,7 @@
     "workers": 14,
     "item_contract": {
      "owns": [
-      "ui/components/<Name>.kt"
+      "src/ui/components/<Name>.tsx"
      ],
      "manifest": "build/fanout/T1.3/<Cn>.json",
      "manifest_shape": {
@@ -430,10 +430,10 @@
      ]
     },
     "shared_files_written_by_merge": [
-     "ui/components/SaayaModifiers.kt",
-     "ui/gallery/ComponentGallery.kt"
+     "ui/components/saayaStyles.ts",
+     "ui/gallery/ComponentGallery.tsx"
     ],
-    "merge": "code: (1) assert every tokens_used entry exists in graph/spec_graph.json, fail on an invented token; (2) collect helpers_declared, emit each ONCE into SaayaModifiers.kt, fail on same name with different signature; (3) generate ComponentGallery.kt from the 14 previews; (4) collect strings_used and hand forward to T9.1"
+    "merge": "code: (1) assert every tokens_used entry exists in graph/spec_graph.json, fail on an invented token; (2) collect helpers_declared, emit each ONCE into saayaStyles.ts, fail on same name with different signature; (3) generate ComponentGallery.tsx from the 14 previews; (4) collect strings_used and hand forward to T9.1"
    }
   },
   "T2.2": {

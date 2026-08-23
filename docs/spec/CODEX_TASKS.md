@@ -124,9 +124,9 @@ the nearest-station block using the Haversine rule in §9 with `ACTION_DIAL` (ne
 **Done when:** M3, M4 and M5 in `TEST_PLAN.md` pass by hand.
 
 ### T3.2 Onboarding
-**Reads:** `SCREENS.md` S2, `ANDROID_PLATFORM.md` (permission order), `BUSINESS_RULES.md` §7, `COMPONENT_LIBRARY.md` (C1, C7, C9, C12), `STATES_CATALOGUE.md`, `ACCESSIBILITY_SPEC.md`
+**Reads:** `SCREENS.md` S2, `WEB_PLATFORM.md` (permission order), `BUSINESS_RULES.md` §7, `COMPONENT_LIBRARY.md` (C1, C7, C9, C12), `STATES_CATALOGUE.md`, `ACCESSIBILITY_SPEC.md`
 **Prompt:** Four-step onboarding per S2. Follow the permission request order in
-ANDROID_PLATFORM.md exactly: notifications, then foreground location after a rationale
+WEB_PLATFORM.md exactly: notifications, then foreground location after a rationale
 screen, then background location as a **separate** request after foreground is granted.
 Denial of background must not dead-end. PIN per §7: salted SHA-256 in
 EncryptedSharedPreferences, weak-PIN rejection, confirm step. Room entities for `contact`.
@@ -139,7 +139,7 @@ nowhere in prefs, the database or logcat.
 
 ### T4.1 The engine (JVM only, no Android)
 **Reads:** `STATE_MACHINE.md`, `BUSINESS_RULES.md`, `TEST_PLAN.md`
-**Prompt:** Implement `domain/engine`: `Rules.kt` holding every constant from
+**Prompt:** Implement `domain/engine`: `rules.ts` holding every constant from
 BUSINESS_RULES.md, `ArmingEvaluator`, `IntervalCalculator`, and `SessionEngine` as a pure
 function `onEvent(state, event, ctx): EngineResult` emitting `Command`s. **Zero Android
 imports in `domain/`.** Inject `Clock`. Implement the full transition table including
@@ -149,7 +149,7 @@ no test sleeps. **Do this before any Android work tonight.** If the evening runs
 tested engine with no service is a far better outcome than a service with no engine.
 
 ### T4.2 Foreground service and geofencing
-**Reads:** `ANDROID_PLATFORM.md`, `STATE_MACHINE.md` (recovery)
+**Reads:** `WEB_PLATFORM.md`, `STATE_MACHINE.md` (recovery)
 **Prompt:** `SaayaForegroundService` with `foregroundServiceType="location"`, calling
 `startForeground` within 5 seconds. Register geofences for the 19 non-SAFE zones using
 each `geofence_radius_m`, with `INITIAL_TRIGGER_ENTER`. On enter, run the real
@@ -171,7 +171,7 @@ jumps and reset, plus the permanent labelled banner while demo speed is on.
 ## E5 - The check-in ladder
 
 ### T5.1 Check-in screens
-**Reads:** `SCREENS.md` S5 S6, `ANDROID_PLATFORM.md` (notifications), `COPY.md`, `COMPONENT_LIBRARY.md` (C2, C3, C4), `INTERACTION_SPEC.md` (haptics and sound), `MOTION_SPEC.md`, `ACCESSIBILITY_SPEC.md`
+**Reads:** `SCREENS.md` S5 S6, `WEB_PLATFORM.md` (notifications), `COPY.md`, `COMPONENT_LIBRARY.md` (C2, C3, C4), `INTERACTION_SPEC.md` (haptics and sound), `MOTION_SPEC.md`, `ACCESSIBILITY_SPEC.md`
 **Prompt:** Check-in 1 as a heads-up on `saaya_checkin` plus an in-app card, 90 s ring,
 `brand` lavender with a 1.0 dp card border, showing `checkin1_reason` with the actual zone,
 tier and hour. Check-in 2 full-screen over the lock screen on `saaya_urgent`, 60 s ring,

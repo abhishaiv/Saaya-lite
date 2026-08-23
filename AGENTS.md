@@ -295,7 +295,7 @@ the nodes that read it. Query with `python3 scripts/kg.py query <name>`.
 | `docs/spec/CODEX_TASKS.md` | the task text for each node |
 | `docs/spec/SETUP.md` | Firebase, tooling, repo layout, deploy commands |
 | `docs/spec/SECRETS_AND_ACCESS.md` | every key and config file. **There are none to obtain.** |
-| `docs/spec/BUILD_CONFIG.md` | Gradle, versions, signing, manifest privacy flags |
+| `docs/spec/BUILD_CONFIG.md` | Next.js, Vercel, versions, the closed list |
 | `docs/spec/ARCHITECTURE.md` | modules, layers, threading, DI, repositories |
 | `docs/spec/DATA_MODEL.md` | assets, Room, both Firestore payloads, rules, indexes |
 | `docs/spec/BUSINESS_RULES.md` | **every number in the product** |
@@ -311,7 +311,7 @@ the nodes that read it. Query with `python3 scripts/kg.py query <name>`.
 | `docs/spec/STATES_CATALOGUE.md` | loading, empty, error, offline, denied, all screens |
 | `docs/spec/ACCESSIBILITY_SPEC.md` | screen reader, focus, contrast, motor, cognitive |
 | `docs/spec/COPY.md` | every string, English and Telugu, locked vocabulary |
-| `docs/spec/ANDROID_PLATFORM.md` | permissions, service, geofencing, notification ids |
+| `docs/spec/WEB_PLATFORM.md` | geolocation, wake lock, tab lifecycle, and what a browser cannot do |
 | `docs/spec/CONSOLE_SPEC.md` | the console, our live demo link, the journey trigger |
 | `docs/spec/TEST_PLAN.md` | acceptance criteria, four layers, V1-V8 |
 | `docs/spec/DEMO_SCRIPT.md` | the 3-minute video, shot by shot |

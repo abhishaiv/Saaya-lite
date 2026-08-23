@@ -15,7 +15,12 @@ import json,re,sys,subprocess,os
 ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 G=json.load(open(os.path.join(ROOT,"graph/spec_graph.json")))
 NUMS={}; COLORS={}
+SUPERSEDED=0
 for f in G["facts"]:
+    # A fact from a retired platform must never provide provenance for current code.
+    # Kept in the file for history; excluded from matching. This is why `17` stopped
+    # passing on build.jvm after the web pivot.
+    if f.get("superseded_by"): SUPERSEDED+=1; continue
     v=f["value"]
     if f["kind"]=="color": COLORS[str(v).upper()]=f["id"]
     elif isinstance(v,(int,float)): NUMS.setdefault(float(v),[]).append(f["id"])
@@ -108,6 +113,6 @@ def main():
         print("  3. if it is genuinely structural (an index, a loop bound), append")
         print("     `// GROUNDED-EXEMPT: <one-line reason>` to that line.")
         sys.exit(1)
-    print(f"grounded: {len(paths)} file(s), 0 ungrounded literals")
+    print(f"grounded: {len(paths)} file(s), 0 ungrounded literals  ({len(NUMS)+len(COLORS)} live facts, {SUPERSEDED} superseded and excluded)")
 
 if __name__=="__main__": main()

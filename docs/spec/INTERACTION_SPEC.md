@@ -101,5 +101,5 @@ never as a toast, never as a dialog.
 | Incoming call during SOS | SOS continues, notification stays |
 | App backgrounded during ladder | everything continues; the service and AlarmManager own the timing |
 | Screen off during check-in 2 | full-screen intent turns the screen on |
-| Battery saver enabled | detect and warn per `ANDROID_PLATFORM.md`. Never fail silently. |
+| Battery saver enabled | detect and warn per `WEB_PLATFORM.md`. Never fail silently. |
 | Airplane mode | ladder unaffected, writes queue, UI states it is queued |
