@@ -313,7 +313,7 @@
  ],
  "counts": {
   "entities": 231,
-  "edges": 521,
+  "edges": 531,
   "events": 48
  },
  "entities": [
@@ -679,7 +679,9 @@
    "rationale": "founder call; the iOS product already exists",
    "by": "founder",
    "date": "2026-08-18",
-   "class": "Decision"
+   "class": "Decision",
+   "platform": "android",
+   "superseded_by": "web pivot 2026-08-19"
   },
   {
    "id": "d.problem",
@@ -826,7 +828,7 @@
   {
    "id": "node.T1.1",
    "class": "BuildNode",
-   "label": "Scaffold, theme, manifest privacy flags",
+   "label": "Scaffold: Next.js, TypeScript, theme tokens, Vercel",
    "risk": "low",
    "shape": "serial",
    "seq": 1
@@ -834,7 +836,7 @@
   {
    "id": "node.T2.1",
    "class": "BuildNode",
-   "label": "Zone parsing to typed Zone/ZoneCard/PoliceStation",
+   "label": "Zone parsing to typed Zone/ZoneCard/PoliceStation (TS)",
    "risk": "low",
    "shape": "diamond",
    "seq": 2
@@ -842,7 +844,7 @@
   {
    "id": "node.T4.1",
    "class": "BuildNode",
-   "label": "Session engine, pure JVM, no Android imports",
+   "label": "Session engine, pure TypeScript, zero browser API",
    "risk": "HIGH",
    "shape": "serial",
    "seq": 3
@@ -850,7 +852,7 @@
   {
    "id": "node.T4.2",
    "class": "BuildNode",
-   "label": "Foreground service, geofencing, alarms, recovery",
+   "label": "Geolocation watch, arming, wake lock, tab lifecycle",
    "risk": "HIGHEST",
    "shape": "serial",
    "seq": 4
@@ -858,7 +860,7 @@
   {
    "id": "node.T1.2",
    "class": "BuildNode",
-   "label": "Firebase wiring, anonymous auth",
+   "label": "Firebase wiring, anonymous auth (project exists)",
    "risk": "low",
    "shape": "serial",
    "seq": 5
@@ -874,7 +876,7 @@
   {
    "id": "node.T8.2",
    "class": "BuildNode",
-   "label": "Console: the live demo link",
+   "label": "State view console route",
    "risk": "HIGH",
    "shape": "serial",
    "seq": 7
@@ -882,7 +884,7 @@
   {
    "id": "node.T1.3",
    "class": "BuildNode",
-   "label": "Component library C1 to C14",
+   "label": "Component library C1 to C14 (React)",
    "risk": "med",
    "shape": "diamond",
    "seq": 8
@@ -890,7 +892,7 @@
   {
    "id": "node.T2.2",
    "class": "BuildNode",
-   "label": "Map screen, zones, her dot, offline",
+   "label": "Map screen: Leaflet, CARTO tiles, zones, her dot",
    "risk": "med",
    "shape": "serial",
    "seq": 9
@@ -914,7 +916,7 @@
   {
    "id": "node.T3.2",
    "class": "BuildNode",
-   "label": "Onboarding, permissions, favourites, PIN",
+   "label": "Onboarding, permissions, favourites, PIN (Web Crypto)",
    "risk": "med",
    "shape": "serial",
    "seq": 12
@@ -922,7 +924,7 @@
   {
    "id": "node.T5.1",
    "class": "BuildNode",
-   "label": "Check-in 1 and 2, notifications, lock screen",
+   "label": "Check-in 1 and 2, Notification API, full-screen overlay",
    "risk": "HIGH",
    "shape": "serial",
    "seq": 13
@@ -930,7 +932,7 @@
   {
    "id": "node.T6.1",
    "class": "BuildNode",
-   "label": "Family escalation composer and screen",
+   "label": "Family escalation builder and screen",
    "risk": "med",
    "shape": "serial",
    "seq": 14
@@ -938,7 +940,7 @@
   {
    "id": "node.T6.2",
    "class": "BuildNode",
-   "label": "Offline queue with backoff",
+   "label": "Offline queue in IndexedDB with backoff",
    "risk": "med",
    "shape": "serial",
    "seq": 15
@@ -962,7 +964,7 @@
   {
    "id": "node.T7.3",
    "class": "BuildNode",
-   "label": "What the police see, in app",
+   "label": "What the police see, in the citizen app",
    "risk": "low",
    "shape": "serial",
    "seq": 18
@@ -978,7 +980,7 @@
   {
    "id": "node.T9.0",
    "class": "BuildNode",
-   "label": "Landing page with APK and video",
+   "label": "Submission page: video, summary, disclosures",
    "risk": "low",
    "shape": "serial",
    "seq": 20
@@ -1368,8 +1370,8 @@
   {
    "id": "art.firebase",
    "class": "Artifact",
-   "label": "Firebase project saaya-lite",
-   "path": "app/google-services.json",
+   "label": "Firebase project saaya-lite (web SDK config)",
+   "path": "console/firebase-config.js",
    "kind": "config",
    "node": "T1.2"
   },
@@ -1395,7 +1397,9 @@
    "label": "T1.1 unblock: Gradle 8.9, core-splashscreen 1.0.1, real brand icon",
    "by": "founder",
    "date": "2026-08-19",
-   "rationale": "Codex correctly refused to invent a wrapper version, add an unlisted dependency, or draw a placeholder mark. All three are now facts or committed assets, and the specs amended before building rather than after."
+   "rationale": "Codex correctly refused to invent a wrapper version, add an unlisted dependency, or draw a placeholder mark. All three are now facts or committed assets, and the specs amended before building rather than after.",
+   "platform": "android",
+   "superseded_by": "web pivot 2026-08-19"
   },
   {
    "id": "d.g6-limit",
@@ -1408,10 +1412,12 @@
   {
    "id": "art.g6fixture",
    "class": "Artifact",
-   "label": "grounded_fixture.kt",
-   "path": "test/grounded_fixture.kt",
+   "label": "grounded_fixture.ts",
+   "path": "test/grounded_fixture.ts",
    "kind": "test",
-   "node": "T1.1"
+   "node": "T1.1",
+   "platform": "android",
+   "superseded_by": "web pivot 2026-08-19"
   },
   {
    "id": "d.buildmem",
@@ -1419,14 +1425,18 @@
    "label": "Gradle 1536m/768m and Kotlin daemon 1536m, not the usual 2g/1g",
    "by": "founder",
    "date": "2026-08-19",
-   "rationale": "the 2g/1g recommendation is sized for a 16 GB machine. This one is 8 GB with about 1 GB free, where over-allocating causes swap thrashing and makes builds less reliable. KSP runs in the Kotlin daemon, so that is the one that had to be raised."
+   "rationale": "the 2g/1g recommendation is sized for a 16 GB machine. This one is 8 GB with about 1 GB free, where over-allocating causes swap thrashing and makes builds less reliable. KSP runs in the Kotlin daemon, so that is the one that had to be raised.",
+   "platform": "android",
+   "superseded_by": "web pivot 2026-08-19"
   },
   {
    "id": "anchor.t11.allowbackup",
    "class": "Anchor",
    "label": "aapt2 dump xmltree confirms allowBackup=false in the built APK",
    "node": "T1.1",
-   "taken_by": "codex"
+   "taken_by": "codex",
+   "platform": "android",
+   "superseded_by": "web pivot 2026-08-19"
   },
   {
    "id": "d.emulator-policy",
@@ -1434,13 +1444,17 @@
    "label": "Emulator suffices where the gate tests what the app draws or decides; hardware where it tests what Android does to the app",
    "by": "founder",
    "date": "2026-08-19",
-   "rationale": "G5/G8 said 'real device' without qualification, which would have blocked every UI gate on hardware. T4.2 still demands a real phone: an emulator will report a geofence success where a Xiaomi will not, and that anchor is the product's central claim."
+   "rationale": "G5/G8 said 'real device' without qualification, which would have blocked every UI gate on hardware. T4.2 still demands a real phone: an emulator will report a geofence success where a Xiaomi will not, and that anchor is the product's central claim.",
+   "platform": "android",
+   "superseded_by": "web pivot 2026-08-19"
   },
   {
    "id": "art.t11.gradle_project",
    "class": "Artifact",
    "label": "Android Gradle 8.9 single-module scaffold with the closed dependency catalog",
-   "node": "T1.1"
+   "node": "T1.1",
+   "platform": "android",
+   "superseded_by": "web pivot 2026-08-19"
   },
   {
    "id": "art.t11.theme_tokens",
@@ -1464,7 +1478,9 @@
    "id": "art.t11.splash",
    "class": "Artifact",
    "label": "AndroidX core-splashscreen integration with the Saaya mark",
-   "node": "T1.1"
+   "node": "T1.1",
+   "platform": "android",
+   "superseded_by": "web pivot 2026-08-19"
   },
   {
    "id": "ver.t11.spec.round1",
@@ -1571,7 +1587,9 @@
    "id": "art.t21.assets_bundled",
    "class": "Artifact",
    "label": "T2.1 byte-identical Vizag heatmap, zone-card and police-point Android assets",
-   "node": "T2.1"
+   "node": "T2.1",
+   "platform": "android",
+   "superseded_by": "web pivot 2026-08-19"
   },
   {
    "id": "art.t21.zone_loader",
@@ -1829,7 +1847,7 @@
   {
    "id": "art.t41.session_engine",
    "class": "Artifact",
-   "label": "T4.1 exhaustive pure JVM session transition reducer",
+   "label": "T4.1 exhaustive pure TypeScript session transition reducer",
    "node": "T4.1"
   },
   {
@@ -1874,7 +1892,9 @@
    "label": "Use DEX-safe camelCase names for instrumented tests while retaining sentence names for JVM tests",
    "by": "codex",
    "date": "2026-08-20",
-   "rationale": "D8 for minSdk 24 rejects space characters in method SimpleName before DEX 040; test naming is internal and does not alter product behavior."
+   "rationale": "D8 for minSdk 24 rejects space characters in method SimpleName before DEX 040; test naming is internal and does not alter product behavior.",
+   "superseded_by": "web pivot 2026-08-19",
+   "platform": "android"
   },
   {
    "id": "f.t42.stale_generated_classes",
@@ -6149,6 +6169,86 @@
    "from": "d.t42.androidtest_names",
    "rel": "enables",
    "to": "claim.no_press",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.web",
+   "rel": "supersedes",
+   "to": "anchor.t11.allowbackup",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.web",
+   "rel": "supersedes",
+   "to": "art.g6fixture",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.web",
+   "rel": "supersedes",
+   "to": "art.t11.gradle_project",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.web",
+   "rel": "supersedes",
+   "to": "art.t11.splash",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.web",
+   "rel": "supersedes",
+   "to": "art.t21.assets_bundled",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.web",
+   "rel": "supersedes",
+   "to": "d.android",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.web",
+   "rel": "supersedes",
+   "to": "d.buildmem",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.web",
+   "rel": "supersedes",
+   "to": "d.emulator-policy",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.web",
+   "rel": "supersedes",
+   "to": "d.t11-unblock",
+   "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.web",
+   "rel": "supersedes",
+   "to": "d.t42.androidtest_names",
    "at": "2026-08-19",
    "by": "claude",
    "confidence": "high"

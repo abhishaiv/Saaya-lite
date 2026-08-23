@@ -15,12 +15,13 @@ import json,re,sys,subprocess,os
 ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 G=json.load(open(os.path.join(ROOT,"graph/spec_graph.json")))
 NUMS={}; COLORS={}
-SUPERSEDED=0
+SUPERSEDED=0; LIVE=0
 for f in G["facts"]:
     # A fact from a retired platform must never provide provenance for current code.
     # Kept in the file for history; excluded from matching. This is why `17` stopped
     # passing on build.jvm after the web pivot.
     if f.get("superseded_by"): SUPERSEDED+=1; continue
+    LIVE+=1
     v=f["value"]
     if f["kind"]=="color": COLORS[str(v).upper()]=f["id"]
     elif isinstance(v,(int,float)): NUMS.setdefault(float(v),[]).append(f["id"])
@@ -34,20 +35,28 @@ SKIP_LINE=re.compile(r'^\s*(//|\*|/\*|#)')
 # Anything on a line carrying this marker is exempt, with the reason required after it.
 EXEMPT=re.compile(r'GROUNDED-EXEMPT:\s*\S+')
 
-# Kotlin and Compose write product values as 16.dp, 14.sp, 0.75f, 1_000. An earlier
+# TS and CSS write product values as 16px, 0.75, 1_000, 1.5rem. An earlier
 # pattern required a non-word, non-dot character after the number, so it matched NONE of
-# those and the gate was effectively inert against real Compose code. Match the numeric
+# those and the gate was effectively inert against real product code. Match the numeric
 # core and ignore whatever suffix or extension property follows it.
 NUM_RE=re.compile(r'(?<![\w.$])(\d[\d_]*(?:\.\d[\d_]*)?)')
 HEXNUM_RE=re.compile(r'0[xX][0-9A-Fa-f]+')
 HEX_RE=re.compile(r'#([0-9A-Fa-f]{6,8})\b|0x([0-9A-Fa-f]{8})\b')
 
 def hexlookup(hx):
-    """Compose writes colours as ARGB: 0xFFA78BFA is our #A78BFA at full alpha.
-    Normalise before lookup, and use this in BOTH gate and explain so they never disagree."""
+    """CSS 8-digit hex is #RRGGBBAA -- alpha LAST. (Compose was 0xAARRGGBB, alpha first;
+    normalising that way here turned #A78BFAFF into #BFAFF and falsely reported our own
+    brand colour as ungrounded.) Try the literal, then alpha-last, then alpha-first, so
+    a legacy 0xFF.. constant still resolves. Used by BOTH gate and --explain so they
+    can never disagree."""
     hx=hx.upper()
-    for cand in (hx, "#"+hx[3:] if len(hx)==9 and hx.startswith("#FF") else hx):
-        if cand in COLORS: return COLORS[cand]
+    body=hx[1:] if hx.startswith("#") else hx
+    cands=[hx, "#"+body]
+    if len(body)==8:
+        cands.append("#"+body[:6])   # #RRGGBBAA -> #RRGGBB   (CSS)
+        cands.append("#"+body[2:])   # 0xAARRGGBB -> #RRGGBB  (legacy)
+    for c in cands:
+        if c in COLORS: return COLORS[c]
     return None
 
 def check(path):
@@ -113,6 +122,6 @@ def main():
         print("  3. if it is genuinely structural (an index, a loop bound), append")
         print("     `// GROUNDED-EXEMPT: <one-line reason>` to that line.")
         sys.exit(1)
-    print(f"grounded: {len(paths)} file(s), 0 ungrounded literals  ({len(NUMS)+len(COLORS)} live facts, {SUPERSEDED} superseded and excluded)")
+    print(f"grounded: {len(paths)} file(s), 0 ungrounded literals  ({LIVE} live facts -> {len(NUMS)+len(COLORS)} distinct values, {SUPERSEDED} superseded and excluded)")
 
 if __name__=="__main__": main()

@@ -29,7 +29,8 @@ runs=lines("graph/runs.jsonl"); ver=lines("graph/verifications.jsonl")
 codex_commits=[c for c in sh("git","log","--grep=Built-with: OpenAI Codex","--format=%h|%s").splitlines() if c]
 all_commits=[c for c in sh("git","log","--format=%h|%s").splitlines() if c]
 done=[n for n in order if N.get(n,{}).get("status")=="complete"]
-kt=sh("git","ls-files","*.kt","*.kts").splitlines()
+kt=[f for f in sh("git","ls-files","*.ts","*.tsx","*.css").splitlines()
+    if f and not f.startswith(("scripts/","test/grounded_fixture"))]
 loc=0
 for f in kt:
     try: loc+=sum(1 for _ in open(os.path.join(ROOT,f),errors="ignore"))
@@ -50,8 +51,8 @@ else:  print("\nCODEX CONTRIBUTION — generated from the repo, not from memory\
 out("Nodes completed", f"{len(done)} of {len(order)}")
 out("Commits tagged Built-with: OpenAI Codex", len(codex_commits))
 out("Total commits", len(all_commits), "the rest added the frozen specification")
-out("Kotlin files Codex wrote", len(kt))
-out("Lines of Kotlin", loc)
+out("TypeScript files Codex wrote", len(kt))
+out("Lines of TypeScript and CSS", loc)
 out("Adversarial verifier runs recorded", sum(len(r.get("verdicts",[])) for r in ver))
 out("Findings that killed a node", len(kills), "each forced a rewrite before the node passed")
 if lens: out("Kills by lens", ", ".join(f"{k}:{v}" for k,v in lens.most_common()))

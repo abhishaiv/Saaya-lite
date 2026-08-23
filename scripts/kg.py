@@ -132,7 +132,8 @@ def main():
         q=sys.argv[2].lower()
         for e in k["entities"]:
             if q in e["id"].lower() or q in str(e.get("label","")).lower():
-                print(f"{e['id']:34} [{e['class']:12}] {e.get('label','')}")
+                mark=" [SUPERSEDED]" if e.get("superseded_by") else ""
+                print(f"{e['id']:34} [{e['class']:12}] {e.get('label','')}{mark}")
     elif c=="supersede":
         old,new=sys.argv[2],sys.argv[3]
         for x in (old,new):
