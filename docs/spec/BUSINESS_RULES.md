@@ -44,7 +44,7 @@ every zone.
 | Exit dwell before disarming | **180 s** continuously outside | Prevents disarming from one bad GPS fix on a narrow road. |
 | Re-arm cooldown after a manual disarm in the same zone | **45 min** | If she disarmed here deliberately, do not immediately re-arm and nag her. |
 | Re-arm cooldown after `RESOLVED_OK` in the same zone | **20 min** | She answered. Give her space. |
-| Zone containment test | point-in-polygon on the real polygon | `geofence_radius_m` is used **only** for the Android `Geofence` registration, which needs a circle. The authoritative test is the polygon. |
+| Zone containment test | point-in-polygon on the real polygon | `geofence_radius_m` is used **only** as a cheap circular pre-filter before the polygon test, so we do not run point-in-polygon against all 19 zones on every fix. The authoritative test is the polygon. |
 
 ## 4. Check-in intervals (F15)
 
@@ -113,7 +113,7 @@ The last row matters: someone holding her phone must not be able to reset their 
 
 ## 8. Escalation payload to family (F19)
 
-Reactd on device. Never sent, per F21. Displayed exactly as it would be sent.
+Composed on device. Never sent, per F21. Displayed exactly as it would be sent.
 
 ```
 Saaya alert - {name} may need help.

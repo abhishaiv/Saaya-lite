@@ -6,7 +6,7 @@ Built on E9. Every claim traces to `../EVIDENCE.md` or to a verification output.
 | Required | Ours |
 |---|---|
 | **A live public link that opens in a browser without requesting access** | the Vercel URL. The app IS the link. |
-| *"Reviewers will not download a mobile app"* | we pivoted off Android for exactly this |
+| *"Reviewers will not download a mobile app"* | we pivoted off the previous platform for Android for exactly this |
 | *"Reviewers will test the citizen experience, not an admin panel"* | the citizen journey is the deliverable; the console is evidence shown in the video |
 | Mock consumer login credentials **if required** | **not required.** No account, no OTP, no password. Say so; do not leave them hunting for a login box. |
 | **One video, max 2:00** | 1:00 citizen demo, 1:00 how and why. Both teammates may present. |
@@ -82,7 +82,7 @@ guessed.
 
 ### Is this an old project?
 Saaya is an existing iOS product, and I am not going to let you discover that on your own.
-**Saaya Lite is not a port of it.** It is a new Android codebase written for this hackathon.
+**Saaya Lite is not a port of it.** It is a new web codebase written for this hackathon.
 What is reused: the problem statement, the 12 interviews, the audited Visakhapatnam dataset,
 the colour tokens and some check-in strings. What is new and does not exist in the iOS app:
 auto-arming from zone crossed with hour, the four-step ladder with the trust boundary as a
@@ -177,8 +177,8 @@ We would rather be checked than believed.
 ### Known limitations
 - One city. Visakhapatnam only, because that is where the audited data is.
 - Auto-arming needs background location. Denied, it degrades to foreground-only and says so.
-- Some Android OEMs kill background services. We detect it and tell her honestly rather
-  than pretending to watch.
+- **A browser cannot arm in the background.** Arming holds while the page is open. This is
+  disclosed in the product and in the 250 words rather than glossed.
 - The zone data is calibrated against NCRB 2023 and is a proxy for risk, not a measurement
   of it. Low recorded crime can mean low reporting, and the app says so.
 - Nine evenings, one person. This is a prototype and it is presented as one.

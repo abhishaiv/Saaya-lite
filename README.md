@@ -3,7 +3,7 @@
 **India's emergency apps only accept a crime that has already happened.
 This one accepts the fifteen minutes before.**
 
-An Android prototype built for [Build What Moves India](https://buildwhatmovesindia.com).
+A mobile web prototype built for [Build What Moves India](https://buildwhatmovesindia.com).
 Visakhapatnam. Built with OpenAI Codex against a frozen specification.
 
 > **Status:** specification complete and frozen. Application build in progress, node by node.
@@ -102,7 +102,7 @@ to kill the work. Method and reasoning:
 
 **Honest about who did what.** The specification in `docs/` was written in a planning
 dialogue with Claude and then frozen; the two commits that added it say so in their trailers.
-Every line of the Android application is written by Codex, against that frozen spec, and
+Every line of the web application is written by Codex, against that frozen spec, and
 tagged accordingly. We are stating this up front rather than leaving it to be discovered,
 for the same reason everything else here is checkable.
 
@@ -136,7 +136,8 @@ to one of them fails the build. It is how "we did not invent this value" stops b
 
 - One city. Visakhapatnam only, because that is where the audited data is.
 - Auto-arming needs background location. Denied, it degrades to foreground-only and says so.
-- Some Android OEMs kill background services. We detect it and tell her, rather than
+- **A browser cannot arm in the background.** Arming holds while the page is open. A native
+  runtime is required for true pocket-in-the-background arming, and we say so rather than
   pretending to watch.
 - The zone data is calibrated against NCRB 2023 and is a **proxy for risk, not a measurement
   of it.** Low recorded crime can mean low reporting, and the app says exactly that.

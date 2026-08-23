@@ -69,8 +69,8 @@ protected does:
 - A reviewer can open devtools, watch the network tab through the whole ladder, and see that
   nothing identifying leaves the device before SOS.
 
-That last line is the web version of `aapt2 dump xmltree`, and it is a better demo because
-they can run it themselves during the video.
+That last line replaces the manifest check the previous platform relied on, and it is a
+better demo: a reviewer can run it themselves while the video is playing.
 
 ## Deploy
 

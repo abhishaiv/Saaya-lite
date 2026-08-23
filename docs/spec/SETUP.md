@@ -17,7 +17,7 @@ Do this once, at T1.2. Every step is explicit so nothing is guessed.
 **Still outstanding, needed at `T8.2` (node 7), not before:** register a **Web** app in
 Project settings → Your apps → Add app → Web, and paste its config into
 `console/firebase-config.js`. The console uses the Firebase **web** SDK, which needs its own
-app registration; the Android app ids above will not work for it.
+app registration. The two mobile app ids already on the project will not work for it.
 
 ## Firebase project — original steps
 
@@ -30,7 +30,7 @@ app registration; the Android app ids above will not work for it.
    line worth having in the write-up.
 3. Build, Authentication, Get started, Sign-in method, enable **Anonymous only**.
    Enable nothing else. There is no account, no email, no password anywhere in this product.
-4. Project settings, Your apps, Add app, Android.
+4. Project settings, Your apps, Add app, **Web**.
    - Package name `com.nexaflow.saayalite`
    - **Also register `com.nexaflow.saayalite.debug`** as a second app, or debug builds fail
      to authenticate. This catches people out.
@@ -94,7 +94,8 @@ Saaya Lite/
   progress.md               founder-facing log
   docs/                     FEATURES, PROBLEM, SCOPE, EVIDENCE, BUILD_PLAN
   docs/spec/                this pack
-  app/                      the Android app
+  app/                      Next.js routes (App Router)
+  src/                      domain, data, ui
   console/                  static site: index.html, app.js, style.css
   scripts/seed-zones.mjs    one-off zone seeding
   firebase.json

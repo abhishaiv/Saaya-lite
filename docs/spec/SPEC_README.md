@@ -19,7 +19,7 @@ Stop and ask rather than guessing, then the answer gets written into the spec.
 4. **`BUSINESS_RULES.md`** - every number in the product. Arming matrix, timers, formulas.
 5. **`STATE_MACHINE.md`** - the session engine. States, events, guards, edge cases.
 6. **`SCREENS.md`** - every screen and its layout, the navigation graph.
-6b. **`MAP_SPEC.md`** - the hero surface: osmdroid, tiles, zone rendering, offline.
+6b. **`MAP_SPEC.md`** - the hero surface: Leaflet, CARTO tiles, zone rendering, offline.
 
 **Look and feel, all founder-decided on 2026-08-18. Read all seven before writing any UI:**
 
@@ -60,7 +60,7 @@ the ladder ends up untested.
 | Release keystore ceremony | debug signing installs fine when sideloaded |
 | Broad instrumented test coverage | slow to write, needs a device, protects little |
 | Foldables, tablets, landscape | portrait phone only |
-| APK size optimisation | get it reasonable, do not tune it |
+| Bundle size micro-tuning | hit `perf.bundle`, then stop |
 | Crash reporting, analytics, telemetry | we collect nothing, deliberately |
 | Migrations, backfills, versioned schemas | destructive migration is correct here |
 | RBAC, audit trails, retention policies | described in the write-up, not built |
@@ -148,7 +148,7 @@ no user tap. If M6 ever requires a tap, F33 is broken regardless of what any scr
 
 ## Definition of done, for any task
 
-A task is done when: it compiles, it runs on a real Android device, its acceptance
+A task is done when: it compiles, it loads on a real mobile browser, its acceptance
 criteria in `TEST_PLAN.md` pass, and its entry is written in `CODEX_LOG.md`.
 
 
@@ -230,7 +230,7 @@ Add a `Decision` entity via `kg.py`, mention it in one line of your report, and 
 - **Adding a `Command` case** for an effect the specification already requires. If
   `STATE_MACHINE` says the arm banner appears, a command for it is implementation.
 - **Naming** of files, classes and functions inside the stated package layout.
-- **Which Kotlin idiom or platform API** to use for a specified behaviour.
+- **Which TypeScript idiom or browser API** to use for a specified behaviour.
 - **Test structure** beyond the cases `TEST_PLAN` names.
 - Anything with **no user-visible and no state-visible consequence.**
 
@@ -272,4 +272,4 @@ git show archive/android-kotlin:docs/spec/ANDROID_PLATFORM.archived.md
 
 **But `STATE_MACHINE.md` remains authoritative, not the Kotlin.** The engine passed ten
 gates and its verifiers, so it is a good reference for structure. It is not the spec. Where
-they differ, the spec wins, and the difference is a bug in the Kotlin, not in the spec.
+they differ, the spec wins, and the difference is a bug in the archived code, not the spec. Kotlin, not in the spec.

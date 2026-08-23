@@ -165,7 +165,7 @@ its picture. These are the strings. A `contentDescription` that names an icon
 | `err_sync_failed` | Could not send this. Tap to try again. | దీన్ని పంపలేకపోయాం. మళ్లీ ప్రయత్నించడానికి నొక్కండి. |
 | `err_zone_data` | Saaya Lite could not load Visakhapatnam data. Reinstalling should fix this. | సాయ లైట్ విశాఖపట్నం డేటాను లోడ్ చేయలేకపోయింది. మళ్లీ ఇన్‌స్టాల్ చేస్తే సరిపోతుంది. |
 | `err_no_station` | No police station within 20 km. | 20 కి.మీ. లోపు పోలీస్ స్టేషన్ లేదు. |
-| `warn_battery_title` | Android may stop Saaya in the background | ఆండ్రాయిడ్ సాయను బ్యాక్‌గ్రౌండ్‌లో ఆపవచ్చు |
+| `warn_battery_title` | Saaya only watches while this page is open | ఆండ్రాయిడ్ సాయను బ్యాక్‌గ్రౌండ్‌లో ఆపవచ్చు |
 | `warn_battery_body` | To keep watching while your screen is off, Saaya needs to be left running. | మీ స్క్రీన్ ఆఫ్ ఉన్నప్పుడూ గమనించాలంటే, సాయ నడుస్తూ ఉండాలి. |
 | `cta_battery_allow` | Allow | అనుమతించు |
 | `warn_autostart_title` | One more step on your phone | మీ ఫోన్‌లో ఇంకో అడుగు |

@@ -25,7 +25,7 @@ every 5 minutes trains her to mute the app, and a muted safety app is a deleted 
 
 1. **Escalation sound ignores the silent switch.** iOS routes the chime through a
    `.playback` session deliberately, with the reasoning that a check-in must be perceivable
-   to be answerable. On Android: use `STREAM_ALARM` for check-in 2, family and SOS, which
+   to be answerable. On the web: an `<audio>` element the user has already gestured on, for check-in 2, family and SOS, which
    plays through silent and Do Not Disturb. **Check-in 1 stays silent**, so this only ever
    fires when something is genuinely wrong.
 2. **Never disturb a live SOS with another sound.** Suppress all other audio and haptics

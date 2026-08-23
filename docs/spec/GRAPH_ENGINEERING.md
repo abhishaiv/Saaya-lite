@@ -372,7 +372,7 @@ reverse**. Distinct from an anchor, which is a measurement. A gate is permission
 |---|---|---|
 | Firestore rules and public read go live | before `T8.1` | public read is hard to un-publish; confirm every record is synthetic first |
 | Console URL becomes reachable | before `T8.2` | it is the submission's live link; once shared it is judged |
-| APK published on the landing page | after `T9.0` | an installed APK cannot be recalled from a judge's phone |
+| the submission form | after `T9.0` | there is no grace period after 2026-08-28 20:00 IST |
 | Submission | after `T9.2` | irreversible by definition |
 
 Codex stops at each and waits. It does not ask permission for anything else.

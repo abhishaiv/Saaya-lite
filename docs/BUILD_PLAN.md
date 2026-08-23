@@ -1,6 +1,7 @@
 # Saaya Lite - Build Plan
-Nine evenings, 3 hours each, Tue 2026-08-18 to Wed 2026-08-26. Submit Thu 2026-08-27.
-Revised 2026-08-18 against the verified 33-feature list in FEATURES.md.
+From 2026-08-19 to the deadline. Submission closes **2026-08-28 at 20:00 IST, with no grace period.**
+Revised 2026-08-19 for the web platform. `graph/build_graph.json` owns the execution order;
+this file carries the cut order and the risk register.
 
 ## The schedule reality, on the record
 
@@ -43,29 +44,25 @@ escalation, F23-F24 SOS with PIN, F29 the web console, F21 and F30 the disclosur
 
 ## Evenings
 
-### E1 - Tue Aug 18: decisions and scaffold
 - Planning docs. **Done.**
-- Android project: TypeScript, React, min SDK 24, package, icon, Saaya theme.
+- Next.js project: App Router, TypeScript strict, theme tokens, fonts, Vercel preview URL.
 - New Firebase project, Firestore. Saaya production is never touched.
 - Git repo init. **CODEX_LOG.md started tonight, not later.**
-- **DoD:** an empty React app installs on a real Android phone and writes one test doc
+- **DoD:** the Vercel preview URL loads on a real mobile browser and writes one test doc
   to the new Firestore.
 
-### E2 - Wed Aug 19: the map (F6, F9)
 - Port the audited Vizag data to `zones.json`: geometry, risk score, active hours,
   incident breakdown, women-safety count, nearest station and distance.
 - Map screen rendering heat-zones. Hour-aware risk shading.
 - **DoD:** the Vizag map renders real zones on the device and a zone reads differently at
   14:00 and 02:00.
 
-### E3 - Thu Aug 20: zone detail and onboarding (F7, F8, F1-F5)
 - Tap a zone: risk level, incident breakdown, women-safety count, nearest station with
   distance and a call button.
 - Onboarding: trusted contact, location permission with a plain reason first, language,
   **PIN setup**.
 - **DoD:** a stranger completes onboarding in under 90 seconds and can read the map.
 
-### E4 - Fri Aug 21: Shadow, the core claim (F10-F14)
 - Wake lock plus a visible page, location updates, zone entry and exit detection.
 - Arming rules: zone risk crossed with hour of day.
 - "Why it woke" banner. Quiet persistent status. Manual arm. One-tap disarm.
@@ -73,20 +70,17 @@ escalation, F23-F24 SOS with PIN, F29 the web console, F21 and F30 the disclosur
 - **DoD:** walking or simulating into a zone arms a session with **no user tap**. This is
   the most important DoD in the plan and the likeliest evening to overrun.
 
-### E5 - Sat Aug 22: SUS, the check-in ladder (F15-F18)
 - Adaptive interval rules. Prompt, countdown, *I'm OK*, *I need help now*.
 - Session state machine: idle, shadow, checking, escalating, SOS, resolved.
 - **DoD:** a session runs shadow to check-in to resolved, and separately shadow to
   check-in to escalating. Weekend evening, so this is where an E4 overrun gets absorbed.
 
-### E6 - Sun Aug 23: family escalation (F19-F22)
 - Escalation composes the family message with its context: zone, hour, that zone's
   reported history, last known area, and the non-response.
 - Cancel window with a visible timer. Mocked-delivery disclosure in the UI. Offline queue.
 - **DoD:** escalation fires end to end, the contact view is correct, cancel works, the
   mock disclosure is on screen, and killing the network does not lose the escalation.
 
-### E7 - Mon Aug 24: SOS and the state writes (F23-F27)
 - SOS trigger from both routes: *I need help now*, and cancel-window lapse.
 - PIN-protected stop. On-screen statement that the state now has it.
 - Two writes: **anonymised SUS records** (zone-snapped, no session id, no name) and
@@ -94,14 +88,12 @@ escalation, F23-F24 SOS with PIN, F29 the web console, F21 and F30 the disclosur
 - **DoD:** the trust boundary holds under test. Shadow and SUS produce nothing
   identifying; only SOS crosses.
 
-### E8 - Tue Aug 25: the state view and the live link (F28-F30)
 - Web console on Firebase Hosting. SUS and SOS, filterable last 24 hours / 7 days /
   30 days. Permanent "connected to no government system" disclaimer.
 - In-app "what the police see", showing all three honest states. First on the cut list.
 - **DoD:** the console URL loads in a logged-out private window, on a phone, and shows an
   incident the app created minutes earlier.
 
-### E9 - Wed Aug 26: conditions and submission (F31-F33)
 - Telugu strings. Low-end device pass. Throttled-network pass. Empty and error states.
 - 3-minute video: the 4 a.m. ride and the four shut doors, Shakthi's 0.28%, T-Safe's
   1,300 downloads, the map, auto-arm with no press, escalation with its context, the
@@ -116,13 +108,12 @@ and the deployed site do not fit in three hours. If E1 through E8 hold, move the
 onto Sat Aug 22 or Sun Aug 23 alongside E5 and E6. If they do not hold, Telugu is cut
 first and E9 becomes submission-only.
 
-### Thu Aug 27: submit. The day is buffer, not workspace.
 
 ## Risk register
 
 | Risk | Likelihood | Mitigation |
 |---|---|---|
-| **E4 overruns.** Android background location, battery optimisation, permission tiers | **High** | Wake lock plus a visible page with a persistent notification. D1 demo trigger so the video never depends on real geofencing. E5 is a weekend evening and absorbs the overrun. |
+| **T4.2 overruns.** Tab lifecycle is where a web build of this quietly breaks: a hidden tab is throttled, timers may not fire, and a resumed countdown that was never recomputed looks fine until it matters. | **High** | Absolute deadlines in IndexedDB, recomputed on every visibilitychange, never resumed. The D1 demo trigger so the video never depends on real geolocation. Manual checks M15 and M16 exist for exactly this. |
 | **37 hours of work in 27 hours of evenings** | **High** | Codex velocity, per the founder's call. The fixed cut order as insurance. Two weekend days held in reserve. |
 | **E9 cannot hold polish plus submission** | **High** | Stated above. Move video and write-up to the weekend if E1-E8 hold. |
 | Codex log is thin by E9 | **High** | It is the only evidence for the tooling requirement. Log the same evening, every evening. |

@@ -38,7 +38,7 @@ Saying exactly where the browser stops is a better architecture answer than pret
 
 ## Browser APIs, and what each replaces
 
-| Android | Web | Notes |
+| Previous platform | Web | Notes |
 |---|---|---|
 | `FusedLocationProvider` | `navigator.geolocation.watchPosition` | `enableHighAccuracy: true` while armed. Sampling rates from `BUSINESS_RULES` still apply. |
 | Geofencing API | **point-in-polygon in JS, on every fix** | we already treat the polygon as authoritative; `geofence_radius_m` becomes a cheap pre-filter |

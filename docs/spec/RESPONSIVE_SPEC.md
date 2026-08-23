@@ -6,7 +6,7 @@ F31 says low-end phones and F32 says slow connections. Our user is not on a flag
 | Class | Width px | Example | Priority |
 |---|---|---|---|
 | Compact small | **320 - 359** | Redmi 9A, older Realme | **must work, do not break** |
-| Compact | 360 - 411 | most Indian Android phones | **primary target** |
+| Compact | 360 - 411 | most phones in India | **primary target** |
 | Compact large | 412 - 479 | Galaxy A-series, Pixel | must work |
 | Medium | 480 - 599 | large phones, small foldables unfolded | must work |
 | Expanded | 600+ | tablets | must not crash, layout may be plain |

@@ -37,14 +37,14 @@ verbatim. A judge who discovers that on their own will conclude we submitted an 
 
 | What is reused | What is new |
 |---|---|
-| The problem statement and the 12 interviews | The entire Android codebase, written from scratch for this hackathon in Kotlin and Compose |
+| The problem statement and the 12 interviews | The entire web codebase, written from scratch for this hackathon in Next.js and TypeScript |
 | The audited Visakhapatnam zone dataset (24 zones, NCRB 2023 calibrated) | The auto-arming model: zone crossed with hour, which does not exist in the iOS app |
 | Colour tokens and several check-in strings | The four-step ladder with the trust boundary as an explicit, visible step |
 | The brand and the name | The anonymised zone-level civic signal and the state view console |
 | | The whole public-service framing: naming Shakthi and T-Safe and building the missing intake tier |
 
 **The sentence for the write-up:** "Saaya is an existing iOS product. Saaya Lite is not a
-port of it. It is a new Android codebase, built for this hackathon, that takes one argument
+port of it. It is a new web codebase, built for this hackathon, that takes one argument
 out of Saaya and proves it end to end: that India's emergency intake accepts only completed
 crimes, and that the missing tier can be built without asking her to press anything. The
 iOS app has no auto-arming, no anonymised civic signal, and no state view. Those are the

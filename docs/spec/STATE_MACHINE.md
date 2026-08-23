@@ -1,6 +1,6 @@
 # Saaya Lite - Session State Machine
 The heart of the app. Implemented as a **pure function** in `src/domain/engine/sessionEngine.ts`
-with zero Android imports, so every rule here is unit-testable on the JVM.
+with zero browser API, React or DOM, so every rule here is unit-testable under vitest.
 
 `fun onEvent(state: SessionState, event: SessionEvent, ctx: EngineContext): EngineResult`
 
@@ -112,7 +112,7 @@ Whenever any state transitions to `SOS_ACTIVE`:
 
 ## Recovery after process death
 
-The service is `START_STICKY` and Android will kill it. On restart:
+A hidden tab is throttled and a closed tab stops entirely. On the next visibilitychange or page load:
 
 | Persisted state | Action |
 |---|---|
@@ -272,7 +272,7 @@ export function onEvent(
 ): EngineResult;
 ```
 
-**`nowEpochMs`, not `Instant`.** The Android build used `java.time` and needed desugaring.
+**`nowEpochMs`, not a date object.** The previous platform needed a date library and a polyfill for it.
 On the web, epoch millis is the native currency, it serialises into IndexedDB unchanged, and
 it keeps `src/domain/` free of any date library. `HourBand` is still derived through a clock
 helper so tests can inject time.

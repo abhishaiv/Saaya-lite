@@ -1444,3 +1444,52 @@ the bug.
 
 **Final: 43 docs, 22 nodes, 275 live facts and 31 superseded, 231 entities, 521 edges, zero
 orphans, zero Android leakage outside the five historical files.**
+
+## 2026-08-19 - Strict re-verification. The pivot needed three passes.
+
+Founder asked for a strict re-verify. Right to insist: the first pivot pass updated the graph
+and two platform docs, the second caught the document translation, and only this third pass
+caught the things that would actually have misled Codex.
+
+**Found and fixed in this pass:**
+
+`CODEX_PROMPT.md`, the file the founder attaches, still opened with **"a native Android app
+in TypeScript"**. The mechanical translation had changed the language and left the platform
+noun. That one line would have set the wrong frame for the entire run.
+
+`README.md`, the reviewer-facing document, still opened with **"An Android prototype"**, and
+its known-limitations list still cited Android OEMs killing background services. A judge would
+have read that.
+
+**Both anchor lists still said `aapt2 dump xmltree`**, which is meaningless on the web. All
+seven anchors rewritten, and the T1.1 anchor is now better than what it replaced: open
+devtools, run the ladder, watch the network tab, and see that nothing identifying leaves
+before SOS. A reviewer can run that themselves during the video.
+
+`CODEX_TASKS.md` was still describing Android task steps and had been corrupted into nonsense
+by the translation - "targetSdk 34, TypeScript JVM 17, React BOM". Regenerated all 22 task
+prompts for web, **from the graph**, so the file cannot drift from it again.
+
+`TEST_PLAN.md`'s device layers were entirely stale: instrumented tests, Xiaomi battery
+management, an emulator policy section, and a line telling the founder to stop the npm daemon
+before booting an emulator. Rewritten for the browser, and the two manual checks that matter
+most are now **M15 and M16**, tab-switch mid-countdown and past a deadline, because tab
+lifecycle is where a web build of this quietly breaks.
+
+`COMPLIANCE.md`'s originality table claimed "the entire Android codebase written from scratch"
+- a submission claim that had become factually false.
+
+Plus: `BUILD_PLAN` carried the old 2026-08-27 deadline, the icon spec still described an
+adaptive-icon foreground/background split rather than PWA icons, `SECRETS_AND_ACCESS` still
+listed adb and an AVD, `BUSINESS_RULES` had a word the translation mangled to "Reactd", and
+`ARCHITECTURE` said "TypeScript JVM target 17".
+
+**And the translation silently blinded a gate.** Changing the type-contract fences from
+`kotlin` to `typescript` made `reads_check.py` report "0 types defined, 0 unresolved" -
+passing while checking nothing. Rewrote it for TypeScript declarations and then functionally
+tested it by injecting a bogus type. A checker that passes vacuously is worse than none, and
+the only reason I caught it was that the count looked wrong.
+
+**Final: 43 docs, 22 nodes, 275 live facts and 31 superseded, 231 entities, 521 edges. Zero
+stale platform references, zero orphans, zero unresolved reads. CODEX_TASKS, AGENTS and
+BUILD_STATE all match the graph order exactly. All four checkers pass.**

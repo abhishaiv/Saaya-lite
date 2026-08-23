@@ -112,7 +112,7 @@ Recorded so this is not relitigated mid-build.
 | Option | Why not |
 |---|---|
 | Google Maps SDK | Needs an API key and a billing account. A key or quota problem on submission day kills the live demo, and the brief requires everything to work without requesting access. |
-| MapLibre + OpenFreeMap | Genuinely good, vector, free, no key. Rejected only on time: it is a heavier Android integration than Leaflet and we have nine evenings. |
+| MapLibre GL + OpenFreeMap | Genuinely good, vector, free, no key. Rejected on weight: the GL bundle is several times Leaflet's, and `perf.bundle` is 200 KB gzipped for the whole app. |
 | No basemap, bundled vectors only | Cleanest and fully offline, but she cannot orient against real streets, which undercuts "check a stretch before you commit to it". |
 
 ---

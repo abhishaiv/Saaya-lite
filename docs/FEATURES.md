@@ -56,7 +56,7 @@ precision is the entire point.
 |---|---|---|---|---|
 | F1 | Onboarding under 90 seconds | Four short screens, then done | She installs this on a calm day, not in a crisis. Ten minutes of setup and we lose her before the product ever runs. | Real |
 | F2 | Add a trusted contact | Name and number, one is enough | The person who gets told at step 3. Deliberately not framed as "who will save you", since her mother at 4 a.m. is asleep. | Real |
-| F3 | Location permission, explained first | Plain reason in her words, then the system dialog | Android asks twice and the background prompt is where most safety apps die at install. | Real |
+| F3 | Location permission, explained first | Plain reason in her words, then the system dialog | A browser permission prompt fired before she understands why is where most web tools lose people. | Real |
 | F4 | Language: English or Telugu | One tap | Vizag. An escalation her family reads slowly has failed. | Real |
 | F5 | **PIN setup, four digits** | Set once, calmly | This is what stops a live SOS. Set on a calm day because she will need it on a bad one, possibly while someone else is holding the phone. | Real |
 
@@ -77,7 +77,7 @@ Without this stage there is no product, only an engine. Nobody installs an engin
 |---|---|---|---|---|
 | F10 | **Automatic arming from zone and hour** | Nothing. She does nothing. | The whole product. She enters a flagged zone at a flagged hour and Saaya wakes by itself. This is the only reason a woman who has never pressed SOS in 240 rides is covered on ride 241, and it is the single difference from T-Safe. | Real |
 | F11 | The "why it woke" banner | Quiet line: which zone, what hour, and that she did not start it | Without this it feels like surveillance. With it, she stays in charge of a thing she did not switch on. | Real |
-| F12 | Quiet persistent status | A calm ongoing notification | Required by Android to keep location alive, and doubles as honesty. She is never watched secretly. | Real |
+| F12 | Quiet persistent status | A calm always-visible banner while armed | The page holds a wake lock and watches position, and she can always see that it is doing so. She is never watched secretly. | Real |
 | F13 | Manual arm | A button, for a road not on our map | Coverage outside flagged zones. This is a press, and it is the fallback, never the path. | Real |
 | F14 | One-tap disarm | "I am home" | She will do this constantly. Friction here gets the app uninstalled. Note this stops Shadow and SUS only, never a live SOS. | Real |
 

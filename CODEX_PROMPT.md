@@ -1,6 +1,6 @@
 # Saaya Lite — build instruction
 
-You are building **Saaya Lite**: a native Android app in TypeScript and React, for the
+You are building **Saaya Lite**: a mobile-first web app in Next.js and TypeScript and React, for the
 Build What Moves India hackathon.
 
 Repository: `https://github.com/abhishaiv/Saaya-lite` (public, branch `main`).
@@ -28,13 +28,14 @@ Otherwise you are starting fresh. Continue here.
 | Item | State |
 |---|---|
 | Firebase project `saaya-lite` (`799647753855`) | created, Firestore `asia-south1`, **anonymous auth only** |
-| Both Android apps registered | `com.nexaflow.saayalite` and `com.nexaflow.saayalite.debug` |
+| Firestore + anonymous auth | live on project `saaya-lite` |
 | `app/google-services.json` | in place, contains **both** packages, gitignored |
 | Vizag dataset | committed at `assets/` — 24 zones, 19 cards, 37 stations |
 | Saaya iOS source | **not required.** Every value from it is already a fact in `spec_graph.json` |
 
 **Not yet done:** a **Web** app registration for `console/firebase-config.js`. The console
-uses the Firebase web SDK, which needs its own app id — the Android ones will not work.
+uses the Firebase web SDK, which needs its own app id. The two mobile app ids already
+registered on the project will not work for it.
 Needed at **`T8.2` (node 7)**, not before. Stop and ask when you reach it.
 
 Do not clone the repository again. `app/google-services.json` is gitignored and would not
@@ -199,7 +200,7 @@ Breaking one means the work is wrong even if it compiles.
 code, and a spec document **only** when I answer a BLOCKED question.
 **Never** `docs/FEATURES.md`, `progress.md`, `README.md` or `AGENTS.md`.
 
-**Write the JVM unit tests** named in `docs/spec/TEST_PLAN.md` as part of each node, not
+**Write the unit tests** named in `docs/spec/TEST_PLAN.md` as part of each node, not
 afterwards. They are what prove the trust boundary holds.
 
 ---
@@ -262,13 +263,13 @@ what to check, and wait.
 
 | Node | Anchor |
 |---|---|
-| `T1.1` | `aapt2 dump xmltree` shows `allowBackup="false"` |
-| `T4.2` | **a real device arms a session with no tap** — the most important check in the build |
-| `T5.1` | check-in 2 appears over a locked screen |
-| `T6.2` | airplane mode, the escalation is not lost |
+| `T1.1` | the Vercel preview URL loads on a real mobile browser, themed, no console errors |
+| `T4.2` | **a real phone arms a session with no tap, page open** — the most important check in the build |
+| `T5.1` | check-in 2 renders full-screen and its Notification fires on a real phone |
+| `T6.2` | offline through the ladder: nothing lost, flushes on reconnect |
 | `T8.2` | the console loads logged out, on a phone, on another network |
-| `T9.1` | I read the Telugu — you cannot judge it |
-| `T9.2` | the V7 no-AI grep and V8 manifest outputs |
+| `T9.1` | you read the Telugu — Codex cannot judge it |
+| `T9.2` | the no-AI grep, and **the network tab through a full ladder showing nothing identifying leaves before SOS** |
 
 ---
 

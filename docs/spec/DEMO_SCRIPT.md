@@ -6,7 +6,7 @@ Recorded on E9. Do not improvise on the day.
 
 | Item | Value |
 |---|---|
-| Device | mid-range Android, not a flagship. It should look like her phone. |
+| Device | a mid-range phone browser, not a flagship. It should look like her phone. |
 | Demo speed | **ON**, divisor 6, ladder runs 15 / 10 / 10 s |
 | Banner | the demo banner **stays visible**. Never hide it. |
 | Zone | `dwaraka_police_station`, HIGH tier |

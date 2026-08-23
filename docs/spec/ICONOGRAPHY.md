@@ -69,24 +69,19 @@ The mark is *her position as a confident violet pin*, lit from one soft top ligh
 Penumbra aura, with a short dashed breadcrumb trail fading beneath. The shadow that walks
 beside her, drawn as light.
 
-### Splitting it for an Android PWA icon set
+### Exporting it for the web
 
-The master is layered so the split is mechanical, not a redraw:
+Same master, simpler job than the platform we came from. No foreground/background split.
 
-| Layer in the SVG | Goes to |
-|---|---|
-| `<rect width="1024" height="1024" fill="url(#ground)"/>` — the aubergine ground | `ic_launcher_background.xml` |
-| the ambient aura field, the breadcrumb trail, and the pin | `ic_launcher_foreground.xml` |
+| Output | From | Notes |
+|---|---|---|
+| `favicon.svg` | the whole master | browsers scale it; no raster favicon needed |
+| `icon-192.png`, `icon-512.png` | rendered from the master | PWA manifest icons |
+| `apple-touch-icon.png` 180 | rendered from the master | iOS home screen |
+| `icon-maskable-512.png` | the master with the pin inside the **80% safe circle** | `purpose: "maskable"`. Android launchers crop aggressively; the aura may extend into the outer 20% but the pin must not. |
 
-1. **Background.** Radial gradient, centre `50% 42%`, radius `72%`:
-   `#191230` to `#120C24` to `#0C0918`. A `<vector>` with a gradient fill, full 108 px bleed.
-2. **Foreground.** Everything except that rect, scaled and centred so the pin sits inside the
-   **72 px safe zone** of the 108 px canvas. The aura may extend past the safe zone but must
-   not reach the 108 px edge, or launchers that mask aggressively will clip it.
-3. **Monochrome** (maskable PWA icons). The pin silhouette only, solid, no gradient, no
-   aura, no trail. Themed icons are tinted flat by the launcher and a gradient turns to mud.
-4. Convert with your editor's *Vector Asset* import, or hand-author the `<vector>`. Do not
-   ship a raster `ic_launcher_foreground`.
+The aubergine ground stays part of the image rather than a separate layer. Do not ship a
+transparent icon: the mark is designed on that ground and reads badly without it.
 
 ### Colours, all sourced from the asset
 

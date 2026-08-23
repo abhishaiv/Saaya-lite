@@ -99,7 +99,7 @@ console during the video without a refresh. That moment is the demo.
    no session link; SOS is precise and pseudonymous.
 
 ## Performance and reach (F32)
-Under 100 KB excluding map tiles. Must render on a mid-range Android browser on 3G.
+Under 100 KB excluding map tiles. Must render on a mid-range phone browser android browser on 3G.
 No web fonts. System font stack. Same dark palette as the app.
 
 ## Verification before submission
@@ -151,7 +151,7 @@ require a click to find.
 - Every record written this way carries **`source: "CONSOLE_DEMO"`**, and the console
   renders those rows with a small `DEMO` chip.
 - The narration strip ends with: *"That was synthetic. The same thing happens from the
-  Android app, and the video shows it from her side."*
+  app, and the video shows it from her side."*
 - The button is **disabled for 90 seconds** after a press, with a countdown, so repeated
   presses do not flood the console for the next judge.
 - **Never claim a real incident occurred.** The header disclaimer stays visible throughout.

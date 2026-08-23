@@ -57,7 +57,7 @@
     "WEB_PLATFORM.md"
    ],
    "extra_gates": [
-    "aapt2_allowbackup_false"
+    "preview_url_loads_on_mobile"
    ],
    "risk": "low",
    "cumulative_hours": 2.0,
@@ -989,7 +989,8 @@
     "DEMO_SCRIPT.md"
    ],
    "extra_gates": [
-    "all_anchors_green"
+    "all_anchors_green",
+    "network_tab_evidence"
    ],
    "risk": "HIGH",
    "cumulative_hours": 45.0,

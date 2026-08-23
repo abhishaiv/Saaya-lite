@@ -5,7 +5,7 @@
 This is the build agent's manual. Humans reviewing this project should read `README.md`
 instead, which explains what Saaya Lite is and how to verify it.
 
-Saaya Lite is a native Android app for the Build What Moves India hackathon (submission
+Saaya Lite is a mobile-first web app for the Build What Moves India hackathon (submission
 2026-08-27). A scoped prototype of Saaya, a women's safety product for Visakhapatnam.
 
 **Repository:** https://github.com/abhishaiv/Saaya-lite (public, branch `main`)
@@ -108,7 +108,7 @@ A node is not done until every one passes. Stop at the first failure.
 | G5 | Acceptance | the node's "Done when" is literally true, checked by running it |
 | G6 | **Grounded** | `python3 scripts/grounded_check.py <files>` exits 0. Every numeric and colour literal traces to a fact in `graph/spec_graph.json`. **Never widen the TRIVIAL set to silence a failure.** |
 | G7 | Non-negotiables | re-read the 12 in `SPEC_README.md`; none broken |
-| G8 | Runs on device | installs, and the affected screen behaves as `SCREENS.md` describes |
+| G8 | Runs in a browser | the Vercel preview loads on a real mobile browser and the affected screen behaves as `SCREENS.md` describes |
 | G10 | **Reads complete** | `python3 scripts/reads_check.py` exits 0. A node that cannot see the document defining what it must build will block, and correctly: the fault is the graph's. |
 | G9 | **Verified** | every lens in `verify_lenses` ran fresh-context and none returned kill |
 
@@ -123,26 +123,26 @@ Risk-first, not phase-first. Do not reorder it.
 
 | # | Node | Title | Risk | Shape | Cum h |
 |---|---|---|---|---|---|
-|  1 | `T1.1` | Scaffold, theme, manifest privacy flags | low | serial | 2.0 |
-|  2 | `T2.1` | Zone parsing to typed Zone/ZoneCard/PoliceStation | low | diamond | 3.5 |
-|  3 | `T4.1` | Session engine, pure JVM, no Android imports | HIGH | serial | 6.5 |
-|  4 | `T4.2` | Wake lock plus a visible page, geofencing, alarms, recovery | HIGHEST | serial | 9.5 |
-|  5 | `T1.2` | Firebase wiring, anonymous auth | low | serial | 10.5 |
+|  1 | `T1.1` | Scaffold: Next.js, TypeScript, theme tokens, Vercel | low | serial | 2.0 |
+|  2 | `T2.1` | Zone parsing to typed Zone/ZoneCard/PoliceStation (TS) | low | diamond | 3.5 |
+|  3 | `T4.1` | Session engine, pure TypeScript, zero browser API | HIGH | serial | 6.5 |
+|  4 | `T4.2` | Geolocation watch, arming, wake lock, tab lifecycle | HIGHEST | serial | 9.5 |
+|  5 | `T1.2` | Firebase wiring, anonymous auth (project exists) | low | serial | 10.5 |
 |  6 | `T8.1` | Seed zones to Firestore | low | serial | 11.0 |
-|  7 | `T8.2` | Console: the live demo link | HIGH | serial | 14.0 |
-|  8 | `T1.3` | Component library C1 to C14 | med | diamond | 17.0 |
-|  9 | `T2.2` | Map screen, zones, her dot, offline | med | serial | 19.5 |
+|  7 | `T8.2` | State view console route | HIGH | serial | 14.0 |
+|  8 | `T1.3` | Component library C1 to C14 (React) | med | diamond | 17.0 |
+|  9 | `T2.2` | Map screen: Leaflet, CARTO tiles, zones, her dot | med | serial | 19.5 |
 | 10 | `T4.3` | Home session states, arm banner, demo panel | med | serial | 21.5 |
 | 11 | `T3.1` | Zone detail sheet, nearest station | low | serial | 23.5 |
-| 12 | `T3.2` | Onboarding, permissions, favourites, PIN | med | serial | 26.5 |
-| 13 | `T5.1` | Check-in 1 and 2, notifications, lock screen | HIGH | serial | 29.5 |
-| 14 | `T6.1` | Family escalation composer and screen | med | serial | 31.5 |
-| 15 | `T6.2` | Offline queue with backoff | med | serial | 33.0 |
+| 12 | `T3.2` | Onboarding, permissions, favourites, PIN (Web Crypto) | med | serial | 26.5 |
+| 13 | `T5.1` | Check-in 1 and 2, Notification API, full-screen overlay | HIGH | serial | 29.5 |
+| 14 | `T6.1` | Family escalation builder and screen | med | serial | 31.5 |
+| 15 | `T6.2` | Offline queue in IndexedDB with backoff | med | serial | 33.0 |
 | 16 | `T7.1` | SOS screen and PIN entry | HIGH | serial | 35.5 |
 | 17 | `T7.2` | Anonymiser and the two Firestore writers | HIGHEST | serial | 37.5 |
-| 18 | `T7.3` | What the police see, in app | low | serial | 39.0 |
+| 18 | `T7.3` | What the police see, in the citizen app | low | serial | 39.0 |
 | 19 | `T8.3` | Console live journey trigger | med | serial | 40.5 |
-| 20 | `T9.0` | Landing page with deployed site and video | low | serial | 41.5 |
+| 20 | `T9.0` | Submission page: video, summary, disclosures | low | serial | 41.5 |
 | 21 | `T9.1` | Localisation, low-end, font scale, a11y | med | diamond | 43.5 |
 | 22 | `T9.2` | Verification sweep V1 to V8 | HIGH | diamond+cycle | 45.0 |
 

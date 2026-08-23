@@ -29,10 +29,10 @@ app/
 
 | Rule | Why |
 |---|---|
-| `domain/` has **zero Android imports** | The engine and the rules must be unit-testable on the JVM without a device. This is what lets us verify the trust boundary in `TEST_PLAN.md`. |
+| `src/domain/` has **zero browser API, React or DOM** | The engine and the rules must be unit-testable under vitest with no browser. This is what lets us verify the trust boundary in `TEST_PLAN.md`. Grep it for `window`, `document`, `navigator`, `localStorage`: nothing. |
 | ViewModels talk to repositories only, never to IndexedDB or Firestore | One seam to fake in tests. |
 | `SessionEngine` is a pure state machine | Input: events. Output: state plus a list of side-effect commands. It does **not** fire notifications, write Firestore or start services itself. |
-| The service executes commands, the engine decides them | Keeps every timing rule testable without Android. |
+| The service executes commands, the engine decides them | Keeps every timing rule testable without a browser. |
 
 ## The core decision: engine emits commands, service performs them
 
@@ -55,7 +55,7 @@ sealed interface Command {
 ```
 
 `SessionEngine.onEvent(event): EngineResult` is a **pure function of (currentState, event,
-clock, config)**. No IO, no coroutines, no Android. Every rule in `BUSINESS_RULES.md` is
+clock, config)**. No IO, no async, no browser API. Every rule in `BUSINESS_RULES.md` is
 tested against this function directly.
 
 ## Threading
@@ -116,7 +116,7 @@ any analytics SDK, any crash reporter that phones home, any AI or ML library.
 | `targetSdk` | 34 |
 | `compileSdk` | 34 |
 | `applicationId` | `com.nexaflow.saayalite` |
-| TypeScript JVM target | 17 |
+| TypeScript target | ES2020 |
 | Build types | `debug` (demo trigger visible), `release` (demo trigger visible **and labelled**, since judges install the deployed site) |
 
 **Note on the demo trigger.** Unlike full Saaya, the demo affordance ships in release here,

@@ -23,16 +23,17 @@ never taken is not done. In execution order:
 
 | # | Node | What you check | Roughly |
 |---|---|---|---|
-| 1 | `T1.1` | `aapt2 dump xmltree` on the deployed site shows `allowBackup="false"` | hour 2 |
-| 2 | `T4.2` | **a real phone arms a session with no tap** | hour 9.5 |
-| 3 | `T8.2` | console loads logged out, on a phone, on another network | hour 14 |
-| 4 | `T5.1` | check-in 2 appears over a locked screen | hour 29 |
-| 5 | `T6.2` | airplane mode, the escalation survives | hour 33 |
-| 6 | `T9.1` | you read the Telugu | hour 43 |
-| 7 | `T9.2` | the V7 no-AI grep and V8 manifest outputs | hour 45 |
+| 1 | `T1.1` | the Vercel preview URL loads on a real mobile browser, themed, no console errors | |
+| 2 | `T4.2` | **a real phone arms a session with no tap, page open** — the most important check in the build | |
+| 3 | `T5.1` | check-in 2 renders full-screen and its Notification fires on a real phone | |
+| 4 | `T6.2` | offline through the ladder: nothing lost, flushes on reconnect | |
+| 5 | `T8.2` | the console loads logged out, on a phone, on another network | |
+| 6 | `T9.1` | you read the Telugu — Codex cannot judge it | |
+| 7 | `T9.2` | the no-AI grep, and **the network tab through a full ladder showing nothing identifying leaves before SOS** | |
 
-Anchor 2 is the one that matters most. It is the product's entire claim, and it is the only
-way to know the geofencing actually works rather than merely compiles.
+Anchor 2 is the one that matters most. It is the product's entire claim. A desktop browser
+with devtools emulation will happily report success where a real phone does not, so run it on
+a phone.
 
 **Human gates — 4 points that cannot be undone.** Codex stops and asks. It should ask for
 nothing else.
@@ -42,7 +43,7 @@ Firestore public read going live (before `T8.1`) · the console URL becoming rea
 
 **One outstanding setup item.** Register a **Web** app in Firebase and paste its config into
 `console/firebase-config.js`. The console uses the web SDK and needs its own app id; the
-Android ones will not work. Needed at `T8.2`, node 7. Codex will ask.
+two mobile app ids already on the project will not work for it. Needed at `T8.2`, node 7. Codex will ask.
 
 ## What to watch for
 
