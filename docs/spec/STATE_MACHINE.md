@@ -309,6 +309,20 @@ recovery error path. Recovery never invents a replacement band.
 **The engine takes `EngineContext` and returns `EngineResult`. It reads nothing else and
 touches no IO.** That is what makes every rule in `BUSINESS_RULES.md` testable on the JVM.
 
+## Pre-arm service mode, outside the state machine
+
+`SaayaForegroundService` has a private `CANDIDATE` execution mode used only after a circular
+geofence ENTER. It is not a new `SessionState`: Home, map and `SessionEngine` stay `IDLE`,
+and candidate mode creates no session or product event. The service proves authoritative
+polygon containment using the 15-second, five-fix, 60-second monotonic policy in
+`ANDROID_PLATFORM.md`, then emits exactly one `ZoneEntered(zoneId)`.
+
+Only if the engine accepts that event and returns `SHADOW` does the service persist a
+session, capture `armedHourBand`, schedule the check-in and update its existing foreground
+notification from the candidate copy to the Shadow copy. An n/a matrix cell or cooldown
+leaves the engine quietly `IDLE`. Candidate process death discards dwell evidence and a
+recovered candidate starts the proof again; it cannot manufacture continuity across death.
+
 
 ## First launch and cold start, before any location fix
 
@@ -323,6 +337,12 @@ outdoors and longer indoors. Decided behaviour:
 | First fix has accuracy worse than 100 m | Ignore for containment, keep sampling. Show the dot with its accuracy circle. |
 | No fix within 60 s | `caption` in the sheet: location is taking longer than usual, with a link to location settings. Keep trying. Do not give up and do not claim to be watching. |
 | Manual arm with no fix | **Allowed.** Arms in `MANUAL` mode with a 10 min interval. The ladder does not need a coordinate to run: only the SOS payload does, and by then there will be one, or the last known fix is sent with its age stated. |
+
+For a background geofence trigger, the first qualifying candidate fix starts a fresh
+monotonic dwell. A last-known fix never starts or completes that proof. Background-location
+denial keeps the already-defined foreground-only arming fallback; a platform start or
+permission failure emits no `ZoneEntered` and is reported honestly on the next foreground
+launch.
 
 The principle: **never claim to be watching when we are blind, and never let blindness stop
 her from arming manually.**

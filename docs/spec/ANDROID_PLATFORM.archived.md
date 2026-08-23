@@ -13,6 +13,7 @@ The evening most likely to consume the whole build is E4. This file exists so it
 <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
 <uses-permission android:name="android.permission.USE_EXACT_ALARM"/>
 <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+<uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
 <uses-permission android:name="android.permission.VIBRATE"/>
 <uses-permission android:name="android.permission.WAKE_LOCK"/>
 <uses-permission android:name="android.permission.INTERNET"/>
@@ -76,6 +77,53 @@ Use `setInitialTriggerBehavior(INITIAL_TRIGGER_ENTER)` so a session arms if she 
 standing inside a zone when the app starts. Missing that case would be a visible bug in
 the demo.
 
+### Pre-arm `CANDIDATE` service mode
+
+`CANDIDATE` is a private execution mode inside `SaayaForegroundService`, not a
+`SessionState`. The engine and every user-facing screen remain `IDLE` until the polygon
+dwell succeeds and the engine accepts `ZoneEntered(zoneId)`.
+
+1. A circular `GEOFENCE_TRANSITION_ENTER` starts the service in `CANDIDATE` mode. A
+   background trigger requires `ACCESS_BACKGROUND_LOCATION`; when that permission is
+   denied, retain the existing foreground-only arming fallback.
+2. Call `startForeground` within 5 seconds and request `HIGH_ACCURACY` location every
+   15 seconds. Overlapping candidate geofences share one service, one location stream and
+   one notification.
+3. A qualifying fix has accuracy <= 100 m. The first qualifying fix inside the
+   authoritative polygon begins a monotonic 60-second proof. Require at least five
+   qualifying in-polygon fixes spanning at least 60 seconds before emitting exactly one
+   `ZoneEntered(zoneId)` to `SessionEngine`.
+4. Any qualifying fix outside a candidate's polygon resets that candidate's dwell
+   evidence, but sampling continues while its circular geofence remains active. A fix with
+   accuracy > 100 m is ignored: it neither proves containment nor completes the dwell.
+5. If the engine arms, update the same running service and notification from `CANDIDATE`
+   to `SHADOW` without restarting it. `armedHourBand` is captured only on that accepted
+   engine transition. If the matrix says n/a or a cooldown applies, keep the engine and UI
+   `IDLE`, remove the completed candidate, and stop candidate mode when no other candidate
+   geofence remains.
+6. On circular `GEOFENCE_TRANSITION_EXIT`, remove that candidate. Stop the service when no
+   candidates remain and no real session is active.
+7. Candidate mode creates no Saaya session, SUS event, SOS incident, timeline event,
+   cooldown or family notification. It performs no local or remote product write. Private
+   operational candidate IDs may be retained only so service recovery knows what to
+   re-check.
+8. If the process dies during candidate dwell, discard all dwell evidence. A recovered
+   candidate restarts the full proof from its first new qualifying fix; never infer
+   continuous containment across process death.
+
+Candidate notification, on the existing `saaya_shadow` channel:
+
+- `LOW`, silent and ongoing; reuse `NotifId.SHADOW_ONGOING` so successful arming updates it
+  in place.
+- Tap opens Home/map. It has no check-in, disarm or help actions.
+- Title: `notif_candidate_title`. Text: `notif_candidate_text` from `COPY.md`.
+- It must never say or imply that Saaya is watching or armed.
+
+Catch both `SecurityException` and `ForegroundServiceStartNotAllowedException` around a
+background candidate start. On failure, never emit `ZoneEntered`, never claim to be
+watching, and record the operational failure for the existing honest warning on the next
+foreground launch.
+
 ## Timers
 
 `AlarmManager.setExactAndAllowWhileIdle(RTC_WAKEUP, ...)` with a `PendingIntent` per timer
@@ -94,9 +142,24 @@ recompute it after process death.
 
 This is where a real device silently kills the ladder, and it varies by OEM.
 
-- Detect with `PowerManager.isIgnoringBatteryOptimizations`.
-- If not exempt, show a one-time explanation and
-  `ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS`.
+- Detect with `PowerManager.isIgnoringBatteryOptimizations(packageName)`. If already
+  exempt, show nothing and continue.
+- If not exempt, show the existing one-time Saaya explanation using `warn_battery_title`,
+  `warn_battery_body` and `cta_battery_allow`. Record that the explanation was shown so the
+  system dialog is never reopened automatically.
+- Only when Meera deliberately taps Allow, launch
+  `Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` with
+  `Uri.parse("package:$packageName")`. The manifest permission
+  `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` is required for this action. Direct exemption is
+  justified here because uninterrupted background execution is core safety functionality;
+  the Android dialog remains user-controlled and Saaya never implies approval is automatic.
+- Declining or dismissing is a supported degraded condition, not an onboarding failure. It
+  blocks neither onboarding, manual arming, map use nor the safety ladder. Keep the existing
+  non-blocking battery warning visible while the app remains non-exempt, and let Meera retry
+  only through a deliberate action.
+- If the direct action has no handler or throws, fall back to
+  `Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS`. This choice writes no analytics or
+  personal data.
 - **Xiaomi, Oppo, Vivo, Realme and OnePlus** additionally need Autostart enabled in their
   own settings, which no standard API can request. Detect the manufacturer and show a
   short, specific instruction. This affects a large share of Indian devices and ignoring

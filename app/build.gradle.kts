@@ -15,6 +15,7 @@ android {
         applicationId = "com.nexaflow.saayalite"
         minSdk = 24 // grounded: build.minSdk
         targetSdk = 34 // grounded: build.targetSdk
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         versionCode = 1
         versionName = "1.0.0" // GROUNDED-EXEMPT: semantic version fixed verbatim by BUILD_CONFIG.md
 

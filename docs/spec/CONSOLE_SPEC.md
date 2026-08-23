@@ -1,5 +1,10 @@
 # Saaya Lite - State View Console
-**This is the live demo link the hackathon requires.** It must load in a logged-out
+**DEMOTED 2026-08-19.** The brief now says *"reviewers will test the citizen experience,
+not an admin panel."* This is no longer the submission's live link. The citizen app is.
+
+The console remains, and it still matters: it is the End-to-end-thinking evidence, shown in
+the video's second minute, and it is what makes "the state finally receives a signal it never
+had" demonstrable rather than asserted. But it is a supporting route, not the front door. It must load in a logged-out
 private window, on a phone, with no install and no access request.
 
 Static HTML, CSS and vanilla JS on Firebase Hosting reading Firestore directly with the

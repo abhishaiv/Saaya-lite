@@ -88,9 +88,9 @@ def main():
     # the regression fixture is ungrounded ON PURPOSE; never let it fail a real run
     if "--staged" in sys.argv:
         out=subprocess.run(["git","diff","--cached","--name-only"],capture_output=True,text=True).stdout
-        paths=[p for p in out.split() if p.endswith((".kt",".kts",".js",".mjs"))]
+        paths=[p for p in out.split() if p.endswith((".kt",".kts",".js",".mjs",".ts",".tsx"))]
     else:
-        paths=[a for a in sys.argv[1:] if a.endswith((".kt",".kts",".js",".mjs"))]
+        paths=[a for a in sys.argv[1:] if a.endswith((".kt",".kts",".js",".mjs",".ts",".tsx"))]
     total=0
     for p in paths:
         for line,lit,kind in check(p):

@@ -3,7 +3,7 @@
  "kind": "knowledge_graph",
  "note": "Domain facts with provenance. Never merge with build_graph.json - different truth standards.",
  "rule": "Every numeric or colour literal in source must trace to a fact id here, or the grounded checker fails the node.",
- "count": 279,
+ "count": 304,
  "facts": [
   {
    "id": "ladder.cd1",
@@ -2797,6 +2797,256 @@
    "means": "hour-band policy for every active AUTO_ZONE session",
    "sourced_from": "BUSINESS_RULES.md:60-65",
    "governs": "BUSINESS_RULES.md",
+   "frozen": true
+  },
+  {
+   "id": "candidate.mode.session_state",
+   "kind": "string",
+   "value": "IDLE",
+   "unit": "state",
+   "means": "SessionEngine and user-facing state throughout pre-arm candidate evaluation",
+   "sourced_from": "STATE_MACHINE.md:312-324",
+   "governs": "STATE_MACHINE.md",
+   "frozen": true
+  },
+  {
+   "id": "candidate.sample.interval",
+   "kind": "number",
+   "value": 15,
+   "unit": "s",
+   "means": "high-accuracy location interval in service-private CANDIDATE mode",
+   "sourced_from": "BUSINESS_RULES.md:171-177",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true
+  },
+  {
+   "id": "candidate.sample.priority",
+   "kind": "string",
+   "value": "HIGH_ACCURACY",
+   "unit": "priority",
+   "means": "location priority in service-private CANDIDATE mode",
+   "sourced_from": "BUSINESS_RULES.md:171-177",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true
+  },
+  {
+   "id": "candidate.fix.accuracy.max",
+   "kind": "number",
+   "value": 100,
+   "unit": "m",
+   "means": "maximum accuracy value for a candidate containment fix to qualify",
+   "sourced_from": "BUSINESS_RULES.md:179-185",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true
+  },
+  {
+   "id": "candidate.dwell.min_fixes",
+   "kind": "number",
+   "value": 5,
+   "unit": "fixes",
+   "means": "minimum qualifying in-polygon fixes before candidate dwell succeeds",
+   "sourced_from": "BUSINESS_RULES.md:182-185",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true
+  },
+  {
+   "id": "candidate.dwell.min_span",
+   "kind": "number",
+   "value": 60,
+   "unit": "s",
+   "means": "minimum monotonic span of candidate in-polygon dwell evidence",
+   "sourced_from": "BUSINESS_RULES.md:182-185",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true
+  },
+  {
+   "id": "candidate.privacy.effects",
+   "kind": "string",
+   "value": "NO_PRODUCT_WRITES_OR_OUTBOUND_EFFECTS",
+   "unit": "policy",
+   "means": "candidate privacy boundary before SessionEngine accepts ZoneEntered",
+   "sourced_from": "ANDROID_PLATFORM.md:105-108",
+   "governs": "ANDROID_PLATFORM.md",
+   "frozen": true
+  },
+  {
+   "id": "candidate.notification.channel",
+   "kind": "string",
+   "value": "saaya_shadow",
+   "unit": "channel",
+   "means": "notification channel reused by candidate foreground mode",
+   "sourced_from": "ANDROID_PLATFORM.md:113-119",
+   "governs": "ANDROID_PLATFORM.md",
+   "frozen": true
+  },
+  {
+   "id": "candidate.notification.id",
+   "kind": "number",
+   "value": 1001,
+   "unit": "id",
+   "means": "SHADOW_ONGOING notification id reused so candidate-to-shadow updates in place",
+   "sourced_from": "ANDROID_PLATFORM.md:113-119",
+   "governs": "ANDROID_PLATFORM.md",
+   "frozen": true
+  },
+  {
+   "id": "candidate.notification.behavior",
+   "kind": "string",
+   "value": "LOW_SILENT_ONGOING_OPEN_ONLY",
+   "unit": "policy",
+   "means": "candidate notification importance, sound, persistence and action policy",
+   "sourced_from": "ANDROID_PLATFORM.md:113-119",
+   "governs": "ANDROID_PLATFORM.md",
+   "frozen": true
+  },
+  {
+   "id": "candidate.recovery.dwell_policy",
+   "kind": "string",
+   "value": "RESET_ON_PROCESS_DEATH",
+   "unit": "policy",
+   "means": "candidate dwell evidence recovery policy",
+   "sourced_from": "ANDROID_PLATFORM.md:109-111",
+   "governs": "ANDROID_PLATFORM.md",
+   "frozen": true
+  },
+  {
+   "id": "candidate.transition.success",
+   "kind": "string",
+   "value": "ZONE_ENTERED",
+   "unit": "event",
+   "means": "only engine event emitted after successful candidate polygon proof",
+   "sourced_from": "ANDROID_PLATFORM.md:91-94",
+   "governs": "STATE_MACHINE.md",
+   "frozen": true
+  },
+  {
+   "id": "battery.optimization.permission",
+   "kind": "string",
+   "value": "REQUEST_IGNORE_BATTERY_OPTIMIZATIONS",
+   "unit": "manifest_permission",
+   "means": "permission required for the direct battery-optimization exemption request",
+   "sourced_from": "ANDROID_PLATFORM.md:150-155",
+   "governs": "ANDROID_PLATFORM.md",
+   "frozen": true
+  },
+  {
+   "id": "battery.optimization.direct_action",
+   "kind": "string",
+   "value": "ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS",
+   "unit": "android_action",
+   "means": "settings action launched only after Meera deliberately taps Allow",
+   "sourced_from": "ANDROID_PLATFORM.md:150-155",
+   "governs": "ANDROID_PLATFORM.md",
+   "frozen": true
+  },
+  {
+   "id": "battery.optimization.explanation_policy",
+   "kind": "string",
+   "value": "ONE_TIME_BEFORE_SYSTEM_DIALOG",
+   "unit": "policy",
+   "means": "Saaya explanation is shown once and the system dialog is never reopened automatically",
+   "sourced_from": "ANDROID_PLATFORM.md:147-149",
+   "governs": "ANDROID_PLATFORM.md",
+   "frozen": true
+  },
+  {
+   "id": "battery.optimization.denial_policy",
+   "kind": "string",
+   "value": "SUPPORTED_NON_BLOCKING_DEGRADED",
+   "unit": "policy",
+   "means": "declining battery exemption leaves onboarding, map, arming and ladder usable",
+   "sourced_from": "ANDROID_PLATFORM.md:156-159",
+   "governs": "ANDROID_PLATFORM.md",
+   "frozen": true
+  },
+  {
+   "id": "battery.optimization.fallback_action",
+   "kind": "string",
+   "value": "ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS",
+   "unit": "android_action",
+   "means": "settings-list fallback when the direct exemption action cannot be launched",
+   "sourced_from": "ANDROID_PLATFORM.md:160-162",
+   "governs": "ANDROID_PLATFORM.md",
+   "frozen": true
+  },
+  {
+   "id": "battery.optimization.telemetry",
+   "kind": "string",
+   "value": "NONE",
+   "unit": "policy",
+   "means": "battery-exemption choice writes no analytics or personal data",
+   "sourced_from": "ANDROID_PLATFORM.md:160-162",
+   "governs": "ANDROID_PLATFORM.md",
+   "frozen": true
+  },
+  {
+   "id": "sub.deadline",
+   "kind": "string",
+   "value": "2026-08-28T20:00+05:30",
+   "unit": "datetime",
+   "means": "submission deadline. NO grace period.",
+   "sourced_from": "buildwhatmovesindia.com/brief, fetched 2026-08-19",
+   "governs": "SUBMISSION.md",
+   "frozen": true
+  },
+  {
+   "id": "sub.video.max",
+   "kind": "number",
+   "value": 120,
+   "unit": "s",
+   "means": "one video, no longer than two minutes",
+   "sourced_from": "buildwhatmovesindia.com/brief, fetched 2026-08-19",
+   "governs": "SUBMISSION.md",
+   "frozen": true
+  },
+  {
+   "id": "sub.video.citizen",
+   "kind": "number",
+   "value": 60,
+   "unit": "s",
+   "means": "first minute: demo as a citizen",
+   "sourced_from": "buildwhatmovesindia.com/brief, fetched 2026-08-19",
+   "governs": "SUBMISSION.md",
+   "frozen": true
+  },
+  {
+   "id": "sub.video.build",
+   "kind": "number",
+   "value": 60,
+   "unit": "s",
+   "means": "second minute: how you built it and why",
+   "sourced_from": "buildwhatmovesindia.com/brief, fetched 2026-08-19",
+   "governs": "SUBMISSION.md",
+   "frozen": true
+  },
+  {
+   "id": "sub.summary.max",
+   "kind": "number",
+   "value": 250,
+   "unit": "words",
+   "means": "project summary, under 250 words",
+   "sourced_from": "buildwhatmovesindia.com/brief, fetched 2026-08-19",
+   "governs": "SUBMISSION.md",
+   "frozen": true
+  },
+  {
+   "id": "sub.round2",
+   "kind": "string",
+   "value": "2026-09-07",
+   "unit": "date",
+   "means": "Round 2 resubmission, same email",
+   "sourced_from": "buildwhatmovesindia.com/brief, fetched 2026-08-19",
+   "governs": "SUBMISSION.md",
+   "frozen": true
+  },
+  {
+   "id": "sub.finale",
+   "kind": "string",
+   "value": "2026-09-12",
+   "unit": "date",
+   "means": "Bengaluru demo day",
+   "sourced_from": "buildwhatmovesindia.com/brief, fetched 2026-08-19",
+   "governs": "SUBMISSION.md",
    "frozen": true
   }
  ]

@@ -45,6 +45,21 @@ protect the submission's claims**, so they are not optional.
 | Manual across bands | every band reschedules a MANUAL session at 10 min with `armedHourBand=null` |
 | Hour change silence | changing the current band alone emits no backend command, notification or user interruption |
 
+### `CandidateModeTest` (pure coordinator with fake monotonic clock)
+| Test | Assertion |
+|---|---|
+| Circular enter | starts service-private `CANDIDATE`; `SessionEngine`, Home and map remain `IDLE` |
+| Sampling request | exactly 15 s at `HIGH_ACCURACY` |
+| Successful proof | five qualifying inside fixes spanning at least 60 s emit exactly one `ZoneEntered` |
+| Outside reset | any qualifying outside fix clears that candidate's accumulated proof |
+| Inaccurate fix | accuracy > 100 m cannot start, extend or complete dwell |
+| Trust boundary | candidate emits no backend write, family effect, product event or session persistence |
+| Rejected arm | n/a and cooldown engine results return to quiet `IDLE` and remove the completed candidate |
+| Notification handoff | accepted arm updates `SHADOW_ONGOING` in place from candidate to Shadow; it does not restart the service |
+| Circular exit | removes that candidate and stops the service when it is the last candidate and no session is active |
+| Process death | candidate IDs may recover, but all dwell fixes and timestamps reset |
+| Background denial | no candidate starts without background permission; foreground-only arming remains available and no `ZoneEntered` is emitted |
+
 ### `AnonymiserTest` - **the trust boundary, and the most important test in the build**
 | Test | Assertion |
 |---|---|

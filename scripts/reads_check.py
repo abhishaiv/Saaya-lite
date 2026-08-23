@@ -23,7 +23,7 @@ NEED={
  "COMPONENT_LIBRARY.md":["components_c1_c14","map_screen","home_states","onboarding","sos_screen",
                          "checkin_screens","family_screen","police_view","zone_sheet","arm_banner"],
  "DESIGN_SYSTEM.md":["components_c1_c14","theme_tokens","map_screen","home_states"],
- "ANDROID_PLATFORM.md":["service_running","geofences_registered","timers_exact","notif_channels",
+ "WEB_PLATFORM.md":["service_running","geofences_registered","timers_exact","notif_channels",
                         "fullscreen_intent","onboarding"],
  "BUSINESS_RULES.md":["engine_pure","escalation_message","nearest_station","zone_sheet","backoff_policy","pin_entry"],
  "STATE_MACHINE.md":["engine_pure","recovery_works","sos_screen","home_states"],

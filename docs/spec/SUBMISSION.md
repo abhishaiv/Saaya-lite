@@ -1,34 +1,71 @@
 # Saaya Lite - Submission Pack
 Built on E9. Every claim traces to `../EVIDENCE.md` or to a verification output.
 
-## What the brief requires
+## What the brief requires (fetched 2026-08-19, authoritative)
 
-| Required | Ours | Where |
-|---|---|---|
-| A live demo link | the state view console, **with a one-press live journey replay** so the main journey is completable with no install | Firebase Hosting, `saaya-lite.web.app` |
-| A demo video, under 3 min | per `DEMO_SCRIPT.md` | unlisted YouTube, **no sign-in** |
-| A short write-up | template below | the landing page and the submission form |
-| Source repo, optional | **https://github.com/abhishaiv/Saaya-lite** | public; opens with no access request |
-
-**Every link must work without requesting access.** Verified by `TEST_PLAN.md` V1 to V4,
-from a logged-out private window, on a phone, on a different network.
-
-## Landing page
-
-One static page, hosted alongside the console at `/build`. Same dark palette, Poppins,
-under 100 KB.
-
-| Section | Content |
+| Required | Ours |
 |---|---|
-| Hero | Saaya Lite. One line: "India's emergency apps only accept a crime that already happened. This accepts the fifteen minutes before." |
-| Three buttons | **Open the live console** (with a line saying: press *Watch a journey happen* and you can see the whole thing without installing anything), **Download the APK**, **Watch the 3-minute demo** |
-| The problem | Shakthi's 0.28% and T-Safe's 1,300 downloads, cited to their sources |
-| What works, what is mocked | the two lists from `SCOPE.md`, side by side, equally prominent |
-| Disclaimers | not a government product, no live system connection, synthetic data, no AI |
-| Install note | "Android 7 and above. You will need to allow install from unknown sources, because this is a prototype and not a Play Store release." |
+| **A live public link that opens in a browser without requesting access** | the Vercel URL. The app IS the link. |
+| *"Reviewers will not download a mobile app"* | we pivoted off Android for exactly this |
+| *"Reviewers will test the citizen experience, not an admin panel"* | the citizen journey is the deliverable; the console is evidence shown in the video |
+| Mock consumer login credentials **if required** | **not required.** No account, no OTP, no password. Say so; do not leave them hunting for a login box. |
+| **One video, max 2:00** | 1:00 citizen demo, 1:00 how and why. Both teammates may present. |
+| **Summary under 250 words** | template below. Under, not near. |
+| Partner's registered email | James registers separately; each enters the other's email |
+| Deadline **2026-08-28 20:00 IST** | **no grace period after the form closes** |
 
-**Put the mocked list next to the working list, at the same size.** Burying it costs more
-than it saves, and Honesty is scored.
+A source repository is **no longer a submission item.** It stays valuable as Codex evidence
+and for our own honesty, but nobody is required to open it.
+
+## The 250 words
+
+Ruthless. Every sentence earns its place. Draft, then cut to fit.
+
+```
+India's emergency apps accept exactly one thing: a crime that already happened.
+
+Andhra Pradesh's Shakthi has 1.52 crore downloads. Its own published numbers: 11,60,146 SOS
+presses produced 3,193 FIRs. 0.28%. Telangana's T-Safe already checks in during a ride and
+escalates on no-response, and was downloaded 1,300 times in a month, because she still has
+to start it herself. We interviewed 12 solo women travellers: every one had a safety app,
+none had ever pressed SOS.
+
+Saaya Lite adds the missing input: "at risk, nothing has happened yet", with no press and no
+name.
+
+She opens a map of Visakhapatnam's 24 police-jurisdiction risk zones to check a route. Enter
+a flagged zone at a flagged hour and it arms itself. An adaptive check-in follows, not a
+fixed timer. Miss two and her chosen favourites are told, with context: the area, the hour,
+that zone's record, the missed checks. Only if she still does not answer does SOS fire, and
+only then does anything identifying leave her phone. She is told the moment that line is
+crossed.
+
+Real: the map, zone detection, arming, the ladder, escalation, the PIN-protected SOS, both
+writes to the state view. Mocked and labelled in the product: SMS delivery, which needs
+Indian DLT registration. Connected to no government system. No AI: every decision is a
+stated rule.
+
+Background arming needs a native runtime. In a browser it runs while the page is open, and
+we say so.
+```
+
+That is 249 words. Count before submitting.
+
+## The 2-minute video
+
+| Time | Content |
+|---|---|
+| 0:00-0:12 | 4 a.m., the four shut doors. No product yet. |
+| 0:12-0:25 | Shakthi's 0.28% and T-Safe's 1,300, on screen, cited |
+| 0:25-0:40 | the map: zones, tap one, nearest station |
+| 0:40-0:52 | **it arms with no press.** Hands visibly off. |
+| 0:52-1:00 | check-in, missed, family told with context, SOS |
+| 1:00-1:20 | architecture: the trust boundary, what crosses and when |
+| 1:20-1:40 | the state view: not a dot, a sequence. The 0.28% answered. |
+| 1:40-1:55 | how it was built: spec frozen first, Codex against 300+ facts, adversarial verifiers |
+| 1:55-2:00 | disclosures: no government link, synthetic data, no AI, browser limits |
+
+**Hard cap 2:00.** Nothing after it is watched.
 
 ## Write-up template
 

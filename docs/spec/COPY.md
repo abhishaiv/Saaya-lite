@@ -84,6 +84,8 @@ demo video.
 | `cta_continue` | Continue | కొనసాగించు |
 | `cta_add_another` | Add another favourite | మరో ఆత్మీయుడిని జోడించు |
 | `cta_finish` | Finish | పూర్తి చేయి |
+| `notif_candidate_title` | Checking this area | ఈ ప్రాంతాన్ని పరిశీలిస్తోంది |
+| `notif_candidate_text` | Checking whether Saaya should wake. Nothing leaves this phone. | సాయ మేల్కోవాలా అని పరిశీలిస్తోంది. ఈ ఫోన్ నుంచి ఏదీ బయటకు వెళ్లదు. |
 | `notif_channel_shadow` | Saaya is watching | సాయ గమనిస్తోంది |
 | `notif_shadow_text` | Watching %1$s. Tap to open. | %1$s ని గమనిస్తోంది. తెరవడానికి నొక్కండి. |
 

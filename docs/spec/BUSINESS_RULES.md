@@ -172,11 +172,17 @@ because silently dropping an escalation is the worst failure this app can have.
 |---|---|---|
 | Idle, app foreground | 30 s | `BALANCED` |
 | Idle, app background | geofence callbacks only | n/a |
+| Candidate, after circular enter and before arm | **15 s** | `HIGH_ACCURACY` |
 | Shadow armed | 15 s | `HIGH_ACCURACY` |
 | SOS active | 5 s | `HIGH_ACCURACY` |
 
 Discard any fix with `accuracy > 100 m` for zone-containment decisions. Never discard for
 SOS, where a poor fix beats no fix, but do send `accuracyM` so the console can show it.
+
+`CANDIDATE` is service-private and leaves `SessionEngine` in `IDLE`. The containment proof
+requires at least **five** qualifying in-polygon fixes spanning at least the existing
+**60 s** enter dwell on a monotonic clock. A qualifying outside fix resets the proof;
+accuracy worse than **100 m** is ignored. Process death resets the proof completely.
 
 
 ---

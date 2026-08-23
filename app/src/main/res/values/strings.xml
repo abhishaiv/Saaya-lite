@@ -1,4 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Saaya Lite</string>
+    <string name="notif_channel_shadow">Saaya is watching</string>
+    <string name="notif_candidate_title">Checking this area</string>
+    <string name="notif_candidate_text">Checking whether Saaya should wake. Nothing leaves this phone.</string>
+    <string name="notif_shadow_text">Watching %1$s. Tap to open.</string>
+    <string name="status_shadow_manual">Watching, you turned this on</string>
+    <string name="warn_battery_title">Android may stop Saaya in the background</string>
+    <string name="warn_battery_body">To keep watching while your screen is off, Saaya needs to be left running.</string>
+    <string name="cta_battery_allow">Allow</string>
+    <string name="warn_exact_alarm">Saaya needs permission for exact timing, or check-ins may arrive late.</string>
 </resources>

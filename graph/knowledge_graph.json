@@ -312,9 +312,9 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 212,
-  "edges": 490,
-  "events": 35
+  "entities": 229,
+  "edges": 511,
+  "events": 48
  },
  "entities": [
   {
@@ -1837,6 +1837,135 @@
    "class": "Artifact",
    "label": "T4.1 RulesTest and SessionEngineTest with 37 passing timing-rule cases",
    "node": "T4.1"
+  },
+  {
+   "id": "q.t42.prearm_dwell",
+   "class": "Question",
+   "label": "T4.2 has no canonical execution model or sampling interval for continuous polygon dwell before SHADOW",
+   "node": "T4.2",
+   "status": "blocked"
+  },
+  {
+   "id": "d.t42.candidate_fgs",
+   "class": "Decision",
+   "label": "Use a service-private CANDIDATE FGS with five fixes over 60 seconds at 15-second high accuracy",
+   "by": "founder",
+   "date": "2026-08-20",
+   "rationale": "Provides a real polygon dwell proof under Android background and Doze limits while SessionEngine and UI remain IDLE; the mandatory notification states that nothing leaves the phone."
+  },
+  {
+   "id": "q.t42.battery_permission",
+   "class": "Question",
+   "label": "T4.2 direct battery-exemption action lacked its required manifest permission",
+   "node": "T4.2",
+   "status": "blocked"
+  },
+  {
+   "id": "d.t42.battery_exemption",
+   "class": "Decision",
+   "label": "Declare REQUEST_IGNORE_BATTERY_OPTIMIZATIONS and keep the deliberate direct exemption flow with non-blocking denial",
+   "by": "founder",
+   "date": "2026-08-20",
+   "rationale": "Uninterrupted background execution is core safety functionality; the system remains user-controlled and a settings-list fallback preserves degraded use."
+  },
+  {
+   "id": "d.t42.androidtest_names",
+   "class": "Decision",
+   "label": "Use DEX-safe camelCase names for instrumented tests while retaining sentence names for JVM tests",
+   "by": "codex",
+   "date": "2026-08-20",
+   "rationale": "D8 for minSdk 24 rejects space characters in method SimpleName before DEX 040; test naming is internal and does not alter product behavior."
+  },
+  {
+   "id": "f.t42.stale_generated_classes",
+   "class": "Failure",
+   "label": "G1 found stale duplicate transformed theme classes under generated app/build output",
+   "node": "T4.2",
+   "gate": "G1",
+   "corrected_by": "gradle clean"
+  },
+  {
+   "id": "f.t42.dex_test_names",
+   "class": "Failure",
+   "label": "Connected-test packaging rejected backticked androidTest method names for pre-DEX-040 minSdk",
+   "node": "T4.2",
+   "gate": "G4",
+   "corrected_by": "d.t42.androidtest_names"
+  },
+  {
+   "id": "a.t42.emulator_platform",
+   "class": "Anchor",
+   "label": "API 35 emulator: candidate notification and 15-second high-accuracy stream, five-fix dwell to SHADOW, exact alarm, and START_STICKY deadline recovery",
+   "device": "saaya_api35",
+   "scope": "draws_and_decides_only_not_hardware_anchor",
+   "date": "2026-08-20"
+  },
+  {
+   "id": "ver.t42.spec.round1",
+   "class": "Verification",
+   "label": "T4.2 spec verifier round 1 rejected service recovery, fresh-fix, fallback, test-layer, battery-flow, and hardware-anchor gaps",
+   "node": "T4.2",
+   "kill": "true",
+   "confidence": "0.99"
+  },
+  {
+   "id": "ver.t42.boundary.round1",
+   "class": "Verification",
+   "label": "T4.2 boundary verifier round 1 rejected false-watching and insufficient boundary tests",
+   "node": "T4.2",
+   "kill": "true",
+   "confidence": "0.99"
+  },
+  {
+   "id": "ver.t42.invention.round1",
+   "class": "Verification",
+   "label": "T4.2 invention verifier round 1 rejected channel-copy role reuse and two incorrect fact citations",
+   "node": "T4.2",
+   "kill": "true",
+   "confidence": "0.99"
+  },
+  {
+   "id": "fail.t42.verifier_round1",
+   "class": "Failure",
+   "label": "T4.2 first verifier diamond rejected recovery integrity, candidate freshness, production wiring, test evidence, and provenance",
+   "node": "T4.2",
+   "gate": "G9"
+  },
+  {
+   "id": "q.t42.candidate_channel_label",
+   "class": "Question",
+   "label": "Shared saaya_shadow channel is frozen as Watching while CANDIDATE must never be labelled watching or armed",
+   "node": "T4.2",
+   "status": "blocked"
+  },
+  {
+   "id": "src.brief",
+   "class": "Source",
+   "label": "buildwhatmovesindia.com/brief (fetched 2026-08-19)",
+   "kind": "competition_rules",
+   "year": "2026"
+  },
+  {
+   "id": "f.nomobileapp",
+   "class": "Finding",
+   "label": "Reviewers will not download a mobile app; the submission must be a live public browser link",
+   "value": "explicit in the updated brief",
+   "note": "invalidates a native Android deliverable"
+  },
+  {
+   "id": "f.nocitizenadmin",
+   "class": "Finding",
+   "label": "Reviewers will test the citizen experience, not an admin panel",
+   "value": "explicit in the updated brief",
+   "note": "the police console demotes to evidence, not the deliverable"
+  },
+  {
+   "id": "d.web",
+   "class": "Decision",
+   "label": "Pivot from native Android to a mobile-first web app",
+   "by": "founder",
+   "date": "2026-08-19",
+   "rationale": "the brief now states reviewers will not download a mobile app and the submission must be a live browser link. Roughly 94% of the spec is platform-agnostic and transfers; only ANDROID_PLATFORM and BUILD_CONFIG are replaced. The Kotlin is archived on a branch, not deleted, since it is evidence of Codex's work."
   }
  ],
  "edges": [
@@ -5759,6 +5888,174 @@
    "at": "2026-08-20",
    "by": "codex",
    "confidence": "high"
+  },
+  {
+   "from": "q.t42.prearm_dwell",
+   "rel": "contradicts",
+   "to": "node.T4.2",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "d.t42.candidate_fgs",
+   "rel": "motivated_by",
+   "to": "q.t42.prearm_dwell",
+   "at": "2026-08-20",
+   "by": "founder",
+   "confidence": "high"
+  },
+  {
+   "from": "d.t42.candidate_fgs",
+   "rel": "supersedes",
+   "to": "q.t42.prearm_dwell",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "d.t42.battery_exemption",
+   "rel": "motivated_by",
+   "to": "q.t42.battery_permission",
+   "at": "2026-08-20",
+   "by": "founder",
+   "confidence": "high"
+  },
+  {
+   "from": "d.t42.battery_exemption",
+   "rel": "supersedes",
+   "to": "q.t42.battery_permission",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.architecture",
+   "rel": "read_by",
+   "to": "node.T4.2",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.copy",
+   "rel": "read_by",
+   "to": "node.T4.2",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "doc.test-plan",
+   "rel": "read_by",
+   "to": "node.T4.2",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "f.t42.stale_generated_classes",
+   "rel": "caused_by",
+   "to": "node.T4.2",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "f.t42.dex_test_names",
+   "rel": "caused_by",
+   "to": "node.T4.2",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "node.T4.2",
+   "rel": "verified_by",
+   "to": "a.t42.emulator_platform",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "ver.t42.spec.round1",
+   "rel": "contradicts",
+   "to": "node.T4.2",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "ver.t42.boundary.round1",
+   "rel": "contradicts",
+   "to": "node.T4.2",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "ver.t42.invention.round1",
+   "rel": "contradicts",
+   "to": "node.T4.2",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.t42.verifier_round1",
+   "rel": "caused_by",
+   "to": "node.T4.2",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "q.t42.candidate_channel_label",
+   "rel": "contradicts",
+   "to": "doc.copy",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "q.t42.candidate_channel_label",
+   "rel": "contradicts",
+   "to": "doc.android-platform",
+   "at": "2026-08-20",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "f.nomobileapp",
+   "rel": "sourced_from",
+   "to": "src.brief",
+   "at": "2026-08-19",
+   "by": "founder",
+   "confidence": "high"
+  },
+  {
+   "from": "f.nocitizenadmin",
+   "rel": "sourced_from",
+   "to": "src.brief",
+   "at": "2026-08-19",
+   "by": "founder",
+   "confidence": "high"
+  },
+  {
+   "from": "d.web",
+   "rel": "motivated_by",
+   "to": "f.nomobileapp",
+   "at": "2026-08-19",
+   "by": "founder",
+   "confidence": "high"
+  },
+  {
+   "from": "d.web",
+   "rel": "enables",
+   "to": "claim.nokeys",
+   "at": "2026-08-19",
+   "by": "founder",
+   "confidence": "high"
   }
  ],
  "events": [
@@ -6152,6 +6449,152 @@
     "ver.t41.invention.round4"
    ],
    "node": "T4.1"
+  },
+  {
+   "id": "ev.0036",
+   "type": "blocked",
+   "at": "2026-08-20",
+   "actor": "codex",
+   "detail": "T4.2 geofence ENTER must start high-accuracy sampling and prove 60 seconds continuous polygon containment before arming, but location updates are specified only inside an FGS that is forbidden while IDLE; no candidate sampling interval is frozen",
+   "refs": [
+    "q.t42.prearm_dwell"
+   ],
+   "node": "T4.2"
+  },
+  {
+   "id": "ev.0037",
+   "type": "unblocked",
+   "at": "2026-08-20",
+   "actor": "codex",
+   "detail": "Founder approved a service-private CANDIDATE foreground mode: 15-second HIGH_ACCURACY sampling, five qualifying polygon fixes spanning 60 seconds, IDLE engine state and privacy-safe notification",
+   "refs": [
+    "q.t42.prearm_dwell",
+    "d.t42.candidate_fgs"
+   ],
+   "node": "T4.2"
+  },
+  {
+   "id": "ev.0038",
+   "type": "spec_amended",
+   "at": "2026-08-20",
+   "actor": "codex",
+   "detail": "Canonicalized T4.2 candidate lifecycle, background-permission failure behavior, exact bilingual notification copy, deterministic tests and 12 candidate semantic facts",
+   "refs": [
+    "d.t42.candidate_fgs"
+   ],
+   "node": "T4.2"
+  },
+  {
+   "id": "ev.0039",
+   "type": "blocked",
+   "at": "2026-08-20",
+   "actor": "codex",
+   "detail": "Android requires REQUEST_IGNORE_BATTERY_OPTIMIZATIONS for the specified direct exemption action, but the canonical manifest list omitted it",
+   "refs": [
+    "q.t42.battery_permission"
+   ],
+   "node": "T4.2"
+  },
+  {
+   "id": "ev.0040",
+   "type": "unblocked",
+   "at": "2026-08-20",
+   "actor": "codex",
+   "detail": "Founder approved the required normal manifest permission, one-time explanation, deliberate direct request, non-blocking denial and settings-list fallback",
+   "refs": [
+    "q.t42.battery_permission",
+    "d.t42.battery_exemption"
+   ],
+   "node": "T4.2"
+  },
+  {
+   "id": "ev.0041",
+   "type": "spec_amended",
+   "at": "2026-08-20",
+   "actor": "codex",
+   "detail": "Added the canonical battery-exemption permission and six semantic facts for direct action, one-time explanation, degraded denial, fallback and zero telemetry",
+   "refs": [
+    "d.t42.battery_exemption"
+   ],
+   "node": "T4.2"
+  },
+  {
+   "id": "ev.0042",
+   "type": "decision_made",
+   "at": "2026-08-20",
+   "actor": "codex",
+   "detail": "T4.2 androidTest methods use DEX-safe camelCase because backticked sentence names cannot be packaged for minSdk 24",
+   "refs": [
+    "d.t42.androidtest_names"
+   ],
+   "node": "T4.2"
+  },
+  {
+   "id": "ev.0043",
+   "type": "gate_failed",
+   "at": "2026-08-20",
+   "actor": "codex",
+   "detail": "G1 attempt 1: stale generated SaayaType 2.class and SaayaColors 2.class caused duplicate D8 definitions; Gradle clean removed generated output and the unchanged full gate rerun passed",
+   "refs": [
+    "f.t42.stale_generated_classes"
+   ],
+   "node": "T4.2"
+  },
+  {
+   "id": "ev.0044",
+   "type": "gate_failed",
+   "at": "2026-08-20",
+   "actor": "codex",
+   "detail": "Connected Android test attempt 1 failed before device execution because D8 rejects spaces in method SimpleName for minSdk 24; DEX-safe camelCase correction then ran 6 tests successfully",
+   "refs": [
+    "f.t42.dex_test_names",
+    "d.t42.androidtest_names"
+   ],
+   "node": "T4.2"
+  },
+  {
+   "id": "ev.0045",
+   "type": "anchor_taken",
+   "at": "2026-08-20",
+   "actor": "codex",
+   "detail": "On saaya_api35, notification 1001 was LOW silent ongoing with exact candidate copy; live GPS requested 15s HIGH_ACCURACY; five in-polygon fixes updated the same notification to SHADOW; Room and exact RTC alarm shared the original absolute deadline across PID 3904 to PID 4095 restart. This does not satisfy hardware_only_no_emulator.",
+   "refs": [
+    "a.t42.emulator_platform"
+   ],
+   "node": "T4.2"
+  },
+  {
+   "id": "ev.0046",
+   "type": "verifier_killed",
+   "at": "2026-08-20",
+   "actor": "codex",
+   "detail": "T4.2 round 1 spec, boundary, and invention lenses all rejected the node; verdicts preserved in verifications.jsonl",
+   "node": "T4.2",
+   "refs": [
+    "ver.t42.spec.round1",
+    "ver.t42.boundary.round1",
+    "ver.t42.invention.round1",
+    "fail.t42.verifier_round1"
+   ]
+  },
+  {
+   "id": "ev.0047",
+   "type": "blocked",
+   "at": "2026-08-20",
+   "actor": "codex",
+   "detail": "T4.2 candidate must reuse the saaya_shadow channel but its frozen Watching label contradicts the rule that CANDIDATE is never labelled watching or armed",
+   "node": "T4.2",
+   "refs": [
+    "q.t42.candidate_channel_label"
+   ]
+  },
+  {
+   "id": "ev.0048",
+   "type": "spec_amended",
+   "at": "2026-08-22",
+   "actor": "codex",
+   "detail": "Platform pivot: native Android to mobile-first web. Brief fetched 2026-08-19 states reviewers will not download a mobile app and will test the citizen experience, not an admin panel. Kotlin archived on archive/android-kotlin.",
+   "node": "T1.1"
   }
  ]
 }

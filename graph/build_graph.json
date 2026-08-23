@@ -40,49 +40,31 @@
   "T1.1": {
    "id": "T1.1",
    "seq": 1,
-   "title": "Scaffold, theme, manifest privacy flags",
+   "title": "Scaffold: Next.js, TypeScript, theme tokens, Vercel",
    "hours": 2.0,
    "requires": [],
    "produces": [
-    "gradle_project",
+    "next_project",
     "theme_tokens",
-    "manifest_privacy",
-    "adaptive_icon",
-    "splash"
+    "vercel_deploy"
    ],
    "reads": [
     "BUILD_CONFIG.md",
     "ARCHITECTURE.md",
     "DESIGN_SYSTEM.md",
     "ICONOGRAPHY.md",
-    "brand/README.md"
+    "brand/README.md",
+    "WEB_PLATFORM.md"
    ],
    "extra_gates": [
     "aapt2_allowbackup_false"
    ],
    "risk": "low",
    "cumulative_hours": 2.0,
-   "status": "complete",
+   "status": "pending",
    "run_id": "run.T1.1.2026-08-20.001",
-   "gates_passed": [
-    "G1_assembleDebug",
-    "G2_lintDebug",
-    "G3_testDebugUnitTest",
-    "G4_no_tests_named_for_T1.1",
-    "G5_acceptance_api35_emulator",
-    "G6_grounded_with_explain",
-    "G7_non_negotiables",
-    "G8_runs_on_api35_emulator",
-    "G9_spec_verifier_round2_pass",
-    "aapt2_allowbackup_false"
-   ],
-   "artifacts": [
-    "art.t11.gradle_project",
-    "art.t11.theme_tokens",
-    "art.t11.manifest_privacy",
-    "art.t11.adaptive_icon",
-    "art.t11.splash"
-   ],
+   "gates_passed": [],
+   "artifacts": [],
    "corrections": [
     "Resolved androidx.core:core-ktx 1.15.0, which requires compileSdk 35, to the latest prior stable 1.x release 1.13.1 whose AAR declares minCompileSdk 34.",
     "Corrected the AndroidX SplashScreen extension import and API-27-qualified navigation-bar theme inheritance.",
@@ -98,12 +80,13 @@
    ],
    "verify_command": "spawn spec as fresh-context subagents; merge verdicts in code",
    "shape": "serial",
-   "fanout": null
+   "fanout": null,
+   "note": "Completed on Android and archived on branch archive/android-kotlin. Redo for web. The LOGIC transfers; the platform layer does not."
   },
   "T2.1": {
    "id": "T2.1",
    "seq": 2,
-   "title": "Zone parsing to typed Zone/ZoneCard/PoliceStation",
+   "title": "Zone parsing to typed Zone/ZoneCard/PoliceStation (TS)",
    "hours": 1.5,
    "requires": [
     "T1.1"
@@ -124,29 +107,10 @@
    ],
    "risk": "low",
    "cumulative_hours": 3.5,
-   "status": "complete",
+   "status": "pending",
    "run_id": "run.T2.1.2026-08-20.001",
-   "gates_passed": [
-    "fanout_check_three_workers",
-    "G1_assembleDebug",
-    "G2_lintDebug",
-    "G3_testDebugUnitTest",
-    "G4_ZoneParsingTest",
-    "G5_acceptance_24_19_37_and_189_coordinate_anchor",
-    "G6_grounded_with_explain",
-    "G7_non_negotiables",
-    "G8_pure_jvm_no_affected_screen",
-    "G9_spec_verifier_round2_pass",
-    "invention_verifier_supplemental_pass"
-   ],
-   "artifacts": [
-    "art.t21.zone_type",
-    "art.t21.zone_card_type",
-    "art.t21.police_station_type",
-    "art.t21.assets_bundled",
-    "art.t21.zone_loader",
-    "art.t21.zone_parsing_test"
-   ],
+   "gates_passed": [],
+   "artifacts": [],
    "corrections": [
     "The cite-and-propose transcription was faithful to DATA_MODEL.md but the measured coordinate box was wrong against the frozen asset; the founder replaced it with the 17.4..18.1 / 82.9..83.7 district envelope.",
     "The initial repair recommendation of lowering only the centroid longitude minimum to 83.0975 was too narrow because 34 polygon vertices also exceeded the old box; the final parser validates all 24 centroids and all 165 vertices.",
@@ -194,12 +158,13 @@
      "data/zone/ZoneLoader.kt"
     ],
     "merge": "code: assert 24/19/37 counts and every centroid plus polygon vertex inside lat 17.4-18.1 lon 82.9-83.7; then write the single ZoneLoader that composes the three parsers"
-   }
+   },
+   "note": "Completed on Android and archived on branch archive/android-kotlin. Redo for web. The LOGIC transfers; the platform layer does not."
   },
   "T4.1": {
    "id": "T4.1",
    "seq": 3,
-   "title": "Session engine, pure JVM, no Android imports",
+   "title": "Session engine, pure TypeScript, zero browser API",
    "hours": 3.0,
    "requires": [
     "T2.1"
@@ -225,40 +190,20 @@
    ],
    "risk": "HIGH",
    "cumulative_hours": 6.5,
-      "status": "complete",
-      "run_id": "run.T4.1.2026-08-20.001",
-      "gates_passed": [
-        "G1_assembleDebug",
-        "G2_lintDebug_zero_errors",
-        "G3_testDebugUnitTest_39_tests",
-        "G4_RulesTest_and_SessionEngineTest",
-        "G5_full_transition_table_and_freeze_at_arm_acceptance",
-        "G6_grounded_22_files_with_explain",
-        "G7_twelve_non_negotiables",
-        "G8_installs_and_cold_launches_on_api35_emulator",
-        "G9_final_spec_boundary_invention_pass",
-        "G10_reads_check_51_types_closed",
-        "no_android_import_in_domain"
-      ],
-      "artifacts": [
-        "art.t41.session_types",
-        "art.t41.rules",
-        "art.t41.arming_evaluator",
-        "art.t41.interval_calculator",
-        "art.t41.dwell_evaluator",
-        "art.t41.session_engine",
-        "art.t41.engine_tests"
-      ],
-      "corrections": [
-        "The initial node contract did not define Command, PersistedSession, Rules or EngineResult outcome and omitted required reads; founder amendments closed the type contract and G10 now enforces it.",
-        "FEATURES and STATE_MACHINE contradicted each other on check-in manual disarm and the first state-visible write; founder amendments made check-in disarm local-only, the anonymous civic signal begin at FAMILY_ESCALATED and the detailed incident begin at SOS_ACTIVE.",
-        "The first spec verifier killed current-band n/a rescheduling, recomputed SHADOW recovery, an undocumented ZoneExited guard and overdue recovery without foreground-service restart.",
-        "The founder selected FREEZE_AT_ARM: AUTO_ZONE persists armedHourBand and every absolute deadline, while MANUAL remains fixed at ten minutes and fresh n/a arms stay IDLE.",
-        "The first invention verifier killed an inert 0.5 test default that mechanically matched an unrelated display-risk fact; it is now explicitly exempted as fixture plumbing and every behavioral literal remains grounded.",
-        "The final invention pass first killed a stale spec_graph header count of 248 against 279 actual facts; the declared cardinality now matches the array and the fresh rerun passed.",
-        "G1's first final rerun found stale duplicate transformed classes only in generated app/build output; Gradle clean removed them and the complete assemble, lint and test rerun passed.",
-        "Persistence commands were ordered so the local session arm record exists before ScheduleTimer attaches its absolute deadline."
-      ],
+   "status": "pending",
+   "run_id": "run.T4.1.2026-08-20.001",
+   "gates_passed": [],
+   "artifacts": [],
+   "corrections": [
+    "The initial node contract did not define Command, PersistedSession, Rules or EngineResult outcome and omitted required reads; founder amendments closed the type contract and G10 now enforces it.",
+    "FEATURES and STATE_MACHINE contradicted each other on check-in manual disarm and the first state-visible write; founder amendments made check-in disarm local-only, the anonymous civic signal begin at FAMILY_ESCALATED and the detailed incident begin at SOS_ACTIVE.",
+    "The first spec verifier killed current-band n/a rescheduling, recomputed SHADOW recovery, an undocumented ZoneExited guard and overdue recovery without foreground-service restart.",
+    "The founder selected FREEZE_AT_ARM: AUTO_ZONE persists armedHourBand and every absolute deadline, while MANUAL remains fixed at ten minutes and fresh n/a arms stay IDLE.",
+    "The first invention verifier killed an inert 0.5 test default that mechanically matched an unrelated display-risk fact; it is now explicitly exempted as fixture plumbing and every behavioral literal remains grounded.",
+    "The final invention pass first killed a stale spec_graph header count of 248 against 279 actual facts; the declared cardinality now matches the array and the fresh rerun passed.",
+    "G1's first final rerun found stale duplicate transformed classes only in generated app/build output; Gradle clean removed them and the complete assemble, lint and test rerun passed.",
+    "Persistence commands were ordered so the local session arm record exists before ScheduleTimer attaches its absolute deadline."
+   ],
    "verify_lenses": [
     "spec",
     "boundary",
@@ -266,32 +211,34 @@
    ],
    "verify_command": "spawn spec, boundary, invention as fresh-context subagents; merge verdicts in code",
    "shape": "serial",
-   "fanout": null
+   "fanout": null,
+   "note": "Direct port of the pure Kotlin engine. Same states, events, transitions, timings and tests. Only the language changes. Zero browser API in src/domain/."
   },
   "T4.2": {
    "id": "T4.2",
    "seq": 4,
-   "title": "Foreground service, geofencing, alarms, recovery",
+   "title": "Geolocation watch, arming, wake lock, tab lifecycle",
    "hours": 3.0,
    "requires": [
     "T4.1",
     "T2.1"
    ],
    "produces": [
-    "service_running",
-    "geofences_registered",
-    "timers_exact",
-    "recovery_works"
+    "location_watch",
+    "arming_works",
+    "wakelock",
+    "tab_recovery"
    ],
    "reads": [
-    "ANDROID_PLATFORM.md",
     "STATE_MACHINE.md",
     "BUSINESS_RULES.md",
-    "ARCHITECTURE.md"
+    "ARCHITECTURE.md",
+    "COPY.md",
+    "TEST_PLAN.md",
+    "WEB_PLATFORM.md"
    ],
    "extra_gates": [
-    "device_arms_with_no_tap",
-    "hardware_only_no_emulator"
+    "arms_with_no_tap_page_open"
    ],
    "risk": "HIGHEST",
    "cumulative_hours": 9.5,
@@ -308,12 +255,12 @@
    "verify_command": "spawn spec, boundary, invention as fresh-context subagents; merge verdicts in code",
    "shape": "serial",
    "fanout": null,
-   "note": "ANCHOR REQUIRES REAL HARDWARE. An emulator will report geofence success where a real phone under Doze and OEM battery management will not. This anchor is the product's central claim; an emulator pass is worth nothing here."
+   "note": "Replaces the Android hardware anchor. A browser CANNOT arm in the background: arming holds only while the page is open. See WEB_PLATFORM.md. The anchor is now 'arms with no tap while the page is open, on a real mobile browser'."
   },
   "T1.2": {
    "id": "T1.2",
    "seq": 5,
-   "title": "Firebase wiring, anonymous auth (project already exists)",
+   "title": "Firebase wiring, anonymous auth (project exists)",
    "hours": 1.0,
    "requires": [
     "T1.1"
@@ -378,7 +325,7 @@
   "T8.2": {
    "id": "T8.2",
    "seq": 7,
-   "title": "Console: the live demo link",
+   "title": "State view console route",
    "hours": 3.0,
    "requires": [
     "T8.1"
@@ -411,12 +358,13 @@
    ],
    "verify_command": "spawn spec, boundary, invention as fresh-context subagents; merge verdicts in code",
    "shape": "serial",
-   "fanout": null
+   "fanout": null,
+   "note": "Demoted from THE live link to supporting evidence. Reviewers test the citizen experience, not an admin panel."
   },
   "T1.3": {
    "id": "T1.3",
    "seq": 8,
-   "title": "Component library C1 to C14",
+   "title": "Component library C1 to C14 (React)",
    "hours": 3.0,
    "requires": [
     "T1.1"
@@ -491,7 +439,7 @@
   "T2.2": {
    "id": "T2.2",
    "seq": 9,
-   "title": "Map screen, zones, her dot, offline",
+   "title": "Map screen: Leaflet, CARTO tiles, zones, her dot",
    "hours": 2.5,
    "requires": [
     "T2.1",
@@ -509,7 +457,8 @@
     "STATES_CATALOGUE.md",
     "ARCHITECTURE.md",
     "COMPONENT_LIBRARY.md",
-    "DESIGN_SYSTEM.md"
+    "DESIGN_SYSTEM.md",
+    "WEB_PLATFORM.md"
    ],
    "extra_gates": [
     "zones_render_offline"
@@ -608,7 +557,7 @@
   "T3.2": {
    "id": "T3.2",
    "seq": 12,
-   "title": "Onboarding, permissions, favourites, PIN",
+   "title": "Onboarding, permissions, favourites, PIN (Web Crypto)",
    "hours": 3.0,
    "requires": [
     "T1.3"
@@ -620,13 +569,13 @@
    ],
    "reads": [
     "SCREENS.md",
-    "ANDROID_PLATFORM.md",
     "BUSINESS_RULES.md",
     "COMPONENT_LIBRARY.md",
     "ACCESSIBILITY_SPEC.md",
     "ARCHITECTURE.md",
     "DATA_MODEL.md",
-    "COPY.md"
+    "COPY.md",
+    "WEB_PLATFORM.md"
    ],
    "extra_gates": [
     "PinStorageTest"
@@ -649,7 +598,7 @@
   "T5.1": {
    "id": "T5.1",
    "seq": 13,
-   "title": "Check-in 1 and 2, notifications, lock screen",
+   "title": "Check-in 1 and 2, Notification API, full-screen overlay",
    "hours": 3.0,
    "requires": [
     "T4.1",
@@ -658,17 +607,17 @@
    "produces": [
     "checkin_screens",
     "notif_channels",
-    "fullscreen_intent"
+    "fullscreen_overlay"
    ],
    "reads": [
     "SCREENS.md",
-    "ANDROID_PLATFORM.md",
     "COPY.md",
     "COMPONENT_LIBRARY.md",
     "INTERACTION_SPEC.md",
     "MOTION_SPEC.md",
     "ACCESSIBILITY_SPEC.md",
-    "ARCHITECTURE.md"
+    "ARCHITECTURE.md",
+    "WEB_PLATFORM.md"
    ],
    "extra_gates": [
     "checkin2_over_lockscreen"
@@ -731,7 +680,7 @@
   "T6.2": {
    "id": "T6.2",
    "seq": 15,
-   "title": "Offline queue with backoff",
+   "title": "Offline queue in IndexedDB with backoff",
    "hours": 1.5,
    "requires": [
     "T1.2"
@@ -744,7 +693,8 @@
     "ARCHITECTURE.md",
     "BUSINESS_RULES.md",
     "TEST_PLAN.md",
-    "DATA_MODEL.md"
+    "DATA_MODEL.md",
+    "WEB_PLATFORM.md"
    ],
    "extra_gates": [
     "QueueTest",
@@ -851,7 +801,7 @@
   "T7.3": {
    "id": "T7.3",
    "seq": 18,
-   "title": "What the police see, in app",
+   "title": "What the police see, in the citizen app",
    "hours": 1.5,
    "requires": [
     "T7.2",
@@ -918,13 +868,13 @@
   "T9.0": {
    "id": "T9.0",
    "seq": 20,
-   "title": "Landing page with APK and video",
+   "title": "Submission page: video, summary, disclosures",
    "hours": 1.0,
    "requires": [
     "T8.2"
    ],
    "produces": [
-    "landing_page"
+    "submission_page"
    ],
    "reads": [
     "SUBMISSION.md",
@@ -1113,19 +1063,14 @@
    "why": "public read is hard to un-publish; confirm every record is synthetic first"
   },
   {
-   "before": "T8.2",
-   "gate": "console URL becomes reachable",
+   "before": "T2.2",
+   "gate": "the Vercel URL becomes publicly reachable",
    "why": "this is the submission's live link; once shared it is judged"
   },
   {
    "after": "T9.0",
-   "gate": "APK published on the landing page",
-   "why": "an installed APK cannot be recalled from a judge's phone"
-  },
-  {
-   "after": "T9.2",
-   "gate": "submission",
-   "why": "irreversible by definition"
+   "gate": "submission form",
+   "why": "no grace period after 2026-08-28 20:00 IST"
   }
  ],
  "architecture": {
@@ -1154,11 +1099,12 @@
    "decision": "NO git worktrees.",
    "reason": "A collision means the node contract was drawn wrong. Every worker now owns a disjoint set of paths plus its own manifest; the merge is plain code that assembles the shared files. There is nothing left to collide.",
    "roadmap_alignment": "Step 3: bounded input, bounded output, exactly one job. Step 4: the reduce is plain code and edges are free. Step 10 says worktrees are the seatbelt for the one topology that needs it, not a default tax.",
-   "cost_avoided": "14 full Android checkouts for T1.3, and one merge becoming fourteen.",
+   "cost_avoided": "n/a on web; disjoint contracts still apply to the diamonds.",
    "when_worktrees_WOULD_be_right": "If a future diamond's workers must each modify the SAME existing file - a cross-cutting refactor, a rename across call sites. We have no such node. If one is ever added, isolate it; do not widen the contracts to fit.",
    "workers_never_commit": "Only the parent commits, once, after the merge. Avoids git index contention entirely.",
    "guard": "python3 scripts/fanout_check.py <node> - asserts no worker wrote outside its owned paths and no two workers claimed the same path."
-  }
+  },
+  "platform": "web (Next.js on Vercel). Pivoted 2026-08-19; see decision d.web."
  },
  "always_read": {
   "files": [
