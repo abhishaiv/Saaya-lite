@@ -99,7 +99,7 @@ never as a toast, never as a dialog.
 |---|---|
 | Incoming call during check-in | check-in continues underneath, countdown unaffected, re-presents when the call ends |
 | Incoming call during SOS | SOS continues, notification stays |
-| App backgrounded during ladder | everything continues; the service and an absolute deadline in IndexedDB own the timing |
-| Screen off during check-in 2 | full-screen intent turns the screen on |
+| Tab hidden during ladder | the absolute deadline in IndexedDB owns the timing. Timers do not run reliably while hidden, so the ladder is reconciled on `visibilitychange` and on load, never resumed. |
+| Screen off during check-in 2 | a browser cannot turn the screen on. The notification is posted with `requireInteraction: true` and the ladder continues against its absolute deadline. Disclosed as a platform limit. |
 | Battery saver enabled | detect and warn per `WEB_PLATFORM.md`. Never fail silently. |
 | Airplane mode | ladder unaffected, writes queue, UI states it is queued |

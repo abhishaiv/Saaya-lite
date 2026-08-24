@@ -136,20 +136,50 @@ verifiable in devtools, which is the point.
 ## Gitignore
 
 ```gitignore
+# Secrets and machine-local (none exist yet, listed defensively)
 google-services.json
+keystore.properties
+*.jks
+*.keystore
 local.properties
 .env
-/build
+.env.*
+
+# Build output
+/build/
 **/build/
-.gradle
-.idea
+.gradle/
 *.apk
-*.jks
-keystore.properties
+*.aab
+node_modules/
+.next/
+out/
+.vercel/
+*.tsbuildinfo
+__pycache__/
+*.pyc
+
+# IDE / OS
+.idea/
+*.iml
+.DS_Store
+
+# Fan-out worker scratch (manifests are regenerated per node)
+build/fanout/
+
+# Build crash artefacts. A 719 MB JVM heap dump from the T1.1 OOM was swept into a
+# commit by `git add -A` on 2026-08-19 and rejected by GitHub. These are never wanted.
+*.hprof
+*.heapdump
+hs_err_pid*.log
+replay_pid*.log
+.kotlin/
 ```
 
-`*.jks` and `keystore.properties` are listed defensively even though we do not use a
-keystore, so an accidental one can never be committed.
+This block is the real `.gitignore` verbatim. `*.jks`, `keystore.properties`,
+`google-services.json` and the Android build outputs are defensive: the web build uses none
+of them, but this repo carries the Android history on `archive/android-kotlin`, so an
+accidental one can never be committed. The `*.hprof` entries are not theoretical.
 
 ## Verification, after setup
 

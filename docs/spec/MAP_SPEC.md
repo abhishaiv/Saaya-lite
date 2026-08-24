@@ -28,9 +28,9 @@ low contrast is exactly what we want: the basemap is context, the zones are the 
 | Setting | Value |
 |---|---|
 | Tile source | CARTO Dark Matter, `dark_all` (labels retained, she needs to orient) |
-| Retina | append `@2x` on `xhdpi` and above |
-| User agent | set `Configuration.getInstance().userAgentValue` to the package name. **Required.** OSM infrastructure blocks the default agent. |
-| Cache | Leaflet SQLite tile cache, 64 MB cap, so a repeated route is instant and cheap |
+| Retina | append `@2x` when `devicePixelRatio > 1` |
+| User agent | not applicable. The browser sends its own, and CARTO's tile CDN serves it. Nothing to configure. |
+| Cache | the browser HTTP cache, governed by CARTO's own headers. There is no tile cache to configure and no cap to set. Do not add a Service Worker tile cache for the prototype. |
 | Min zoom | 10 |
 | Max zoom | 17 |
 | Default | zoom 12.5, centred on `17.7100, 83.3000` |

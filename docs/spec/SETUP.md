@@ -101,7 +101,7 @@ Saaya Lite/
   firebase.json
   firestore.rules
   firestore.indexes.json
-  gradle/package.json
+  package.json
   .gitignore
 ```
 

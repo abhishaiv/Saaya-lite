@@ -21,26 +21,41 @@ things: an anonymised SUS event, and a full SOS incident.
 ### `Zone` (domain model)
 
 ```typescript
-data class Zone(
-  val stationId: String,          // "dwaraka_police_station" - the primary key everywhere
-  val stationName: String,        // "Dwaraka Police Station"
-  val district: String,           // "Visakhapatnam"
-  val polygon: List<LatLng>,      // geometry.coordinates[0], NOTE: GeoJSON is [lon, lat]
-  val centroid: LatLng,           // properties.latitude / longitude
-  val riskScore: Double,          // 0.0722 .. 1.0
-  val riskTier: RiskTier,         // HIGH | ELEVATED | MODERATE | SAFE
-  val colorHex: String,           // "#FF3B30" | "#FF9500" | "#FFCC00" | "#00000000"
-  val opacity: Double,            // 0.35 etc
-  val totalCases: Int,            // 478
-  val womenSafetyCases: Int,      // 84
-  val crimeBreakdown: Map<String, Int>,
-  val geofenceRadiusM: Int,       // 2000 .. 5000, ALREADY COMPUTED, do not derive
-  val areasCovered: String,
-  val touristSpots: String?,
-  val riskNotes: String?
-)
+export enum RiskTier {
+  HIGH = "HIGH", ELEVATED = "ELEVATED", MODERATE = "MODERATE", SAFE = "SAFE",
+}
 
-enum class RiskTier { HIGH, ELEVATED, MODERATE, SAFE }
+export type ZoneColorHex = "#FF3B30" | "#FF9500" | "#FFCC00" | "#00000000";
+
+/** A coordinate in domain order, deliberately unlike GeoJSON's [longitude, latitude]. */
+export interface LatLng {
+  readonly latitude: number;
+  readonly longitude: number;
+}
+
+export type CrimeBreakdown = Readonly<Record<string, number>>;
+
+export interface Zone {
+  readonly stationId: string;      // "dwaraka_police_station" - the primary key everywhere
+  readonly stationName: string;    // "Dwaraka Police Station"
+  readonly district: string;       // "Visakhapatnam"
+  readonly polygon: readonly LatLng[];  // geometry.coordinates[0]. GeoJSON is [lon, lat]
+  readonly centroid: LatLng;       // properties.latitude / longitude
+  readonly riskScore: number;      // 0.0722 .. 1.0
+  readonly riskTier: RiskTier;
+  readonly colorHex: ZoneColorHex;
+  readonly opacity: number;        // 0.35 etc
+  readonly totalCases: number;     // 478
+  readonly womenSafetyCases: number;   // 84
+  readonly crimeBreakdown: CrimeBreakdown;
+  readonly geofenceRadiusM: number;    // 2000 .. 5000, ALREADY COMPUTED, do not derive
+  readonly areasCovered: string;
+  readonly touristSpots: string | null;
+  readonly riskNotes: string | null;
+}
+
+`geofenceRadiusM` is a field of the frozen asset and is used only as a cheap pre-filter
+before the polygon test, per `BUSINESS_RULES.md`. It never defines containment.
 ```
 
 **GeoJSON gotcha:** coordinates are `[longitude, latitude]`. Getting this backwards puts
@@ -69,26 +84,35 @@ have no entry in `zone_info_cards.json`, which is why that file has 19 entries a
 ### `ZoneCard`
 
 ```typescript
-data class ZoneCard(
-  val stationId: String, val areaName: String, val fullAreas: String,
-  val riskLevel: String,      // "High Risk" - display string, use as-is
-  val riskTier: String, val incidentCount: Int, val womenSafetyCount: Int,
-  val topCrimes: String,      // "Theft & Burglary: 125, Other IPC: 82, ..." pre-formatted
-  val riskNotes: String, val touristSpots: String
-)
+export interface ZoneCard {
+  readonly stationId: string;
+  readonly areaName: string;
+  readonly fullAreas: string;
+  readonly riskLevel: string;      // "High Risk" - display string, use as-is
+  readonly riskTier: string;
+  readonly incidentCount: number;
+  readonly womenSafetyCount: number;
+  readonly topCrimes: string;      // "Theft & Burglary: 125, ..." pre-formatted
+  readonly riskNotes: string;
+  readonly touristSpots: string;
+}
 ```
 
 ### `PoliceStation`
 
 ```typescript
-data class PoliceStation(
-  val id: String,             // "PS-001"
-  val name: String, val category: String, val locality: String,
-  val areaCovered: String, val latitude: Double, val longitude: Double,
-  val coordPrecision: String, // "locality-approx" - surface this honestly in the UI
-  val phone: String,          // "0891-2563632"
-  val address: String
-)
+export interface PoliceStation {
+  readonly id: string;             // "PS-001"
+  readonly name: string;
+  readonly category: string;
+  readonly locality: string;
+  readonly areaCovered: string;
+  readonly latitude: number;
+  readonly longitude: number;
+  readonly coordPrecision: string; // "locality-approx" - surface honestly in the UI
+  readonly phone: string;          // "0891-2563632"
+  readonly address: string;
+}
 ```
 
 ---

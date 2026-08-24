@@ -32,7 +32,9 @@ primary button and never shrink the countdown numeral**, because those are what 
 
 ## Orientation
 
-**Portrait only.** `screenOrientation="portrait"` in the manifest for every activity.
+**Portrait only.** `"orientation": "portrait"` in the PWA manifest. A browser tab cannot
+hard-lock orientation the way an Android activity could, so also hold the portrait layout
+with CSS at every width and never depend on the lock.
 
 Reasoning, and put it in the write-up: this is used one-handed, in a moving vehicle, at
 night. Landscape adds a layout matrix we cannot test properly in nine evenings, and a
@@ -71,7 +73,7 @@ Full-bleed map means edge-to-edge. Handle `WindowInsets` properly:
 layout by width, which is adequate, and we do not verify it.
 
 The one thing that must hold regardless: **the session survives any configuration change**,
-because it lives in the wake lock plus a visible page and not in the activity. That is already true if
+because it lives in IndexedDB as an absolute deadline and not in component state. That is already true if
 `ARCHITECTURE.md` is followed, and it is covered by the rotation-free portrait lock.
 
 ## Performance on low-end devices

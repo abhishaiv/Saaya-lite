@@ -89,13 +89,16 @@ demo video.
 | `notif_channel_shadow` | Saaya is watching | సాయ గమనిస్తోంది |
 | `notif_shadow_text` | Watching %1$s. Tap to open. | %1$s ని గమనిస్తోంది. తెరవడానికి నొక్కండి. |
 
-## Notification channel names
+## Notification kinds
 
-| Channel id | Name | Importance |
+The web Notification API has no channels and no importance levels, and nothing can bypass
+Do Not Disturb. These are the three kinds we post and the options each uses.
+
+| Kind | Title | Options |
 |---|---|---|
-| `saaya_shadow` | Watching | LOW, no sound, ongoing |
-| `saaya_checkin` | Check-ins | HIGH, sound, heads-up |
-| `saaya_urgent` | Urgent check-ins | HIGH, alarm sound, bypass DND |
+| shadow | Watching | `silent: true`, `tag: "saaya-shadow"`, re-posted rather than stacked |
+| check-in | Check-ins | default sound, `tag: "saaya-checkin"` |
+| urgent | Urgent check-ins | `requireInteraction: true`, urgent sound played in-page when audible |
 | `saaya_sos` | SOS | HIGH, ongoing, not dismissible |
 
 ## Vocabulary, locked 2026-08-18

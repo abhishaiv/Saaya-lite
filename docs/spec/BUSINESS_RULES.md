@@ -170,11 +170,11 @@ because silently dropping an escalation is the worst failure this app can have.
 
 | State | Interval | Priority |
 |---|---|---|
-| Idle, app foreground | 30 s | `BALANCED` |
-| Idle, app background | geofence callbacks only | n/a |
-| Candidate, after circular enter and before arm | **15 s** | `HIGH_ACCURACY` |
-| Shadow armed | 15 s | `HIGH_ACCURACY` |
-| SOS active | 5 s | `HIGH_ACCURACY` |
+| Idle, page visible | 30 s | `enableHighAccuracy: false` |
+| Page hidden | nothing. The watch stops and no arming can occur; see `WEB_PLATFORM.md`. | n/a |
+| Pending dwell, before arm | **15 s** | `enableHighAccuracy: true` |
+| Shadow armed | 15 s | `enableHighAccuracy: true` |
+| SOS active | 5 s | `enableHighAccuracy: true` |
 
 Discard any fix with `accuracy > 100 m` for zone-containment decisions. Never discard for
 SOS, where a poor fix beats no fix, but do send `accuracyM` so the console can show it.

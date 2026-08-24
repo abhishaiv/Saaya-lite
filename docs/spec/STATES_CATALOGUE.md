@@ -65,9 +65,9 @@ common way a demo breaks in front of a judge.
 | countdown running | ring `linear`, numeral `tnum`, no other animation |
 | deadline passed | card removes itself, ladder advances underneath |
 | answered | 160 ms exit |
-| app was backgrounded | notification carries it. On resume, re-present with the **correct remaining time**, never a reset countdown. |
+| tab was hidden or closed | the Notification API carries it if permission was granted. On resume, re-present with the **correct remaining time** recomputed from `deadlineEpochMs`, never a reset countdown. |
 | notification permission denied | in-app card only, plus a Home banner warning she may miss a check-in when the app is closed |
-| full-screen intent refused (API 34) | fall back to high-importance heads-up, log it, still play the alarm-stream sound |
+| the page is hidden at check-in 2 | a browser cannot wake a locked phone and has no full-screen intent. Fire the notification with `requireInteraction: true`, play the urgent sound if the page is audible, and disclose this limit in the write-up. Never claim the screen will turn on. |
 
 ## S7 Family escalation
 | State | Treatment |
