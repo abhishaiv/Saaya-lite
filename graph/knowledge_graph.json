@@ -313,8 +313,8 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 267,
-  "edges": 571,
+  "entities": 269,
+  "edges": 573,
   "events": 56
  },
  "entities": [
@@ -2254,6 +2254,18 @@
    "id": "d.no_perfnow",
    "class": "Decision",
    "label": "Deadlines are absolute epoch millis, never performance.now(). Monotonic time does not survive a frozen tab, which is the normal case on web, not the edge case.",
+   "at": "2026-08-24"
+  },
+  {
+   "id": "d.pivot_sweep",
+   "class": "Decision",
+   "label": "After three consecutive blockers of the same class (pivot residue in a doc a node reads), swept every document in the remaining nodes' reads arrays instead of waiting for the fourth. Eight genuine sites fixed across DATA_MODEL, RESPONSIVE_SPEC, STATES_CATALOGUE, INTERACTION_SPEC, MAP_SPEC, COPY, BUSINESS_RULES, SETUP and SECRETS_AND_ACCESS.",
+   "at": "2026-08-24"
+  },
+  {
+   "id": "d.spec_follows_code",
+   "class": "Decision",
+   "label": "DATA_MODEL.md carried Kotlin data classes inside typescript fences, which is why the type checker read them without complaint. Reconciled to the models T2.1 actually produced and verified, rather than writing a second contract for the same types. Where a node has already built and passed its verifiers, the spec is corrected to match the code.",
    "at": "2026-08-24"
   }
  ],
@@ -6822,6 +6834,22 @@
    "from": "fail.statemachine_pivot",
    "rel": "caused_by",
    "to": "fail.audit_grep_scope",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.pivot_sweep",
+   "rel": "motivated_by",
+   "to": "fail.statemachine_pivot",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.spec_follows_code",
+   "rel": "motivated_by",
+   "to": "fail.statemachine_pivot",
    "at": "2026-08-24",
    "by": "claude",
    "confidence": "high"
