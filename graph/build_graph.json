@@ -263,11 +263,42 @@
    ],
    "risk": "HIGH",
    "cumulative_hours": 6.5,
-   "status": "pending",
-   "run_id": null,
-   "gates_passed": [],
-   "artifacts": [],
-   "corrections": [],
+   "status": "complete",
+   "run_id": "run.T4.1.2026-08-24.web.001",
+   "gates_passed": [
+    "G1_npm_run_build",
+    "G2_tsc_and_next_lint_zero_errors",
+    "G3_vitest_50_tests",
+    "G4_rules_dwell_and_session_engine_42_tests",
+    "G5_full_transition_dwell_freeze_and_recovery_acceptance",
+    "G6_grounded_9_typescript_files_with_semantic_explain",
+    "G7_twelve_non_negotiables",
+    "G8_pure_domain_node_no_affected_screen",
+    "G9_final_spec_boundary_invention_pass",
+    "G10_reads_check_17_types_closed",
+    "no_browser_or_android_import_in_domain"
+   ],
+   "failed_attempts": {
+    "G3": 1,
+    "G9": 2
+   },
+   "artifacts": [
+    "art.t41.web_session_types",
+    "art.t41.web_rules",
+    "art.t41.web_arming_evaluator",
+    "art.t41.web_interval_calculator",
+    "art.t41.web_dwell_evaluator",
+    "art.t41.web_session_engine",
+    "art.t41.web_engine_tests"
+   ],
+   "corrections": [
+    "The first targeted Vitest run exposed that the Next.js path alias was not available to Vitest; pure domain imports were changed to relative module paths without adding test configuration or a dependency.",
+    "The first boundary verifier killed stale recovery that could downgrade active SOS and family cancellation that left location and wake effects running; SOS is now PIN-sticky across stale snapshots and every resolved path cleans up live effects.",
+    "The spec verifier found that ambient active-context validation ran before persisted recovery hydration and that legitimate SOS recovery had become an inert sticky no-op; recovery now hydrates first and restores the SOS watch, UI and PIN requirement.",
+    "The first invention pass killed inert synthetic Zone score defaults, exempted behavioral clock endpoints and an implicit 0000 PIN literal; fixtures now carry explicit plumbing exemptions, endpoints derive from frozen start facts and 0000 derives from Western zero plus PIN length.",
+    "The second invention pass killed an AUTO_ZONE recovery test whose ten-minute deadline borrowed the manual interval fact; it now derives HIGH plus NIGHT_DEEP through the production interval calculator.",
+    "The archived current-Zone-object guard on ZoneExited was removed so a completed exit-dwell event remains authoritative."
+   ],
    "verify_lenses": [
     "spec",
     "boundary",

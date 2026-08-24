@@ -211,3 +211,40 @@ also added to the bounded reads because those two done conditions proved load-be
 
 **Verdict:** Saved about half a net hour. Parallel parser construction was effective, while
 the adversarial pass caught two acceptance gaps that compilation and the initial tests missed.
+
+### T4.1 - Pure TypeScript session engine          2026-08-24, ~35 minutes active
+
+**Asked:** Rebuild Saaya's deterministic session engine for the web pivot: exact canonical
+TypeScript types, frozen arming and interval rules, five-fix dwell proof, the complete
+check-in/family/SOS ladder, frozen arm-time hour bands, absolute-deadline tab recovery and
+intent-only commands, with no browser API or personal data in `src/domain/`.
+
+**Produced:** The canonical `SessionState`, `SessionEvent`, `Command`, `PersistedSession`,
+`Rules`, `EngineContext` and `EngineResult` contracts; pure arming, interval, dwell and
+session evaluators; and 42 focused Vitest cases. AUTO_ZONE sessions keep their arm-time
+band across reschedules and recovery, MANUAL stays at ten minutes, entry requires five
+qualifying fixes spanning the dwell, and only the family and SOS transitions emit their
+respective state-write intents.
+
+**Shipped:** The optimized Next.js build, strict type check and ESLint pass; all 50 project
+tests pass; G6 reports nine changed TypeScript files with zero ungrounded literals; G10
+closes all 17 referenced state-machine types; and `src/domain/` contains no browser,
+React, Firebase, Leaflet or Android import. Final fresh spec, boundary and invention
+verdicts all returned `kill=false` at 0.99 confidence.
+
+**Needed correcting:** The first targeted test run exposed that Vitest did not resolve the
+Next.js path alias, so domain imports became relative without adding configuration. The
+first boundary pass killed two lifecycle defects: stale recovery could downgrade live SOS,
+and cancelling family escalation left location and wake effects running. The spec pass then
+caught recovery validation before persisted hydration and a sticky-SOS fix that also blocked
+legitimate SOS restoration. Invention round 1 killed four provenance gaps: two inert Zone
+scores hidden by the trivial set, behavioral clock endpoints wrongly exempted, and `0000`
+hidden as trivial zero. Round 2 killed one more wrong-same-valued fixture: an AUTO_ZONE
+recovery test borrowed the manual ten-minute fact. The final code derives endpoints and PIN
+fixtures from their governing facts, explicitly exempts only inert plumbing, uses the proper
+HIGH/NIGHT_DEEP interval, and passed all three lenses on the final snapshot. The archived
+current-Zone-object guard was also removed so a completed exit-dwell event is authoritative.
+
+**Verdict:** Saved substantial implementation time, but the adversarial loop did the
+load-bearing work: compilation and 50 passing tests alone would not have exposed the SOS
+recovery bypasses or the wrong-role provenance matches.

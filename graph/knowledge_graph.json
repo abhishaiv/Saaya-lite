@@ -313,9 +313,9 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 280,
-  "edges": 585,
-  "events": 56
+  "entities": 302,
+  "edges": 608,
+  "events": 62
  },
  "entities": [
   {
@@ -2333,6 +2333,190 @@
    "class": "Decision",
    "label": "Manual entry only, no contact picker. SECRETS_AND_ACCESS states contacts access is never requested and its absence is verifiable in devtools, which is part of the privacy argument; the Contact Picker API is also Chrome-Android-only, so it would work for some users and vanish for others.",
    "at": "2026-08-24"
+  },
+  {
+   "id": "art.t41.web_session_types",
+   "class": "Artifact",
+   "label": "Canonical web session state, event, command and persistence contracts",
+   "node": "T4.1",
+   "run": "run.T4.1.2026-08-24.web.001"
+  },
+  {
+   "id": "art.t41.web_rules",
+   "class": "Artifact",
+   "label": "Frozen pure TypeScript business rules and risk helpers",
+   "node": "T4.1",
+   "run": "run.T4.1.2026-08-24.web.001"
+  },
+  {
+   "id": "art.t41.web_arming_evaluator",
+   "class": "Artifact",
+   "label": "Automatic arming and overlapping-zone evaluator",
+   "node": "T4.1",
+   "run": "run.T4.1.2026-08-24.web.001"
+  },
+  {
+   "id": "art.t41.web_interval_calculator",
+   "class": "Artifact",
+   "label": "Frozen arm-band interval calculator",
+   "node": "T4.1",
+   "run": "run.T4.1.2026-08-24.web.001"
+  },
+  {
+   "id": "art.t41.web_dwell_evaluator",
+   "class": "Artifact",
+   "label": "Five-fix pure entry and exit dwell evaluator",
+   "node": "T4.1",
+   "run": "run.T4.1.2026-08-24.web.001"
+  },
+  {
+   "id": "art.t41.web_session_engine",
+   "class": "Artifact",
+   "label": "Pure TypeScript session transition and recovery reducer",
+   "node": "T4.1",
+   "run": "run.T4.1.2026-08-24.web.001"
+  },
+  {
+   "id": "art.t41.web_engine_tests",
+   "class": "Artifact",
+   "label": "Forty-two pure rules, dwell and session-engine tests",
+   "node": "T4.1",
+   "run": "run.T4.1.2026-08-24.web.001"
+  },
+  {
+   "id": "fail.t41.web_g3_alias",
+   "class": "Failure",
+   "label": "T4.1 first Vitest run could not resolve the Next.js path alias",
+   "node": "T4.1",
+   "run": "run.T4.1.2026-08-24.web.001",
+   "gate": "G3"
+  },
+  {
+   "id": "fail.t41.web_boundary_round1",
+   "class": "Failure",
+   "label": "T4.1 web boundary round 1 rejected stale SOS recovery and incomplete resolved cleanup",
+   "node": "T4.1",
+   "run": "run.T4.1.2026-08-24.web.001"
+  },
+  {
+   "id": "fail.t41.web_spec_round1",
+   "class": "Failure",
+   "label": "T4.1 web spec round 1 rejected recovery hydration order and inert legitimate SOS recovery",
+   "node": "T4.1",
+   "run": "run.T4.1.2026-08-24.web.001"
+  },
+  {
+   "id": "fail.t41.web_invention_round1",
+   "class": "Failure",
+   "label": "T4.1 web invention round 1 rejected four fixture and endpoint provenance gaps",
+   "node": "T4.1",
+   "run": "run.T4.1.2026-08-24.web.001"
+  },
+  {
+   "id": "fail.t41.web_invention_round2",
+   "class": "Failure",
+   "label": "T4.1 web invention round 2 rejected a manual-interval fact reused by an automatic recovery fixture",
+   "node": "T4.1",
+   "run": "run.T4.1.2026-08-24.web.001"
+  },
+  {
+   "id": "d.t41.web_lifecycle_effects",
+   "class": "Decision",
+   "label": "Use browser watch and wake-lock cleanup as the lifecycle meaning of terminal engine transitions",
+   "node": "T4.1",
+   "by": "codex",
+   "date": "2026-08-24",
+   "rationale": "The canonical Command union is closed; terminal results must stop precise-location and wake effects without adding an Android service command."
+  },
+  {
+   "id": "ver.t41.web.spec.round1",
+   "class": "Verification",
+   "label": "T4.1 web spec verifier round 1 rejected two recovery edge cases",
+   "node": "T4.1",
+   "run": "run.T4.1.2026-08-24.web.001",
+   "lens": "spec",
+   "kill": "true",
+   "confidence": "0.99"
+  },
+  {
+   "id": "ver.t41.web.boundary.round1",
+   "class": "Verification",
+   "label": "T4.1 web boundary verifier round 1 rejected two lifecycle boundary gaps",
+   "node": "T4.1",
+   "run": "run.T4.1.2026-08-24.web.001",
+   "lens": "boundary",
+   "kill": "true",
+   "confidence": "0.98"
+  },
+  {
+   "id": "ver.t41.web.invention.round1",
+   "class": "Verification",
+   "label": "T4.1 web invention verifier round 1 rejected four semantic provenance gaps",
+   "node": "T4.1",
+   "run": "run.T4.1.2026-08-24.web.001",
+   "lens": "invention",
+   "kill": "true",
+   "confidence": "0.99"
+  },
+  {
+   "id": "ver.t41.web.spec.round2",
+   "class": "Verification",
+   "label": "T4.1 web spec verifier round 2 passed the corrected recovery engine",
+   "node": "T4.1",
+   "run": "run.T4.1.2026-08-24.web.001",
+   "lens": "spec",
+   "kill": "false",
+   "confidence": "0.99"
+  },
+  {
+   "id": "ver.t41.web.boundary.round2",
+   "class": "Verification",
+   "label": "T4.1 web boundary verifier round 2 passed the corrected lifecycle engine",
+   "node": "T4.1",
+   "run": "run.T4.1.2026-08-24.web.001",
+   "lens": "boundary",
+   "kill": "false",
+   "confidence": "0.98"
+  },
+  {
+   "id": "ver.t41.web.invention.round2",
+   "class": "Verification",
+   "label": "T4.1 web invention verifier round 2 rejected one wrong-role interval fixture",
+   "node": "T4.1",
+   "run": "run.T4.1.2026-08-24.web.001",
+   "lens": "invention",
+   "kill": "true",
+   "confidence": "0.99"
+  },
+  {
+   "id": "ver.t41.web.spec.round3",
+   "class": "Verification",
+   "label": "T4.1 final web spec verifier passed with no findings",
+   "node": "T4.1",
+   "run": "run.T4.1.2026-08-24.web.001",
+   "lens": "spec",
+   "kill": "false",
+   "confidence": "0.99"
+  },
+  {
+   "id": "ver.t41.web.boundary.round3",
+   "class": "Verification",
+   "label": "T4.1 final web boundary verifier passed with no findings",
+   "node": "T4.1",
+   "run": "run.T4.1.2026-08-24.web.001",
+   "lens": "boundary",
+   "kill": "false",
+   "confidence": "0.99"
+  },
+  {
+   "id": "ver.t41.web.invention.round3",
+   "class": "Verification",
+   "label": "T4.1 final web invention verifier passed with no findings",
+   "node": "T4.1",
+   "run": "run.T4.1.2026-08-24.web.001",
+   "lens": "invention",
+   "kill": "false",
+   "confidence": "0.99"
   }
  ],
  "edges": [
@@ -7015,6 +7199,190 @@
    "at": "2026-08-24",
    "by": "claude",
    "confidence": "high"
+  },
+  {
+   "from": "art.t41.web_session_types",
+   "rel": "produced_by",
+   "to": "node.T4.1",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t41.web_rules",
+   "rel": "produced_by",
+   "to": "node.T4.1",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t41.web_arming_evaluator",
+   "rel": "produced_by",
+   "to": "node.T4.1",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t41.web_interval_calculator",
+   "rel": "produced_by",
+   "to": "node.T4.1",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t41.web_dwell_evaluator",
+   "rel": "produced_by",
+   "to": "node.T4.1",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t41.web_session_engine",
+   "rel": "produced_by",
+   "to": "node.T4.1",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t41.web_engine_tests",
+   "rel": "produced_by",
+   "to": "node.T4.1",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t41.web_session_engine",
+   "rel": "depends_on",
+   "to": "art.t41.web_session_types",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t41.web_session_engine",
+   "rel": "depends_on",
+   "to": "art.t41.web_rules",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t41.web_session_engine",
+   "rel": "depends_on",
+   "to": "art.t41.web_arming_evaluator",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t41.web_session_engine",
+   "rel": "depends_on",
+   "to": "art.t41.web_interval_calculator",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t41.web_engine_tests",
+   "rel": "depends_on",
+   "to": "art.t41.web_session_engine",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t41.web_engine_tests",
+   "rel": "depends_on",
+   "to": "art.t41.web_dwell_evaluator",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.t41.web_g3_alias",
+   "rel": "caused_by",
+   "to": "node.T4.1",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.t41.web_boundary_round1",
+   "rel": "caused_by",
+   "to": "node.T4.1",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.t41.web_spec_round1",
+   "rel": "caused_by",
+   "to": "node.T4.1",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.t41.web_invention_round1",
+   "rel": "caused_by",
+   "to": "node.T4.1",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.t41.web_invention_round2",
+   "rel": "caused_by",
+   "to": "node.T4.1",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "d.t41.web_lifecycle_effects",
+   "rel": "motivated_by",
+   "to": "fail.t41.web_boundary_round1",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "d.t41.web_lifecycle_effects",
+   "rel": "respects",
+   "to": "con.boundary",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "node.T4.1",
+   "rel": "verified_by",
+   "to": "ver.t41.web.spec.round3",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "node.T4.1",
+   "rel": "verified_by",
+   "to": "ver.t41.web.boundary.round3",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "node.T4.1",
+   "rel": "verified_by",
+   "to": "ver.t41.web.invention.round3",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
   }
  ],
  "events": [
@@ -7658,6 +8026,86 @@
     "art.t21.fanout_guard_fix"
    ],
    "node": "T2.1"
+  },
+  {
+   "id": "ev.0057",
+   "type": "gate_failed",
+   "at": "2026-08-24",
+   "actor": "codex",
+   "detail": "T4.1 first targeted Vitest run could not resolve the Next.js path alias; relative pure-domain imports fixed it without adding configuration.",
+   "refs": [
+    "fail.t41.web_g3_alias"
+   ],
+   "node": "T4.1"
+  },
+  {
+   "id": "ev.0058",
+   "type": "verifier_killed",
+   "at": "2026-08-24",
+   "actor": "codex",
+   "detail": "T4.1 web round 1 rejected two recovery-spec gaps, two lifecycle-boundary gaps and four semantic-provenance gaps.",
+   "refs": [
+    "ver.t41.web.spec.round1",
+    "ver.t41.web.boundary.round1",
+    "ver.t41.web.invention.round1",
+    "fail.t41.web_spec_round1",
+    "fail.t41.web_boundary_round1",
+    "fail.t41.web_invention_round1"
+   ],
+   "node": "T4.1"
+  },
+  {
+   "id": "ev.0059",
+   "type": "decision_made",
+   "at": "2026-08-24",
+   "actor": "codex",
+   "detail": "T4.1 maps every terminal result to the closed browser lifecycle intents StopLocationWatch and ReleaseWakeLock; no Android service command was added.",
+   "refs": [
+    "d.t41.web_lifecycle_effects"
+   ],
+   "node": "T4.1"
+  },
+  {
+   "id": "ev.0060",
+   "type": "verifier_killed",
+   "at": "2026-08-24",
+   "actor": "codex",
+   "detail": "T4.1 web invention round 2 rejected an AUTO recovery test that reused the manual ten-minute fact; it now derives the correct automatic interval.",
+   "refs": [
+    "ver.t41.web.invention.round2",
+    "fail.t41.web_invention_round2"
+   ],
+   "node": "T4.1"
+  },
+  {
+   "id": "ev.0061",
+   "type": "verifier_passed",
+   "at": "2026-08-24",
+   "actor": "codex",
+   "detail": "T4.1 final web spec, boundary and invention verifiers passed the stable snapshot with no findings at 0.99 confidence.",
+   "refs": [
+    "ver.t41.web.spec.round3",
+    "ver.t41.web.boundary.round3",
+    "ver.t41.web.invention.round3"
+   ],
+   "node": "T4.1"
+  },
+  {
+   "id": "ev.0062",
+   "type": "node_completed",
+   "at": "2026-08-24",
+   "actor": "codex",
+   "detail": "T4.1 web completed: a pure TypeScript engine now proves arming, five-fix dwell, frozen-band scheduling, the full local-to-state boundary and absolute-deadline recovery through 42 focused tests and all ten gates.",
+   "refs": [
+    "art.t41.web_session_types",
+    "art.t41.web_rules",
+    "art.t41.web_arming_evaluator",
+    "art.t41.web_interval_calculator",
+    "art.t41.web_dwell_evaluator",
+    "art.t41.web_session_engine",
+    "art.t41.web_engine_tests"
+   ],
+   "node": "T4.1"
   }
  ]
 }
