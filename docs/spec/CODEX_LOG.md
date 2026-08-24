@@ -248,3 +248,38 @@ current-Zone-object guard was also removed so a completed exit-dwell event is au
 **Verdict:** Saved substantial implementation time, but the adversarial loop did the
 load-bearing work: compilation and 50 passing tests alone would not have exposed the SOS
 recovery bypasses or the wrong-role provenance matches.
+
+### T4.2 - Browser location, arming and tab lifecycle checkpoint          2026-08-24, ~70 minutes active
+
+**Asked:** Implement the highest-risk browser platform seam: page-open geolocation watching,
+polygon dwell and zero-tap arming, wake lock, absolute-deadline timers, frozen-tab recovery,
+and the one notification-only Service Worker. Preserve the web platform's honest limits and
+prove containment against the frozen Vizag polygons rather than the legacy Android radius.
+
+**Produced:** A bounding-box-prefiltered authoritative polygon evaluator; consent-gated
+geolocation watches at the frozen idle, SHADOW and SOS rates; a page runtime that feeds
+qualifying dwell fixes into the pure engine; visibility-aware wake-lock and lifecycle
+controllers; absolute deadline timers; IndexedDB session recovery; Asia/Kolkata band
+resolution outside the engine; and exactly one 31-line notification worker with no fetch or
+cache path. Twenty-six new tests bring the project total to 76.
+
+**Checkpointed:** G1, G2, G3, G4, local G5, G6, G7 and G10 pass. The optimized build and
+strict checks are clean, all 76 tests pass across 13 files, G6 reports zero ungrounded source
+literals, and G10 closes all 17 state-machine types. The worker handles only message and
+notification-click events. This node remains **PENDING**: G8, the real-phone anchor “arms
+with no tap, page open”, and the fresh spec, boundary and invention G9 lenses are open until
+a real HTTPS deployment exists. Localhost and LAN HTTP were not substituted for that anchor.
+
+**Needed correcting:** Measuring the frozen asset proved the inherited radius prefilter
+would reject 126 of 165 vertices across 23 of 24 zones, so the founder corrected the spec to
+the polygon bounding-box rule. Two unrelated same-valued facts were rejected and dedicated
+last-known-age and slow-first-fix facts were added. The first lifecycle test exposed
+overlapping asynchronous visibility work, now serialized. A warning path could also say
+“nothing was sent” after family or SOS writes; it is now restricted to pre-outbound states.
+Session recovery uses its own IndexedDB database so it cannot accidentally open a partial
+schema owned by a later offline-queue node. One parallel G2 invocation raced on generated
+Next.js types and passed when rerun in the required sequential order.
+
+**Verdict:** The local implementation is preserved in Git without overstating the central
+claim. Completion depends on measurement from a real phone against the real deployment and
+then a fresh adversarial verifier diamond.

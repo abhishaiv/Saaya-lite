@@ -352,10 +352,50 @@
    "risk": "HIGHEST",
    "cumulative_hours": 9.5,
    "status": "pending",
-   "run_id": null,
-   "gates_passed": [],
-   "artifacts": [],
-   "corrections": [],
+   "run_id": "run.T4.2.2026-08-24.web.001",
+   "gates_passed": [
+    "G1_npm_run_build",
+    "G2_tsc_and_next_lint_zero_errors",
+    "G3_vitest_76_tests",
+    "G4_containment_location_arming_wakelock_deadline_tab_and_worker_tests",
+    "G5_local_browser_runtime_acceptance",
+    "G6_grounded_typescript_css_javascript",
+    "G7_twelve_non_negotiables",
+    "G10_reads_check_17_types_closed",
+    "notification_worker_exactly_one_no_fetch_no_cache"
+   ],
+   "pending_gates": [
+    "G8_vercel_preview_real_mobile_browser",
+    "arms_with_no_tap_page_open_real_phone",
+    "G9_fresh_spec_boundary_invention_verifiers"
+   ],
+   "artifacts": [
+    "art.t42.web_containment",
+    "art.t42.web_location_watch",
+    "art.t42.web_arming_runtime",
+    "art.t42.web_wake_lock",
+    "art.t42.web_deadline_timer",
+    "art.t42.web_tab_recovery",
+    "art.t42.web_notification_worker",
+    "art.t42.web_platform_tests"
+   ],
+   "pending_artifacts": [
+    "real_phone_anchor",
+    "fresh_verifier_verdicts"
+   ],
+   "failed_attempts": {
+    "G2": 1,
+    "G3": 1
+   },
+   "corrections": [
+    "replaced the inherited radius prefilter with the founder-approved polygon bounding-box prefilter after frozen-asset measurement proved silent false negatives",
+    "used the two newly provenanced last-known-centering and first-fix-slow facts instead of borrowing same-valued facts",
+    "serialized asynchronous visibility transitions after the first lifecycle test exposed an ordering race",
+    "restricted the page-stopped nothing-sent warning to pre-outbound states so it cannot contradict family or SOS writes",
+    "isolated session recovery in a dedicated IndexedDB database to avoid opening a partial schema owned by later nodes",
+    "reran G2 sequentially after a parallel build and typecheck raced on generated Next.js types",
+    "left G8, the real-phone arms-with-no-tap anchor and all fresh G9 lenses open until the real deployment exists"
+   ],
    "verify_lenses": [
     "spec",
     "boundary",

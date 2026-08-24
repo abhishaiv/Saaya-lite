@@ -313,9 +313,9 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 306,
-  "edges": 611,
-  "events": 62
+  "entities": 318,
+  "edges": 622,
+  "events": 63
  },
  "entities": [
   {
@@ -2541,6 +2541,92 @@
    "class": "Decision",
    "label": "The containment prefilter is each polygon's bounding box, computed once at load from the frozen asset. Provably contains every point of its polygon, two comparisons per axis. geofence_radius_m stays in the asset because the asset is frozen and audited, and nothing reads it. The general rule is now stated in BUSINESS_RULES: a prefilter may return extra candidates and may never exclude a point the polygon would accept.",
    "at": "2026-08-24"
+  },
+  {
+   "id": "art.t42.web_containment",
+   "class": "Artifact",
+   "label": "Bounding-box-prefiltered authoritative polygon containment with boundary inclusion",
+   "node": "T4.2",
+   "run": "run.T4.2.2026-08-24.web.001"
+  },
+  {
+   "id": "art.t42.web_location_watch",
+   "class": "Artifact",
+   "label": "Consent-gated browser geolocation watch with frozen sampling and accuracy policies",
+   "node": "T4.2",
+   "run": "run.T4.2.2026-08-24.web.001"
+  },
+  {
+   "id": "art.t42.web_arming_runtime",
+   "class": "Artifact",
+   "label": "Page-open zero-tap dwell-to-session arming runtime",
+   "node": "T4.2",
+   "run": "run.T4.2.2026-08-24.web.001"
+  },
+  {
+   "id": "art.t42.web_wake_lock",
+   "class": "Artifact",
+   "label": "Visibility-aware browser screen wake-lock controller",
+   "node": "T4.2",
+   "run": "run.T4.2.2026-08-24.web.001"
+  },
+  {
+   "id": "art.t42.web_deadline_timer",
+   "class": "Artifact",
+   "label": "Absolute epoch-millisecond deadline timer and persistence bridge",
+   "node": "T4.2",
+   "run": "run.T4.2.2026-08-24.web.001"
+  },
+  {
+   "id": "art.t42.web_tab_recovery",
+   "class": "Artifact",
+   "label": "IndexedDB session recovery and serialized frozen-tab lifecycle controller",
+   "node": "T4.2",
+   "run": "run.T4.2.2026-08-24.web.001"
+  },
+  {
+   "id": "art.t42.web_notification_worker",
+   "class": "Artifact",
+   "label": "Single notification-only service worker with no fetch or cache path",
+   "node": "T4.2",
+   "run": "run.T4.2.2026-08-24.web.001"
+  },
+  {
+   "id": "art.t42.web_platform_tests",
+   "class": "Artifact",
+   "label": "Twenty-six browser-platform and containment tests",
+   "node": "T4.2",
+   "run": "run.T4.2.2026-08-24.web.001"
+  },
+  {
+   "id": "fail.t42.web_visibility_race",
+   "class": "Failure",
+   "label": "The first tab-lifecycle test exposed overlapping asynchronous visibility transitions that could reorder recovery work",
+   "node": "T4.2",
+   "run": "run.T4.2.2026-08-24.web.001",
+   "status": "corrected"
+  },
+  {
+   "id": "d.t42.web_lifecycle_serialization",
+   "class": "Decision",
+   "label": "Serialize visibility transitions so recovery, dwell reset and warnings preserve browser event order",
+   "node": "T4.2",
+   "run": "run.T4.2.2026-08-24.web.001"
+  },
+  {
+   "id": "fail.t42.web_page_stopped_boundary",
+   "class": "Failure",
+   "label": "The first page-stopped warning path could claim nothing was sent after family or SOS writes; it was restricted to pre-outbound states",
+   "node": "T4.2",
+   "run": "run.T4.2.2026-08-24.web.001",
+   "status": "corrected"
+  },
+  {
+   "id": "d.t42.web_session_database_boundary",
+   "class": "Decision",
+   "label": "Use a dedicated Saaya session IndexedDB database so recovery cannot open a partial schema owned by later offline-queue nodes",
+   "node": "T4.2",
+   "run": "run.T4.2.2026-08-24.web.001"
   }
  ],
  "edges": [
@@ -7431,6 +7517,94 @@
    "at": "2026-08-24",
    "by": "claude",
    "confidence": "high"
+  },
+  {
+   "from": "art.t42.web_containment",
+   "rel": "produced_by",
+   "to": "node.T4.2",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t42.web_location_watch",
+   "rel": "produced_by",
+   "to": "node.T4.2",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t42.web_arming_runtime",
+   "rel": "produced_by",
+   "to": "node.T4.2",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t42.web_wake_lock",
+   "rel": "produced_by",
+   "to": "node.T4.2",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t42.web_deadline_timer",
+   "rel": "produced_by",
+   "to": "node.T4.2",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t42.web_tab_recovery",
+   "rel": "produced_by",
+   "to": "node.T4.2",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t42.web_notification_worker",
+   "rel": "produced_by",
+   "to": "node.T4.2",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t42.web_platform_tests",
+   "rel": "produced_by",
+   "to": "node.T4.2",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.t42.web_visibility_race",
+   "rel": "caused_by",
+   "to": "node.T4.2",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "d.t42.web_lifecycle_serialization",
+   "rel": "motivated_by",
+   "to": "fail.t42.web_visibility_race",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.t42.web_page_stopped_boundary",
+   "rel": "caused_by",
+   "to": "node.T4.2",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
   }
  ],
  "events": [
@@ -8154,6 +8328,18 @@
     "art.t41.web_engine_tests"
    ],
    "node": "T4.1"
+  },
+  {
+   "id": "ev.0063",
+   "type": "decision_made",
+   "at": "2026-08-24",
+   "actor": "codex",
+   "detail": "Checkpoint T4.2 with local gates preserved while the real-phone arms-with-no-tap anchor and fresh G9 verifier diamond remain open; continue at T1.3",
+   "refs": [
+    "art.t42.web_arming_runtime",
+    "art.t42.web_location_watch"
+   ],
+   "node": "T4.2"
   }
  ]
 }
