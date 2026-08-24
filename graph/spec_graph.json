@@ -3,7 +3,7 @@
  "kind": "knowledge_graph",
  "note": "Domain facts with provenance. Never merge with build_graph.json - different truth standards.",
  "rule": "Every numeric or colour literal in source must trace to a fact id here, or the grounded checker fails the node.",
- "count": 340,
+ "count": 342,
  "facts": [
   {
    "id": "ladder.cd1",
@@ -3772,6 +3772,28 @@
    "governs": "TEST_PLAN.md",
    "frozen": true,
    "platform": "web"
+  },
+  {
+   "id": "loc.last_known.centering.max_age",
+   "kind": "number",
+   "value": 5,
+   "unit": "min",
+   "means": "maximum age of a last-known fix that may be used for map centring only; never for an arming decision",
+   "sourced_from": "STATE_MACHINE.md:298, founder 2026-08-18",
+   "governs": "STATE_MACHINE.md",
+   "frozen": true,
+   "platform": "any"
+  },
+  {
+   "id": "loc.first_fix.slow_after",
+   "kind": "number",
+   "value": 60,
+   "unit": "s",
+   "means": "no first fix within this window shows the slow-location caption while the watch continues; never give up and never claim to be watching",
+   "sourced_from": "STATE_MACHINE.md:301, founder 2026-08-18",
+   "governs": "STATE_MACHINE.md",
+   "frozen": true,
+   "platform": "any"
   }
  ]
 }

@@ -313,8 +313,8 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 302,
-  "edges": 608,
+  "entities": 303,
+  "edges": 609,
   "events": 62
  },
  "entities": [
@@ -2517,6 +2517,12 @@
    "lens": "invention",
    "kill": "false",
    "confidence": "0.99"
+  },
+  {
+   "id": "d.no_borrowed_provenance",
+   "class": "Decision",
+   "at": "2026-08-24",
+   "label": "Two location values in STATE_MACHINE had no facts while eighteen live facts carried the same numbers for unrelated behaviour (ladder.cd2, dwell.enter, pin.lockout at 60; interval.high.deep, pin.attempts, loc.sample.sos at 5). Codex refused to borrow any of them and blocked instead, which is the correct call: a same-valued match is false provenance, and an earlier verifier in this project killed a node for exactly that. Added loc.last_known.centering.max_age and loc.first_fix.slow_after."
   }
  ],
  "edges": [
@@ -7382,6 +7388,14 @@
    "to": "ver.t41.web.invention.round3",
    "at": "2026-08-24",
    "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "d.no_borrowed_provenance",
+   "rel": "motivated_by",
+   "to": "fail.t41.invention_round1",
+   "at": "2026-08-24",
+   "by": "claude",
    "confidence": "high"
   }
  ],
