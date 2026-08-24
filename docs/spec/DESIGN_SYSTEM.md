@@ -142,13 +142,39 @@ Spacing, radii, borders and icon sizes are emitted as `px` directly. **Type is e
 `rem`** so it follows the browser's text-size setting, derived from the same frozen px
 value rather than restated:
 
+Write every one as a `calc`, not as a precomputed `1.25rem`. The px number stays visible and
+traceable to its fact, `type.rem.base` is itself a fact, and nothing in the type scale is an
+invented literal.
+
+**The whole scale, so nothing has to be extrapolated from an example.** These are generated
+from the facts, not typed:
+
 ```css
---type-title: calc(20 / 16 * 1rem);   /* type.title.size / type.rem.base */
+:root {
+  --type-display-size:        calc(34 / 16 * 1rem);   /* type.display */
+  --type-display-line-height: calc(40 / 16 * 1rem);   /* type.display.lineheight */
+  --type-title-size:        calc(24 / 16 * 1rem);   /* type.title */
+  --type-title-line-height: calc(30 / 16 * 1rem);   /* type.title.lineheight */
+  --type-card-title-size:        calc(20 / 16 * 1rem);   /* type.cardTitle */
+  --type-card-title-line-height: calc(26 / 16 * 1rem);   /* type.cardTitle.lineheight */
+  --type-headline-size:        calc(18 / 16 * 1rem);   /* type.headline */
+  --type-headline-line-height: calc(24 / 16 * 1rem);   /* type.headline.lineheight */
+  --type-body-size:        calc(16 / 16 * 1rem);   /* type.body */
+  --type-body-line-height: calc(24 / 16 * 1rem);   /* type.body.lineheight */
+  --type-card-body-size:        calc(14 / 16 * 1rem);   /* type.cardBody */
+  --type-card-body-line-height: calc(20 / 16 * 1rem);   /* type.cardBody.lineheight */
+  --type-caption-size:        calc(13 / 16 * 1rem);   /* type.caption */
+  --type-caption-line-height: calc(18 / 16 * 1rem);   /* type.caption.lineheight */
+  --type-label-size:        calc(11 / 16 * 1rem);   /* type.label */
+  --type-label-line-height: calc(14 / 16 * 1rem);   /* type.label.lineheight */
+  --type-label-tracking:   calc(0.5 / 16 * 1rem);   /* type.label.tracking */
+}
 ```
 
-Write it as a `calc` like that, not as a precomputed `1.25rem`. The px number stays visible
-and traceable to its fact, and `type.rem.base` is itself a fact, so nothing in the type
-scale is an invented literal.
+Note `type.title` is **24 px** and `type.cardTitle` is **20 px**. An earlier draft of this
+section showed `--type-title` at 20, which is `cardTitle`'s value, and would have shrunk
+every screen title had it been copied. Take the number from the fact whose name matches the
+token, never from a neighbouring example.
 
 ### Scale
 

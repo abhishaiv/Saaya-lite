@@ -313,8 +313,8 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 336,
-  "edges": 636,
+  "entities": 338,
+  "edges": 638,
   "events": 63
  },
  "entities": [
@@ -2735,6 +2735,18 @@
    "class": "Constraint",
    "label": "Material Symbols opsz axis is 20 to 48. Icons specified at 16 px, which includes dim.status.icon and dim.icon.tier.badge, render at opsz=20. ICONOGRAPHY's rule that optical size matches the rendered px is clamped to the axis range; the floor is a property of the font, not a preference.",
    "at": "2026-08-24"
+  },
+  {
+   "id": "fail.example_wrong_fact",
+   "class": "Failure",
+   "at": "2026-08-24",
+   "label": "The CSS example showing how type reaches the stylesheet used --type-title with 20, which is type.cardTitle's value; type.title is 24. Copying it would have shrunk every screen title, and G6 would not have caught it because 20 is a real fact, just the wrong one. An illustrative example is copied more often than it is read, so a wrong example is a wrong spec."
+  },
+  {
+   "id": "d.generate_examples",
+   "class": "Decision",
+   "at": "2026-08-24",
+   "label": "Where a spec shows a pattern that will be copied, show the complete set generated from the facts rather than one specimen to extrapolate from. The full type scale is now emitted from spec_graph and asserted against it, so a name and its value cannot drift apart."
   }
  ],
  "edges": [
@@ -7822,6 +7834,22 @@
    "from": "fail.units_dp_sp",
    "rel": "caused_by",
    "to": "d.web",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.example_wrong_fact",
+   "rel": "caused_by",
+   "to": "d.type_as_calc",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.generate_examples",
+   "rel": "motivated_by",
+   "to": "fail.example_wrong_fact",
    "at": "2026-08-24",
    "by": "claude",
    "confidence": "high"
