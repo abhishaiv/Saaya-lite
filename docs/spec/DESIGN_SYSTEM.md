@@ -61,15 +61,40 @@ Procedure, once, and recorded in `CODEX_LOG.md`:
    and must be flagged, not absorbed.
 2. Subset with `pyftsubset` (fontTools). It is a build-time tool run once, not a project
    dependency, and it does not enter `package.json`.
-   - Poppins: `--unicodes=U+0000-00FF,U+2018,U+2019,U+201C,U+201D,U+2026,U+00B7`
+   - Poppins: `--unicodes=U+0020-00FF,U+2018,U+2019,U+201C,U+201D,U+2026,U+00B7`
      (Latin basic plus the punctuation the copy actually uses, including the `·` in
      "I'm OK · 42s"). Drop Latin-Ext and Devanagari.
-   - Noto Sans Telugu: `--unicodes=U+0C00-0C7F,U+0964,U+0965,U+200C,U+200D` and
-     `--layout-features+=akhn,blwf,half,pres,abvs,blws,psts` so conjuncts still form.
-     **Dropping the layout features silently breaks Telugu rendering**, which nobody
-     testing in English would notice.
+   - Noto Sans Telugu: `--unicodes=U+0020,U+00A0,U+0C00-0C7F,U+0964,U+0965,U+200C,U+200D`
+     with `--layout-features='*'`.
    - Keep `--flavor=woff2` and `--desubroutinize` off for variable fonts.
-3. Commit the outputs to `public/fonts/` with their licences beside them. `COMPLIANCE.md`
+
+   **`U+0020` is not optional and is easy to lose.** A Telugu range alone omits the space,
+   the subset then has no cmap entry for it, and the space either shapes as `.notdef` at the
+   wrong advance or falls through to Poppins. Both change Telugu spacing metrics, and both
+   look plausible enough to ship.
+
+   **Do not enumerate layout feature tags.** An earlier version of this file listed
+   `half` and `pres`, which **do not exist in this font**, and omitted `haln` and `rphf`,
+   which do. `pyftsubset` accepts nonexistent feature names in silence, so the wrong list
+   produces a subset that builds cleanly and shapes Telugu wrongly. `--layout-features='*'`
+   retains whatever the font actually has; the features apply to glyphs we are keeping
+   anyway, so the size cost is negligible against the risk.
+
+3. **Prove the subset shapes identically before accepting it.** This is the gate, not the
+   feature list, because the feature list is exactly what nobody can verify by reading.
+
+   Shape every Telugu string in `COPY.md` (104 of them, which is the entire Telugu surface
+   of the product) through HarfBuzz twice, once against the upstream font and once against
+   the subset, and compare **glyph ids and advances**. They must match exactly. Any
+   difference means the subset lost something; fix the subset, never the test corpus.
+
+   Record in `CODEX_LOG.md`: the feature tags the upstream font actually contains, read off
+   the font rather than assumed, the number of strings shaped, and the result. If the copy
+   ever gains a Telugu string, this check must be re-run.
+
+   Poppins gets the same treatment with the English column. Material Symbols does not shape,
+   so a glyph-presence check over the subset codepoints is enough.
+4. Commit the outputs to `public/fonts/` with their licences beside them. `COMPLIANCE.md`
    records the licences but the files were not actually shipping, which is the part that
    matters legally:
    - `public/fonts/OFL-poppins.txt` from `ofl/poppins/OFL.txt`
@@ -77,9 +102,9 @@ Procedure, once, and recorded in `CODEX_LOG.md`:
    - `public/fonts/LICENSE-material-symbols.txt` from the **root `LICENSE`** of
      `google/material-design-icons` (Apache 2.0), which is the licence `COMPLIANCE.md`
      already names for this family.
-4. Declare with `font-display: swap` and preload only the two faces above the fold:
+5. Declare with `font-display: swap` and preload only the two faces above the fold:
    Poppins 400 and Poppins 600.
-5. **Verify the budget:** the sum of everything in `public/fonts/` must be under
+6. **Verify the budget:** the sum of everything in `public/fonts/` must be under
    `font.budget` (250 KB). Record the actual total in `CODEX_LOG.md`. If it is over, the
    fix is a tighter subset, never a fourth weight or a dropped language.
 

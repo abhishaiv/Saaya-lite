@@ -313,8 +313,8 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 325,
-  "edges": 626,
+  "entities": 327,
+  "edges": 629,
   "events": 63
  },
  "entities": [
@@ -2649,7 +2649,7 @@
   {
    "id": "c.telugu_layout_features",
    "class": "Constraint",
-   "label": "Subsetting Noto Sans Telugu must retain the akhn, blwf, half, pres, abvs, blws and psts layout features. Dropping them silently breaks conjunct formation, which nobody testing in English would notice, and Telugu is half the intended audience.",
+   "label": "Do not enumerate OpenType feature tags when subsetting Noto Sans Telugu. An earlier version of this constraint named half and pres, which do not exist in this font, and omitted haln and rphf, which do. pyftsubset accepts nonexistent feature tags in silence, so a wrong list builds cleanly and shapes Telugu wrongly. Use --layout-features='*' and prove the subset by HarfBuzz shaping equivalence against the upstream font over all 104 Telugu strings in COPY.md. Also keep U+0020: a Telugu-only range drops the space, which then shapes as .notdef or falls through to Poppins, changing Telugu spacing metrics either way.",
    "at": "2026-08-24"
   },
   {
@@ -2669,6 +2669,18 @@
    "class": "Decision",
    "at": "2026-08-24",
    "label": "External source paths, filenames and versions written into the spec are verified against the live source before they are frozen, not recalled. A spec that tells the builder to pin by hash while itself carrying an unverified path is asking for a rigour it does not practise."
+  },
+  {
+   "id": "fail.telugu_feature_list",
+   "class": "Failure",
+   "at": "2026-08-24",
+   "label": "The Telugu subset contract I wrote named two OpenType features that do not exist in Noto Sans Telugu (half, pres) and omitted two that do (haln, rphf), and its unicode range omitted U+0020 so the space shaped as .notdef at advance 600 against an upstream 283. Both were written from memory. Codex found them by shaping the real font with HarfBuzz rather than by reading the spec, which is the only way either could have been found."
+  },
+  {
+   "id": "d.shaping_equivalence_gate",
+   "class": "Decision",
+   "at": "2026-08-24",
+   "label": "A font subset is accepted only if it shapes identically to its upstream source: glyph ids and advances compared through HarfBuzz over the real shipped strings. The feature list is not the gate, because a feature list is exactly what cannot be verified by reading and what fontTools accepts wrongly in silence. Generalises beyond fonts: where a tool fails silently on bad input, the acceptance test must be behavioural, not declarative."
   }
  ],
  "edges": [
@@ -7674,6 +7686,30 @@
   },
   {
    "from": "d.verify_external_paths",
+   "rel": "motivated_by",
+   "to": "fail.font_source_unverified",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.telugu_feature_list",
+   "rel": "caused_by",
+   "to": "d.selfhost_fonts",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.shaping_equivalence_gate",
+   "rel": "motivated_by",
+   "to": "fail.telugu_feature_list",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.shaping_equivalence_gate",
    "rel": "motivated_by",
    "to": "fail.font_source_unverified",
    "at": "2026-08-24",

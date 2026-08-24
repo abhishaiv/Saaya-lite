@@ -160,15 +160,18 @@ in the 250 words. Saying exactly where the browser stops is the architecture ans
 | # | Check |
 |---|---|
 | V1 | Console URL loads in a private window with no login |
-| V2 | deployed site downloads and installs from the landing page |
+| V2 | the deployed site loads on a real phone from the submission link, in a private window, with no sign-in |
 | V3 | Video plays without sign-in |
 | V4 | Repo link, if provided, opens without an access request |
 | V5 | No screen anywhere shows a government logo or implies endorsement |
 | V6 | Every mock is labelled in the product, not only in the write-up |
 | V7 | `grep -ri "openai\|gpt\|claude\|ml\|model"` over the source returns nothing that contradicts the no-AI claim |
-| V8 | The manifest contains no `RECORD_AUDIO`, `CAMERA` or `SEND_SMS` |
+| V8 | `grep -rn "getUserMedia\|MediaRecorder\|navigator.contacts\|ContactsManager" src app` returns nothing, and a full run of the ladder in devtools prompts for **geolocation and notifications only** |
+| V9 | Every font in `public/fonts` shapes identically to its upstream source: glyph ids and advances match over all 104 Telugu strings and the English column of `COPY.md`. Licence files present beside them. Total under `font.budget`. |
 
-V7 and V8 are how we prove the honesty claims rather than assert them. Run them and paste
+V7, V8 and V9 are how we prove the honesty claims rather than assert them. V8 replaces an
+Android manifest check: a web app has no manifest to inspect, so the equivalent evidence is
+the absent API calls plus the prompts a reviewer can watch for themselves. Run them and paste
 the output into the write-up.
 
 ---
