@@ -9,11 +9,11 @@ the build depends on a credential that could fail on submission day.**
 
 | | |
 |---|---|
-| Library | `org.Leaflet:Leaflet-android:6.1.20` |
+| Library | `leaflet` 1.9.4 from npm, pinned in `BUILD_CONFIG.md` |
 | API key | **none required** |
 | Billing | **none** |
 | Quota risk | **none** |
-| Offline behaviour | zones render without tiles, see below |
+| Offline behaviour | zone polygons render from the bundled asset with no tiles, see below |
 
 ## Tiles: CARTO Dark Matter
 
@@ -30,7 +30,7 @@ low contrast is exactly what we want: the basemap is context, the zones are the 
 | Tile source | CARTO Dark Matter, `dark_all` (labels retained, she needs to orient) |
 | Retina | append `@2x` when `devicePixelRatio > 1` |
 | User agent | not applicable. The browser sends its own, and CARTO's tile CDN serves it. Nothing to configure. |
-| Cache | the browser HTTP cache, governed by CARTO's own headers. There is no tile cache to configure and no cap to set. Do not add a Service Worker tile cache for the prototype. |
+| Cache | the browser HTTP cache only, governed by CARTO's headers. Nothing to configure, no cap to set, and no Service Worker tile cache in the prototype. |
 | Min zoom | 10 |
 | Max zoom | 17 |
 | Default | zoom 12.5, centred on `17.7100, 83.3000` |

@@ -113,7 +113,7 @@ Whenever any state transitions to `SOS_ACTIVE`:
 7. Escalate location sampling to 5 s.
 8. `RequirePinToStop`.
 
-## Recovery after process death
+## Recovery after a frozen or closed tab
 
 A hidden tab is throttled and a closed tab stops entirely. On the next visibilitychange or page load:
 
@@ -125,8 +125,9 @@ A hidden tab is throttled and a closed tab stops entirely. On the next visibilit
 | `FAMILY_ESCALATED` | recompute the cancel window. If it lapsed while dead, **go straight to SOS.** |
 | `SOS_ACTIVE` | resume SOS, keep requiring the PIN, re-show the notification. |
 
-The rule underneath: **process death must never rescue her from the ladder.** A phone that
-dies mid-ladder is more likely to be a real emergency, not less.
+The rule underneath: **a frozen or closed tab must never rescue her from the ladder.** A
+phone that dies mid-ladder is more likely to be a real emergency, not less. On web this is
+the common case rather than the rare one, which makes the rule more important, not less.
 
 ## Edge cases, decided in advance
 

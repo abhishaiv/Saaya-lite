@@ -7,33 +7,42 @@ Founder decision: **escalating haptics, sound only from check-in 2.**
 Reasoning to preserve: on a HIGH zone at 4 a.m. the check-in interval is 5 minutes. A chime
 every 5 minutes trains her to mute the app, and a muted safety app is a deleted one.
 
-| Moment | Haptic | Sound | Channel |
-|---|---|---|---|
-| Auto-arm | soft double tap | **none** | `saaya_shadow` |
-| Manual arm | light tick | none | n/a |
-| Check-in 1 appears | `EFFECT_TICK` x2, 120 ms apart | **none** | `saaya_checkin` |
-| Check-in 1, 10 s left | single medium tick | none | n/a |
-| Check-in 2 appears | long pattern `0,400,200,400,200,600` | **alarm-stream tone** | `saaya_urgent` |
-| Family escalation | double long `0,600,300,600` | alarm-stream tone, louder | `saaya_urgent` |
-| SOS trigger | `EFFECT_HEAVY_CLICK` x3 | continuous alert until acknowledged on screen | `saaya_sos` |
-| I'm OK tapped | light confirm tick | none | n/a |
-| Cancel tapped | light confirm tick | none | n/a |
-| Wrong PIN | double sharp tick | none | n/a |
-| Button press, general | `EFFECT_TICK` | none | n/a |
+Haptics use `navigator.vibrate(pattern)`. **It does not exist in iOS Safari**, so every
+haptic below is a progressive enhancement and nothing may depend on it. Feature-detect once
+and treat absence as normal, not as an error. Sound is the fallback that carries the
+escalation, and the visible card is the fallback under that.
+
+| Moment | `navigator.vibrate` | Sound |
+|---|---|---|
+| Auto-arm | `[40, 60, 40]` | **none** |
+| Manual arm | `[20]` | none |
+| Check-in 1 appears | `[30, 120, 30]` | **none** |
+| Check-in 1, 10 s left | `[50]` | none |
+| Check-in 2 appears | `[0, 400, 200, 400, 200, 600]` | **urgent tone** |
+| Family escalation | `[0, 600, 300, 600]` | urgent tone, louder |
+| SOS trigger | `[80, 60, 80, 60, 80]` | continuous alert until acknowledged on screen |
+| I'm OK tapped | `[20]` | none |
+| Cancel tapped | `[20]` | none |
+| Wrong PIN | `[30, 80, 30]` | none |
+| Button press, general | `[15]` | none |
 
 ### Two rules carried from the iOS app
 
-1. **Escalation sound ignores the silent switch.** iOS routes the chime through a
-   `.playback` session deliberately, with the reasoning that a check-in must be perceivable
-   to be answerable. On the web: an `<audio>` element the user has already gestured on, for check-in 2, family and SOS, which
-   plays through silent and Do Not Disturb. **Check-in 1 stays silent**, so this only ever
-   fires when something is genuinely wrong.
+1. **The intent carries over, the capability does not.** iOS Saaya routes the escalation
+   chime through a `.playback` session so it sounds through the silent switch, because a
+   check-in must be perceivable to be answerable. **A web page cannot do this.** An
+   `<audio>` element respects the device silent switch and Do Not Disturb, and there is no
+   API to override either. Do not claim otherwise in the UI, the write-up or the demo.
+   What we do instead: unlock an `<audio>` element on her first gesture, keep check-in 1
+   silent so sound only ever fires when something is genuinely wrong, and lean on the
+   full-screen in-page overlay, which is the one channel that does not depend on the
+   ringer. State the limit in the write-up beside the background-arming limit.
 2. **Never disturb a live SOS with another sound.** Suppress all other audio and haptics
    while `SOS_ACTIVE`.
 
-Respect `Settings.System.HAPTIC_FEEDBACK_ENABLED`. If haptics are off system-wide, do not
-force them, but **do** still play the escalation sounds, because those are safety-critical
-and the user did not switch off sound by switching off haptics.
+There is no system haptics setting to read on the web. If `navigator.vibrate` is absent or
+returns false, carry on silently; **do** still play the escalation sounds, because those
+are safety-critical.
 
 ## Gestures
 
@@ -68,10 +77,15 @@ and the user did not switch off sound by switching off haptics.
 | **`SOS_ACTIVE`** | **consumed. Only the PIN exits.** |
 | PIN entry | returns to SOS screen, never out of SOS |
 
-Use `BackHandler(enabled = true) { }` for the consumed cases. Also block `HOME` escape
-where possible by using `setShowWhenLocked` and re-presenting on resume: if she leaves
-`SOS_ACTIVE` via the home button, the app **re-presents it on next resume**, and the
-ongoing notification is not dismissible.
+"Back" is the browser back gesture. Trap the consumed cases by pushing a history entry
+when the state is entered and calling `history.pushState` again inside `popstate`, so back
+becomes a no-op without leaving the page. Never call `preventDefault` on navigation; it
+does not work and the attempt will mislead the next reader.
+
+**What we cannot do, and must not claim:** a web page cannot show over the lock screen,
+cannot turn the screen on, and cannot make a notification undismissable. If she leaves the
+tab during `SOS_ACTIVE`, the app **re-presents SOS on the next `visibilitychange`** and the
+SOS state survives in IndexedDB. That is the honest ceiling; put it in the write-up.
 
 ## Touch targets
 
@@ -86,9 +100,9 @@ Both are 72 px tall and full width, positioned in the bottom third.
 
 | Field | Keyboard | Rules |
 |---|---|---|
-| Favourite name | text, `capWords` | non-empty, max 40 chars |
-| Favourite phone | phone | `+91` fixed prefix, exactly 10 digits, digits only, auto-advance |
-| PIN | numberPassword | 4 digits, auto-advance, no paste, `FLAG_SECURE` |
+| Favourite name | `type="text"`, `autocapitalize="words"` | non-empty, max 40 chars |
+| Favourite phone | `type="tel"`, `inputmode="numeric"` | `+91` fixed prefix, exactly 10 digits, digits only, auto-advance |
+| PIN | `type="password"`, `inputmode="numeric"` | 4 digits, auto-advance, `onPaste` prevented. **There is no `FLAG_SECURE` on the web:** screenshots and screen recording cannot be blocked. Accepted, and disclosed. |
 
 Validate on blur, never per keystroke. Errors appear below the field in `caption` `danger`,
 never as a toast, never as a dialog.

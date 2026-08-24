@@ -99,7 +99,7 @@ Do Not Disturb. These are the three kinds we post and the options each uses.
 | shadow | Watching | `silent: true`, `tag: "saaya-shadow"`, re-posted rather than stacked |
 | check-in | Check-ins | default sound, `tag: "saaya-checkin"` |
 | urgent | Urgent check-ins | `requireInteraction: true`, urgent sound played in-page when audible |
-| `saaya_sos` | SOS | HIGH, ongoing, not dismissible |
+| sos | SOS | `requireInteraction: true`, `tag: "saaya-sos"`. A web notification **can** be dismissed; SOS is re-presented on the next `visibilitychange` instead. |
 
 ## Vocabulary, locked 2026-08-18
 

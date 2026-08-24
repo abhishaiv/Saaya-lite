@@ -159,7 +159,8 @@ Empty shows nothing; filled shows a 12 px `brand` dot, never the digit.
 | locked | all four at 30% opacity, message below, countdown to unlock |
 
 Numeric keyboard only. No system clipboard paste. Never log, never screenshot: set
-`FLAG_SECURE` on this screen.
+There is no `FLAG_SECURE` equivalent on the web, so this screen cannot block screenshots.
+Disclosed in `INTERACTION_SPEC.md` rather than silently ignored.
 
 ---
 

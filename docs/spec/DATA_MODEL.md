@@ -10,13 +10,13 @@ things: an anonymised SUS event, and a full SOS incident.
 
 ## Bundled assets (read-only, copied from the Saaya repo)
 
-`app/src/main/assets/`
+`public/assets/`, fetched at runtime
 
 | File | Parse into |
 |---|---|
-| `vizag_heatmap.geojson` | `List<Zone>` |
-| `zone_info_cards.json` | `Map<String, ZoneCard>` keyed by `station_id` |
-| `vizag_police_points.json` | `List<PoliceStation>` |
+| `vizag_heatmap.geojson` | `Zone[]` |
+| `zone_info_cards.json` | `Record<string, ZoneCard>` keyed by `station_id` |
+| `vizag_police_points.json` | `PoliceStation[]` |
 
 ### `Zone` (domain model)
 
@@ -130,16 +130,26 @@ Database `saaya_lite.db`, version 1.
 | `isPrimary` | Boolean | exactly one true |
 | `createdAt` | Long | epoch millis |
 
-### `session`
-| Column | Type | Note |
+### `session` (object store, keyPath `sessionId`)
+
+**This store is exactly `PersistedSession` from `STATE_MACHINE.md`, plus one local-only
+history field.** It had drifted into a second, contradicting contract that omitted
+`armedHourBand` and `deadlineEpochMs`, which are the two fields recovery cannot work
+without. If this table and the `PersistedSession` interface ever disagree again, the
+interface wins.
+
+| Key | Type | Note |
 |---|---|---|
-| `id` | String PK | UUID, **device-local only, never uploaded** |
-| `zoneId` | String? | null when manually armed outside a zone |
-| `armedAt` | Long | |
-| `armMode` | String | `AUTO_ZONE` \| `MANUAL` |
-| `state` | String | see STATE_MACHINE.md |
-| `endedAt` | Long? | |
-| `outcome` | String? | `RESOLVED_OK` \| `CANCELLED` \| `ESCALATED_SOS` \| `DISARMED` |
+| `sessionId` | string | UUID, **device-local only, never uploaded** |
+| `state` | SessionState | see STATE_MACHINE.md |
+| `armMode` | ArmMode | `AUTO_ZONE` \| `MANUAL` |
+| `zoneId` | string \| null | null when manually armed outside a zone |
+| `armedAtEpochMs` | number | |
+| `armedHourBand` | HourBand \| null | frozen at arm, `FREEZE_AT_ARM`. null for `MANUAL`. **Required for recovery.** |
+| `deadlineEpochMs` | number \| null | absolute. Countdowns are recomputed from this, never resumed. |
+| `susEventWritten` | boolean | |
+| `outcome` | Outcome \| undefined | `RESOLVED_OK` \| `CANCELLED` \| `ESCALATED_SOS` \| `DISARMED` |
+| `endedAtEpochMs` | number \| null | local history only, not part of `PersistedSession` |
 
 ### `session_event` (the local timeline, feeds the SOS payload)
 | Column | Type | Note |
@@ -306,12 +316,30 @@ rather than letting a reviewer discover it.
 Database version **1**. There is no version 2 in a nine-evening build.
 
 ```typescript
-IndexedDB.databaseBuilder(ctx, SaayaDb::class.java, "saaya_lite.db")
-    .fallbackToDestructiveMigration()
-    .build()
+import { openDB, deleteDB } from "idb";
+
+const DB_NAME = "saaya_lite";
+const DB_VERSION = 1;
+
+// Destructive by design: on any version mismatch, drop and recreate.
+export async function openSaayaDb() {
+  return openDB(DB_NAME, DB_VERSION, {
+    async upgrade(db, oldVersion) {
+      if (oldVersion > 0) {
+        // A prototype has no data worth migrating. Wipe rather than migrate.
+        for (const name of Array.from(db.objectStoreNames)) db.deleteObjectStore(name);
+      }
+      db.createObjectStore("session", { keyPath: "sessionId" });
+      db.createObjectStore("session_event", { keyPath: "id", autoIncrement: true });
+      db.createObjectStore("queued_event", { keyPath: "id", autoIncrement: true });
+      db.createObjectStore("contact", { keyPath: "id", autoIncrement: true });
+      db.createObjectStore("settings");
+    },
+  });
+}
 ```
 
-`fallbackToDestructiveMigration` is correct **here and only here**: no user has data worth
+Wiping on a version bump is correct **here and only here**: no user has data worth
 preserving across a prototype schema change, and a migration crash in front of a judge is
 far worse than a wiped local database. **If this were the real Saaya, it would be wrong.**
 Say so in the write-up rather than letting a reviewer assume we did not know.

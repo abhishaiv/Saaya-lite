@@ -39,11 +39,14 @@ spec, so **STOP and report it**.
 | 4 | Authentication, **Anonymous only** enabled | per `SETUP.md` | free |
 | 5 | Hosting enabled, site id `saaya-lite` | per `SETUP.md` | free |
 | 6 | ~~Two mobile apps registered~~ | done on the previous platform. Harmless, unused by the web SDK. |
-| 7 | One Web app registered, for the console | Firebase console, Add app, Web | free |
+| 7 | One Web app registered, for the app **and** the console | Firebase console, Add app, Web | free |
 | 8 | A YouTube account for the unlisted demo video | E9 | free |
 | 9 | A GitHub account, public repo | optional, E9 | free |
 
-**Item 7 is the one still outstanding.** The web SDK needs its own app registration; the mobile app ids on the project will not work for it. Needed at `T8.2`.
+**Item 7 is the one still outstanding, and it is needed at `T1.2`, not `T8.2`.** The whole
+product is a web app now, so the Firebase web SDK performs anonymous auth at `T1.2`. The
+mobile app ids on the project will not work for it. One registration serves both the app
+and the console.
 debug builds fail to authenticate, with an error that does not say why.
 
 ### Codex, local machine

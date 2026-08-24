@@ -120,5 +120,5 @@ Environment: only the public Firebase web config, which is public by design
 | G10 reads | `python3 scripts/reads_check.py` |
 
 `grounded_check.py` already scans `.js`/`.mjs`; extend its extension list to `.ts` and
-`.tsx`. The **dp values in `spec_graph` become px at 1x**, so the fact table transfers
+`.tsx`. The **spacing and size facts in `spec_graph` are already px**, so the fact table transfers
 unchanged.

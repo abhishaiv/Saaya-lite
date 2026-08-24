@@ -10,14 +10,17 @@ Do this once, at T1.2. Every step is explicit so nothing is guessed.
 | Storage bucket | `saaya-lite.firebasestorage.app` |
 | Region | `asia-south1` (Mumbai) |
 | Auth | Anonymous only |
-| Release app | `com.nexaflow.saayalite` — `1:799647753855:android:f1ac1d7d789de1fd17014a` |
-| Debug app | `com.nexaflow.saayalite.debug` — `1:799647753855:android:19c7be4f0fed48bb17014a` |
-| `app/google-services.json` | **in place**, contains BOTH packages, gitignored |
+| Two mobile apps | registered on the previous platform. Unused by the web SDK, harmless, ignore them. |
+| `google-services.json` | an Android artefact. **The web build does not use it.** Gitignored. |
 
-**Still outstanding, needed at `T8.2` (node 7), not before:** register a **Web** app in
-Project settings → Your apps → Add app → Web, and paste its config into
-`console/firebase-config.js`. The console uses the Firebase **web** SDK, which needs its own
-app registration. The two mobile app ids already on the project will not work for it.
+**Still outstanding, and needed at `T1.2` (node 5), not `T8.2`:** register a **Web** app in
+Project settings → Your apps → Add app → Web, and paste its config in. The entire product
+is now a web app, so the Firebase **web** SDK is what performs anonymous auth at `T1.2`,
+long before the console needs it at `T8.2`. The two mobile app ids on the project will not
+work for it.
+
+The same config serves both surfaces: the app reads it from `NEXT_PUBLIC_FIREBASE_*`
+environment variables, and the console reads `console/firebase-config.js`. Register once.
 
 ## Firebase project — original steps
 

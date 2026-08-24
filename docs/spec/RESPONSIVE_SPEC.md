@@ -43,12 +43,14 @@ portrait layout centred at a 480 px max content width.
 
 ## Font scale
 
-Must survive `fontScale` **1.0 to 2.0**. Test at 1.0, 1.3, 1.5 and 2.0.
+Must survive the browser text-size setting from **1.0 to 2.0**. Test at 1.0, 1.3, 1.5 and
+2.0 by changing the browser's default font size, not by zooming the page: page zoom scales
+everything and hides exactly the bug this is looking for.
 
 | Rule | Detail |
 |---|---|
-| Use `px` for all text | never `px` for type |
-| Use `px` for icons and spacing | so layout does not explode with type |
+| Use `rem` for all text | so type follows the browser's font-size setting. **Never `px` for type.** |
+| Use `px` for icons, borders and spacing | so layout does not explode when type scales |
 | Never set `maxLines = 1` on a meaningful string | truncating "I need help now" is unacceptable |
 | Buttons | grow in height with the text, never clip |
 | `LadderCard` | becomes scrollable above 1.5x rather than clipping |
@@ -59,7 +61,8 @@ button must remain visible without scrolling. **Pin it to the bottom of the card
 
 ## Insets
 
-Full-bleed map means edge-to-edge. Handle `WindowInsets` properly:
+Full-bleed map means edge-to-edge. Handle the safe-area insets properly, using
+`viewport-fit=cover` in the viewport meta plus the `env(safe-area-inset-*)` variables:
 - Status bar: `StatusPill` sits 12 px below the top inset.
 - Navigation bar: bottom sheet and every primary button sit above the bottom inset.
 - Gesture navigation: keep 16 px clear of the bottom edge so the sheet drag does not fight

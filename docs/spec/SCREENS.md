@@ -117,7 +117,9 @@ Heads-up notification plus, if foregrounded, an in-app card.
 
 ## S6. CheckIn2
 
-Full screen, over the lock screen, `setShowWhenLocked` + `setTurnScreenOn`.
+Full screen, in page. **A browser cannot show over the lock screen or turn the screen on.**
+The overlay covers the viewport, the notification is posted with `requireInteraction: true`,
+and the state is re-presented on the next `visibilitychange`. Disclosed, never implied.
 
 - `CountdownRing`, 60 s, **`amber` `#F09921`**, card border 1.5 px.
 - `checkin2_title`, `checkin2_body` stating exactly what happens at zero.

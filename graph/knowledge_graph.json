@@ -313,8 +313,8 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 269,
-  "edges": 573,
+  "entities": 275,
+  "edges": 579,
   "events": 56
  },
  "entities": [
@@ -2266,6 +2266,42 @@
    "id": "d.spec_follows_code",
    "class": "Decision",
    "label": "DATA_MODEL.md carried Kotlin data classes inside typescript fences, which is why the type checker read them without complaint. Reconciled to the models T2.1 actually produced and verified, rather than writing a second contract for the same types. Where a node has already built and passed its verifiers, the spec is corrected to match the code.",
+   "at": "2026-08-24"
+  },
+  {
+   "id": "fail.sweep_regex_narrow",
+   "class": "Failure",
+   "label": "The first pivot sweep matched Android keywords, so it could not see Kotlin syntax inside typescript fences, mangled identifiers whose case broke the pattern (org.Leaflet:Leaflet-android), or self-contradictions made of valid words (RESPONSIVE_SPEC said use px for all text, never px for type). A keyword grep cannot find a contradiction. The second pass matched syntax and API shapes instead and found 33 lines across 10 files.",
+   "at": "2026-08-24"
+  },
+  {
+   "id": "fail.map_cache_contradiction",
+   "class": "Failure",
+   "label": "The MAP_SPEC cache row was rewritten without reading the surrounding prose, leaving the file saying both no tile-cache cap and 64 MB. Self-inflicted during the first sweep: a row was patched in isolation.",
+   "at": "2026-08-24"
+  },
+  {
+   "id": "fail.session_second_contract",
+   "class": "Failure",
+   "label": "DATA_MODEL.md carried a second contract for the persisted session, in Room column terms, omitting armedHourBand and deadlineEpochMs. It contradicted PersistedSession, and it was the one T4.1 had to write to. Now declared as exactly PersistedSession plus one local history field, with the interface named as the winner on any future disagreement.",
+   "at": "2026-08-24"
+  },
+  {
+   "id": "fail.false_audio_claim",
+   "class": "Failure",
+   "label": "INTERACTION_SPEC claimed a web audio element plays through silent and Do Not Disturb. It does not, on any browser, and there is no API to override either. A false capability claim that would have reached the submission write-up.",
+   "at": "2026-08-24"
+  },
+  {
+   "id": "d.disclose_web_ceilings",
+   "class": "Decision",
+   "label": "Where the web cannot do what the iOS product does, the spec states the limit in the same place it used to state the capability: no silent-switch override, no lock-screen presentation, no turning the screen on, no undismissable notification, no FLAG_SECURE, no background arming, and navigator.vibrate absent entirely on iOS Safari. Disclosed rather than implied, in the UI and the write-up.",
+   "at": "2026-08-24"
+  },
+  {
+   "id": "d.firebase_web_at_t12",
+   "class": "Decision",
+   "label": "The Firebase Web app registration moves from T8.2 to a human gate before T1.2. The whole product is a web app, so the web SDK performs anonymous auth at T1.2; deferring it to the console node was four nodes too late. One registration serves both app and console.",
    "at": "2026-08-24"
   }
  ],
@@ -6850,6 +6886,54 @@
    "from": "d.spec_follows_code",
    "rel": "motivated_by",
    "to": "fail.statemachine_pivot",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.sweep_regex_narrow",
+   "rel": "caused_by",
+   "to": "d.pivot_sweep",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.map_cache_contradiction",
+   "rel": "caused_by",
+   "to": "d.pivot_sweep",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.session_second_contract",
+   "rel": "caused_by",
+   "to": "d.web",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.false_audio_claim",
+   "rel": "caused_by",
+   "to": "d.web",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.disclose_web_ceilings",
+   "rel": "motivated_by",
+   "to": "fail.false_audio_claim",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.firebase_web_at_t12",
+   "rel": "motivated_by",
+   "to": "fail.sweep_regex_narrow",
    "at": "2026-08-24",
    "by": "claude",
    "confidence": "high"

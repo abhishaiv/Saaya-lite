@@ -78,9 +78,11 @@ visible in the UI: the check-in screen states why it checked when it did.
 
 Total from check-in 1 appearing to SOS: **210 s (3 min 30 s)**.
 
-Check-in 2 differs from check-in 1: full-screen, sound at alarm stream volume, long
-vibration pattern, and it bypasses Do Not Disturb via a high-importance notification
-channel. Check-in 1 is gentle: heads-up notification plus a short vibration.
+Check-in 2 differs from check-in 1: a full-screen in-page overlay, the urgent sound, and
+the long vibration pattern where `navigator.vibrate` exists. Check-in 1 is gentle: a plain
+notification and a short vibration. **Nothing here bypasses Do Not Disturb or the silent
+switch.** A web page cannot, and `INTERACTION_SPEC.md` states the limit rather than
+claiming otherwise.
 
 ## 6. Demo speed (D1)
 
@@ -179,10 +181,12 @@ because silently dropping an escalation is the worst failure this app can have.
 Discard any fix with `accuracy > 100 m` for zone-containment decisions. Never discard for
 SOS, where a poor fix beats no fix, but do send `accuracyM` so the console can show it.
 
-`CANDIDATE` is service-private and leaves `SessionEngine` in `IDLE`. The containment proof
-requires at least **five** qualifying in-polygon fixes spanning at least the existing
-**60 s** enter dwell on a monotonic clock. A qualifying outside fix resets the proof;
-accuracy worse than **100 m** is ignored. Process death resets the proof completely.
+A pending dwell is private to the dwell evaluator and leaves `SessionEngine` in `IDLE`.
+The containment proof requires at least **five** qualifying in-polygon fixes spanning at
+least the existing **60 s** enter dwell. A qualifying outside fix resets the proof;
+accuracy worse than **100 m** is ignored. Any interruption of the position watch, which
+includes the page being hidden, discards the proof completely and it restarts from zero:
+`dwell.recovery.policy = RESET_ON_WATCH_INTERRUPTION`.
 
 ---
 
@@ -191,7 +195,7 @@ accuracy worse than **100 m** is ignored. Process death resets the proof complet
 ### Haversine
 
 ```typescript
-const val EARTH_RADIUS_M = 6_371_008.8   // IUGG mean radius
+export const EARTH_RADIUS_M = 6_371_008.8;   // IUGG mean radius
 ```
 
 Standard haversine on that radius. At Vizag's scale the error against a geodesic is under

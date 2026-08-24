@@ -1143,6 +1143,11 @@
    "why": "T1.1 produces vercel_deploy and its extra gate is preview_url_loads_on_mobile. This is an account action, not a public act: a preview URL is not the submission link. Distinct from the T2.2 gate."
   },
   {
+   "before": "T1.2",
+   "gate": "register the Firebase Web app and supply its config",
+   "why": "T1.2 performs anonymous auth with the Firebase web SDK, which needs a Web app registration. The two mobile app ids on the project do not work for it. SETUP.md deferred this to T8.2, which is four nodes too late."
+  },
+  {
    "before": "T8.1",
    "gate": "Firestore rules and public read go live",
    "why": "public read is hard to un-publish; confirm every record is synthetic first"
@@ -1210,6 +1215,6 @@
    "com.nexaflow.saayalite.debug"
   ],
   "google_services_json": "app/google-services.json (present, gitignored)",
-  "outstanding": "Web app registration for console/firebase-config.js, needed at T8.2 only"
+  "outstanding": "Web app registration, needed at T1.2 (not T8.2): the app itself uses the Firebase web SDK for anonymous auth."
  }
 }
