@@ -137,7 +137,12 @@ Database `saaya_lite.db`, version 1.
 | `createdAt` / `lastAttemptAt` | Long | |
 | `remoteId` | String? | Firestore doc id once sent |
 
-### Encrypted preferences (`androidx.security`, file `saaya_secure`)
+### Settings store (IndexedDB object store `settings`)
+
+A browser has no OS keystore. The PIN hash lives in IndexedDB, isolated by origin. That is
+weaker than the Android original and it is accepted: the PIN only gates stopping a live
+SOS, and an attacker with the unlocked device and devtools has already lost that fight.
+It is still never stored in plaintext.
 | Key | Value |
 |---|---|
 | `pin_hash` | SHA-256 of (salt + pin) |

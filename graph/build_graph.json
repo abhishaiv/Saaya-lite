@@ -62,26 +62,31 @@
    "risk": "low",
    "cumulative_hours": 2.0,
    "status": "pending",
-   "run_id": "run.T1.1.2026-08-20.001",
+   "run_id": null,
    "gates_passed": [],
    "artifacts": [],
-   "corrections": [
-    "Resolved androidx.core:core-ktx 1.15.0, which requires compileSdk 35, to the latest prior stable 1.x release 1.13.1 whose AAR declares minCompileSdk 34.",
-    "Corrected the AndroidX SplashScreen extension import and API-27-qualified navigation-bar theme inheritance.",
-    "Completed the closed dependency set and architecture package skeleton omitted by the partial scaffold.",
-    "Founder replaced the rejected 2 GiB/1 GiB memory advice with an 8 GB-machine profile: Gradle 1536 MiB/768 MiB, Kotlin daemon 1536 MiB, two workers, no parallel build.",
-    "First spec verifier killed the node for Material default role leaks, v27 style loss, adaptive-icon centring, and disabled wrapper URL validation; all were corrected and round 2 passed.",
-    "Font assets remain owned by T1.3's explicit fonts_bundled artifact; all current Material typography roles now map to the frozen Saaya scale.",
-    "Founder commits captured early T1.1 artifacts before the gates; history was preserved and the completion commit records final corrections and provenance without rewriting those commits.",
-    "Record-time uniqueness audit found historical duplicate knowledge-graph event IDs; append-only history was preserved, the unique node_completed event is ev.0016, and the allocator defect was recorded as dev.kg.event_id_collisions."
-   ],
+   "corrections": [],
    "verify_lenses": [
     "spec"
    ],
    "verify_command": "spawn spec as fresh-context subagents; merge verdicts in code",
    "shape": "serial",
    "fanout": null,
-   "note": "A previous build of this node targeted a different platform and is archived on branch archive/android-kotlin. Build fresh for web. Nothing from that branch is required."
+   "note": "A previous build of this node targeted a different platform and is archived on branch archive/android-kotlin. Build fresh for web. Nothing from that branch is required.",
+   "archived_android_run": {
+    "run_id": "run.T1.1.2026-08-20.001",
+    "corrections": [
+     "Resolved androidx.core:core-ktx 1.15.0, which requires compileSdk 35, to the latest prior stable 1.x release 1.13.1 whose AAR declares minCompileSdk 34.",
+     "Corrected the AndroidX SplashScreen extension import and API-27-qualified navigation-bar theme inheritance.",
+     "Completed the closed dependency set and architecture package skeleton omitted by the partial scaffold.",
+     "Founder replaced the rejected 2 GiB/1 GiB memory advice with an 8 GB-machine profile: Gradle 1536 MiB/768 MiB, Kotlin daemon 1536 MiB, two workers, no parallel build.",
+     "First spec verifier killed the node for Material default role leaks, v27 style loss, adaptive-icon centring, and disabled wrapper URL validation; all were corrected and round 2 passed.",
+     "Font assets remain owned by T1.3's explicit fonts_bundled artifact; all current Material typography roles now map to the frozen Saaya scale.",
+     "Founder commits captured early T1.1 artifacts before the gates; history was preserved and the completion commit records final corrections and provenance without rewriting those commits.",
+     "Record-time uniqueness audit found historical duplicate knowledge-graph event IDs; append-only history was preserved, the unique node_completed event is ev.0016, and the allocator defect was recorded as dev.kg.event_id_collisions."
+    ],
+    "note": "From the Android build of this node, archived on branch archive/android-kotlin. Not applicable to the web build. Kept for history only."
+   }
   },
   "T2.1": {
    "id": "T2.1",
@@ -108,18 +113,10 @@
    "risk": "low",
    "cumulative_hours": 3.5,
    "status": "pending",
-   "run_id": "run.T2.1.2026-08-20.001",
+   "run_id": null,
    "gates_passed": [],
    "artifacts": [],
-   "corrections": [
-    "The cite-and-propose transcription was faithful to DATA_MODEL.md but the measured coordinate box was wrong against the frozen asset; the founder replaced it with the 17.4..18.1 / 82.9..83.7 district envelope.",
-    "The initial repair recommendation of lowering only the centroid longitude minimum to 83.0975 was too narrow because 34 polygon vertices also exceeded the old box; the final parser validates all 24 centroids and all 165 vertices.",
-    "G1 found stale duplicate transformed class copies ending in ' 2.class' only under generated app/build output; ./gradlew clean removed them and the clean rebuild passed.",
-    "The first JVM test helper used Files.readString, which AGP did not expose on its unit-test API surface; a buffered reader replaced it.",
-    "The first spec verifier killed a stale 17.6..17.9 / 83.1..83.5 merge contract in build_graph.json; it was corrected and fresh round 2 passed at 0.99 confidence.",
-    "The founder's coordinate-correction commit captured the in-progress T2.1 artifacts before all gates passed; history was preserved and this completion commit records the final delta and provenance.",
-    "Grounded explain lists multiple same-valued facts for 24 and 19, so the merge constants explicitly bind those literals to zones.total and cards.total; 37 binds to stations.total."
-   ],
+   "corrections": [],
    "verify_lenses": [
     "spec"
    ],
@@ -159,7 +156,20 @@
     ],
     "merge": "code: assert 24/19/37 counts and every centroid plus polygon vertex inside lat 17.4-18.1 lon 82.9-83.7; then write the single ZoneLoader that composes the three parsers"
    },
-   "note": "A previous build of this node is archived on branch archive/android-kotlin. Build fresh for web. The parse assertions and counts are unchanged."
+   "note": "A previous build of this node is archived on branch archive/android-kotlin. Build fresh for web. The parse assertions and counts are unchanged.",
+   "archived_android_run": {
+    "run_id": "run.T2.1.2026-08-20.001",
+    "corrections": [
+     "The cite-and-propose transcription was faithful to DATA_MODEL.md but the measured coordinate box was wrong against the frozen asset; the founder replaced it with the 17.4..18.1 / 82.9..83.7 district envelope.",
+     "The initial repair recommendation of lowering only the centroid longitude minimum to 83.0975 was too narrow because 34 polygon vertices also exceeded the old box; the final parser validates all 24 centroids and all 165 vertices.",
+     "G1 found stale duplicate transformed class copies ending in ' 2.class' only under generated app/build output; ./gradlew clean removed them and the clean rebuild passed.",
+     "The first JVM test helper used Files.readString, which AGP did not expose on its unit-test API surface; a buffered reader replaced it.",
+     "The first spec verifier killed a stale 17.6..17.9 / 83.1..83.5 merge contract in build_graph.json; it was corrected and fresh round 2 passed at 0.99 confidence.",
+     "The founder's coordinate-correction commit captured the in-progress T2.1 artifacts before all gates passed; history was preserved and this completion commit records the final delta and provenance.",
+     "Grounded explain lists multiple same-valued facts for 24 and 19, so the merge constants explicitly bind those literals to zones.total and cards.total; 37 binds to stations.total."
+    ],
+    "note": "From the Android build of this node, archived on branch archive/android-kotlin. Not applicable to the web build. Kept for history only."
+   }
   },
   "T4.1": {
    "id": "T4.1",
@@ -191,19 +201,10 @@
    "risk": "HIGH",
    "cumulative_hours": 6.5,
    "status": "pending",
-   "run_id": "run.T4.1.2026-08-20.001",
+   "run_id": null,
    "gates_passed": [],
    "artifacts": [],
-   "corrections": [
-    "The initial node contract did not define Command, PersistedSession, Rules or EngineResult outcome and omitted required reads; founder amendments closed the type contract and G10 now enforces it.",
-    "FEATURES and STATE_MACHINE contradicted each other on check-in manual disarm and the first state-visible write; founder amendments made check-in disarm local-only, the anonymous civic signal begin at FAMILY_ESCALATED and the detailed incident begin at SOS_ACTIVE.",
-    "The first spec verifier killed current-band n/a rescheduling, recomputed SHADOW recovery, an undocumented ZoneExited guard and overdue recovery without foreground-service restart.",
-    "The founder selected FREEZE_AT_ARM: AUTO_ZONE persists armedHourBand and every absolute deadline, while MANUAL remains fixed at ten minutes and fresh n/a arms stay IDLE.",
-    "The first invention verifier killed an inert 0.5 test default that mechanically matched an unrelated display-risk fact; it is now explicitly exempted as fixture plumbing and every behavioral literal remains grounded.",
-    "The final invention pass first killed a stale spec_graph header count of 248 against 279 actual facts; the declared cardinality now matches the array and the fresh rerun passed.",
-    "G1's first final rerun found stale duplicate transformed classes only in generated app/build output; Gradle clean removed them and the complete assemble, lint and test rerun passed.",
-    "Persistence commands were ordered so the local session arm record exists before ScheduleTimer attaches its absolute deadline."
-   ],
+   "corrections": [],
    "verify_lenses": [
     "spec",
     "boundary",
@@ -212,7 +213,21 @@
    "verify_command": "spawn spec, boundary, invention as fresh-context subagents; merge verdicts in code",
    "shape": "serial",
    "fanout": null,
-   "note": "An earlier implementation of this engine, passing all gates and its verifiers, is archived on branch archive/android-kotlin and may be consulted for STRUCTURE only. STATE_MACHINE.md is authoritative: where they differ, the archive is the bug."
+   "note": "An earlier implementation of this engine, passing all gates and its verifiers, is archived on branch archive/android-kotlin and may be consulted for STRUCTURE only. STATE_MACHINE.md is authoritative: where they differ, the archive is the bug.",
+   "archived_android_run": {
+    "run_id": "run.T4.1.2026-08-20.001",
+    "corrections": [
+     "The initial node contract did not define Command, PersistedSession, Rules or EngineResult outcome and omitted required reads; founder amendments closed the type contract and G10 now enforces it.",
+     "FEATURES and STATE_MACHINE contradicted each other on check-in manual disarm and the first state-visible write; founder amendments made check-in disarm local-only, the anonymous civic signal begin at FAMILY_ESCALATED and the detailed incident begin at SOS_ACTIVE.",
+     "The first spec verifier killed current-band n/a rescheduling, recomputed SHADOW recovery, an undocumented ZoneExited guard and overdue recovery without foreground-service restart.",
+     "The founder selected FREEZE_AT_ARM: AUTO_ZONE persists armedHourBand and every absolute deadline, while MANUAL remains fixed at ten minutes and fresh n/a arms stay IDLE.",
+     "The first invention verifier killed an inert 0.5 test default that mechanically matched an unrelated display-risk fact; it is now explicitly exempted as fixture plumbing and every behavioral literal remains grounded.",
+     "The final invention pass first killed a stale spec_graph header count of 248 against 279 actual facts; the declared cardinality now matches the array and the fresh rerun passed.",
+     "G1's first final rerun found stale duplicate transformed classes only in generated app/build output; Gradle clean removed them and the complete assemble, lint and test rerun passed.",
+     "Persistence commands were ordered so the local session arm record exists before ScheduleTimer attaches its absolute deadline."
+    ],
+    "note": "From the Android build of this node, archived on branch archive/android-kotlin. Not applicable to the web build. Kept for history only."
+   }
   },
   "T4.2": {
    "id": "T4.2",
@@ -1060,14 +1075,19 @@
  },
  "human_gates": [
   {
+   "before": "T1.1",
+   "gate": "connect the GitHub repo to Vercel so previews build",
+   "why": "T1.1 produces vercel_deploy and its extra gate is preview_url_loads_on_mobile. This is an account action, not a public act: a preview URL is not the submission link. Distinct from the T2.2 gate."
+  },
+  {
    "before": "T8.1",
    "gate": "Firestore rules and public read go live",
    "why": "public read is hard to un-publish; confirm every record is synthetic first"
   },
   {
    "before": "T2.2",
-   "gate": "the Vercel URL becomes publicly reachable",
-   "why": "this is the submission's live link; once shared it is judged"
+   "gate": "the production Vercel URL is shared as the submission's live link",
+   "why": "this is the judged link; once shared it is judged. The repo is already connected at T1.1; this gate is about publishing, not deploying."
   },
   {
    "after": "T9.0",

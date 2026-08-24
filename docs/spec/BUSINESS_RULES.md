@@ -102,7 +102,7 @@ and it never changes what is written to Firestore.
 |---|---|
 | Length | exactly 4 digits |
 | Rejected values | `0000`, `1234`, `1111`, and any 4 identical digits |
-| Storage | SHA-256 of (16-byte random salt + pin), salt and hash in EncryptedSharedPreferences |
+| Storage | Web Crypto `SHA-256` of (16-byte random salt + pin); salt and hash in IndexedDB, never uploaded |
 | Wrong attempts before lockout | **5** |
 | Lockout | **60 s**, doubling to a max of 15 min |
 | What the PIN protects | **stopping a live SOS only** |

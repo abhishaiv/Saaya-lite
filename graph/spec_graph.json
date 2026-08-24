@@ -3,7 +3,7 @@
  "kind": "knowledge_graph",
  "note": "Domain facts with provenance. Never merge with build_graph.json - different truth standards.",
  "rule": "Every numeric or colour literal in source must trace to a fact id here, or the grounded checker fails the node.",
- "count": 306,
+ "count": 339,
  "facts": [
   {
    "id": "ladder.cd1",
@@ -3405,6 +3405,361 @@
    "governs": "WEB_PLATFORM.md",
    "frozen": true,
    "platform": "any"
+  },
+  {
+   "id": "dep.next",
+   "kind": "string",
+   "value": "14.2.15",
+   "means": "pinned next version",
+   "sourced_from": "founder 2026-08-19 via BUILD_CONFIG.md",
+   "governs": "BUILD_CONFIG.md",
+   "frozen": true,
+   "platform": "web",
+   "unit": "version"
+  },
+  {
+   "id": "dep.react",
+   "kind": "string",
+   "value": "18.3.1",
+   "means": "pinned react version",
+   "sourced_from": "founder 2026-08-19 via BUILD_CONFIG.md",
+   "governs": "BUILD_CONFIG.md",
+   "frozen": true,
+   "platform": "web",
+   "unit": "version"
+  },
+  {
+   "id": "dep.react_dom",
+   "kind": "string",
+   "value": "18.3.1",
+   "means": "pinned react_dom version",
+   "sourced_from": "founder 2026-08-19 via BUILD_CONFIG.md",
+   "governs": "BUILD_CONFIG.md",
+   "frozen": true,
+   "platform": "web",
+   "unit": "version"
+  },
+  {
+   "id": "dep.typescript",
+   "kind": "string",
+   "value": "5.6.3",
+   "means": "pinned typescript version",
+   "sourced_from": "founder 2026-08-19 via BUILD_CONFIG.md",
+   "governs": "BUILD_CONFIG.md",
+   "frozen": true,
+   "platform": "web",
+   "unit": "version"
+  },
+  {
+   "id": "dep.leaflet",
+   "kind": "string",
+   "value": "1.9.4",
+   "means": "pinned leaflet version",
+   "sourced_from": "founder 2026-08-19 via BUILD_CONFIG.md",
+   "governs": "BUILD_CONFIG.md",
+   "frozen": true,
+   "platform": "web",
+   "unit": "version"
+  },
+  {
+   "id": "dep.firebase",
+   "kind": "string",
+   "value": "10.14.1",
+   "means": "pinned firebase version",
+   "sourced_from": "founder 2026-08-19 via BUILD_CONFIG.md",
+   "governs": "BUILD_CONFIG.md",
+   "frozen": true,
+   "platform": "web",
+   "unit": "version"
+  },
+  {
+   "id": "dep.idb",
+   "kind": "string",
+   "value": "8.0.0",
+   "means": "pinned idb version",
+   "sourced_from": "founder 2026-08-19 via BUILD_CONFIG.md",
+   "governs": "BUILD_CONFIG.md",
+   "frozen": true,
+   "platform": "web",
+   "unit": "version"
+  },
+  {
+   "id": "dep.types_node",
+   "kind": "string",
+   "value": "20.17.0",
+   "means": "pinned types_node version",
+   "sourced_from": "founder 2026-08-19 via BUILD_CONFIG.md",
+   "governs": "BUILD_CONFIG.md",
+   "frozen": true,
+   "platform": "web",
+   "unit": "version"
+  },
+  {
+   "id": "dep.types_react",
+   "kind": "string",
+   "value": "18.3.11",
+   "means": "pinned types_react version",
+   "sourced_from": "founder 2026-08-19 via BUILD_CONFIG.md",
+   "governs": "BUILD_CONFIG.md",
+   "frozen": true,
+   "platform": "web",
+   "unit": "version"
+  },
+  {
+   "id": "dep.types_react_dom",
+   "kind": "string",
+   "value": "18.3.1",
+   "means": "pinned types_react_dom version",
+   "sourced_from": "founder 2026-08-19 via BUILD_CONFIG.md",
+   "governs": "BUILD_CONFIG.md",
+   "frozen": true,
+   "platform": "web",
+   "unit": "version"
+  },
+  {
+   "id": "dep.types_leaflet",
+   "kind": "string",
+   "value": "1.9.14",
+   "means": "pinned types_leaflet version",
+   "sourced_from": "founder 2026-08-19 via BUILD_CONFIG.md",
+   "governs": "BUILD_CONFIG.md",
+   "frozen": true,
+   "platform": "web",
+   "unit": "version"
+  },
+  {
+   "id": "dep.vitest",
+   "kind": "string",
+   "value": "2.1.3",
+   "means": "pinned vitest version",
+   "sourced_from": "founder 2026-08-19 via BUILD_CONFIG.md",
+   "governs": "BUILD_CONFIG.md",
+   "frozen": true,
+   "platform": "web",
+   "unit": "version"
+  },
+  {
+   "id": "dep.eslint",
+   "kind": "string",
+   "value": "8.57.1",
+   "means": "pinned eslint version",
+   "sourced_from": "founder 2026-08-19 via BUILD_CONFIG.md",
+   "governs": "BUILD_CONFIG.md",
+   "frozen": true,
+   "platform": "web",
+   "unit": "version"
+  },
+  {
+   "id": "dep.eslint_config_next",
+   "kind": "string",
+   "value": "14.2.15",
+   "means": "pinned eslint_config_next version",
+   "sourced_from": "founder 2026-08-19 via BUILD_CONFIG.md",
+   "governs": "BUILD_CONFIG.md",
+   "frozen": true,
+   "platform": "web",
+   "unit": "version"
+  },
+  {
+   "id": "build.framework",
+   "kind": "string",
+   "value": "NEXT_APP_ROUTER",
+   "means": "Next.js App Router",
+   "sourced_from": "BUILD_CONFIG.md:29",
+   "governs": "BUILD_CONFIG.md",
+   "frozen": true,
+   "platform": "web"
+  },
+  {
+   "id": "build.typescript.strict",
+   "kind": "string",
+   "value": "true",
+   "means": "TypeScript strict mode on",
+   "sourced_from": "BUILD_CONFIG.md:30",
+   "governs": "BUILD_CONFIG.md",
+   "frozen": true,
+   "platform": "web"
+  },
+  {
+   "id": "build.ecma.target",
+   "kind": "string",
+   "value": "ES2020",
+   "means": "compile target",
+   "sourced_from": "BUILD_CONFIG.md:32",
+   "governs": "BUILD_CONFIG.md",
+   "frozen": true,
+   "platform": "web"
+  },
+  {
+   "id": "build.package_manager",
+   "kind": "string",
+   "value": "npm",
+   "means": "package manager, lockfile committed",
+   "sourced_from": "BUILD_CONFIG.md:33",
+   "governs": "BUILD_CONFIG.md",
+   "frozen": true,
+   "platform": "web"
+  },
+  {
+   "id": "build.node.major",
+   "kind": "number",
+   "value": 20,
+   "means": "Node LTS major",
+   "sourced_from": "BUILD_CONFIG.md:34",
+   "governs": "BUILD_CONFIG.md",
+   "frozen": true,
+   "platform": "web",
+   "unit": "major"
+  },
+  {
+   "id": "type.family.english",
+   "kind": "string",
+   "value": "Poppins",
+   "means": "English typeface",
+   "sourced_from": "DESIGN_SYSTEM.md:23",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true,
+   "platform": "web"
+  },
+  {
+   "id": "type.family.telugu",
+   "kind": "string",
+   "value": "Noto Sans Telugu",
+   "means": "Telugu typeface, Poppins has no coverage",
+   "sourced_from": "DESIGN_SYSTEM.md:25",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true,
+   "platform": "web"
+  },
+  {
+   "id": "type.weight.regular",
+   "kind": "number",
+   "value": 400,
+   "means": "Poppins Regular",
+   "sourced_from": "DESIGN_SYSTEM.md:23",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true,
+   "platform": "web",
+   "unit": "weight"
+  },
+  {
+   "id": "type.weight.semibold",
+   "kind": "number",
+   "value": 600,
+   "means": "Poppins SemiBold",
+   "sourced_from": "DESIGN_SYSTEM.md:23",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true,
+   "platform": "web",
+   "unit": "weight"
+  },
+  {
+   "id": "type.weight.bold",
+   "kind": "number",
+   "value": 700,
+   "means": "Poppins Bold",
+   "sourced_from": "DESIGN_SYSTEM.md:23",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true,
+   "platform": "web",
+   "unit": "weight"
+  },
+  {
+   "id": "type.numerals.feature",
+   "kind": "string",
+   "value": "tnum",
+   "means": "tabular numerals so countdowns do not jitter",
+   "sourced_from": "DESIGN_SYSTEM.md:28",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true,
+   "platform": "web"
+  },
+  {
+   "id": "icon.master.size",
+   "kind": "number",
+   "value": 1024,
+   "means": "brand master artboard",
+   "sourced_from": "ICONOGRAPHY.md:63",
+   "governs": "ICONOGRAPHY.md",
+   "frozen": true,
+   "platform": "web",
+   "unit": "px"
+  },
+  {
+   "id": "icon.web.pwa.small",
+   "kind": "number",
+   "value": 192,
+   "means": "PWA manifest icon",
+   "sourced_from": "ICONOGRAPHY.md:79",
+   "governs": "ICONOGRAPHY.md",
+   "frozen": true,
+   "platform": "web",
+   "unit": "px"
+  },
+  {
+   "id": "icon.web.pwa.large",
+   "kind": "number",
+   "value": 512,
+   "means": "PWA manifest icon",
+   "sourced_from": "ICONOGRAPHY.md:79",
+   "governs": "ICONOGRAPHY.md",
+   "frozen": true,
+   "platform": "web",
+   "unit": "px"
+  },
+  {
+   "id": "icon.web.apple",
+   "kind": "number",
+   "value": 180,
+   "means": "apple-touch-icon",
+   "sourced_from": "ICONOGRAPHY.md:80",
+   "governs": "ICONOGRAPHY.md",
+   "frozen": true,
+   "platform": "web",
+   "unit": "px"
+  },
+  {
+   "id": "icon.web.maskable",
+   "kind": "number",
+   "value": 512,
+   "means": "maskable icon",
+   "sourced_from": "ICONOGRAPHY.md:81",
+   "governs": "ICONOGRAPHY.md",
+   "frozen": true,
+   "platform": "web",
+   "unit": "px"
+  },
+  {
+   "id": "icon.web.maskable.safe",
+   "kind": "number",
+   "value": 80,
+   "means": "maskable safe circle, pin must stay inside",
+   "sourced_from": "ICONOGRAPHY.md:81",
+   "governs": "ICONOGRAPHY.md",
+   "frozen": true,
+   "platform": "web",
+   "unit": "pct"
+  },
+  {
+   "id": "app.label",
+   "kind": "string",
+   "value": "Saaya Lite",
+   "means": "PWA name and home-screen label",
+   "sourced_from": "ICONOGRAPHY.md:100",
+   "governs": "ICONOGRAPHY.md",
+   "frozen": true,
+   "platform": "web"
+  },
+  {
+   "id": "viewport.floor",
+   "kind": "number",
+   "value": 320,
+   "means": "narrowest supported viewport",
+   "sourced_from": "ARCHITECTURE.md",
+   "governs": "BUILD_CONFIG.md",
+   "frozen": true,
+   "platform": "web",
+   "unit": "px"
   }
  ]
 }

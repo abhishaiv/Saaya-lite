@@ -1,84 +1,96 @@
 # Saaya Lite - Architecture
 
+Web. Next.js App Router, TypeScript. The Android architecture this replaces is archived on
+branch `archive/android-kotlin` and nothing from it is required.
+
 ## Shape
 
-Single npm module, clean-ish layering. **Do not build a multi-module project.** At this
+Single npm package, clean-ish layering. **Do not build a monorepo or a workspace.** At this
 size it costs more than it returns and the build window is nine evenings.
 
 ```
-app/
-  di/                 React context providers
+app/                      Next.js routes
+  page.tsx                the map. the entry point. no login.
+  layout.tsx              fonts, theme tokens, the providers
+  api/                    server-only Firestore writes
+console/                  the state view, its own route
+src/
+  domain/                 THE PURE ENGINE. zero DOM, zero React, zero browser API.
+    model/                SessionState, SessionEvent, Command, PersistedSession, Rules
+    engine/               SessionEngine, ArmingEvaluator, IntervalCalculator, Anonymiser
   data/
-    local/            IndexedDB: entities, store accessors, database, EncryptedSharedPreferences
-    remote/           Firestore writers
-    zone/             Zone loading from bundled assets
-    repository/       The only thing ViewModels touch
-  domain/
-    model/            Pure TypeScript models, no framework imports
-    engine/           SessionEngine, ArmingEvaluator, IntervalCalculator, Anonymiser
-  service/            SaayaForegroundService, geofencing, notifications, alarms
+    db/                   IndexedDB via idb: schema, stores, migrations
+    remote/               Firestore writers
+    zone/                 zone loading from public/assets
+    repository/           the only thing the UI touches
   ui/
-    theme/            Colours, type, spacing from DESIGN_SYSTEM.md
-    components/       Shared components
-    screens/          One package per screen
-    navigation/       NavGraph, routes
-  util/               Clock, formatters, locale
+    theme/                colour, type and spacing tokens from DESIGN_SYSTEM.md
+    components/           shared components
+    screens/              one directory per screen
+  platform/               the browser edge: geolocation, wake lock, timers, visibility
+  util/                   clock, formatters, locale
+public/assets/            the three Vizag files, fonts, icons
 ```
+
+`src/platform/` is the only place a browser API may be called outside `app/`. It exists so
+the rest of the app can be tested without a browser, and so the tab-lifecycle rules in
+`WEB_PLATFORM.md` live in one auditable place rather than scattered through components.
 
 ## Layer rules
 
 | Rule | Why |
 |---|---|
-| `src/domain/` has **zero browser API, React or DOM** | The engine and the rules must be unit-testable under vitest with no browser. This is what lets us verify the trust boundary in `TEST_PLAN.md`. Grep it for `window`, `document`, `navigator`, `localStorage`: nothing. |
-| ViewModels talk to repositories only, never to IndexedDB or Firestore | One seam to fake in tests. |
-| `SessionEngine` is a pure state machine | Input: events. Output: state plus a list of side-effect commands. It does **not** fire notifications, write Firestore or start services itself. |
-| The service executes commands, the engine decides them | Keeps every timing rule testable without a browser. |
+| `src/domain/` has **zero browser API, React or DOM** | The engine and the rules must be unit-testable under vitest with no browser. This is what lets us verify the trust boundary in `TEST_PLAN.md`. Grep it for `window`, `document`, `navigator`, `localStorage`, `fetch`, `Date.now`: nothing. |
+| The UI talks to repositories only, never to IndexedDB or Firestore | One seam to fake in tests. |
+| `SessionEngine` is a pure state machine | Input: events. Output: state plus a list of side-effect commands. It does **not** fire notifications, write Firestore or touch the network itself. |
+| `src/platform/` performs commands, the engine decides them | Keeps every timing rule testable without a browser. |
 
-## The core decision: engine emits commands, service performs them
+## The core decision: engine emits commands, the app performs them
 
 ```typescript
-// domain/engine
-data class EngineResult(val state: SessionState, val commands: List<Command>)
-
-// CANONICAL DEFINITION LIVES IN STATE_MACHINE.md, which is the type-contract document
-// and is what T4.1 reads. This copy is illustrative; if they ever differ, that one wins.
-sealed interface Command {
-  data class ShowCheckIn(val countdownSec: Int, val urgency: Urgency) : Command
-  data class NotifyFamily(val payload: FamilyPayload) : Command
-  data class WriteSusEvent(val event: SusEvent) : Command
-  data class WriteSosIncident(val incident: SosIncident) : Command
-  data class ScheduleTimer(val id: TimerId, val delaySec: Int) : Command
-  data class CancelTimer(val id: TimerId) : Command
-  data object PlayUrgentAlert : Command
-  data object RequirePinToStop : Command
-}
+// src/domain/engine
+export function onEvent(
+  state: SessionState,
+  event: SessionEvent,
+  ctx: EngineContext,
+): EngineResult;   // { state, commands: Command[] }
 ```
 
-`SessionEngine.onEvent(event): EngineResult` is a **pure function of (currentState, event,
-clock, config)**. No IO, no async, no browser API. Every rule in `BUSINESS_RULES.md` is
-tested against this function directly.
+`onEvent` is a **pure function of (state, event, ctx)**. No IO, no async, no browser API.
+Time enters as `ctx.nowEpochMs`; the engine never calls `Date.now()`. Every rule in
+`BUSINESS_RULES.md` is tested against this function directly.
 
-## Threading
+**Commands are intent only.** `NotifyFamily` carries no phone number and no message.
+`WriteSusEvent` carries no zone name. The performer builds any payload from its own store
+at the moment it acts. The full command list is frozen in `STATE_MACHINE.md`; do not add a
+command that carries personal data.
+
+## Timing, location and the tab
+
+Full detail and the honest limitation are in `WEB_PLATFORM.md`. The architectural rules:
 
 | Concern | Choice |
 |---|---|
-| Location updates | `navigator.geolocation.watchPosition` inside the wake lock plus a visible page |
-| Timers | `an absolute deadline in IndexedDB` with `setExactAndAllowWhileIdle`. **Not** coroutine `delay`, which does not survive Doze. |
-| Persistence | IndexedDB with suspend store accessors on `Dispatchers.IO` |
-| Firestore writes | Enqueued to IndexedDB first, then flushed. See the offline queue below. |
-| UI | `StateFlow` exposed by ViewModels, collected with `collectAsStateWithLifecycle` |
+| Location | `navigator.geolocation.watchPosition`, `enableHighAccuracy: true` while armed. Sampling from `SetLocationSampling`. |
+| Timers | An **absolute `deadlineEpochMs`** in IndexedDB. `setTimeout` is only ever a hint for the visible tab. |
+| Resuming | On `visibilitychange` and on load, **recompute** from `deadlineEpochMs`. Never resume a countdown from where it paused. A frozen tab is the normal case, not the edge case. |
+| Staying awake | `navigator.wakeLock.request("screen")` while armed, re-acquired on `visibilitychange` because the browser drops it. |
+| Persistence | IndexedDB via `idb`, async everywhere. |
+| Firestore writes | Enqueued to IndexedDB first, then flushed. See below. |
+| UI state | React state driven by a reducer that wraps the pure engine. |
 
 ## The offline queue is not optional
 
-F22 and F32. Every outbound write goes to IndexedDB `queued_event` first, then a flusher drains it.
+F22 and F32. Every outbound write goes to IndexedDB `queued_event` first, then a flusher
+drains it.
 
 ```
 Engine emits WriteSusEvent
   -> insert into queued_event (status = PENDING)
-  -> QueueFlusher attempts Firestore write
+  -> QueueFlusher attempts the Firestore write
      -> success: status = SENT
      -> failure: status stays PENDING, retry with backoff 5s, 15s, 60s, 5min, then on
-        next connectivity change
+        the next `online` event
 ```
 
 Rationale: an unlit road in Vizag at 4 a.m. is where connectivity is worst and where the
@@ -87,85 +99,74 @@ submission claim, so it must actually be true.
 
 ## Dependency list, and nothing else
 
+Runtime, pinned in `BUILD_CONFIG.md`:
+
 | Dependency | Purpose |
 |---|---|
-| React (BOM) + Material 3 | UI |
-| dependency wiring | DI |
-| IndexedDB | local persistence and the offline queue |
-| `androidx.security:security-crypto` | EncryptedSharedPreferences for the PIN hash |
-| `play-services-location` | fused location and geofencing |
-| Firebase BOM: Firestore, Auth (anonymous only) | the state view writes |
-| `org.Leaflet:Leaflet-android:6.1.20` | map rendering. **Decided, see `MAP_SPEC.md`.** |
-| _(none: `JSON.parse` is native)_ | asset parsing |
-| `androidx.core:core-splashscreen:1.0.1` | the platform splash API. Added 2026-08-19 by founder decision when T1.1 blocked on it. |
-| `com.android.tools:desugar_jdk_libs:2.0.4` | core library desugaring, so `java.time` works on the 320 px viewport floor. Added 2026-08-19 when T4.1 blocked on it. |
+| `next`, `react`, `react-dom` | framework and UI |
+| `typescript` | language |
+| `leaflet` | map rendering with CARTO Dark Matter tiles. **Decided, see `MAP_SPEC.md`.** |
+| `firebase` | Firestore and anonymous Auth, for the state view writes |
+| `idb` | IndexedDB wrapper: local persistence and the offline queue |
+
+Dev only: `@types/node`, `@types/react`, `@types/react-dom`, `@types/leaflet`, `vitest`,
+`eslint`, `eslint-config-next`. These are required by gates G2 and G3 and by
+`strict: true`; they ship nothing to the browser.
 
 **Map choice is decided: Leaflet with CARTO Dark Matter tiles.** Founder decision
 2026-08-18. No API key, no billing account, no quota, so nothing in the build depends on a
 credential that could fail on submission day. Full specification in `MAP_SPEC.md`.
 Do not substitute Google Maps.
 
-Do not add: Retrofit (no REST API), WorkManager (an absolute deadline in IndexedDB is more precise for this),
-any analytics SDK, any crash reporter that phones home, any AI or ML library.
+**Do not add:** any CSS or UI framework, any state library, any component library, any
+analytics SDK, any crash reporter that phones home, any AI or ML library, any HTTP client
+(`fetch` is native), any date library (epoch millis and `Intl` are enough), any Service
+Worker beyond the PWA manifest. If a thing seems to need one, it probably needs less code.
 
-## Build config
+## DI: four providers, no container
 
-| Setting | Value |
+There is no Hilt and no DI container. Four React context providers, created in
+`app/layout.tsx`. **Do not create a fifth without asking.**
+
+| Provider | Supplies |
 |---|---|
-| `target floor` | 24 |
-| `targetSdk` | 34 |
-| `compileSdk` | 34 |
-| `applicationId` | `com.nexaflow.saayalite` |
-| TypeScript target | ES2020 |
-| Build types | `debug` (demo trigger visible), `release` (demo trigger visible **and labelled**, since judges install the deployed site) |
+| `AppProvider` | `Clock`, `Rules.DEFAULT`, locale |
+| `DataProvider` | the IndexedDB handle and every store accessor |
+| `RemoteProvider` | the Firestore and Auth clients |
+| `RepositoryProvider` | the six repositories below, wired to the two above |
 
-**Note on the demo trigger.** Unlike full Saaya, the demo affordance ships in release here,
-because a judge installing the deployed site must be able to reproduce the journey without walking
-into a Vizag zone at 4 a.m. It is labelled on screen as a demo control. This is the
-opposite of the Saaya de-demo rule and it is deliberate, because the audience is different.
-
----
-
-## Dependency injection: the complete module list
-
-Four React context providers. **Do not create a fifth without asking.**
-
-```typescript
-@Module @InstallIn(SingletonComponent::class)
-object AppModule {          // Clock, CoroutineScope, Dispatchers, Context-derived helpers
-    @Provides fun clock(): Clock = Clock.system(ZoneId.of("Asia/Kolkata"))
-    @Provides fun rules(): Rules = Rules.DEFAULT
-    @Provides @IoDispatcher fun io(): CoroutineDispatcher = Dispatchers.IO
-}
-
-@Module @InstallIn(SingletonComponent::class)
-object DataModule {         // IndexedDB store, all store accessors, EncryptedSharedPreferences
-}
-
-@Module @InstallIn(SingletonComponent::class)
-object RemoteModule {       // FirebaseFirestore, FirebaseAuth
-}
-
-@Module @InstallIn(SingletonComponent::class)
-abstract class RepositoryModule {   // @Binds every interface below to its impl
-}
-```
-
-`Clock` is injected, never `System.currentTimeMillis()` at a call site. That single rule is
-what makes the entire ladder testable with a fake clock.
+`Clock` is injected, never `Date.now()` at a call site. That single rule is what makes the
+entire ladder testable with a fake clock.
 
 ## Repository interfaces
 
-Six. ViewModels and the service touch **only** these, never IndexedDB or Firestore directly.
+Six. The UI and `src/platform/` touch **only** these, never IndexedDB or Firestore directly.
 
 | Interface | Responsibility |
 |---|---|
 | `ZoneRepository` | zones, cards, stations from bundled assets; nearest station; point-in-polygon |
 | `SessionRepository` | current session, session events, cooldowns, persisted deadlines |
 | `FavouriteRepository` | CRUD over `contact`. **Never uploads.** |
-| `SettingsRepository` | PIN hash and verify, language, onboarded flag, demo speed |
+| `SettingsRepository` | PIN hash and verify via Web Crypto, language, onboarded flag, demo speed |
 | `QueueRepository` | enqueue, drain, backoff, status; the only path to Firestore |
 | `StateViewRepository` | builds SUS and SOS payloads via `Anonymiser`, hands them to the queue |
 
-Each has a `Fake` in `src/test` used by the engine and ViewModel tests. Write the fake in
-the same task as the interface, never later.
+Each has a `Fake` in `src/test` used by the engine and UI tests. Write the fake in the same
+node as the interface, never later.
+
+## Build and deploy
+
+| Setting | Value |
+|---|---|
+| Framework | Next.js App Router |
+| TypeScript | `strict: true` |
+| Target | ES2020, modern evergreen browsers |
+| Viewport floor | 320 px |
+| Package manager | npm, lockfile committed |
+| Node | 20 LTS |
+| Host | Vercel |
+
+**Note on the demo trigger.** Unlike full Saaya, the demo affordance ships in the deployed
+build, because a judge opening the live link must be able to reproduce the journey without
+walking into a Vizag zone at 4 a.m. It is labelled on screen as a demo control. This is the
+opposite of the Saaya de-demo rule and it is deliberate, because the audience is different.

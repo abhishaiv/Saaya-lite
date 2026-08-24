@@ -31,6 +31,9 @@ TRIVIAL={0.0,1.0,2.0,3.0,-1.0}
 # Deliberately tiny. An earlier, wider set let common UI numbers (8, 16, 24, 32, 100)
 # bypass the check entirely, which is exactly where an agent invents values. Anything
 # else must trace to spec_graph.json or carry an explicit GROUNDED-EXEMPT reason.
+# One set, used by the gate AND by --explain. They disagreed once: --explain still listed
+# the Kotlin extensions, so `--explain foo.tsx` checked nothing and printed nothing.
+EXTS=(".ts",".tsx",".js",".mjs",".css")
 SKIP_LINE=re.compile(r'^\s*(//|\*|/\*|#)')
 # Anything on a line carrying this marker is exempt, with the reason required after it.
 EXEMPT=re.compile(r'GROUNDED-EXEMPT:\s*\S+')
@@ -97,14 +100,14 @@ def explain(path):
 def main():
     if "--explain" in sys.argv:
         for a in sys.argv[1:]:
-            if a.endswith((".kt",".kts",".js",".mjs",".xml")): explain(a)
+            if a.endswith(EXTS): explain(a)
         return
     # the regression fixture is ungrounded ON PURPOSE; never let it fail a real run
     if "--staged" in sys.argv:
         out=subprocess.run(["git","diff","--cached","--name-only"],capture_output=True,text=True).stdout
-        paths=[p for p in out.split() if p.endswith((".kt",".kts",".js",".mjs",".ts",".tsx"))]
+        paths=[p for p in out.split() if p.endswith(EXTS)]
     else:
-        paths=[a for a in sys.argv[1:] if a.endswith((".kt",".kts",".js",".mjs",".ts",".tsx"))]
+        paths=[a for a in sys.argv[1:] if a.endswith(EXTS)]
     total=0
     for p in paths:
         for line,lit,kind in check(p):

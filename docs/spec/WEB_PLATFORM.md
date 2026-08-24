@@ -31,7 +31,7 @@ Saying exactly where the browser stops is a better architecture answer than pret
 | Hosting | **Vercel**, deployed from the GitHub repo | named in the brief; push-to-deploy |
 | Map | **Leaflet** + the same CARTO Dark Matter tiles | no key, no billing, and the tile source is unchanged from `MAP_SPEC.md` |
 | State | React state + a reducer wrapping the pure engine | the engine is unchanged: pure TypeScript, no DOM |
-| Local storage | **IndexedDB** (favourites, session, queue), `localStorage` for flags | replaces IndexedDB |
+| Local storage | **IndexedDB** (favourites, session, queue), `localStorage` for flags | replaces Room |
 | PIN | **Web Crypto** `SHA-256` over salt+pin | replaces EncryptedSharedPreferences |
 | Backend | **Firestore**, same project `saaya-lite` | unchanged |
 | Fonts | Poppins + Noto Sans Telugu, self-hosted, `font-display: swap` | unchanged values |

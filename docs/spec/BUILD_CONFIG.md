@@ -3,24 +3,54 @@ Replaces the Android build config, archived as `the git history and branch archi
 
 ## Stack, pinned
 
+Runtime dependencies:
+
 ```json
 {
   "next": "14.2.15",
   "react": "18.3.1",
-  "typescript": "5.6.3",
+  "react-dom": "18.3.1",
   "leaflet": "1.9.4",
   "firebase": "10.14.1",
   "idb": "8.0.0"
 }
 ```
 
+Dev dependencies. Not a widening of scope: `strict: true` cannot typecheck without these
+typings, G2 cannot run without ESLint, and G3 cannot run without vitest. None ship to the
+browser.
+
+```json
+{
+  "typescript": "5.6.3",
+  "@types/node": "20.17.0",
+  "@types/react": "18.3.11",
+  "@types/react-dom": "18.3.1",
+  "@types/leaflet": "1.9.14",
+  "vitest": "2.1.3",
+  "eslint": "8.57.1",
+  "eslint-config-next": "14.2.15"
+}
+```
+
+`eslint` stays on **8.x**: `eslint-config-next@14.2.15` does not accept ESLint 9.
+
 **Resolution rule, unchanged:** if a version fails to resolve, move to the latest stable in
 the same **major** line, record it in `CODEX_LOG.md`, and update this file. A major bump is
 not your call: stop and report. This rule already caught `core-ktx` on the Android build.
 
-**Closed dependency list.** Those six plus their transitive deps. Nothing else without an
-explicit amendment. **No** analytics, no UI kit, no CSS framework, no state library, no
-component library. If a thing seems to need one, it probably needs less code instead.
+**Closed dependency list.** Exactly the two blocks above plus their transitive deps.
+Nothing else without an explicit amendment recorded here and in `CODEX_LOG.md`. **No**
+analytics, no UI kit, no CSS framework, no state library, no component library, no HTTP
+client, no date library.
+
+**No component-test tooling, deliberately.** There is no jsdom, no happy-dom and no
+Testing Library. `vitest` tests the pure engine in `src/domain/`, which needs no DOM. UI
+correctness is verified in a real mobile browser under **G8**, because that is where the
+tab-lifecycle bugs in `WEB_PLATFORM.md` actually appear and a simulated DOM would hide
+them. Do not add a DOM test environment to make a UI unit test possible.
+
+If a thing seems to need a dependency, it probably needs less code instead.
 
 ## Project
 
