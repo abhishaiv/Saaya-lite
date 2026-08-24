@@ -313,8 +313,8 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 318,
-  "edges": 622,
+  "entities": 322,
+  "edges": 624,
   "events": 63
  },
  "entities": [
@@ -2627,6 +2627,30 @@
    "label": "Use a dedicated Saaya session IndexedDB database so recovery cannot open a partial schema owned by later offline-queue nodes",
    "node": "T4.2",
    "run": "run.T4.2.2026-08-24.web.001"
+  },
+  {
+   "id": "d.css_curves",
+   "class": "Decision",
+   "label": "Motion is CSS transitions with cubic-bezier curves plus a global prefers-reduced-motion rule. No JS spring solver and no animation library. The curves are DERIVED from the frozen physics rather than replacing it: each curve's first-peak overshoot is matched to the damping ratio it comes from, so motion.spring.damping stays the source of truth and a retune starts there.",
+   "at": "2026-08-24"
+  },
+  {
+   "id": "fail.spring_overshoot",
+   "class": "Failure",
+   "label": "The recommended spring curve cubic-bezier(0.34,1.56,0.64,1) was measured at 9.78% first-peak overshoot against the 2.84% implied by the frozen dampingRatio 0.75: three and a half times the specified bounce. It is the common springy preset and would have passed review by feel. Replaced with cubic-bezier(0.34,1.3,0.64,1), measured 2.99%. The founder direction is warm and springy, not bouncy, and an emergency surface that visibly wobbles reads as a toy.",
+   "at": "2026-08-24"
+  },
+  {
+   "id": "d.selfhost_fonts",
+   "class": "Decision",
+   "label": "Fonts are downloaded once, subset with pyftsubset, and committed to public/fonts with their licence files. The build never fetches a font. Same reasoning that chose Leaflet and CARTO over Google Maps: nothing may depend on a third party being reachable on submission day. This rules out next/font/google, which downloads at build time and cannot subset Material Symbols by icon name. Upstream files are pinned by recorded sha256 rather than by a commit id.",
+   "at": "2026-08-24"
+  },
+  {
+   "id": "c.telugu_layout_features",
+   "class": "Constraint",
+   "label": "Subsetting Noto Sans Telugu must retain the akhn, blwf, half, pres, abvs, blws and psts layout features. Dropping them silently breaks conjunct formation, which nobody testing in English would notice, and Telugu is half the intended audience.",
+   "at": "2026-08-24"
   }
  ],
  "edges": [
@@ -7604,6 +7628,22 @@
    "to": "node.T4.2",
    "at": "2026-08-24",
    "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "d.css_curves",
+   "rel": "motivated_by",
+   "to": "fail.spring_overshoot",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.selfhost_fonts",
+   "rel": "enforces",
+   "to": "claim.nokeys",
+   "at": "2026-08-24",
+   "by": "claude",
    "confidence": "high"
   }
  ],

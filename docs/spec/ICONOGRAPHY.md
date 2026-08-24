@@ -17,6 +17,23 @@ the iOS check-in card depends on.
 Subset to the icons listed below. The full variable font is roughly 4 MB and shipping it
 whole would blow the F31 size goal on its own.
 
+**Subsetting an icon font is by codepoint, not by name.** Look up each icon's codepoint in
+the upstream `MaterialSymbolsRounded.codepoints` file, pass exactly those to `pyftsubset`,
+and keep the `FILL`, `wght`, `GRAD` and `opsz` axes so the axis facts above still apply:
+
+```
+pyftsubset MaterialSymbolsRounded[FILL,GRAD,opsz,wght].ttf \
+  --unicodes=<the codepoints for the icons in the table below> \
+  --flavor=woff2 --output-file=public/fonts/material-symbols-subset.woff2
+```
+
+Do **not** instance the axes away to a single static cut: `icon.fill.state` is 1 and
+`icon.fill.utility` is 0, so both fill values are needed at runtime from one file.
+
+Record the icon count, the codepoints used and the output size in `CODEX_LOG.md`. If a
+screen later needs an icon outside this set, that is a spec change: stop and report it
+rather than widening the subset quietly.
+
 ## Mapping from the iOS SF Symbols
 
 | iOS SF Symbol | Material Symbols Rounded | Used for |

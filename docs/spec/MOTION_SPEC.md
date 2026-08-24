@@ -11,13 +11,27 @@ Founder decision: **warm and springy, but SOS is instant.**
 
 ## Curves
 
-| Name | Definition | Use |
-|---|---|---|
-| `standard` | `FastOutSlowIn`, 200 ms | Default fades, colour of non-accent elements |
-| `spring` | `spring(dampingRatio = 0.75f, stiffness = 380f)` | Sheets, cards, buttons. The warm feel lives here. |
-| `springSoft` | `spring(dampingRatio = 0.85f, stiffness = 240f)` | Large surfaces, bottom sheet |
-| `linear` | `LinearEasing` | **Countdowns only.** Never ease a clock. |
-| `none` | 0 ms | SOS entry, accent changes |
+CSS `transition-timing-function` values. A spring is not expressible as a cubic bezier, so
+these are **derived** from the frozen physics rather than replacing it: each curve's
+first-peak overshoot is matched to the damping ratio it comes from. Durations stay as the
+catalogue below states them.
+
+| Name | CSS | Derived from | Overshoot |
+|---|---|---|---|
+| `standard` | `cubic-bezier(0.4, 0, 0.2, 1)` | Material fast-out-slow-in, 200 ms | none |
+| `spring` | `cubic-bezier(0.34, 1.3, 0.64, 1)` | `motion.spring.damping` 0.75 | 2.99% vs 2.84% theoretical |
+| `springSoft` | `cubic-bezier(0.22, 1, 0.36, 1)` | `motion.springsoft.damping` 0.85 | 0% vs 0.63% theoretical |
+| `linear` | `linear` | | **Countdowns only.** Never ease a clock. |
+| `none` | `0ms`, no transition | SOS entry, accent changes | |
+
+**Why not a bouncier curve.** `cubic-bezier(0.34, 1.56, 0.64, 1)` is the common "springy"
+preset and it overshoots **9.78%**, three and a half times the 0.75 damping ratio this
+product froze. The founder's direction is warm and springy, not bouncy, and an emergency
+surface that visibly wobbles reads as a toy. If the overshoot is ever retuned, retune
+`motion.spring.damping` first and re-derive, so the two cannot drift apart.
+
+**Do not implement a JS spring solver.** No WAAPI physics integration, no animation
+library. CSS transitions with these curves, and nothing else.
 
 ## Catalogue
 
@@ -46,10 +60,26 @@ Founder decision: **warm and springy, but SOS is instant.**
 
 ## Reduced motion
 
-Read `Settings.Global.ANIMATOR_DURATION_SCALE`. If it is `0`, disable **every** entry in the
+Honour `@media (prefers-reduced-motion: reduce)`. Under it, disable **every** entry in the
 table above except the countdown ring, which is information rather than decoration, and
 replace transitions with instant state changes. Never keep a "nice" animation the user
 switched off.
+
+Implement it once, as a global rule, not per component:
+
+```css
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+```
+
+The countdown ring is driven by its own `linear` animation and must be exempted explicitly,
+because losing it would remove information rather than decoration.
 
 ## Performance
 
