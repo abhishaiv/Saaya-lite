@@ -107,15 +107,24 @@ Floating over the map, top-left, 12 px below the status bar inset.
 Height 36 px, radius 18 px, horizontal padding 14 px, fill `cardFill` @ 92%, 1 px border in
 the current accent @ 40%. Leading icon 16 px in the accent, then `label` type text.
 
-| Session state | Text | Accent |
+**Every label is a `COPY.md` key.** This table previously carried English literals, four of
+which had no key at all and so could not be translated. `SCREENS.md` states that strings are
+referenced by key and defined in `COPY.md`; where this file and `COPY.md` disagree, **COPY
+wins**.
+
+| Session state | Key | Accent |
 |---|---|---|
-| `IDLE` | NOT WATCHING | `textSecondary` |
-| `SHADOW` auto | WATCHING THIS STRETCH | `brand` |
-| `SHADOW` manual | WATCHING | `brand` |
-| `CHECKIN_1` | CHECKING IN | `brand` |
-| `CHECKIN_2` | STILL THERE? | `amber` |
-| `FAMILY_ESCALATED` | TELLING YOUR FAVOURITES | `danger` |
-| `SOS_ACTIVE` | SOS ACTIVE | `danger` |
+| `IDLE` | `status_idle` | `textSecondary` |
+| `SHADOW` auto | `status_shadow_auto` | `brand` |
+| `SHADOW` manual | `status_shadow_manual` | `brand` |
+| `CHECKIN_1` | `status_checkin1` | `brand` |
+| `CHECKIN_2` | `status_checkin2` | `amber` |
+| `FAMILY_ESCALATED` | `status_family` | `danger` |
+| `SOS_ACTIVE` | `status_sos` | `danger` |
+
+**No `text-transform: uppercase`.** The earlier literals were uppercase; Telugu is unicase,
+so uppercasing would style one language and not the other. Render the strings as `COPY.md`
+writes them.
 
 Text changes are instant. The pill itself never animates.
 

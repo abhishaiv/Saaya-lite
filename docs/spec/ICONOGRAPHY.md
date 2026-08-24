@@ -11,7 +11,7 @@ the iOS check-in card depends on.
 | Family | Material Symbols Rounded |
 | Weight axis | 400 default, **500** for icons inside filled buttons |
 | Fill axis | **1 (filled)** for state and status icons, **0 (outlined)** for navigation and utility |
-| Optical size | matches the rendered px |
+| Optical size | matches the rendered px, **clamped to the axis range 20 to 48**. The `opsz` axis does not go below 20, so a 16 px icon renders at `opsz=20`. This is a property of the font, not a preference: `dim.status.icon` and `dim.icon.tier.badge` are both 16. |
 | Grade | 0 |
 
 Subset to the icons listed below. The full variable font is roughly 4 MB and shipping it
@@ -66,6 +66,7 @@ rather than widening the subset quietly.
 | `exclamationmark.triangle.fill` | `warning` | Warnings, permission denied |
 | `wifi.slash` | `cloud_off` | Queued offline |
 | `lock.fill` | `lock` | PIN |
+| `info.circle.fill` | `info` (`E88E`) | C7 zone detail, and any inline explanation |
 
 ## Sizes
 

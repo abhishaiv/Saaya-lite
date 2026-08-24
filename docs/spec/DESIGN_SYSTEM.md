@@ -133,6 +133,23 @@ Procedure, once, and recorded in `CODEX_LOG.md`:
    `font.budget` (250 KB). Record the actual total in `CODEX_LOG.md`. If it is over, the
    fix is a tighter subset, never a fourth weight or a dropped language.
 
+### How these reach CSS
+
+Every dimension fact is **px**. The Android `dp` and `sp` units are gone: 88 facts carried
+them after the pivot, and the values were always right while the labels were not.
+
+Spacing, radii, borders and icon sizes are emitted as `px` directly. **Type is emitted as
+`rem`** so it follows the browser's text-size setting, derived from the same frozen px
+value rather than restated:
+
+```css
+--type-title: calc(20 / 16 * 1rem);   /* type.title.size / type.rem.base */
+```
+
+Write it as a `calc` like that, not as a precomputed `1.25rem`. The px number stays visible
+and traceable to its fact, and `type.rem.base` is itself a fact, so nothing in the type
+scale is an invented literal.
+
 ### Scale
 
 | Style | Size | Weight | Line height | Use |

@@ -30,6 +30,11 @@ demo video.
 | `status_idle` | Not watching | గమనించడం లేదు |
 | `status_shadow_auto` | Watching this stretch | ఈ మార్గాన్ని గమనిస్తోంది |
 | `status_shadow_manual` | Watching, you turned this on | గమనిస్తోంది, మీరు దీన్ని ఆన్ చేశారు |
+| `status_checkin1` | Checking in | చెక్-ఇన్ చేస్తోంది |
+| `status_checkin2` | Still there? | ఇంకా అక్కడ ఉన్నారా? |
+| `status_family` | Telling your favourites | మీ ఆత్మీయులకు చెబుతోంది |
+| `status_sos` | SOS active | SOS యాక్టివ్ |
+| `state_working` | Working | పని జరుగుతోంది |
 | `home_arm_banner_title` | Saaya woke by itself | సాయ దానంతట అదే మేల్కొంది |
 | `home_arm_banner_body` | You are in %1$s and it is %2$s. You did not have to do anything. | మీరు %1$s లో ఉన్నారు, ఇప్పుడు %2$s. మీరు ఏమీ చేయాల్సిన అవసరం లేదు. |
 | `home_hour_context` | Right now, %1$s reads %2$s | ప్రస్తుతం, %1$s %2$s గా ఉంది |

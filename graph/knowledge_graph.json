@@ -313,8 +313,8 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 331,
-  "edges": 633,
+  "entities": 336,
+  "edges": 636,
   "events": 63
  },
  "entities": [
@@ -2704,6 +2704,36 @@
    "id": "d.per_run_shaping",
    "class": "Decision",
    "label": "The shaping comparison is per RUN, not per string: segment each string by walking it character by character and assigning each to the first font in the stack whose cmap covers it, exactly as the browser itemises, then compare each run against its own font. Comparing a whole mixed string against a single font reports false failures, because a Telugu string containing SOS shaped against Noto alone correctly emits .notdef.",
+   "at": "2026-08-24"
+  },
+  {
+   "id": "anchor.font_gate_passed",
+   "class": "Anchor",
+   "label": "The behavioural font gate ran and passed on the real artefacts: 100 keyed bilingual rows, 666 Poppins shaping runs and 606 Noto runs compared upstream against subset, exact glyph ids and advances at all three weights, and 17 of 17 Material Symbols glyphs present. This is the first evidence that the subsets are correct rather than merely built.",
+   "at": "2026-08-24"
+  },
+  {
+   "id": "d.copy_wins",
+   "class": "Decision",
+   "label": "Where COMPONENT_LIBRARY and COPY disagree on a user-visible string, COPY wins. SCREENS states that strings are referenced by key and defined in COPY. C5 carried seven English literals, four of which had no COPY key at all and so could not be translated; all seven are now keys. No text-transform uppercase either: Telugu is unicase, so uppercasing styles one language and not the other.",
+   "at": "2026-08-24"
+  },
+  {
+   "id": "fail.units_dp_sp",
+   "class": "Failure",
+   "label": "88 live facts still carried Android dp and sp units after the pivot while the web specs required px and rem. The values were always right and only the labels were wrong, which is why nothing caught it: G6 matches on value, not unit, so the gate could not see it and no build ever failed.",
+   "at": "2026-08-24"
+  },
+  {
+   "id": "d.type_as_calc",
+   "class": "Decision",
+   "label": "Type reaches CSS as calc(<px fact> / 16 * 1rem) rather than a precomputed rem literal. Emitting 1.25rem would put an invented number in the stylesheet that no fact backs and G6 would correctly reject; the calc keeps the frozen px value visible and traceable, with type.rem.base as its own fact, while still scaling with the browser text-size setting.",
+   "at": "2026-08-24"
+  },
+  {
+   "id": "c.opsz_floor",
+   "class": "Constraint",
+   "label": "Material Symbols opsz axis is 20 to 48. Icons specified at 16 px, which includes dim.status.icon and dim.icon.tier.badge, render at opsz=20. ICONOGRAPHY's rule that optical size matches the rendered px is clamped to the axis range; the floor is a property of the font, not a preference.",
    "at": "2026-08-24"
   }
  ],
@@ -7768,6 +7798,30 @@
    "from": "d.font_stack",
    "rel": "motivated_by",
    "to": "fail.frozen_count",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.copy_wins",
+   "rel": "motivated_by",
+   "to": "fail.stale_telugu",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.type_as_calc",
+   "rel": "motivated_by",
+   "to": "fail.units_dp_sp",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.units_dp_sp",
+   "rel": "caused_by",
+   "to": "d.web",
    "at": "2026-08-24",
    "by": "claude",
    "confidence": "high"
