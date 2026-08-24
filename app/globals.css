@@ -1,0 +1,42 @@
+@import "../src/ui/theme/tokens.css";
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: var(--viewport-floor);
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  background: var(--color-background);
+  color: var(--color-text-primary);
+  font-family: var(--font-family-english);
+  font-size: var(--type-body-size);
+  line-height: var(--type-body-line-height);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+.app-shell {
+  display: grid;
+  min-height: 100dvh; /* GROUNDED-EXEMPT: full viewport is structural layout */
+  place-items: center;
+  padding: var(--screen-padding);
+  background: var(--color-background);
+}
+
+.app-title {
+  margin: 0;
+  color: var(--color-brand);
+  font-size: var(--type-title-size);
+  font-weight: var(--weight-bold);
+  line-height: var(--type-title-line-height);
+}

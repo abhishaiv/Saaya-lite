@@ -313,9 +313,9 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 239,
-  "edges": 540,
-  "events": 48
+  "entities": 247,
+  "edges": 548,
+  "events": 51
  },
  "entities": [
   {
@@ -2051,6 +2051,65 @@
    "class": "Failure",
    "at": "2026-08-24",
    "label": "The closed dependency list named six runtime packages and omitted everything the gates need: react-dom, the four @types, vitest for G3, eslint for G2. A list declared closed while structurally incomplete forces the builder to either stall or violate it. Codex stalled, correctly."
+  },
+  {
+   "id": "art.t11.web_scaffold",
+   "class": "Artifact",
+   "label": "Web Next.js and TypeScript scaffold",
+   "node": "T1.1",
+   "run": "run.T1.1.2026-08-24.web.001"
+  },
+  {
+   "id": "art.t11.web_theme_tokens",
+   "class": "Artifact",
+   "label": "Frozen Saaya web theme tokens in TypeScript and CSS",
+   "node": "T1.1",
+   "run": "run.T1.1.2026-08-24.web.001"
+  },
+  {
+   "id": "art.t11.web_icons",
+   "class": "Artifact",
+   "label": "PWA and favicon assets derived from saaya-icon-v2.svg",
+   "node": "T1.1",
+   "run": "run.T1.1.2026-08-24.web.001"
+  },
+  {
+   "id": "art.t11.vercel_config",
+   "class": "Artifact",
+   "label": "Vercel configuration for the Next.js app",
+   "node": "T1.1",
+   "run": "run.T1.1.2026-08-24.web.001"
+  },
+  {
+   "id": "art.t11.grounded_checker_fix",
+   "class": "Artifact",
+   "label": "CSS hex filtering and complete colour provenance in grounded_check",
+   "node": "T1.1",
+   "run": "run.T1.1.2026-08-24.web.001"
+  },
+  {
+   "id": "ver.t11.web.spec.round1",
+   "class": "Verification",
+   "label": "T1.1 web spec verifier passed with no findings",
+   "node": "T1.1",
+   "run": "run.T1.1.2026-08-24.web.001",
+   "lens": "spec",
+   "kill": "false",
+   "confidence": "0.98"
+  },
+  {
+   "id": "fail.t11.web_g6_hex_double_scan",
+   "class": "Failure",
+   "label": "T1.1 web G6 double-scanned numeric fragments inside validated CSS hex colours",
+   "node": "T1.1",
+   "gate": "G6"
+  },
+  {
+   "id": "fail.t11.web_g6_colour_overwrite",
+   "class": "Failure",
+   "label": "T1.1 web G6 overwrote same-valued semantic colour provenance",
+   "node": "T1.1",
+   "gate": "G6"
   }
  ],
  "edges": [
@@ -6373,6 +6432,70 @@
    "at": "2026-08-24",
    "by": "claude",
    "confidence": "high"
+  },
+  {
+   "from": "art.t11.web_scaffold",
+   "rel": "produced_by",
+   "to": "node.T1.1",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t11.web_theme_tokens",
+   "rel": "produced_by",
+   "to": "node.T1.1",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t11.web_icons",
+   "rel": "produced_by",
+   "to": "node.T1.1",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t11.vercel_config",
+   "rel": "produced_by",
+   "to": "node.T1.1",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t11.grounded_checker_fix",
+   "rel": "produced_by",
+   "to": "node.T1.1",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "node.T1.1",
+   "rel": "verified_by",
+   "to": "ver.t11.web.spec.round1",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.t11.web_g6_hex_double_scan",
+   "rel": "caused_by",
+   "to": "node.T1.1",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.t11.web_g6_colour_overwrite",
+   "rel": "caused_by",
+   "to": "node.T1.1",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
   }
  ],
  "events": [
@@ -6911,6 +7034,45 @@
    "at": "2026-08-22",
    "actor": "codex",
    "detail": "Platform pivot: native Android to mobile-first web. Brief fetched 2026-08-19 states reviewers will not download a mobile app and will test the citizen experience, not an admin panel. Kotlin archived on archive/android-kotlin.",
+   "node": "T1.1"
+  },
+  {
+   "id": "ev.0049",
+   "type": "gate_failed",
+   "at": "2026-08-24",
+   "actor": "codex",
+   "detail": "T1.1 web G6 self-test found CSS hex digits were double-scanned and duplicate colour provenance was overwritten; both checker defects were fixed and the intentional regression fixture now fails only on its invented literals.",
+   "refs": [
+    "fail.t11.web_g6_hex_double_scan",
+    "fail.t11.web_g6_colour_overwrite"
+   ],
+   "node": "T1.1"
+  },
+  {
+   "id": "ev.0050",
+   "type": "verifier_passed",
+   "at": "2026-08-24",
+   "actor": "codex",
+   "detail": "T1.1 web fresh-context spec verifier passed with no findings at 0.98 confidence.",
+   "refs": [
+    "ver.t11.web.spec.round1"
+   ],
+   "node": "T1.1"
+  },
+  {
+   "id": "ev.0051",
+   "type": "node_completed",
+   "at": "2026-08-24",
+   "actor": "codex",
+   "detail": "T1.1 web local build completed: Next.js scaffold, frozen theme, PWA icons and Vercel config passed every locally applicable gate. Founder-authorized follow-up remains pending for vercel_deploy and preview_url_loads_on_mobile.",
+   "refs": [
+    "art.t11.web_scaffold",
+    "art.t11.web_theme_tokens",
+    "art.t11.web_icons",
+    "art.t11.vercel_config",
+    "art.t11.grounded_checker_fix",
+    "ver.t11.web.spec.round1"
+   ],
    "node": "T1.1"
   }
  ]

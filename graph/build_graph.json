@@ -61,11 +61,37 @@
    ],
    "risk": "low",
    "cumulative_hours": 2.0,
-   "status": "pending",
-   "run_id": null,
-   "gates_passed": [],
-   "artifacts": [],
-   "corrections": [],
+   "status": "complete",
+   "run_id": "run.T1.1.2026-08-24.web.001",
+   "gates_passed": [
+    "G1_npm_run_build",
+    "G2_tsc_and_next_lint_zero_errors",
+    "G3_vitest_four_theme_contract_tests",
+    "G4_theme_token_contract_test",
+    "G5_local_production_artifact_and_pwa_assets",
+    "G6_grounded_css_ts_with_explain",
+    "G7_twelve_non_negotiables",
+    "G9_fresh_spec_verifier_pass",
+    "G10_reads_check"
+   ],
+   "artifacts": [
+    "art.t11.web_scaffold",
+    "art.t11.web_theme_tokens",
+    "art.t11.web_icons",
+    "art.t11.vercel_config",
+    "art.t11.grounded_checker_fix"
+   ],
+   "pending_artifacts": [
+    "vercel_deploy"
+   ],
+   "pending_gates": [
+    "preview_url_loads_on_mobile"
+   ],
+   "corrections": [
+    "G6 initially double-scanned digits inside CSS hex colours as numeric literals; the scanner now removes colour tokens before numeric matching.",
+    "G6 initially retained only the final fact for duplicate colour values; colour provenance now reports every matching semantic fact.",
+    "The founder explicitly deferred the Vercel deploy artifact and real-mobile preview gate while the repository connection completes; all locally applicable gates passed."
+   ],
    "verify_lenses": [
     "spec"
    ],

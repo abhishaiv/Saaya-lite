@@ -29,12 +29,12 @@ marketing, and these judges build with Codex daily.
 
 | Metric | Value |
 |---|---|
-| Tasks run through Codex | 3 |
+| Tasks run through Codex | 4 |
 | Tasks accepted with no correction | 0 |
-| Tasks needing correction | 3 |
-| Estimated hours saved | ~1.5 net |
-| Where Codex was clearly better than hand-writing | Mechanical theme/icon scaffold; three-way parser fan-out; exhaustive asset joins and coordinate anchors; pure transition reducer with 37 timing-rule tests; adversarial recovery and provenance checks |
-| Where Codex was clearly worse | Initial dependency completeness, 8 GB memory sizing, Material default-role closure, the too-narrow coordinate repair recommendation, first-pass recovery semantics and provenance-graph bookkeeping |
+| Tasks needing correction | 4 |
+| Estimated hours saved | ~2.5 net |
+| Where Codex was clearly better than hand-writing | Mechanical Android and web theme/icon scaffolds; exact PWA asset generation; three-way parser fan-out; exhaustive asset joins and coordinate anchors; pure transition reducer with 37 timing-rule tests; adversarial recovery and provenance checks |
+| Where Codex was clearly worse | Initial dependency completeness, 8 GB memory sizing, Material default-role closure, the too-narrow coordinate repair recommendation, first-pass recovery semantics, provenance-graph bookkeeping, and two defects in the CSS grounding gate |
 
 ## Decisions to record here specifically
 
@@ -158,3 +158,29 @@ removed them and the full assemble/lint/test rerun passed.
 **Verdict:** Saved about one net hour. Codex wrote and tested the broad deterministic engine
 quickly and its adversarial passes found consequential spec and recovery defects, although
 the first implementation and provenance bookkeeping both needed correction.
+
+### T1.1 - Next.js scaffold, theme tokens and PWA assets          2026-08-24, ~55 minutes active
+
+**Asked:** Rebuild the first node for the web pivot: an exact pinned Next.js and TypeScript
+scaffold, frozen Saaya theme tokens, installable brand assets and Vercel configuration. Keep
+browser APIs outside the pure domain layer and continue while the founder connects Vercel.
+
+**Produced:** A Next.js App Router project with the complete pinned runtime and development
+dependency closure, strict TypeScript and ESLint configuration, Vitest, manifest metadata,
+an intentionally minimal dark home surface, typed and CSS theme tokens, and favicon,
+Apple-touch, regular and maskable PWA icons derived from the committed v2 SVG master.
+
+**Shipped:** The local production build, type check, lint and four token-contract tests pass.
+The production server returns the app, manifest and opaque icons at their canonical paths;
+the favicon is byte-identical to the brand master, and a fresh-context spec verifier returned
+`kill=false` at 0.98 confidence. The Vercel deploy artifact and real-mobile preview gate are
+explicitly pending, as the founder directed, until the repository connection produces its URL.
+
+**Needed correcting:** The new CSS coverage exposed two defects in `grounded_check.py`: it
+validated a hex colour and then scanned the colour's digits again as numbers, and its colour
+index retained only the last fact when several semantic facts shared one value. The scanner
+now removes colour tokens before numeric matching and `--explain` reports every matching
+colour fact. The intentional regression fixture still fails only for its three invented values.
+
+**Verdict:** Saved about one net hour. The scaffold and icon derivation were fast and exact;
+the stricter gate also found real defects in the build tooling before later CSS-heavy nodes.

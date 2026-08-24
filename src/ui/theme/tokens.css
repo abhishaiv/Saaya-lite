@@ -1,0 +1,74 @@
+:root {
+  --color-brand: #A78BFA;
+  --color-brand-light: #C2ADFD;
+  --color-brand-dark: #8566D1;
+  --color-background: #0B0B0F;
+  --color-card-fill: #1F1F1F;
+  --color-surface: rgb(from #FFFFFF r g b / 0.06);
+  --color-surface-elevated: rgb(from #FFFFFF r g b / 0.1);
+  --color-scrim: rgb(from #000000 r g b / 0.4);
+  --color-text-primary: #FFFFFF;
+  --color-text-on-card: rgb(from #FFFFFF r g b / 0.75);
+  --color-text-secondary: rgb(from #FFFFFF r g b / 0.6);
+  --color-text-tertiary: rgb(from #FFFFFF r g b / 0.4);
+  --color-safe: #34C759;
+  --color-amber: #F09921;
+  --color-danger: #FF3B30;
+
+  --font-family-english: "Poppins", sans-serif;
+  --font-family-telugu: "Noto Sans Telugu", sans-serif;
+  --font-feature-numerals: "tnum";
+  --weight-regular: 400;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  --type-display-size: 34px;
+  --type-display-line-height: 40px;
+  --type-title-size: 24px;
+  --type-title-line-height: 30px;
+  --type-card-title-size: 20px;
+  --type-card-title-line-height: 26px;
+  --type-headline-size: 18px;
+  --type-headline-line-height: 24px;
+  --type-body-size: 16px;
+  --type-body-line-height: 24px;
+  --type-card-body-size: 14px;
+  --type-card-body-line-height: 20px;
+  --type-caption-size: 13px;
+  --type-caption-line-height: 18px;
+  --type-label-size: 11px;
+  --type-label-line-height: 14px;
+  --type-label-tracking: 0.5px;
+
+  --radius-card: 22px;
+  --radius-control: 14px;
+  --radius-small: 10px;
+
+  --space-4: 4px;
+  --space-8: 8px;
+  --space-12: 12px;
+  --space-14: 14px;
+  --space-16: 16px;
+  --space-20: 20px;
+  --space-22: 22px;
+  --space-24: 24px;
+  --space-30: 30px;
+  --space-32: 32px;
+  --space-48: 48px;
+
+  --screen-padding: 20px;
+  --minimum-touch-target: 48px;
+  --sheet-peek-height: 160px;
+  --sheet-expanded-height: 55%;
+  --viewport-floor: 320px;
+
+  --accent-shadow: #A78BFA;
+  --accent-checkin-1: #A78BFA;
+  --accent-checkin-2: #F09921;
+  --accent-family: #FF3B30;
+  --accent-sos: #FF3B30;
+  --border-checkin-1: 1px;
+  --border-checkin-2: 1.5px;
+  --border-family: 2px;
+  --border-accent-alpha: 0.5;
+}

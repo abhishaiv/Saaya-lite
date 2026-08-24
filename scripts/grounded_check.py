@@ -23,7 +23,7 @@ for f in G["facts"]:
     if f.get("superseded_by"): SUPERSEDED+=1; continue
     LIVE+=1
     v=f["value"]
-    if f["kind"]=="color": COLORS[str(v).upper()]=f["id"]
+    if f["kind"]=="color": COLORS.setdefault(str(v).upper(),[]).append(f["id"])
     elif isinstance(v,(int,float)): NUMS.setdefault(float(v),[]).append(f["id"])
 
 # Literals that are structurally trivial and never encode a product decision.
@@ -45,6 +45,15 @@ EXEMPT=re.compile(r'GROUNDED-EXEMPT:\s*\S+')
 NUM_RE=re.compile(r'(?<![\w.$])(\d[\d_]*(?:\.\d[\d_]*)?)')
 HEXNUM_RE=re.compile(r'0[xX][0-9A-Fa-f]+')
 HEX_RE=re.compile(r'#([0-9A-Fa-f]{6,8})\b|0x([0-9A-Fa-f]{8})\b')
+
+def without_hex_literals(line):
+    """Remove colour literals before the numeric pass.
+
+    A CSS colour such as #191230 is already checked by HEX_RE. Leaving it in the
+    line makes NUM_RE see 191230 as a second, invented number. Keep this shared by
+    the gate and --explain so their output cannot diverge again.
+    """
+    return HEXNUM_RE.sub(" ", HEX_RE.sub(" ", line))
 
 def hexlookup(hx):
     """CSS 8-digit hex is #RRGGBBAA -- alpha LAST. (Compose was 0xAARRGGBB, alpha first;
@@ -71,7 +80,7 @@ def check(path):
         for m in HEX_RE.finditer(ln):
             hx=("#"+(m.group(1) or m.group(2))).upper()
             if hexlookup(hx) is None: bad.append((i,hx,"colour"))
-        scan=HEXNUM_RE.sub(" ",ln)
+        scan=without_hex_literals(ln)
         for m in NUM_RE.finditer(scan):
             try: v=float(m.group(1).replace("_",""))
             except: continue
@@ -89,8 +98,9 @@ def explain(path):
         if SKIP_LINE.match(ln) or EXEMPT.search(ln): continue
         for m in HEX_RE.finditer(ln):
             hx=("#"+(m.group(1) or m.group(2))).upper()
-            print(f"  {path}:{i}  {hx:>12}  ->  {hexlookup(hx) or 'UNGROUNDED'}")
-        for m in NUM_RE.finditer(HEXNUM_RE.sub(" ",ln)):
+            ids=hexlookup(hx)
+            print(f"  {path}:{i}  {hx:>12}  ->  {', '.join(ids) if ids else 'UNGROUNDED'}")
+        for m in NUM_RE.finditer(without_hex_literals(ln)):
             try: v=float(m.group(1).replace("_",""))
             except: continue
             if v in TRIVIAL: continue

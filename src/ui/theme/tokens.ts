@@ -1,0 +1,64 @@
+export const saayaTheme = {
+  colors: {
+    brand: "#A78BFA",
+    brandLight: "#C2ADFD",
+    brandDark: "#8566D1",
+    background: "#0B0B0F",
+    cardFill: "#1F1F1F",
+    surface: { base: "#FFFFFF", alpha: 0.06 },
+    surfaceElevated: { base: "#FFFFFF", alpha: 0.1 },
+    scrim: { base: "#000000", alpha: 0.4 },
+    textPrimary: "#FFFFFF",
+    textOnCard: { base: "#FFFFFF", alpha: 0.75 },
+    textSecondary: { base: "#FFFFFF", alpha: 0.6 },
+    textTertiary: { base: "#FFFFFF", alpha: 0.4 },
+    safe: "#34C759",
+    amber: "#F09921",
+    danger: "#FF3B30",
+  },
+  type: {
+    family: {
+      english: "Poppins",
+      telugu: "Noto Sans Telugu",
+    },
+    numeralFeature: "tnum",
+    weights: {
+      regular: 400,
+      semibold: 600,
+      bold: 700,
+    },
+    styles: {
+      display: { size: 34, lineHeight: 40, weight: 700 },
+      title: { size: 24, lineHeight: 30, weight: 700 },
+      cardTitle: { size: 20, lineHeight: 26, weight: 700 },
+      headline: { size: 18, lineHeight: 24, weight: 600 },
+      body: { size: 16, lineHeight: 24, weight: 400 },
+      cardBody: { size: 14, lineHeight: 20, weight: 400 },
+      caption: { size: 13, lineHeight: 18, weight: 400 },
+      label: { size: 11, lineHeight: 14, weight: 600, tracking: 0.5, uppercase: true },
+    },
+  },
+  shape: {
+    card: 22,
+    control: 14,
+    small: 10,
+  },
+  spacing: [4, 8, 12, 14, 16, 20, 22, 24, 30, 32, 48],
+  layout: {
+    screenPadding: 20,
+    minimumTouchTarget: 48,
+    sheetPeekHeight: 160,
+    sheetExpandedPercent: 55,
+    viewportFloor: 320,
+  },
+  escalation: {
+    shadow: { accent: "#A78BFA" },
+    checkIn1: { accent: "#A78BFA", borderWidth: 1 },
+    checkIn2: { accent: "#F09921", borderWidth: 1.5 },
+    family: { accent: "#FF3B30", borderWidth: 2 },
+    sos: { accent: "#FF3B30" },
+    borderAlpha: 0.5,
+  },
+} as const;
+
+export type SaayaTheme = typeof saayaTheme;

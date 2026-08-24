@@ -13,6 +13,11 @@ local.properties
 .gradle/
 *.apk
 *.aab
+node_modules/
+.next/
+out/
+.vercel/
+*.tsbuildinfo
 
 # IDE / OS
 .idea/

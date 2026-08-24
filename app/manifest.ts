@@ -1,0 +1,35 @@
+import type { MetadataRoute } from "next";
+
+import { saayaTheme } from "@/src/ui/theme/tokens";
+
+export default function manifest(): MetadataRoute.Manifest {
+  return {
+    name: "Saaya Lite",
+    short_name: "Saaya Lite",
+    start_url: "/",
+    scope: "/",
+    display: "standalone",
+    background_color: saayaTheme.colors.background,
+    theme_color: saayaTheme.colors.background,
+    icons: [
+      {
+        src: "/assets/icons/icon-192.png",
+        sizes: "192x192",
+        type: "image/png",
+        purpose: "any",
+      },
+      {
+        src: "/assets/icons/icon-512.png",
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "any",
+      },
+      {
+        src: "/assets/icons/icon-maskable-512.png",
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "maskable",
+      },
+    ],
+  };
+}
