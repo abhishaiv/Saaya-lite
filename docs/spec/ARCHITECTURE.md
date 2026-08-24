@@ -120,8 +120,12 @@ Do not substitute Google Maps.
 
 **Do not add:** any CSS or UI framework, any state library, any component library, any
 analytics SDK, any crash reporter that phones home, any AI or ML library, any HTTP client
-(`fetch` is native), any date library (epoch millis and `Intl` are enough), any Service
-Worker beyond the PWA manifest. If a thing seems to need one, it probably needs less code.
+(`fetch` is native), any date library (epoch millis and `Intl` are enough). If a thing
+seems to need one, it probably needs less code.
+
+**The one Service Worker** exists solely to post notifications, because Chrome on Android
+has no `Notification` constructor. It has no `fetch` handler and caches nothing. Do not give
+it one, and do not add a second. `WEB_PLATFORM.md` is the authority on this.
 
 ## DI: four providers, no container
 

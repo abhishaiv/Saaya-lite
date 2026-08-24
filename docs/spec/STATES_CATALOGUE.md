@@ -27,11 +27,9 @@ common way a demo breaks in front of a judge.
 | step loading | none, all local |
 | contact name empty | inline "Add a name" under the field on blur |
 | phone wrong length | inline "10 digits, without the country code" |
-| contact picker denied | picker button hides, manual entry stays, `caption` explains. **Never blocks.** |
 | notifications denied | continue. Banner on Home explaining check-ins may be missed, with a settings link. |
 | location denied once | rationale again, softer. Continue button stays enabled. |
-| location denied permanently | `onb_location_partial`, plus settings deep link, plus a working Continue. **Never dead-end.** |
-| background location denied | continue, degrade to foreground-only arming, say so honestly |
+| location denied permanently | `onb_location_partial`, plus a line on re-enabling it in the browser's site settings, plus a working Continue. **Never dead-end.** |
 | PIN weak | `err_pin_weak` inline, boxes clear |
 | PIN mismatch | `err_pin_mismatch`, both entries clear, focus returns to the first box |
 
@@ -42,11 +40,10 @@ common way a demo breaks in front of a judge.
 | tiles failed | dark background, zones drawn, small "Map offline, zones still work" note |
 | location unavailable | no dot, `StatusPill` unchanged, `caption` in the sheet: "Finding you" |
 | location permission revoked while running | persistent `DisclosureBanner`, `warn_location_denied`, session moves to `RESOLVED(DISARMED)` |
-| GPS off | banner with a link to location settings |
+| position unavailable | banner explaining location is on but no fix is arriving, with the browser's site-settings route. No dead end. |
 | zone data failed to parse | **fatal, and say so.** "Saaya Lite could not load Visakhapatnam data." No silent empty map, because an empty map looks like a safe city. |
 | queue has `FAILED_PERMANENT` | persistent banner, `warn_queue_failed`, tap to retry |
-| battery optimisation not exempt | one-time card with the OEM-specific instruction |
-| service killed by system | on next launch, honest notice with the settings link |
+| tab was closed or frozen mid-session | on next load, `warn_page_stopped`, then the recovery table in `STATE_MACHINE.md` runs. Never silently restart a countdown. |
 | demo mode active | permanent labelled banner. **Never hidden.** |
 
 ## S4 Zone detail

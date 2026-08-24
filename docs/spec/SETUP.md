@@ -33,23 +33,27 @@ environment variables, and the console reads `console/firebase-config.js`. Regis
    line worth having in the write-up.
 3. Build, Authentication, Get started, Sign-in method, enable **Anonymous only**.
    Enable nothing else. There is no account, no email, no password anywhere in this product.
-4. Project settings, Your apps, Add app, **Web**.
-   - Package name `com.nexaflow.saayalite`
-   - **Also register `com.nexaflow.saayalite.debug`** as a second app, or debug builds fail
-     to authenticate. This catches people out.
-   - Download `google-services.json` into `app/`. **Gitignored.**
-5. Build, Hosting, Get started. Site id `saaya-lite`. The console lives here.
+4. Project settings, Your apps, Add app, **Web**. Give it any nickname. Firebase Hosting is
+   not required here; we deploy to Vercel.
+   - Copy the `firebaseConfig` object it shows you. That is the whole artefact: there is no
+     file to download, and `google-services.json` is an Android thing the web SDK ignores.
+   - Put the values in `.env.local` as `NEXT_PUBLIC_FIREBASE_*` for the app, and in
+     `console/firebase-config.js` for the console. Same config, both surfaces.
+   - **Needed at `T1.2`**, which performs anonymous auth, not at `T8.2`.
+5. Nothing to do for Hosting. The app and the console both deploy to Vercel.
 6. Record the project id in `CODEX_LOG.md`.
 
 ## Local tooling
 
 | Tool | Version |
 |---|---|
-| JDK | 17 |
-| your editor | Ladybug or newer |
-| the Node toolchain | API 34 platform + build-tools 34.0.0 |
-| Firebase CLI | `npm i -g firebase-tools`, then `firebase login` |
-| Node | 20 or newer, for the seed script only |
+| Node | 20 LTS |
+| npm | bundled with Node 20, lockfile committed |
+| Firebase CLI | `npm i -g firebase-tools`, then `firebase login`. Only for rules, indexes and the seed script. |
+| a Chromium browser | for the mobile-emulation and devtools checks in `TEST_PLAN.md` |
+
+No JDK, no Android SDK, no Xcode. If a step asks for one, it is left over from the previous
+platform: stop and report it.
 
 ## `firebase.json`
 

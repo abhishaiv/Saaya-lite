@@ -9,8 +9,9 @@ split out so nothing founder-facing sits inside a file the agent reads as instru
 cd "/Users/abhishai/Desktop/Saaya Lite" && codex
 ```
 
-Attach `CODEX_PROMPT.md`. **Do not clone fresh** — `app/google-services.json` is gitignored
-and would not come with a clone.
+Attach `CODEX_PROMPT.md`. A fresh clone is fine now: the web build has no gitignored file
+it cannot start without. The Firebase web config goes in `.env.local`, which you create from
+the values in the Firebase console.
 
 If the run dies, attach the same file again. It detects a partly-complete
 `graph/build_graph.json` and resumes from the first incomplete node rather than from a lost

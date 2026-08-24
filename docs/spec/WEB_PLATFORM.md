@@ -44,7 +44,7 @@ Saying exactly where the browser stops is a better architecture answer than pret
 | Geofencing API | **point-in-polygon in JS, on every fix** | we already treat the polygon as authoritative; `geofence_radius_m` becomes a cheap pre-filter |
 | Wake lock plus a visible page | **Wake Lock API** + Page Visibility | `navigator.wakeLock.request('screen')` while armed, so the ladder keeps running |
 | `an absolute deadline in IndexedDB` | `setTimeout` + an **absolute deadline in IndexedDB** | on visibility change, recompute from the deadline. Never trust the timer to have run. |
-| Notification channels | **Notification API** via Service Worker | `requireInteraction: true` for check-in 2 |
+| Notification channels | **Notification API** via `ServiceWorkerRegistration.showNotification` | `requireInteraction: true` for check-in 2. See the Service Worker rule below: Chrome on Android has no `Notification` constructor, so the worker is not optional. |
 | Full-screen intent | an in-page full-screen overlay | a browser cannot wake a locked phone. Disclosed. |
 | `allowBackup=false` | nothing leaves the device by default | favourites and the PIN hash live in IndexedDB and are never uploaded |
 | Battery optimisation | Page Visibility + a stale-heartbeat check | if the tab was frozen, say so honestly on return |
@@ -89,8 +89,31 @@ from the ladder.**
 No web fonts blocking first paint. No map library on the critical path: zones can draw
 before Leaflet loads.
 
+## The Service Worker, and exactly what it is for
+
+There is **one** Service Worker and it exists for **one** reason: Chrome on Android does not
+implement the `Notification` constructor. `new Notification(...)` throws there, and
+`ServiceWorkerRegistration.showNotification()` is the only way to post a notification on our
+primary target platform. Without the worker, check-ins are silent on most Indian phones.
+
+**It has no `fetch` handler and it caches nothing.** Not assets, not tiles, not data. It
+registers, it shows notifications, and it handles `notificationclick` to focus the tab.
+That is the whole file.
+
+Three consequences, stated so nobody implements around them:
+
+1. **There is no offline first launch.** With no network and no cached shell, the page does
+   not load. Do not claim installable-and-works-offline anywhere.
+2. **There is no tile cache to configure and no cap to set.** Tiles are subject to the
+   browser HTTP cache and CARTO's own headers, and nothing else.
+3. **"Offline" in this product means one specific thing:** the page is already open and
+   connectivity drops. Zones stay drawn because they were already parsed, tiles stop
+   arriving and we say so, and every write queues in IndexedDB and flushes on reconnect.
+   That is a real and demonstrable resilience story. The other kind is not, so do not
+   promise it.
+
 ## What is deliberately absent
 
-No analytics, no third-party scripts, no cookies beyond a session flag, no service worker
-caching of anything personal. A reviewer can open devtools and see that nothing leaves the
+No analytics, no third-party scripts, no cookies beyond a session flag, and a Service Worker
+that caches nothing at all. A reviewer can open devtools and see that nothing leaves the
 device before SOS.

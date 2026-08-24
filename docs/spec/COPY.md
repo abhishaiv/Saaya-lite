@@ -23,7 +23,7 @@ demo video.
 | `onb_contact_privacy` | This stays on your phone. Saaya never uploads your favourites. | ఇది మీ ఫోన్‌లోనే ఉంటుంది. సాయ మీ ఆత్మీయులను ఎప్పుడూ అప్‌లోడ్ చేయదు. |
 | `onb_location_title` | Saaya needs to know where the stretch is | మార్గం ఎక్కడ ఉందో సాయకు తెలియాలి |
 | `onb_location_body` | Location is how Saaya wakes without you pressing anything. It is not shared with anyone until you raise an SOS. | మీరు ఏదీ నొక్కకుండా సాయ మేల్కొనేది లొకేషన్ ద్వారానే. మీరు SOS ఇచ్చే వరకు ఇది ఎవరితోనూ పంచుకోబడదు. |
-| `onb_location_partial` | Without background access, Saaya can only wake while the app is open. You can change this later in Settings. | బ్యాక్‌గ్రౌండ్ అనుమతి లేకపోతే, యాప్ తెరిచి ఉన్నప్పుడే సాయ మేల్కొంటుంది. దీన్ని తర్వాత సెట్టింగ్స్‌లో మార్చవచ్చు. |
+| `onb_location_partial` | Saaya watches only while this page is open. Keep it open for the stretch you are on. | ఈ పేజీ తెరిచి ఉన్నప్పుడు మాత్రమే సాయ గమనిస్తుంది. మీరు వెళ్తున్న మార్గం వరకు దీన్ని తెరిచి ఉంచండి. |
 | `onb_pin_title` | Set a PIN | ఒక PIN సెట్ చేయండి |
 | `onb_pin_body` | Four digits. You will need it to stop a live SOS. Set it now, calmly, because you may need it when you are not calm. | నాలుగు అంకెలు. ప్రత్యక్ష SOS ఆపడానికి ఇది అవసరం. ప్రశాంతంగా ఉన్నప్పుడే దీన్ని సెట్ చేయండి. |
 | **Home** | | |
@@ -84,8 +84,6 @@ demo video.
 | `cta_continue` | Continue | కొనసాగించు |
 | `cta_add_another` | Add another favourite | మరో ఆత్మీయుడిని జోడించు |
 | `cta_finish` | Finish | పూర్తి చేయి |
-| `notif_candidate_title` | Checking this area | ఈ ప్రాంతాన్ని పరిశీలిస్తోంది |
-| `notif_candidate_text` | Checking whether Saaya should wake. Nothing leaves this phone. | సాయ మేల్కోవాలా అని పరిశీలిస్తోంది. ఈ ఫోన్ నుంచి ఏదీ బయటకు వెళ్లదు. |
 | `notif_channel_shadow` | Saaya is watching | సాయ గమనిస్తోంది |
 | `notif_shadow_text` | Watching %1$s. Tap to open. | %1$s ని గమనిస్తోంది. తెరవడానికి నొక్కండి. |
 
@@ -166,16 +164,12 @@ its picture. These are the strings. A `contentDescription` that names an icon
 |---|---|---|
 | `err_network` | No connection. Saaya is still watching, and this will send when you are back online. | కనెక్షన్ లేదు. సాయ ఇంకా గమనిస్తోంది, ఆన్‌లైన్‌కి వచ్చాక ఇది పంపబడుతుంది. |
 | `err_sync_failed` | Could not send this. Tap to try again. | దీన్ని పంపలేకపోయాం. మళ్లీ ప్రయత్నించడానికి నొక్కండి. |
-| `err_zone_data` | Saaya Lite could not load Visakhapatnam data. Reinstalling should fix this. | సాయ లైట్ విశాఖపట్నం డేటాను లోడ్ చేయలేకపోయింది. మళ్లీ ఇన్‌స్టాల్ చేస్తే సరిపోతుంది. |
+| `err_zone_data` | Saaya Lite could not load Visakhapatnam data. Reloading the page should fix this. | సాయ లైట్ విశాఖపట్నం డేటాను లోడ్ చేయలేకపోయింది. పేజీని మళ్లీ లోడ్ చేస్తే సరిపోతుంది. |
 | `err_no_station` | No police station within 20 km. | 20 కి.మీ. లోపు పోలీస్ స్టేషన్ లేదు. |
-| `warn_battery_title` | Saaya only watches while this page is open | ఆండ్రాయిడ్ సాయను బ్యాక్‌గ్రౌండ్‌లో ఆపవచ్చు |
-| `warn_battery_body` | To keep watching while your screen is off, Saaya needs to be left running. | మీ స్క్రీన్ ఆఫ్ ఉన్నప్పుడూ గమనించాలంటే, సాయ నడుస్తూ ఉండాలి. |
-| `cta_battery_allow` | Allow | అనుమతించు |
-| `warn_autostart_title` | One more step on your phone | మీ ఫోన్‌లో ఇంకో అడుగు |
-| `warn_autostart_body` | %1$s phones need Autostart switched on for Saaya, or it will be closed in the background. | %1$s ఫోన్‌లకు సాయ కోసం ఆటోస్టార్ట్ ఆన్ చేయాలి, లేదంటే బ్యాక్‌గ్రౌండ్‌లో మూసివేయబడుతుంది. |
-| `warn_service_killed` | Your phone stopped Saaya while you were travelling. Nothing was sent. | మీరు ప్రయాణిస్తున్నప్పుడు మీ ఫోన్ సాయను ఆపింది. ఏదీ పంపబడలేదు. |
-| `warn_notif_denied` | Without notifications you may miss a check-in when the app is closed. | నోటిఫికేషన్‌లు లేకపోతే యాప్ మూసి ఉన్నప్పుడు చెక్-ఇన్ మిస్ కావచ్చు. |
-| `warn_exact_alarm` | Saaya needs permission for exact timing, or check-ins may arrive late. | ఖచ్చితమైన సమయం కోసం సాయకు అనుమతి కావాలి, లేదంటే చెక్-ఇన్‌లు ఆలస్యంగా రావచ్చు. |
+| `warn_keep_open_title` | Saaya only watches while this page is open | ఈ పేజీ తెరిచి ఉన్నప్పుడు మాత్రమే సాయ గమనిస్తుంది |
+| `warn_keep_open_body` | Keep this tab open while you are on the stretch. If you close it, Saaya stops watching. | మీరు ఆ మార్గంలో ఉన్నంత సేపు ఈ ట్యాబ్ తెరిచి ఉంచండి. మూసివేస్తే సాయ గమనించడం ఆగిపోతుంది. |
+| `warn_page_stopped` | Your browser stopped Saaya while you were travelling. Nothing was sent. | మీరు ప్రయాణిస్తున్నప్పుడు మీ బ్రౌజర్ సాయను ఆపింది. ఏదీ పంపబడలేదు. |
+| `warn_notif_denied` | Without notifications you may miss a check-in when this tab is in the background. | నోటిఫికేషన్‌లు లేకపోతే ఈ ట్యాబ్ వెనుక ఉన్నప్పుడు చెక్-ఇన్ మిస్ కావచ్చు. |
 | `loc_searching` | Finding you | మిమ్మల్ని కనుగొంటున్నాం |
 | `loc_slow` | This is taking longer than usual. Check that location is on. | ఇది మామూలు కంటే ఎక్కువ సమయం తీసుకుంటోంది. లొకేషన్ ఆన్‌లో ఉందో చూడండి. |
 | `loc_last_known` | Last known, %1$s ago | చివరిగా తెలిసినది, %1$s క్రితం |

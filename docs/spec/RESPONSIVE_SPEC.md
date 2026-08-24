@@ -67,8 +67,8 @@ Full-bleed map means edge-to-edge. Handle the safe-area insets properly, using
 - Navigation bar: bottom sheet and every primary button sit above the bottom inset.
 - Gesture navigation: keep 16 px clear of the bottom edge so the sheet drag does not fight
   the system back gesture.
-- Display cutout: `LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES`, and no control within the
-  cutout area.
+- Display cutout: covered by `viewport-fit=cover` plus `env(safe-area-inset-*)`. Keep every
+  control clear of the inset area; there is no separate cutout API on the web.
 
 ## Foldables
 

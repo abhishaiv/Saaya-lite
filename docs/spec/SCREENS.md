@@ -13,7 +13,7 @@ Home
  ├─ PoliceView ("What the police see")
  └─ session overlays, driven by state, not by navigation:
       CheckIn1 (heads-up + in-app card)
-      CheckIn2 (full screen, over lock screen)
+      CheckIn2 (full screen, in page)
       FamilyEscalation (full screen)
       SosActive (full screen) ─> PinEntry
 ```
@@ -38,19 +38,24 @@ Progress dots at top. No step is skippable except step 2's second contact.
 ### S2.2 Trusted contact (F2)
 - `onb_contact_title`, `onb_contact_body`.
 - Name field, phone field (prefix `+91` fixed, 10 digits).
-- Contact picker button (needs `READ_CONTACTS`; if denied, manual entry still works and
-  we never block on it).
+- **Manual entry only. There is no contact picker.** `SECRETS_AND_ACCESS.md` states that
+  contacts access is never requested, and its absence is verifiable in devtools, which is
+  part of the argument. The Contact Picker API is also Chrome-Android-only, so a picker
+  would work for some users and silently vanish for others.
 - Validation: name non-empty, phone exactly 10 digits after prefix.
 - `onb_contact_privacy` in a `DisclosureBanner`: this stays on your phone and is never uploaded.
 - Primary: `cta_continue`. Secondary: `cta_add_another` (max 3).
 
 ### S2.3 Location (F3)
 - **Rationale screen before the system dialog.** `onb_location_title`, `onb_location_body`.
-- Primary requests `ACCESS_FINE_LOCATION` + `ACCESS_COARSE_LOCATION`.
-- On grant, a second rationale for background, then `ACCESS_BACKGROUND_LOCATION`.
-- If background is denied: **continue anyway.** Show `onb_location_partial` explaining
-  auto-arm only works with the app open. Never dead-end her.
-- States: `default`, `requesting`, `denied_once`, `denied_permanently` (deep link to settings).
+- Primary calls `navigator.geolocation.getCurrentPosition`, which is what triggers the
+  browser's own permission prompt. There is one location permission on the web and **no
+  background permission to request**: `WEB_PLATFORM.md` explains why there cannot be one.
+- On grant, show `onb_location_partial`: Saaya watches while this page is open. This is not
+  a degraded fallback, it is the only mode, so state it plainly rather than as a limitation
+  she failed to avoid.
+- States: `default`, `requesting`, `denied_once`, `denied_permanently` (explain the
+  browser's site-settings route; a web page cannot deep link into it).
 
 ### S2.4 PIN (F5)
 - `onb_pin_title`, `onb_pin_body` explaining it stops a live SOS.
@@ -123,7 +128,9 @@ and the state is re-presented on the next `visibilitychange`. Disclosed, never i
 
 - `CountdownRing`, 60 s, **`amber` `#F09921`**, card border 1.5 px.
 - `checkin2_title`, `checkin2_body` stating exactly what happens at zero.
-- Alarm-stream sound, long vibration, high-importance channel that bypasses DND.
+- Urgent sound and the long `navigator.vibrate` pattern where it exists. **Nothing here
+  bypasses Do Not Disturb or the silent switch**, and the notification is dismissible. The
+  in-page overlay is the channel that always works. See `INTERACTION_SPEC.md`.
 - Same two actions. Back is consumed.
 
 ## S7. FamilyEscalation

@@ -93,14 +93,18 @@ is the single most likely thing to go wrong in a live demo on venue wifi:
 "Map offline, zones still work" and carry on. A tileless Saaya Lite is fully usable, which
 is a genuine resilience story worth mentioning in the write-up rather than hiding.
 
+**Precisely what that claims.** The page is already open and the network then drops. It does
+**not** claim the app opens with no network: there is no cached shell and no offline first
+launch. See `WEB_PLATFORM.md`.
+
 ## Performance
 
 | Budget | Value |
 |---|---|
 | First zone paint | under 400 ms after Home composes, independent of tiles |
 | Frame rate while panning | 60 fps on a 2 GB device |
-| Tile cache | 64 MB |
-| Polygon paths | computed once at load, cached |
+| Tile caching | browser HTTP cache only. Nothing to configure, no cap, no Service Worker cache. See `WEB_PLATFORM.md`. |
+| Polygon paths | computed once at load, kept in memory |
 
 If panning cannot hold 60 fps, drop tile detail first. **The zones are the product, the
 streets are context.**

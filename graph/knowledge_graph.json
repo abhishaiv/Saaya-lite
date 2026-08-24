@@ -313,8 +313,8 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 275,
-  "edges": 579,
+  "entities": 280,
+  "edges": 585,
   "events": 56
  },
  "entities": [
@@ -2302,6 +2302,36 @@
    "id": "d.firebase_web_at_t12",
    "class": "Decision",
    "label": "The Firebase Web app registration moves from T8.2 to a human gate before T1.2. The whole product is a web app, so the web SDK performs anonymous auth at T1.2; deferring it to the console node was four nodes too late. One registration serves both app and console.",
+   "at": "2026-08-24"
+  },
+  {
+   "id": "d.sw_notifications_only",
+   "class": "Decision",
+   "label": "There is exactly one Service Worker and it exists only because Chrome on Android has no Notification constructor: new Notification() throws there and ServiceWorkerRegistration.showNotification is the only route. It has no fetch handler and caches nothing. Codex recommended removing the Service Worker entirely, which would have silenced check-ins on the primary target platform. Consequences accepted and written down: no offline first launch, no tile cache, and offline means the page is already open when connectivity drops.",
+   "at": "2026-08-24"
+  },
+  {
+   "id": "fail.sw_three_way",
+   "class": "Failure",
+   "label": "BUILD_CONFIG said a Service Worker caches static assets, ARCHITECTURE forbade a Service Worker, MAP_SPEC required a 64 MB tile cache and CODEX_TASKS required offline zone rendering. Four documents, no two compatible. Resolved into one canonical statement in WEB_PLATFORM.md that the others now cite.",
+   "at": "2026-08-24"
+  },
+  {
+   "id": "fail.row_patch_method",
+   "class": "Failure",
+   "label": "Two rounds of fixes patched individual rows without reading the surrounding file, which produced new defects rather than fewer: MAP_SPEC asserted both no cache cap and 64 MB in the same file, and a COMPONENT_LIBRARY replacement left the fragment 'Never log, never screenshot: set'. Method changed to reading each file end to end before editing it.",
+   "at": "2026-08-24"
+  },
+  {
+   "id": "fail.stale_telugu",
+   "class": "Failure",
+   "label": "The pivot updated English copy and left the Telugu column describing Android. warn_battery_title read 'Saaya only watches while this page is open' in English and 'Android can stop Saaya in the background' in Telugu. Half the intended users read only the stale half.",
+   "at": "2026-08-24"
+  },
+  {
+   "id": "d.no_contact_picker",
+   "class": "Decision",
+   "label": "Manual entry only, no contact picker. SECRETS_AND_ACCESS states contacts access is never requested and its absence is verifiable in devtools, which is part of the privacy argument; the Contact Picker API is also Chrome-Android-only, so it would work for some users and vanish for others.",
    "at": "2026-08-24"
   }
  ],
@@ -6934,6 +6964,54 @@
    "from": "d.firebase_web_at_t12",
    "rel": "motivated_by",
    "to": "fail.sweep_regex_narrow",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.sw_three_way",
+   "rel": "caused_by",
+   "to": "d.web",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.row_patch_method",
+   "rel": "caused_by",
+   "to": "d.pivot_sweep",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.map_cache_contradiction",
+   "rel": "caused_by",
+   "to": "fail.row_patch_method",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.stale_telugu",
+   "rel": "caused_by",
+   "to": "d.web",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.sw_notifications_only",
+   "rel": "motivated_by",
+   "to": "fail.sw_three_way",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.no_contact_picker",
+   "rel": "motivated_by",
+   "to": "fail.sw_three_way",
    "at": "2026-08-24",
    "by": "claude",
    "confidence": "high"

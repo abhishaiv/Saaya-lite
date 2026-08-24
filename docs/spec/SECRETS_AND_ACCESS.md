@@ -53,9 +53,8 @@ debug builds fail to authenticate, with an error that does not say why.
 
 | Item | Check |
 |---|---|
-| JDK 17 | Present via Homebrew at `/opt/homebrew/opt/openjdk@17`. Note `java` is **not** on PATH and `/usr/libexec/java_home` does not see it, but npm finds it. If a tool cannot, export `JAVA_HOME=$(brew --prefix openjdk@17)/libexec/openjdk.jdk/Contents/Home`. |
-| the Node toolchain, API 34 platform + build-tools 34.0.0 | via your editor SDK Manager |
-| Node 20+ | `node -v`, needed only for the seed script |
+| Node 20 LTS | `node -v`. This is the whole toolchain. |
+| npm | `npm -v`, bundled with Node. The lockfile is committed. |
 | Firebase CLI | `npm i -g firebase-tools` then `firebase login` (interactive, browser) |
 | Codex CLI, authenticated | founder's own OpenAI account. Build tool only, not in the product. |
 
@@ -63,11 +62,16 @@ debug builds fail to authenticate, with an error that does not say why.
 
 Next.js uses `.env.local`, but we have nothing secret to put in it. Here are the real mechanisms and their exact contents.
 
-### 1. `app/google-services.json` — downloaded, not written
+### 1. The Firebase web config — copied, not downloaded
 
-Copied from Firebase console, Project settings, Your apps, Wndroid. **Do not
-hand-write it.** It must contain **both** package names, `com.nexaflow.saayalite` and
-`com.nexaflow.saayalite.debug`. Drop it at `app/google-services.json`.
+From Firebase console, Project settings, Your apps, **Web**. It is a plain object shown in
+the console; there is no file to download. `google-services.json` is an Android artefact and
+the web SDK ignores it entirely.
+
+The same values go in two places: `NEXT_PUBLIC_FIREBASE_*` in `.env.local` for the app, and
+`console/firebase-config.js` for the console. **This is not a secret.** It ships inside
+every deployed site and anyone can extract it; it identifies the project and authorises
+nothing. The Firestore rules are the security boundary.
 
 **This is not a secret.** It ships inside every deployed site and anyone can extract it. It
 identifies the project; it authorises nothing. The Firestore rules are the security
@@ -188,10 +192,10 @@ accidental one can never be committed. The `*.hprof` entries are not theoretical
 
 | # | Check | How |
 |---|---|---|
-| 1 | Debug build authenticates anonymously | uid appears in logcat |
-| 2 | Both package names registered | `google-services.json` contains both |
+| 1 | The app authenticates anonymously | a uid appears in the browser console at `T1.2` |
+| 2 | A Web app is registered | Firebase console, Project settings, Your apps, Web |
 | 3 | Firestore region is `asia-south1` | Firebase console |
 | 4 | Only Anonymous sign-in enabled | Firebase console, Authentication |
-| 5 | Hosting live | `firebase hosting:channel:list` |
+| 5 | The site is reachable | the Vercel preview URL loads on a real phone |
 | 6 | Map renders with no key | airplane mode off, no key configured anywhere, tiles load |
 | 7 | Nothing secret is committed | `git log -p | grep -i "password\|secret\|private_key"` returns nothing |

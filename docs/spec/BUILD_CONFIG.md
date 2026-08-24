@@ -95,7 +95,8 @@ protected does:
 - Favourites and the PIN hash live in **IndexedDB only** and are never uploaded. There is no
   code path that sends them.
 - **No cookies** beyond a single session flag. No analytics. No third-party script.
-- The Service Worker caches **static assets only**, never anything personal.
+- The Service Worker has no `fetch` handler and **caches nothing**. It exists only to post
+  notifications, which Chrome on Android cannot do without one. See `WEB_PLATFORM.md`.
 - A reviewer can open devtools, watch the network tab through the whole ladder, and see that
   nothing identifying leaves the device before SOS.
 

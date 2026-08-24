@@ -83,7 +83,7 @@ Hard rules:
 
 **Done when:** anonymous sign-in returns a uid against project `saaya-lite` and the smoke doc round-trips.
 
-> The Firebase project is already created and app/google-services.json is already in place with BOTH package names. Do NOT create a project. Verify anonymous sign-in returns a uid against project 'saaya-lite', write one doc to a _smoke collection, read it back, delete it.
+> The Firebase project 'saaya-lite' already exists. Do NOT create a project. The web SDK reads NEXT_PUBLIC_FIREBASE_* from .env.local; google-services.json is an Android artefact and is ignored. If the web config is not present, this is the T1.2 human gate: report it and continue with the next node. Verify anonymous sign-in returns a uid against project 'saaya-lite', write one doc to a _smoke collection, read it back, delete it.
 
 ### T8.1 — Seed zones to Firestore
 
@@ -123,7 +123,7 @@ Hard rules:
 
 **Prompt:** Home: full-bleed Leaflet map per `MAP_SPEC.md`, CARTO Dark Matter tiles, no key. Render the 19 non-SAFE zones in four layers ordered by `risk_score`. **SAFE zones must not be drawn.** Her dot with no heading cone. Attribution bottom-left, always visible. Zones must paint before tiles load.
 
-**Done when:** 19 polygons render correctly over Vizag on a mobile browser, attribution is visible, and **with the network offline the zones still render** with the map-offline note.
+**Done when:** 19 polygons render correctly over Vizag on a mobile browser, attribution is visible, and **with the page already open, disabling the network leaves the zones still rendered** with the map-offline note.
 
 ### T4.3 — Home session states, arm banner, demo panel
 

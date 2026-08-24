@@ -158,9 +158,12 @@ Empty shows nothing; filled shows a 12 px `brand` dot, never the digit.
 | error | 2 px `danger` border on all four, **no shake animation** (see motion rule 1) |
 | locked | all four at 30% opacity, message below, countdown to unlock |
 
-Numeric keyboard only. No system clipboard paste. Never log, never screenshot: set
-There is no `FLAG_SECURE` equivalent on the web, so this screen cannot block screenshots.
-Disclosed in `INTERACTION_SPEC.md` rather than silently ignored.
+Numeric keyboard only. `onPaste` is prevented. Never log the PIN and never include it in
+any error payload.
+
+**Screenshots cannot be blocked.** There is no `FLAG_SECURE` equivalent on the web, so this
+screen is capturable like any other. Disclosed in `INTERACTION_SPEC.md` rather than
+silently ignored.
 
 ---
 
