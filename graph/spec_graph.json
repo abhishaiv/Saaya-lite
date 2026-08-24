@@ -3,7 +3,7 @@
  "kind": "knowledge_graph",
  "note": "Domain facts with provenance. Never merge with build_graph.json - different truth standards.",
  "rule": "Every numeric or colour literal in source must trace to a fact id here, or the grounded checker fails the node.",
- "count": 339,
+ "count": 340,
  "facts": [
   {
    "id": "ladder.cd1",
@@ -3158,7 +3158,7 @@
    "kind": "number",
    "value": 5,
    "unit": "fixes",
-   "means": "minimum qualifying in-polygon fixes before candidate dwell succeeds",
+   "means": "minimum qualifying in-polygon fixes before pending dwell succeeds",
    "sourced_from": "BUSINESS_RULES.md:182-185",
    "governs": "BUSINESS_RULES.md",
    "frozen": true,
@@ -3169,7 +3169,7 @@
    "kind": "number",
    "value": 60,
    "unit": "s",
-   "means": "minimum monotonic span of candidate in-polygon dwell evidence",
+   "means": "minimum monotonic span of pending in-polygon dwell evidence",
    "sourced_from": "BUSINESS_RULES.md:182-185",
    "governs": "BUSINESS_RULES.md",
    "frozen": true,
@@ -3228,7 +3228,8 @@
    "sourced_from": "ANDROID_PLATFORM.md:109-111",
    "governs": "ANDROID_PLATFORM.md",
    "frozen": true,
-   "platform": "any"
+   "platform": "android",
+   "superseded_by": "web pivot: no process to die; the equivalent event is the watch being interrupted"
   },
   {
    "id": "candidate.transition.success",
@@ -3760,6 +3761,17 @@
    "frozen": true,
    "platform": "web",
    "unit": "px"
+  },
+  {
+   "id": "dwell.recovery.policy",
+   "kind": "string",
+   "value": "RESET_ON_WATCH_INTERRUPTION",
+   "unit": "policy",
+   "means": "pending dwell evidence is discarded whenever the position watch is interrupted (page hidden, watch error, permission loss); it is never resumed, only restarted. Same decision as the Android RESET_ON_PROCESS_DEATH policy, renamed for the event that actually occurs in a browser.",
+   "sourced_from": "founder 2026-08-18, translated to web 2026-08-24",
+   "governs": "TEST_PLAN.md",
+   "frozen": true,
+   "platform": "web"
   }
  ]
 }

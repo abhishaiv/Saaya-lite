@@ -25,8 +25,8 @@ protect the submission's claims**, so they are not optional.
 | Full ladder | `SHADOW` -> `CHECKIN_1` -> `CHECKIN_2` -> `FAMILY_ESCALATED` -> `SOS_ACTIVE` at exactly 90 / 60 / 60 s |
 | `OK` at step 1 | returns to `SHADOW`, cancels CD1, reschedules, applies the 20 min cooldown |
 | `OK` at step 2 | same |
-| Manual disarm at step 1 | `RESOLVED(DISARMED)`; exact commands are `CancelTimer(CD1)`, `HideCheckIn`, `StopForegroundService`, `StartZoneCooldown(45)`; no write, notification or PIN command |
-| Manual disarm at step 2 | `RESOLVED(DISARMED)`; exact commands are `CancelTimer(CD2)`, `HideCheckIn`, `StopForegroundService`, `StartZoneCooldown(45)`; no write, notification or PIN command |
+| Manual disarm at step 1 | `RESOLVED(DISARMED)`; exact commands are `CancelTimer(CD1)`, `HideCheckIn`, `StopLocationWatch`, `ReleaseWakeLock`, `StartCooldown(45)`; no write, notification or PIN command |
+| Manual disarm at step 2 | `RESOLVED(DISARMED)`; exact commands are `CancelTimer(CD2)`, `HideCheckIn`, `StopLocationWatch`, `ReleaseWakeLock`, `StartCooldown(45)`; no write, notification or PIN command |
 | Cancel in the family window | `RESOLVED(CANCELLED)`, emits the SUS outcome patch to `CANCELLED_BY_USER` |
 | Help Now from `SHADOW` | straight to `SOS_ACTIVE`, **and also emits a SUS event** so the civic layer is not blind |
 | SOS is sticky | every event except `PinAccepted` leaves it in `SOS_ACTIVE` |
@@ -45,20 +45,24 @@ protect the submission's claims**, so they are not optional.
 | Manual across bands | every band reschedules a MANUAL session at 10 min with `armedHourBand=null` |
 | Hour change silence | changing the current band alone emits no backend command, notification or user interruption |
 
-### `CandidateModeTest` (pure coordinator with fake monotonic clock)
+### `dwellEvaluator.test.ts` (pure, fake clock, no browser)
+
+This replaces the Android `CandidateModeTest`. The dwell **proof** rules are unchanged and
+still matter; what is gone is the background service that used to host them. On web every
+fix arrives while the page is visible, so there is no service to start, no notification to
+hand off and no background-permission branch. Do not test for those.
+
 | Test | Assertion |
 |---|---|
-| Circular enter | starts service-private `CANDIDATE`; `SessionEngine`, Home and map remain `IDLE` |
-| Sampling request | exactly 15 s at `HIGH_ACCURACY` |
+| Pending enter | a first qualifying inside fix starts a pending dwell; `SessionEngine`, Home and map remain `IDLE` |
+| Sampling request | exactly 15 s at `enableHighAccuracy: true` |
 | Successful proof | five qualifying inside fixes spanning at least 60 s emit exactly one `ZoneEntered` |
-| Outside reset | any qualifying outside fix clears that candidate's accumulated proof |
+| Outside reset | any qualifying outside fix clears that zone's accumulated proof |
 | Inaccurate fix | accuracy > 100 m cannot start, extend or complete dwell |
-| Trust boundary | candidate emits no backend write, family effect, product event or session persistence |
-| Rejected arm | n/a and cooldown engine results return to quiet `IDLE` and remove the completed candidate |
-| Notification handoff | accepted arm updates `SHADOW_ONGOING` in place from candidate to Shadow; it does not restart the service |
-| Circular exit | removes that candidate and stops the service when it is the last candidate and no session is active |
-| Process death | candidate IDs may recover, but all dwell fixes and timestamps reset |
-| Background denial | no candidate starts without background permission; foreground-only arming remains available and no `ZoneEntered` is emitted |
+| Trust boundary | a pending dwell emits no backend write, family effect, product event or session persistence |
+| Rejected arm | n/a and cooldown engine results return to quiet `IDLE` and discard the completed proof |
+| Watch interrupted | hiding the page or a watch error discards all accumulated dwell fixes and timestamps. Evidence is never resumed, only restarted. |
+| Exit | a qualifying outside fix past the exit dwell removes that zone's pending state |
 
 ### `anonymiser.test.ts` - **the trust boundary, and the most important test in the build**
 | Test | Assertion |

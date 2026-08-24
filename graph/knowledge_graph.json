@@ -313,8 +313,8 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 262,
-  "edges": 565,
+  "entities": 267,
+  "edges": 571,
   "events": 56
  },
  "entities": [
@@ -2225,6 +2225,36 @@
    "class": "Decision",
    "label": "Treat 189 as a measured frozen-asset structural cardinality and assert it explicitly",
    "node": "T2.1"
+  },
+  {
+   "id": "fail.statemachine_pivot",
+   "class": "Failure",
+   "label": "STATE_MACHINE.md and TEST_PLAN.md kept Android semantics after the pivot: EngineContext described as carrying now: Instant, a java.time desugaring paragraph, geofence re-registration in recovery, monotonic countdowns, and two commands in TEST_PLAN (StopForegroundService, StartZoneCooldown) that are not in the Command union. Codex caught it at T4.1.",
+   "at": "2026-08-24"
+  },
+  {
+   "id": "fail.armedhourband_unpersisted",
+   "class": "Failure",
+   "label": "The canonical PersistedSession omitted armedHourBand while the frozen-band rules depend on it. A session recovered after a frozen tab would have silently rescheduled on the current band instead of the band it armed under. A correctness bug, not a naming one: the prose named the field, the canonical block did not declare it.",
+   "at": "2026-08-24"
+  },
+  {
+   "id": "d.block_wins",
+   "class": "Decision",
+   "label": "Where the prose in STATE_MACHINE.md and its canonical TypeScript block disagree, the block wins, and that rule is now stated in the file. The two had drifted apart silently.",
+   "at": "2026-08-24"
+  },
+  {
+   "id": "d.dwell_web",
+   "class": "Decision",
+   "label": "CandidateModeTest becomes dwellEvaluator.test.ts. The dwell proof rules (5 fixes, 60 s span, 100 m accuracy gate, outside-reset) survive unchanged; the background service that hosted them does not. Dwell evidence is discarded on any watch interruption, never resumed.",
+   "at": "2026-08-24"
+  },
+  {
+   "id": "d.no_perfnow",
+   "class": "Decision",
+   "label": "Deadlines are absolute epoch millis, never performance.now(). Monotonic time does not survive a frozen tab, which is the normal case on web, not the edge case.",
+   "at": "2026-08-24"
   }
  ],
  "edges": [
@@ -6746,6 +6776,54 @@
    "to": "art.t21.web_asset_bundle",
    "at": "2026-08-24",
    "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.statemachine_pivot",
+   "rel": "caused_by",
+   "to": "d.web",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.armedhourband_unpersisted",
+   "rel": "caused_by",
+   "to": "fail.statemachine_pivot",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.block_wins",
+   "rel": "motivated_by",
+   "to": "fail.armedhourband_unpersisted",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.dwell_web",
+   "rel": "motivated_by",
+   "to": "fail.statemachine_pivot",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.no_perfnow",
+   "rel": "motivated_by",
+   "to": "fail.statemachine_pivot",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.statemachine_pivot",
+   "rel": "caused_by",
+   "to": "fail.audit_grep_scope",
+   "at": "2026-08-24",
+   "by": "claude",
    "confidence": "high"
   }
  ],

@@ -2,16 +2,19 @@
 The heart of the app. Implemented as a **pure function** in `src/domain/engine/sessionEngine.ts`
 with zero browser API, React or DOM, so every rule here is unit-testable under vitest.
 
-`fun onEvent(state: SessionState, event: SessionEvent, ctx: EngineContext): EngineResult`
+`export function onEvent(state: SessionState, event: SessionEvent, ctx: EngineContext): EngineResult`
 
-`EngineContext` carries `now: Instant`, `zone: Zone?`, the current `hourBand: HourBand`,
-the frozen `armedHourBand: HourBand?`, and `rules: Rules`.
+`EngineContext` carries `nowEpochMs: number`, `zone: Zone | null`, the current
+`hourBand: HourBand`, the frozen `armedHourBand: HourBand | null`, and `rules: Rules`.
+The canonical declaration is the TypeScript block below. Where this prose and that block
+ever disagree, **the block wins.**
 
-**`java.time` on the 320 px viewport floor.** `Instant` and friends require API 26. We keep `java.time` in
-the domain because it is expressive and testable, and enable **core library desugaring** so
-it runs on API 24. See `BUILD_CONFIG.md` §1c. Do not substitute `Long` epoch millis in the
-domain signatures; do use absolute epoch millis in `PersistedSession`, because that is what
-crosses into IndexedDB.
+**Epoch millis everywhere, no date library.** Every instant in the domain is a `number` of
+milliseconds since the Unix epoch. There is no `Date`, no `Instant`, no date library in
+`src/domain/`, and the engine never calls `Date.now()`: time arrives as `ctx.nowEpochMs`.
+This is what lets the whole ladder run in milliseconds under a fake clock, and it is the
+same representation that crosses into IndexedDB, so nothing is converted at the boundary.
+`HourBand` is derived from the clock **outside** the engine and passed in.
 
 ---
 
@@ -35,8 +38,8 @@ No other transition may write to Firestore. This is a correctness requirement.
 
 | Event | Source |
 |---|---|
-| `ZoneEntered(zoneId)` | geofence + polygon test + 60 s dwell |
-| `ZoneExited(zoneId)` | polygon test + 180 s dwell |
+| `ZoneEntered(zoneId)` | `watchPosition` fix + polygon test + 60 s dwell |
+| `ZoneExited(zoneId)` | `watchPosition` fix + polygon test + 180 s dwell |
 | `ManualArm` | user taps arm |
 | `ManualDisarm` | user taps "I am home" |
 | `CheckInTimerFired` | an absolute deadline in IndexedDB |
@@ -117,7 +120,7 @@ A hidden tab is throttled and a closed tab stops entirely. On the next visibilit
 | Persisted state | Action |
 |---|---|
 | `IDLE` or `RESOLVED` | nothing |
-| `SHADOW` | re-register geofences and restore the next check-in from persisted `deadlineEpochMs`. Never recompute it from `armedAt` or current rules. If already overdue, fire `CheckInTimerFired` immediately. |
+| `SHADOW` | restart the location watch and restore the next check-in from persisted `deadlineEpochMs`. Never recompute it from `armedAt` or current rules. If already overdue, fire `CheckInTimerFired` immediately. |
 | `CHECKIN_1` / `CHECKIN_2` | recompute remaining countdown from the persisted deadline. **If the deadline already passed while dead, advance the ladder immediately.** Do not silently reset the countdown. |
 | `FAMILY_ESCALATED` | recompute the cancel window. If it lapsed while dead, **go straight to SOS.** |
 | `SOS_ACTIVE` | resume SOS, keep requiring the PIN, re-show the notification. |
@@ -134,16 +137,16 @@ dies mid-ladder is more likely to be a real emergency, not less.
 | Airplane mode at escalation | Everything queues. UI shows "queued, will send when connected". Ladder timing is unaffected. |
 | No contact configured | Ladder still runs. Family step shows "no contact set, add one" and proceeds to SOS on lapse. Never block the ladder on missing config. |
 | Location permission revoked mid-session | Move to `RESOLVED(DISARMED)`, show a persistent warning. Never pretend to watch when blind. |
-| Battery saver kills the service | Detect via missed heartbeat on next launch. Show an honest "Saaya was stopped by the system" notice with the settings deep link from `WEB_PLATFORM.md`. |
+| The browser froze or closed the tab | Detect on load by comparing `deadlineEpochMs` with now. Show an honest "Saaya was stopped by your browser" notice, then apply the recovery table above. Never silently restart the countdown. |
 | She uninstalls mid-SOS | Out of scope. Do not attempt to prevent. |
-| Clock change or DST | Use monotonic elapsed time for countdowns, wall clock only for hour bands. |
+| Clock change or DST | Countdowns are absolute `deadlineEpochMs`, so a wall-clock change moves them with it. That is accepted: epoch millis are UTC and IST has no DST. Hour bands are derived from wall clock in Asia/Kolkata. Never use `performance.now()` for a deadline: it does not survive a frozen tab. |
 | Demo mode toggled mid-session | Applies to the **next** timer only. Never retroactively shortens a running countdown. |
 | Active `AUTO_ZONE` session crosses hour bands | Keep `armedHourBand` frozen until `RESOLVED`. A current-band n/a cell cannot disarm it; a later new session still evaluates the current band normally. |
 
 ## Test hooks required
 
-`SessionEngine` takes an injected `Clock` and `Rules`. `TEST_PLAN.md` drives the full
-ladder in milliseconds with a fake clock. **No test may use real `delay` or `Thread.sleep`.**
+`onEvent` takes `ctx.nowEpochMs` and `ctx.rules`; there is no ambient clock to stub. `TEST_PLAN.md` drives the full
+ladder in milliseconds with a fake clock. **No test may use a real timer or `await` a real delay.**
 
 ---
 
@@ -219,6 +222,11 @@ export interface PersistedSession {
   armMode: ArmMode;
   zoneId: string | null;
   armedAtEpochMs: number;
+  // The band captured on IDLE -> SHADOW, per session.auto_zone.hour_band_policy =
+  // FREEZE_AT_ARM. Null for MANUAL sessions, which use the fixed interval. This MUST be
+  // persisted: without it a session recovered after a frozen tab cannot reschedule on the
+  // band it armed under, and would silently switch to the current band.
+  armedHourBand: HourBand | null;
   deadlineEpochMs: number | null;
   susEventWritten: boolean;
   outcome?: Outcome;
@@ -248,7 +256,8 @@ export interface Rules {
 export interface EngineContext {
   nowEpochMs: number;
   zone: Zone | null;
-  hourBand: HourBand;
+  hourBand: HourBand;          // the current wall-clock band
+  armedHourBand: HourBand | null;  // frozen at arm; governs every reschedule. null = MANUAL
   rules: Rules;
   armMode: ArmMode;
   armedAtEpochMs: number | null;
@@ -291,11 +300,12 @@ outdoors and longer indoors. Decided behaviour:
 | No fix within 60 s | `caption` in the sheet: location is taking longer than usual, with a link to location settings. Keep trying. Do not give up and do not claim to be watching. |
 | Manual arm with no fix | **Allowed.** Arms in `MANUAL` mode with a 10 min interval. The ladder does not need a coordinate to run: only the SOS payload does, and by then there will be one, or the last known fix is sent with its age stated. |
 
-For a background geofence trigger, the first qualifying candidate fix starts a fresh
-monotonic dwell. A last-known fix never starts or completes that proof. Background-location
-denial keeps the already-defined foreground-only arming fallback; a platform start or
-permission failure emits no `ZoneEntered` and is reported honestly on the next foreground
-launch.
+There is no background arming. A browser cannot watch position with the page hidden, so
+every fix that feeds a dwell arrives while the page is visible and holding a wake lock; see
+`WEB_PLATFORM.md`. The first qualifying fix starts a fresh dwell, a last-known fix never
+starts or completes that proof, and any interruption to the watch discards accumulated
+dwell evidence rather than resuming it. A permission denial or a watch error emits no
+`ZoneEntered` and is reported honestly in the sheet.
 
 The principle: **never claim to be watching when we are blind, and never let blindness stop
 her from arming manually.**
