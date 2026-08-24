@@ -156,8 +156,9 @@
      "Decision"
     ],
     "range": [
-     "Finding",
      "Constraint",
+     "Failure",
+     "Finding",
      "Question"
     ]
    },
@@ -312,8 +313,8 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 238,
-  "edges": 538,
+  "entities": 239,
+  "edges": 540,
   "events": 48
  },
  "entities": [
@@ -2044,6 +2045,12 @@
    "class": "Failure",
    "label": "The pivot added BUILD_CONFIG.md but never added its values to spec_graph, so every pinned web version would have failed G6 as an invented literal.",
    "at": "2026-08-24"
+  },
+  {
+   "id": "fail.deps_incomplete",
+   "class": "Failure",
+   "at": "2026-08-24",
+   "label": "The closed dependency list named six runtime packages and omitted everything the gates need: react-dom, the four @types, vitest for G3, eslint for G2. A list declared closed while structurally incomplete forces the builder to either stall or violate it. Codex stalled, correctly."
   }
  ],
  "edges": [
@@ -6296,57 +6303,73 @@
    "confidence": "high"
   },
   {
-   "from": "d.web",
-   "rel": "caused",
-   "to": "fail.arch_pivot_sed",
+   "from": "fail.arch_pivot_sed",
+   "rel": "caused_by",
+   "to": "d.web",
    "at": "2026-08-24",
    "by": "claude",
    "confidence": "high"
   },
   {
-   "from": "d.web",
-   "rel": "caused",
-   "to": "fail.webstack_unfacted",
-   "at": "2026-08-24",
-   "by": "claude",
-   "confidence": "high"
-  },
-  {
-   "from": "fail.audit_grep_scope",
-   "rel": "relates_to",
-   "to": "fail.arch_pivot_sed",
-   "at": "2026-08-24",
-   "by": "claude",
-   "confidence": "high"
-  },
-  {
-   "from": "d.deps.devset",
-   "rel": "constrains",
-   "to": "node.T1.1",
-   "at": "2026-08-24",
-   "by": "claude",
-   "confidence": "high"
-  },
-  {
-   "from": "d.vercelgate",
-   "rel": "constrains",
-   "to": "node.T1.1",
-   "at": "2026-08-24",
-   "by": "claude",
-   "confidence": "high"
-  },
-  {
-   "from": "d.nodomtests",
-   "rel": "constrains",
-   "to": "node.T3.1",
+   "from": "fail.webstack_unfacted",
+   "rel": "caused_by",
+   "to": "d.web",
    "at": "2026-08-24",
    "by": "claude",
    "confidence": "high"
   },
   {
    "from": "fail.arch_pivot_sed",
-   "rel": "relates_to",
-   "to": "node.T1.1",
+   "rel": "caused_by",
+   "to": "fail.audit_grep_scope",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.deps.devset",
+   "rel": "motivated_by",
+   "to": "fail.deps_incomplete",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.vercelgate",
+   "rel": "motivated_by",
+   "to": "fail.arch_pivot_sed",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.explain_ext_drift",
+   "rel": "caused_by",
+   "to": "d.web",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.audit_grep_scope",
+   "rel": "caused_by",
+   "to": "d.web",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.nodomtests",
+   "rel": "motivated_by",
+   "to": "fail.deps_incomplete",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.deps_incomplete",
+   "rel": "caused_by",
+   "to": "d.web",
    "at": "2026-08-24",
    "by": "claude",
    "confidence": "high"
