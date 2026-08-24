@@ -64,6 +64,16 @@ hand off and no background-permission branch. Do not test for those.
 | Watch interrupted | hiding the page or a watch error discards all accumulated dwell fixes and timestamps. Evidence is never resumed, only restarted. |
 | Exit | a qualifying outside fix past the exit dwell removes that zone's pending state |
 
+### `containment.test.ts`
+
+| Test | Assertion |
+|---|---|
+| Prefilter admits every vertex | for all 24 zones, **every** polygon vertex passes that zone's bounding-box prefilter. This is the property `geofence_radius_m` failed on 126 of 165 vertices, so it is a regression guard, not a formality. |
+| Prefilter never excludes an inside point | a point known inside a polygon always passes the prefilter. A false negative here silently prevents arming. |
+| Boundary counts as inside | a vertex and a point on an edge both test as contained |
+| Polygon is authoritative | a point inside the bounding box but outside the polygon is **not** contained |
+| Radius is unread | `geofenceRadiusM` appears in no containment code path |
+
 ### `anonymiser.test.ts` - **the trust boundary, and the most important test in the build**
 | Test | Assertion |
 |---|---|

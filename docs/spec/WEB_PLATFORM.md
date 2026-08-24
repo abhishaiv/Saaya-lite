@@ -41,7 +41,7 @@ Saying exactly where the browser stops is a better architecture answer than pret
 | Previous platform | Web | Notes |
 |---|---|---|
 | `FusedLocationProvider` | `navigator.geolocation.watchPosition` | `enableHighAccuracy: true` while armed. Sampling rates from `BUSINESS_RULES` still apply. |
-| Geofencing API | **point-in-polygon in JS, on every fix** | we already treat the polygon as authoritative; `geofence_radius_m` becomes a cheap pre-filter |
+| Geofencing API | **point-in-polygon in JS, on every fix**, with each polygon's **bounding box** as the pre-filter | the polygon is authoritative. `geofence_radius_m` is **not** used: see the prefilter rule below. |
 | Wake lock plus a visible page | **Wake Lock API** + Page Visibility | `navigator.wakeLock.request('screen')` while armed, so the ladder keeps running |
 | `an absolute deadline in IndexedDB` | `setTimeout` + an **absolute deadline in IndexedDB** | on visibility change, recompute from the deadline. Never trust the timer to have run. |
 | Notification channels | **Notification API** via `ServiceWorkerRegistration.showNotification` | `requireInteraction: true` for check-in 2. See the Service Worker rule below: Chrome on Android has no `Notification` constructor, so the worker is not optional. |

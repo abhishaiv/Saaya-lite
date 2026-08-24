@@ -44,7 +44,7 @@ every zone.
 | Exit dwell before disarming | **180 s** continuously outside | Prevents disarming from one bad GPS fix on a narrow road. |
 | Re-arm cooldown after a manual disarm in the same zone | **45 min** | If she disarmed here deliberately, do not immediately re-arm and nag her. |
 | Re-arm cooldown after `RESOLVED_OK` in the same zone | **20 min** | She answered. Give her space. |
-| Zone containment test | point-in-polygon on the real polygon | `geofence_radius_m` is used **only** as a cheap circular pre-filter before the polygon test, so we do not run point-in-polygon against all 19 zones on every fix. The authoritative test is the polygon. |
+| Zone containment test | point-in-polygon on the real polygon | The pre-filter is each polygon's own **bounding box**, computed once at load. `geofence_radius_m` is **not used for containment**: see the rule below. The authoritative test is the polygon. |
 
 ## 4. Check-in intervals (F15)
 
@@ -177,6 +177,24 @@ because silently dropping an escalation is the worst failure this app can have.
 | Pending dwell, before arm | **15 s** | `enableHighAccuracy: true` |
 | Shadow armed | 15 s | `enableHighAccuracy: true` |
 | SOS active | 5 s | `enableHighAccuracy: true` |
+
+### The prefilter rule: never a false negative
+
+A prefilter exists to avoid running point-in-polygon against all 19 non-safe zones on every
+fix. It may return extra candidates; it may **never** exclude a point the polygon would have
+accepted. A prefilter that produces a false negative silently prevents arming, which is the
+one failure this product cannot have.
+
+**Use each polygon's bounding box.** It is computed once at load from the frozen asset, it is
+two comparisons per axis, and it provably contains every point of its polygon.
+
+**Do not use `geofence_radius_m`.** It is a legacy parameter from the Android Geofencing
+API, which could only register circles; it was never an approximation of polygon extent.
+Measured against the frozen asset, **126 of 165 polygon vertices lie outside their own
+declared radius, across 23 of the 24 zones**, the worst being Bheemili at 21,535 m from its
+centroid against a declared 2,000 m. Since a boundary point counts as inside, using these
+radii would have refused to arm across most of Vizag. The field stays in the asset because
+the asset is frozen and audited; nothing reads it.
 
 Discard any fix with `accuracy > 100 m` for zone-containment decisions. Never discard for
 SOS, where a poor fix beats no fix, but do send `accuracyM` so the console can show it.

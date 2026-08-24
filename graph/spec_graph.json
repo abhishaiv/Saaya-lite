@@ -1311,7 +1311,7 @@
    "kind": "number",
    "value": 19,
    "unit": "count",
-   "means": "zones actually rendered",
+   "means": "non-SAFE zones: the ones rendered on the map and the ones containment is tested against",
    "sourced_from": "derived: 24-5",
    "governs": "MAP_SPEC.md",
    "frozen": true,

@@ -48,14 +48,16 @@ export interface Zone {
   readonly totalCases: number;     // 478
   readonly womenSafetyCases: number;   // 84
   readonly crimeBreakdown: CrimeBreakdown;
-  readonly geofenceRadiusM: number;    // 2000 .. 5000, ALREADY COMPUTED, do not derive
+  readonly geofenceRadiusM: number;    // parsed for fidelity to the frozen asset. UNUSED.
   readonly areasCovered: string;
   readonly touristSpots: string | null;
   readonly riskNotes: string | null;
 }
 
-`geofenceRadiusM` is a field of the frozen asset and is used only as a cheap pre-filter
-before the polygon test, per `BUSINESS_RULES.md`. It never defines containment.
+`geofenceRadiusM` is parsed because the asset carries it, and **nothing reads it**. It is a
+legacy Android Geofencing radius and it does not describe its polygon: 126 of 165 vertices
+fall outside their own declared radius. The containment prefilter is the polygon bounding
+box. See the prefilter rule in `BUSINESS_RULES.md`.
 ```
 
 **GeoJSON gotcha:** coordinates are `[longitude, latitude]`. Getting this backwards puts

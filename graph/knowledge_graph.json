@@ -313,8 +313,8 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 303,
-  "edges": 609,
+  "entities": 306,
+  "edges": 611,
   "events": 62
  },
  "entities": [
@@ -2523,6 +2523,24 @@
    "class": "Decision",
    "at": "2026-08-24",
    "label": "Two location values in STATE_MACHINE had no facts while eighteen live facts carried the same numbers for unrelated behaviour (ladder.cd2, dwell.enter, pin.lockout at 60; interval.high.deep, pin.attempts, loc.sample.sos at 5). Codex refused to borrow any of them and blocked instead, which is the correct call: a same-valued match is false provenance, and an earlier verifier in this project killed a node for exactly that. Added loc.last_known.centering.max_age and loc.first_fix.slow_after."
+  },
+  {
+   "id": "anchor.radius_vs_polygon",
+   "class": "Anchor",
+   "label": "Measured from the frozen asset, not reasoned about: 126 of 165 polygon vertices lie outside their own declared geofence_radius_m, across 23 of the 24 zones. Worst is bheemili_police_station at 21,535 m from its centroid against a declared 2,000 m. Verified independently with Haversine against public/assets/vizag_heatmap.geojson, which is byte-identical to the two other copies. Separately confirmed: all 24 declared centroids DO fall inside their own polygons, so centroid-anchored map labels are sound, and a bounding-box prefilter admits 165 of 165 vertices.",
+   "at": "2026-08-24"
+  },
+  {
+   "id": "fail.radius_prefilter",
+   "class": "Failure",
+   "label": "Three documents specified geofence_radius_m as the containment prefilter. It is a legacy Android Geofencing parameter, which could only register circles, and it was never an approximation of polygon extent. Because a boundary point counts as inside, using it would have refused to arm across most of Vizag: a silent false negative in the one path that must not have one. Codex found it at T4.2 by measuring the asset rather than trusting the spec.",
+   "at": "2026-08-24"
+  },
+  {
+   "id": "d.bbox_prefilter",
+   "class": "Decision",
+   "label": "The containment prefilter is each polygon's bounding box, computed once at load from the frozen asset. Provably contains every point of its polygon, two comparisons per axis. geofence_radius_m stays in the asset because the asset is frozen and audited, and nothing reads it. The general rule is now stated in BUSINESS_RULES: a prefilter may return extra candidates and may never exclude a point the polygon would accept.",
+   "at": "2026-08-24"
   }
  ],
  "edges": [
@@ -7394,6 +7412,22 @@
    "from": "d.no_borrowed_provenance",
    "rel": "motivated_by",
    "to": "fail.t41.invention_round1",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.radius_prefilter",
+   "rel": "caused_by",
+   "to": "d.web",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.bbox_prefilter",
+   "rel": "motivated_by",
+   "to": "fail.radius_prefilter",
    "at": "2026-08-24",
    "by": "claude",
    "confidence": "high"
