@@ -8,8 +8,8 @@ Regenerate with `python3 scripts/render_build_state.py`.
 | Field | Value |
 |---|---|
 | Mode | **single continuous run**, order below |
-| Next node | **T2.1** - Zone parsing to typed Zone/ZoneCard/PoliceStation (TS) |
-| Nodes complete | 1 of 22 |
+| Next node | **T4.1** - Session engine, pure TypeScript, zero browser API |
+| Nodes complete | 2 of 22 |
 | Total work | 45.0 h |
 
 ## Node ledger
@@ -20,7 +20,7 @@ hour 14 rather than hour 24. Reasoning in `docs/spec/GRAPH_ENGINEERING.md`.
 | # | Node | Title | Risk | Shape | Cum h | Verify | Status |
 |---|---|---|---|---|---|---|---|
 | 1 | `T1.1` | Scaffold: Next.js, TypeScript, theme tokens, Vercel | low | serial | 2.0 | spec | complete |
-| 2 | `T2.1` | Zone parsing to typed Zone/ZoneCard/PoliceStation (TS) | low | diamond | 3.5 | spec | pending |
+| 2 | `T2.1` | Zone parsing to typed Zone/ZoneCard/PoliceStation (TS) | low | diamond | 3.5 | spec | complete |
 | 3 | `T4.1` | Session engine, pure TypeScript, zero browser API | HIGH | serial | 6.5 | spec, boundary, invention | pending |
 | 4 | `T4.2` | Geolocation watch, arming, wake lock, tab lifecycle | HIGHEST | serial | 9.5 | spec, boundary, invention | pending |
 | 5 | `T1.2` | Firebase wiring, anonymous auth (project exists) | low | serial | 10.5 | spec | pending |

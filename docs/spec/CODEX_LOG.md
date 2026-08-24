@@ -29,12 +29,12 @@ marketing, and these judges build with Codex daily.
 
 | Metric | Value |
 |---|---|
-| Tasks run through Codex | 4 |
+| Tasks run through Codex | 5 |
 | Tasks accepted with no correction | 0 |
-| Tasks needing correction | 4 |
-| Estimated hours saved | ~2.5 net |
+| Tasks needing correction | 5 |
+| Estimated hours saved | ~3 net |
 | Where Codex was clearly better than hand-writing | Mechanical Android and web theme/icon scaffolds; exact PWA asset generation; three-way parser fan-out; exhaustive asset joins and coordinate anchors; pure transition reducer with 37 timing-rule tests; adversarial recovery and provenance checks |
-| Where Codex was clearly worse | Initial dependency completeness, 8 GB memory sizing, Material default-role closure, the too-narrow coordinate repair recommendation, first-pass recovery semantics, provenance-graph bookkeeping, and two defects in the CSS grounding gate |
+| Where Codex was clearly worse | Initial dependency completeness, 8 GB memory sizing, Material default-role closure, the too-narrow coordinate repair recommendation, first-pass recovery semantics, provenance-graph bookkeeping, two defects in the CSS grounding gate, and an ownership guard that initially collapsed untracked directories |
 
 ## Decisions to record here specifically
 
@@ -184,3 +184,30 @@ colour fact. The intentional regression fixture still fails only for its three i
 
 **Verdict:** Saved about one net hour. The scaffold and icon derivation were fast and exact;
 the stricter gate also found real defects in the build tooling before later CSS-heavy nodes.
+
+### T2.1 - Typed web zone parsers and frozen asset bundle          2026-08-24, ~45 minutes active
+
+**Asked:** Run the first web diamond with one disjoint worker per frozen Vizag asset, then
+merge strict TypeScript models and parsers that catch GeoJSON coordinate reversal, preserve
+the audited files, and prove every specified count, join and range.
+
+**Produced:** `Zone`, `ZoneCard` and `PoliceStation` domain types; three fail-loud parsers;
+a single loader that composes and validates them; byte-identical internal and public asset
+copies; and four Vitest cases covering 24/19/37, the 6/9/4/5 tier split, all 189 centroids
+and vertices, non-safe card joins, station phones and public-copy byte identity.
+
+**Shipped:** All three worker manifests and their six disjoint paths passed the ownership
+guard. The full Next.js build, strict type check, ESLint, eight tests, G6, G10 and local
+production HTTP acceptance pass; all three served public resources match the frozen source
+byte for byte. Fresh round-2 spec and invention verifiers both returned `kill=false` at 0.99.
+
+**Needed correcting:** The first ownership check failed because Git's default porcelain
+output collapsed wholly untracked trees to `src/data/` and `src/domain/`; the guard now asks
+for every untracked file and actually validates the manifests its own contract promised.
+Spec verifier round 1 then killed two omissions: the assets were importable internally but
+not published under their original filenames, and the tests bounded every coordinate but
+did not assert the frozen 189-coordinate cardinality. Both were fixed. `CODEX_TASKS.md` was
+also added to the bounded reads because those two done conditions proved load-bearing.
+
+**Verdict:** Saved about half a net hour. Parallel parser construction was effective, while
+the adversarial pass caught two acceptance gaps that compilation and the initial tests missed.

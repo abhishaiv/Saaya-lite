@@ -313,9 +313,9 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 247,
-  "edges": 548,
-  "events": 51
+  "entities": 262,
+  "edges": 565,
+  "events": 56
  },
  "entities": [
   {
@@ -2110,6 +2110,121 @@
    "label": "T1.1 web G6 overwrote same-valued semantic colour provenance",
    "node": "T1.1",
    "gate": "G6"
+  },
+  {
+   "id": "art.t21.web_zone_type",
+   "class": "Artifact",
+   "label": "Typed web Zone domain model and GeoJSON parser",
+   "node": "T2.1",
+   "run": "run.T2.1.2026-08-24.web.001"
+  },
+  {
+   "id": "art.t21.web_zone_card_type",
+   "class": "Artifact",
+   "label": "Typed web ZoneCard model and keyed parser",
+   "node": "T2.1",
+   "run": "run.T2.1.2026-08-24.web.001"
+  },
+  {
+   "id": "art.t21.web_police_station_type",
+   "class": "Artifact",
+   "label": "Typed web PoliceStation model and parser",
+   "node": "T2.1",
+   "run": "run.T2.1.2026-08-24.web.001"
+  },
+  {
+   "id": "art.t21.web_asset_bundle",
+   "class": "Artifact",
+   "label": "Byte-identical internal and public Vizag asset bundle",
+   "node": "T2.1",
+   "run": "run.T2.1.2026-08-24.web.001"
+  },
+  {
+   "id": "art.t21.web_zone_loader",
+   "class": "Artifact",
+   "label": "ZoneLoader composing all parsers and frozen assertions",
+   "node": "T2.1",
+   "run": "run.T2.1.2026-08-24.web.001"
+  },
+  {
+   "id": "art.t21.web_zone_parsing_test",
+   "class": "Artifact",
+   "label": "Vitest zone parsing and asset fidelity acceptance suite",
+   "node": "T2.1",
+   "run": "run.T2.1.2026-08-24.web.001"
+  },
+  {
+   "id": "art.t21.fanout_guard_fix",
+   "class": "Artifact",
+   "label": "Fanout guard exact untracked paths and manifest validation",
+   "node": "T2.1",
+   "run": "run.T2.1.2026-08-24.web.001"
+  },
+  {
+   "id": "ver.t21.web.spec.round1",
+   "class": "Verification",
+   "label": "T2.1 web spec verifier round 1 rejected two acceptance gaps",
+   "node": "T2.1",
+   "run": "run.T2.1.2026-08-24.web.001",
+   "lens": "spec",
+   "kill": "true",
+   "confidence": "0.99"
+  },
+  {
+   "id": "ver.t21.web.invention.round1",
+   "class": "Verification",
+   "label": "T2.1 web supplemental invention verifier round 1 passed",
+   "node": "T2.1",
+   "run": "run.T2.1.2026-08-24.web.001",
+   "lens": "invention",
+   "kill": "false",
+   "confidence": "0.99"
+  },
+  {
+   "id": "ver.t21.web.spec.round2",
+   "class": "Verification",
+   "label": "T2.1 web spec verifier round 2 passed with no findings",
+   "node": "T2.1",
+   "run": "run.T2.1.2026-08-24.web.001",
+   "lens": "spec",
+   "kill": "false",
+   "confidence": "0.99"
+  },
+  {
+   "id": "ver.t21.web.invention.round2",
+   "class": "Verification",
+   "label": "T2.1 web invention verifier round 2 passed with no findings",
+   "node": "T2.1",
+   "run": "run.T2.1.2026-08-24.web.001",
+   "lens": "invention",
+   "kill": "false",
+   "confidence": "0.99"
+  },
+  {
+   "id": "fail.t21.web_fanout_untracked_collapse",
+   "class": "Failure",
+   "label": "T2.1 web fanout guard collapsed exact untracked worker files to directory prefixes",
+   "node": "T2.1",
+   "gate": "fanout_check"
+  },
+  {
+   "id": "fail.t21.web_spec_round1",
+   "class": "Failure",
+   "label": "T2.1 web first spec verifier found missing public filenames and coordinate cardinality assertion",
+   "node": "T2.1",
+   "gate": "G9"
+  },
+  {
+   "id": "d.t21.web_asset_import_copy",
+   "class": "Decision",
+   "label": "Keep original public asset filenames and use a byte-identical internal JSON copy for TypeScript import",
+   "node": "T2.1"
+  },
+  {
+   "id": "d.t21.web_coordinate_cardinality",
+   "class": "Decision",
+   "label": "Treat 189 as a measured frozen-asset structural cardinality and assert it explicitly",
+   "node": "T2.1"
   }
  ],
  "edges": [
@@ -6496,6 +6611,142 @@
    "at": "2026-08-24",
    "by": "codex",
    "confidence": "high"
+  },
+  {
+   "from": "art.t21.web_zone_type",
+   "rel": "produced_by",
+   "to": "node.T2.1",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t21.web_zone_card_type",
+   "rel": "produced_by",
+   "to": "node.T2.1",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t21.web_police_station_type",
+   "rel": "produced_by",
+   "to": "node.T2.1",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t21.web_asset_bundle",
+   "rel": "produced_by",
+   "to": "node.T2.1",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t21.web_zone_loader",
+   "rel": "produced_by",
+   "to": "node.T2.1",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t21.web_zone_parsing_test",
+   "rel": "produced_by",
+   "to": "node.T2.1",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t21.fanout_guard_fix",
+   "rel": "produced_by",
+   "to": "node.T2.1",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "node.T2.1",
+   "rel": "verified_by",
+   "to": "ver.t21.web.spec.round2",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "node.T2.1",
+   "rel": "verified_by",
+   "to": "ver.t21.web.invention.round2",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.t21.web_fanout_untracked_collapse",
+   "rel": "caused_by",
+   "to": "node.T2.1",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.t21.web_spec_round1",
+   "rel": "caused_by",
+   "to": "node.T2.1",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "d.t21.web_asset_import_copy",
+   "rel": "motivated_by",
+   "to": "fail.t21.web_spec_round1",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "d.t21.web_coordinate_cardinality",
+   "rel": "motivated_by",
+   "to": "fail.t21.web_spec_round1",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t21.web_zone_loader",
+   "rel": "depends_on",
+   "to": "art.t21.web_zone_type",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t21.web_zone_loader",
+   "rel": "depends_on",
+   "to": "art.t21.web_zone_card_type",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t21.web_zone_loader",
+   "rel": "depends_on",
+   "to": "art.t21.web_police_station_type",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t21.web_zone_loader",
+   "rel": "depends_on",
+   "to": "art.t21.web_asset_bundle",
+   "at": "2026-08-24",
+   "by": "codex",
+   "confidence": "high"
   }
  ],
  "events": [
@@ -7074,6 +7325,71 @@
     "ver.t11.web.spec.round1"
    ],
    "node": "T1.1"
+  },
+  {
+   "id": "ev.0052",
+   "type": "gate_failed",
+   "at": "2026-08-24",
+   "actor": "codex",
+   "detail": "T2.1 fanout guard attempt 1 falsely saw src/data and src/domain directory prefixes because Git collapsed wholly untracked trees; exact-file mode and manifest validation fixed the checker.",
+   "refs": [
+    "fail.t21.web_fanout_untracked_collapse",
+    "art.t21.fanout_guard_fix"
+   ],
+   "node": "T2.1"
+  },
+  {
+   "id": "ev.0053",
+   "type": "verifier_killed",
+   "at": "2026-08-24",
+   "actor": "codex",
+   "detail": "T2.1 web spec round 1 rejected missing original filenames under public/assets and the absent 189-coordinate cardinality assertion.",
+   "refs": [
+    "ver.t21.web.spec.round1",
+    "fail.t21.web_spec_round1"
+   ],
+   "node": "T2.1"
+  },
+  {
+   "id": "ev.0054",
+   "type": "decision_made",
+   "at": "2026-08-24",
+   "actor": "codex",
+   "detail": "T2.1 keeps original byte-identical public asset filenames while using a byte-identical internal JSON copy for TypeScript import, and treats 189 only as the measured frozen-asset structural cardinality.",
+   "refs": [
+    "d.t21.web_asset_import_copy",
+    "d.t21.web_coordinate_cardinality"
+   ],
+   "node": "T2.1"
+  },
+  {
+   "id": "ev.0055",
+   "type": "verifier_passed",
+   "at": "2026-08-24",
+   "actor": "codex",
+   "detail": "T2.1 web fresh round 2 spec and supplemental invention verifiers both passed with no findings at 0.99 confidence.",
+   "refs": [
+    "ver.t21.web.spec.round2",
+    "ver.t21.web.invention.round2"
+   ],
+   "node": "T2.1"
+  },
+  {
+   "id": "ev.0056",
+   "type": "node_completed",
+   "at": "2026-08-24",
+   "actor": "codex",
+   "detail": "T2.1 web completed: three disjoint workers produced strict Zone, ZoneCard and PoliceStation parsers; the merge published byte-identical assets and proved 24/19/37, 6/9/4/5, all 189 coordinates, joins and phones.",
+   "refs": [
+    "art.t21.web_zone_type",
+    "art.t21.web_zone_card_type",
+    "art.t21.web_police_station_type",
+    "art.t21.web_asset_bundle",
+    "art.t21.web_zone_loader",
+    "art.t21.web_zone_parsing_test",
+    "art.t21.fanout_guard_fix"
+   ],
+   "node": "T2.1"
   }
  ]
 }

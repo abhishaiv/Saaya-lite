@@ -129,6 +129,7 @@
     "assets_bundled"
    ],
    "reads": [
+    "CODEX_TASKS.md",
     "DATA_MODEL.md",
     "TEST_PLAN.md",
     "assets/README.md"
@@ -138,11 +139,40 @@
    ],
    "risk": "low",
    "cumulative_hours": 3.5,
-   "status": "pending",
-   "run_id": null,
-   "gates_passed": [],
-   "artifacts": [],
-   "corrections": [],
+   "status": "complete",
+   "run_id": "run.T2.1.2026-08-24.web.001",
+   "gates_passed": [
+    "fanout_check_three_workers_round2",
+    "G1_npm_run_build",
+    "G2_tsc_and_next_lint_zero_errors",
+    "G3_vitest_eight_tests",
+    "G4_zoneParsing_four_tests",
+    "G5_24_19_37_189_and_public_asset_http_acceptance",
+    "G6_grounded_with_semantic_explain",
+    "G7_twelve_non_negotiables",
+    "G8_pure_data_node_no_affected_screen",
+    "G9_spec_round2_and_supplemental_invention_pass",
+    "G10_reads_check"
+   ],
+   "failed_attempts": {
+    "fanout_check": 1,
+    "G9": 1
+   },
+   "artifacts": [
+    "art.t21.web_zone_type",
+    "art.t21.web_zone_card_type",
+    "art.t21.web_police_station_type",
+    "art.t21.web_asset_bundle",
+    "art.t21.web_zone_loader",
+    "art.t21.web_zone_parsing_test",
+    "art.t21.fanout_guard_fix"
+   ],
+   "corrections": [
+    "The first ownership-guard run saw collapsed untracked directories instead of the six exact worker files; fanout_check now requests all untracked files and validates every manifest.",
+    "The first spec verifier found that the original asset filenames were absent from public/assets and that the 189-coordinate structural cardinality was not asserted; both findings were corrected and fresh round 2 passed.",
+    "CODEX_TASKS.md was added to the bounded reads after its public-asset and coordinate-cardinality done conditions proved load-bearing.",
+    "The GeoJSON retains its original public filename and bytes; a byte-identical .json copy is internal import plumbing for TypeScript's JSON module loader."
+   ],
    "verify_lenses": [
     "spec"
    ],
@@ -178,9 +208,16 @@
      }
     ],
     "shared_files_written_by_merge": [
-     "data/zone/zoneLoader.ts"
+     "src/data/zone/zoneLoader.ts",
+     "src/data/zone/zoneParsing.test.ts",
+     "src/data/zone/assets/vizag_heatmap.json",
+     "src/data/zone/assets/zone_info_cards.json",
+     "src/data/zone/assets/vizag_police_points.json",
+     "public/assets/vizag_heatmap.geojson",
+     "public/assets/zone_info_cards.json",
+     "public/assets/vizag_police_points.json"
     ],
-    "merge": "code: assert 24/19/37 counts and every centroid plus polygon vertex inside lat 17.4-18.1 lon 82.9-83.7; then write the single ZoneLoader that composes the three parsers"
+    "merge": "code: publish byte-identical frozen assets under their original public filenames; assert 24/19/37 counts, the 6/9/4/5 tier split, all 189 centroids plus polygon vertices inside lat 17.4-18.1 lon 82.9-83.7, non-safe card joins and station phones; then write the single ZoneLoader that composes the three parsers"
    },
    "note": "A previous build of this node is archived on branch archive/android-kotlin. Build fresh for web. The parse assertions and counts are unchanged.",
    "archived_android_run": {

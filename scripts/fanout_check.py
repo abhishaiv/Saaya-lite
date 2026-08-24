@@ -20,7 +20,13 @@ ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 g=json.load(open(os.path.join(ROOT,"graph/build_graph.json")))
 
 def changed():
-    out=subprocess.run(["git","status","--porcelain"],capture_output=True,text=True,cwd=ROOT).stdout
+    # Git's default porcelain output collapses wholly untracked directory trees to
+    # `path/`. Diamond contracts own files, not directory prefixes, so ask for every
+    # untracked file or a correct worker will be reported as an unowned directory.
+    out=subprocess.run(
+        ["git","status","--porcelain","--untracked-files=all"],
+        capture_output=True,text=True,cwd=ROOT,
+    ).stdout
     return [l[3:].strip() for l in out.splitlines() if l.strip()]
 
 def main():
@@ -45,6 +51,21 @@ def main():
             if p in owned and owned[p]!=it["id"]:
                 print(f"CLAIM CLASH  {p}  claimed by {owned[p]} and {it['id']}"); bad+=1
             owned[p]=it["id"]
+
+        manifest=it.get("manifest")
+        if manifest:
+            manifest_path=os.path.join(ROOT,manifest)
+            if not os.path.isfile(manifest_path):
+                print(f"MISSING MANIFEST  {manifest}  for {it['id']}"); bad+=1
+            else:
+                try:
+                    payload=json.load(open(manifest_path))
+                    claimed=set(payload.get("owns",payload.get("owned_paths",[])))
+                    missing=set(it.get("owns",[]))-claimed
+                    if missing:
+                        print(f"INCOMPLETE MANIFEST  {manifest}  missing {sorted(missing)}"); bad+=1
+                except (OSError,json.JSONDecodeError,TypeError) as exc:
+                    print(f"INVALID MANIFEST  {manifest}  {exc}"); bad+=1
 
     shared=set(fan.get("shared_files_written_by_merge",[]))
     files=changed()
