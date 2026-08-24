@@ -17,15 +17,27 @@ the iOS check-in card depends on.
 Subset to the icons listed below. The full variable font is roughly 4 MB and shipping it
 whole would blow the F31 size goal on its own.
 
-**Subsetting an icon font is by codepoint, not by name.** Look up each icon's codepoint in
-the upstream `MaterialSymbolsRounded.codepoints` file, pass exactly those to `pyftsubset`,
-and keep the `FILL`, `wght`, `GRAD` and `opsz` axes so the axis facts above still apply:
+**Source: `google/material-design-icons`, directory `variablefont/`.** Not `google/fonts`,
+which has no `materialsymbolsrounded` entry. Both files you need are there and their names
+carry the axis suffix:
 
 ```
-pyftsubset MaterialSymbolsRounded[FILL,GRAD,opsz,wght].ttf \
+variablefont/MaterialSymbolsRounded[FILL,GRAD,opsz,wght].ttf
+variablefont/MaterialSymbolsRounded[FILL,GRAD,opsz,wght].codepoints
+```
+
+**Subsetting an icon font is by codepoint, not by name.** Look each icon up in that
+`.codepoints` file, which is a plain `name codepoint` list, and pass exactly those to
+`pyftsubset`, keeping all four axes so the axis facts above still apply:
+
+```
+pyftsubset 'MaterialSymbolsRounded[FILL,GRAD,opsz,wght].ttf' \
   --unicodes=<the codepoints for the icons in the table below> \
   --flavor=woff2 --output-file=public/fonts/material-symbols-subset.woff2
 ```
+
+Quote the filename in the shell: the square brackets are glob characters and an unquoted
+path will silently not match.
 
 Do **not** instance the axes away to a single static cut: `icon.fill.state` is 1 and
 `icon.fill.utility` is 0, so both fill values are needed at runtime from one file.

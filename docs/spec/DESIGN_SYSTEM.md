@@ -35,11 +35,24 @@ that chose Leaflet and CARTO over Google Maps: nothing in the build may depend o
 party being reachable on submission day. It also rules out `next/font/google`, which
 downloads at build time and cannot subset Material Symbols by icon name.
 
-| Family | Source | Shipped as |
-|---|---|---|
-| Poppins | the `google/fonts` repo, `ofl/poppins`, static TTFs | three subset `woff2`: 400, 600, 700 |
-| Noto Sans Telugu | the `google/fonts` repo, `ofl/notosanstelugu`, **variable** | one subset `woff2`, `wght` axis 400 to 700 |
-| Material Symbols Rounded | the `google/fonts` repo, **variable** | one subset `woff2`, see `ICONOGRAPHY.md` |
+All three paths below were checked against the live repositories on 2026-08-24, because a
+plausible-looking path is not a verified one: an earlier draft of this table sent Material
+Symbols to `google/fonts`, where it does not exist.
+
+| Family | Repository and path | Upstream file | Shipped as |
+|---|---|---|---|
+| Poppins | `google/fonts`, `ofl/poppins` | `Poppins-Regular.ttf`, `Poppins-SemiBold.ttf`, `Poppins-Bold.ttf` | three subset `woff2` |
+| Noto Sans Telugu | `google/fonts`, `ofl/notosanstelugu` | `NotoSansTelugu[wdth,wght].ttf` | one subset `woff2` |
+| Material Symbols Rounded | **`google/material-design-icons`**, `variablefont/` | `MaterialSymbolsRounded[FILL,GRAD,opsz,wght].ttf` and the matching `.codepoints` | one subset `woff2`, see `ICONOGRAPHY.md` |
+
+**Material Symbols is not in `google/fonts`.** There is no `ofl/materialsymbolsrounded`; it
+returns 404. It lives in `google/material-design-icons` under `variablefont/`, which is also
+the only place the matching `.codepoints` file exists, and that file is what makes
+subsetting by icon possible at all.
+
+**Noto Sans Telugu carries two axes, `wdth` and `wght`**, not just weight. Pin `wdth` to its
+default of 100 and keep `wght` at 400 to 700:
+`--instancer wdth=100` (or the equivalent `varLib.instancer` step) before subsetting.
 
 Procedure, once, and recorded in `CODEX_LOG.md`:
 
@@ -56,9 +69,14 @@ Procedure, once, and recorded in `CODEX_LOG.md`:
      **Dropping the layout features silently breaks Telugu rendering**, which nobody
      testing in English would notice.
    - Keep `--flavor=woff2` and `--desubroutinize` off for variable fonts.
-3. Commit the outputs to `public/fonts/`, and commit `OFL.txt` for both OFL families and
-   `LICENSE.txt` for Material Symbols beside them. `COMPLIANCE.md` already records the
-   licences; the files must actually ship.
+3. Commit the outputs to `public/fonts/` with their licences beside them. `COMPLIANCE.md`
+   records the licences but the files were not actually shipping, which is the part that
+   matters legally:
+   - `public/fonts/OFL-poppins.txt` from `ofl/poppins/OFL.txt`
+   - `public/fonts/OFL-notosanstelugu.txt` from `ofl/notosanstelugu/OFL.txt`
+   - `public/fonts/LICENSE-material-symbols.txt` from the **root `LICENSE`** of
+     `google/material-design-icons` (Apache 2.0), which is the licence `COMPLIANCE.md`
+     already names for this family.
 4. Declare with `font-display: swap` and preload only the two faces above the fold:
    Poppins 400 and Poppins 600.
 5. **Verify the budget:** the sum of everything in `public/fonts/` must be under

@@ -313,8 +313,8 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 322,
-  "edges": 624,
+  "entities": 325,
+  "edges": 626,
   "events": 63
  },
  "entities": [
@@ -2651,6 +2651,24 @@
    "class": "Constraint",
    "label": "Subsetting Noto Sans Telugu must retain the akhn, blwf, half, pres, abvs, blws and psts layout features. Dropping them silently breaks conjunct formation, which nobody testing in English would notice, and Telugu is half the intended audience.",
    "at": "2026-08-24"
+  },
+  {
+   "id": "fail.font_source_unverified",
+   "class": "Failure",
+   "at": "2026-08-24",
+   "label": "The font sourcing table sent Material Symbols Rounded to google/fonts, where ofl/materialsymbolsrounded returns 404. Written from memory in the same commit that told Codex to pin sources by hash for reproducibility. It also implied OFL for a family COMPLIANCE.md correctly records as Apache 2.0. Corrected to google/material-design-icons/variablefont, which is also the only place the matching .codepoints file exists, and that file is what makes subsetting by icon possible."
+  },
+  {
+   "id": "anchor.font_paths",
+   "class": "Anchor",
+   "at": "2026-08-24",
+   "label": "All four upstream paths checked against the live GitHub API on 2026-08-24, not recalled: google/fonts ofl/poppins (static TTFs, OFL.txt present); google/fonts ofl/notosanstelugu (NotoSansTelugu[wdth,wght].ttf, TWO axes not one, OFL.txt present); google/material-design-icons variablefont/ (MaterialSymbolsRounded[FILL,GRAD,opsz,wght].ttf and matching .codepoints); google/material-design-icons root LICENSE."
+  },
+  {
+   "id": "d.verify_external_paths",
+   "class": "Decision",
+   "at": "2026-08-24",
+   "label": "External source paths, filenames and versions written into the spec are verified against the live source before they are frozen, not recalled. A spec that tells the builder to pin by hash while itself carrying an unverified path is asking for a rigour it does not practise."
   }
  ],
  "edges": [
@@ -7642,6 +7660,22 @@
    "from": "d.selfhost_fonts",
    "rel": "enforces",
    "to": "claim.nokeys",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.font_source_unverified",
+   "rel": "caused_by",
+   "to": "d.selfhost_fonts",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.verify_external_paths",
+   "rel": "motivated_by",
+   "to": "fail.font_source_unverified",
    "at": "2026-08-24",
    "by": "claude",
    "confidence": "high"
