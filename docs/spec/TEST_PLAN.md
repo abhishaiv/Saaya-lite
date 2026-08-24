@@ -167,7 +167,7 @@ in the 250 words. Saying exactly where the browser stops is the architecture ans
 | V6 | Every mock is labelled in the product, not only in the write-up |
 | V7 | `grep -ri "openai\|gpt\|claude\|ml\|model"` over the source returns nothing that contradicts the no-AI claim |
 | V8 | `grep -rn "getUserMedia\|MediaRecorder\|navigator.contacts\|ContactsManager" src app` returns nothing, and a full run of the ladder in devtools prompts for **geolocation and notifications only** |
-| V9 | Every font in `public/fonts` shapes identically to its upstream source: glyph ids and advances match over all 104 Telugu strings and the English column of `COPY.md`. Licence files present beside them. Total under `font.budget`. |
+| V9 | Every font in `public/fonts` shapes identically to its upstream source: glyph ids and advances match per shaping run over every keyed bilingual row of `COPY.md`, segmented by the declared font stack. Licence files present beside them. Total under `font.budget`. |
 
 V7, V8 and V9 are how we prove the honesty claims rather than assert them. V8 replaces an
 Android manifest check: a web app has no manifest to inspect, so the equivalent evidence is

@@ -23,6 +23,7 @@ Poppins Regular, Medium, SemiBold and Bold.
 | English | **Poppins**, ship **Regular 400, SemiBold 600, Bold 700** only |
 | Map Medium 500 to | SemiBold 600. Do not ship a fourth weight. |
 | Telugu | **Noto Sans Telugu**. Poppins has no Telugu coverage and will tofu. |
+| The stack | **one** stack everywhere, Poppins first: `font-family: "Poppins", "Noto Sans Telugu", sans-serif`. Do not switch stacks by language. |
 | Subsetting | Subset Poppins to **Latin basic**. The Google Fonts build carries Latin-Ext and Devanagari we never use, and dropping them cuts roughly 40 percent. |
 | Budget | All font assets combined under **250 KB**. Verify in the deployed site on E9. |
 | Telugu weights | **400, 600, 700**, matching English so the scale below holds in both languages |
@@ -66,7 +67,23 @@ Procedure, once, and recorded in `CODEX_LOG.md`:
      "I'm OK · 42s"). Drop Latin-Ext and Devanagari.
    - Noto Sans Telugu: `--unicodes=U+0020,U+00A0,U+0C00-0C7F,U+0964,U+0965,U+200C,U+200D`
      with `--layout-features='*'`.
+   - Poppins and Noto Sans Telugu both also take **`--retain-gids`**. Without it `pyftsubset`
+     renumbers glyph ids and the shaping comparison in step 3 cannot compare them at all.
+     It applies to the shipped font, not a throwaway copy, so the artefact tested is the
+     artefact served. Material Symbols does **not** take it: nothing shapes there, the check
+     is glyph presence by codepoint, and retaining ids in a font of that size costs `loca`
+     space for no benefit.
    - Keep `--flavor=woff2` and `--desubroutinize` off for variable fonts.
+
+   **Latin inside Telugu strings is Poppins's job, not Noto's.** The Telugu column contains
+   `SOS`, `PIN`, `%1$s`, digits and punctuation: about thirty codepoints outside the Telugu
+   block. Do **not** widen the Noto subset to cover them. With Poppins first in the stack
+   they resolve to Poppins by ordinary per-character fallback, which is the design intent:
+   "SOS" reads in the same typeface in both languages. Widening Noto instead would put
+   Noto's Latin on those words and change the typeface silently, and it would spend budget
+   duplicating glyphs Poppins already ships.
+
+   This is why the shaping check in step 3 compares **runs**, not whole strings.
 
    **`U+0020` is not optional and is easy to lose.** A Telugu range alone omits the space,
    the subset then has no cmap entry for it, and the space either shapes as `.notdef` at the
@@ -83,17 +100,25 @@ Procedure, once, and recorded in `CODEX_LOG.md`:
 3. **Prove the subset shapes identically before accepting it.** This is the gate, not the
    feature list, because the feature list is exactly what nobody can verify by reading.
 
-   Shape every Telugu string in `COPY.md` (104 of them, which is the entire Telugu surface
-   of the product) through HarfBuzz twice, once against the upstream font and once against
-   the subset, and compare **glyph ids and advances**. They must match exactly. Any
-   difference means the subset lost something; fix the subset, never the test corpus.
+   Take **every keyed bilingual row in `COPY.md`**. Count them at run time and report the
+   number found; do not hard-code a count. An earlier version of this file froze "104",
+   which was a count of lines containing Telugu rather than of rows, and was wrong.
 
-   Record in `CODEX_LOG.md`: the feature tags the upstream font actually contains, read off
-   the font rather than assumed, the number of strings shaped, and the result. If the copy
-   ever gains a Telugu string, this check must be re-run.
+   For each string, **segment it into runs the way the browser does**: walk it character by
+   character and assign each character to the first font in the declared stack whose cmap
+   covers it. Then shape each run through HarfBuzz against that font twice, once upstream
+   and once subset, and compare **glyph ids and advances**. Every run must match exactly.
 
-   Poppins gets the same treatment with the English column. Material Symbols does not shape,
-   so a glyph-presence check over the subset codepoints is enough.
+   Comparing whole strings against a single font is wrong and will report false failures:
+   a Telugu string containing `SOS` shaped against Noto alone emits `.notdef`, which is
+   correct behaviour for that font and not a subsetting defect.
+
+   Record in `CODEX_LOG.md`: the feature tags each upstream font actually contains, read off
+   the font rather than assumed; the number of rows found; the number of runs compared per
+   font; and the result. If the copy gains a string, this check must be re-run.
+
+   Material Symbols does not shape, so a glyph-presence check over the subset codepoints is
+   enough.
 4. Commit the outputs to `public/fonts/` with their licences beside them. `COMPLIANCE.md`
    records the licences but the files were not actually shipping, which is the part that
    matters legally:

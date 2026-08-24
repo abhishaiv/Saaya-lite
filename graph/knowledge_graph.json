@@ -313,8 +313,8 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 327,
-  "edges": 629,
+  "entities": 331,
+  "edges": 633,
   "events": 63
  },
  "entities": [
@@ -2681,6 +2681,30 @@
    "class": "Decision",
    "at": "2026-08-24",
    "label": "A font subset is accepted only if it shapes identically to its upstream source: glyph ids and advances compared through HarfBuzz over the real shipped strings. The feature list is not the gate, because a feature list is exactly what cannot be verified by reading and what fontTools accepts wrongly in silence. Generalises beyond fonts: where a tool fails silently on bad input, the acceptance test must be behavioural, not declarative."
+  },
+  {
+   "id": "d.font_stack",
+   "class": "Decision",
+   "label": "One font stack everywhere, Poppins first: font-family: \"Poppins\", \"Noto Sans Telugu\", sans-serif. It was never declared, and that omission is what made the Telugu subset scope ambiguous. With Poppins first, the Latin, digits and %1$s placeholders inside Telugu strings resolve to Poppins by ordinary per-character fallback, which is the design intent: SOS reads in the same typeface in both languages. Widening the Noto subset to cover them instead would put Noto's Latin on those words, changing the typeface silently, and would spend budget duplicating glyphs Poppins already ships.",
+   "at": "2026-08-24"
+  },
+  {
+   "id": "fail.frozen_count",
+   "class": "Failure",
+   "label": "The shaping gate froze the Telugu corpus at 104 strings. That number came from grepping lines containing Telugu, not keyed rows; the real count by a strict row regex is 96, and Codex measured 100 by its own counting. Three different numbers for one thing, which is the argument against freezing a count of something derived. The gate now counts at run time and reports what it found.",
+   "at": "2026-08-24"
+  },
+  {
+   "id": "fail.gid_renumber",
+   "class": "Failure",
+   "label": "The shaping gate required exact glyph-id comparison, but pyftsubset renumbers glyph ids unless --retain-gids is passed, so the comparison it demanded was impossible to perform. A gate that cannot be executed is worse than no gate: it reads as rigour and delivers nothing.",
+   "at": "2026-08-24"
+  },
+  {
+   "id": "d.per_run_shaping",
+   "class": "Decision",
+   "label": "The shaping comparison is per RUN, not per string: segment each string by walking it character by character and assigning each to the first font in the stack whose cmap covers it, exactly as the browser itemises, then compare each run against its own font. Comparing a whole mixed string against a single font reports false failures, because a Telugu string containing SOS shaped against Noto alone correctly emits .notdef.",
+   "at": "2026-08-24"
   }
  ],
  "edges": [
@@ -7712,6 +7736,38 @@
    "from": "d.shaping_equivalence_gate",
    "rel": "motivated_by",
    "to": "fail.font_source_unverified",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.frozen_count",
+   "rel": "caused_by",
+   "to": "d.shaping_equivalence_gate",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.gid_renumber",
+   "rel": "caused_by",
+   "to": "d.shaping_equivalence_gate",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.per_run_shaping",
+   "rel": "motivated_by",
+   "to": "fail.gid_renumber",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.font_stack",
+   "rel": "motivated_by",
+   "to": "fail.frozen_count",
    "at": "2026-08-24",
    "by": "claude",
    "confidence": "high"
