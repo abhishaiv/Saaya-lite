@@ -21,7 +21,7 @@ You are implementing it, not designing it.
 
 ## THE LOOP
 
-One continuous run. **22 nodes**, in the order in `graph/build_graph.json`.
+One continuous run. **13 nodes**, in the order in `graph/build_graph.json`.
 
 Context is your enemy in a long run: quality degrades *before* it visibly breaks, as you
 start paraphrasing a spec you read twenty nodes ago and inventing plausible values. The
@@ -38,11 +38,17 @@ For each node in graph/build_graph.json order:
            this node's `reads` array. That is your bounded subgraph. Do not re-read the
            whole spec pack, and do not work from memory of a doc you read earlier.
 
+           **Read each file ONCE per node.** Open it, take what the node needs, and do not
+           re-open it later in the same node. Re-reading a file you already loaded is the
+           single largest avoidable cost in this build, and it buys nothing: the content
+           has not changed since you read it ten minutes ago. If you cannot recall a
+           detail, that is what the knowledge graph query is for.
+
 2. PLAN    state the files you will create or change; confirm they match `produces`.
 
 3. BUILD   obey the node's `shape`:
              serial         ONE agent. Do NOT fan out. Sequential reasoning scores -70%
-                            when split. 18 of 22 nodes.
+                            when split. 9 of 13 nodes.
              diamond        spawn one subagent per item in `fanout`, concurrently. Each
                             worker writes ONLY its `owns` paths plus its manifest. NEVER
                             a shared file, NEVER another worker's path, and workers NEVER
@@ -66,19 +72,31 @@ For each node in graph/build_graph.json order:
            A verifier that fails to run is a KILL, never a pass.
 
 6. RECORD  node status + artifacts in graph/build_graph.json; a line in graph/runs.jsonl;
-           the prose entry in docs/spec/CODEX_LOG.md; and the knowledge graph:
+           and the knowledge graph:
              python3 scripts/kg.py add-entity <id> Artifact "<what>" node=<node>
              python3 scripts/kg.py add-edge   <id> produced_by node.<node>
              python3 scripts/kg.py event      node_completed "<summary>" node=<node>
            plus a Decision, Failure, Deviation or Question entity for anything this node
            forced. Never hand-edit graph/knowledge_graph.json.
 
+           The graph append STAYS: it is a few lines, and it is what stops the next node
+           re-deciding something this one already settled. The prose CODEX_LOG narrative
+           does NOT: it restated what the graph already holds, at length. One line there
+           if a correction needs prose, otherwise nothing.
+
 7. DROP    discard this node's working context. Carry forward NOTHING but the graph.
            To recall an earlier decision, QUERY it:
              python3 scripts/kg.py query <term>
              python3 scripts/kg.py context <id> --depth 2
 
-8. REPORT  one short summary, then the next node.
+8. REPORT  FIVE LINES, then the next node. Not prose:
+             node id + done/blocked
+             files written
+             gates run + result
+             verifier verdict
+             anything a later node must know
+           No preamble, no recap of the spec, no restating what you just built. The graph
+           and the diff are the record; the report is a pointer.
 ```
 
 **Step 7 is the one that makes a long run survivable and the one most likely to be skipped.**
@@ -121,30 +139,30 @@ acceptance criterion.
 
 Risk-first, not phase-first. Do not reorder it.
 
-| # | Node | Title | Risk | Shape | Cum h |
+| # | Node | Title | Risk | Verify | Cum h |
 |---|---|---|---|---|---|
-|  1 | `T1.1` | Scaffold: Next.js, TypeScript, theme tokens, Vercel | low | serial | 2.0 |
-|  2 | `T2.1` | Zone parsing to typed Zone/ZoneCard/PoliceStation (TS) | low | diamond | 3.5 |
-|  3 | `T4.1` | Session engine, pure TypeScript, zero browser API | HIGH | serial | 6.5 |
-|  4 | `T4.2` | Geolocation watch, arming, wake lock, tab lifecycle | HIGHEST | serial | 9.5 |
-|  5 | `T1.2` | Firebase wiring, anonymous auth (project exists) | low | serial | 10.5 |
-|  6 | `T8.1` | Seed zones to Firestore | low | serial | 11.0 |
-|  7 | `T8.2` | State view console route | HIGH | serial | 14.0 |
-|  8 | `T1.3` | Component library C1 to C14 (React) | med | diamond | 17.0 |
-|  9 | `T2.2` | Map screen: Leaflet, CARTO tiles, zones, her dot | med | serial | 19.5 |
-| 10 | `T4.3` | Home session states, arm banner, demo panel | med | serial | 21.5 |
-| 11 | `T3.1` | Zone detail sheet, nearest station | low | serial | 23.5 |
-| 12 | `T3.2` | Onboarding, permissions, favourites, PIN (Web Crypto) | med | serial | 26.5 |
-| 13 | `T5.1` | Check-in 1 and 2, Notification API, full-screen overlay | HIGH | serial | 29.5 |
-| 14 | `T6.1` | Family escalation builder and screen | med | serial | 31.5 |
-| 15 | `T6.2` | Offline queue in IndexedDB with backoff | med | serial | 33.0 |
-| 16 | `T7.1` | SOS screen and PIN entry | HIGH | serial | 35.5 |
-| 17 | `T7.2` | Anonymiser and the two Firestore writers | HIGHEST | serial | 37.5 |
-| 18 | `T7.3` | What the police see, in the citizen app | low | serial | 39.0 |
-| 19 | `T8.3` | Console live journey trigger | med | serial | 40.5 |
-| 20 | `T9.0` | Submission page: video, summary, disclosures | low | serial | 41.5 |
-| 21 | `T9.1` | Localisation, low-end, font scale, a11y | med | diamond | 43.5 |
-| 22 | `T9.2` | Verification sweep V1 to V8 | HIGH | diamond+cycle | 45.0 |
+|  1 | `T1.1` ✓ | Scaffold: Next.js, TypeScript, theme tokens, Vercel | low | spec | 2.0 |
+|  2 | `T2.1` ✓ | Zone parsing to typed Zone/ZoneCard/PoliceStation (TS) | low | spec | 3.5 |
+|  3 | `T4.1` ✓ | Session engine, pure TypeScript, zero browser API | HIGH | spec, boundary, invention | 6.5 |
+|  4 | `T4.2` | Geolocation watch, arming, wake lock, tab lifecycle | HIGHEST | spec | 9.5 |
+|  5 | `T1.3` | Component library C1 to C14 (React) | med | spec | 12.5 |
+|  6 | `M2` | Data and trust boundary: Firebase, offline queue, anonymiser, writers | high | spec, boundary, invention | 17.0 |
+|  7 | `M1` | Session UI: onboarding, check-ins, family escalation, SOS | med | spec | 27.5 |
+|  8 | `T2.2` | Map screen: Leaflet, CARTO tiles, zones, her dot | med | spec | 30.0 |
+|  9 | `M3` | Console: seed zones and the state view | med | spec | 33.5 |
+| 10 | `T4.3` | Home session states, arm banner, demo panel | med | spec | 35.5 |
+| 11 | `T9.0` | Submission page: video, summary, disclosures | low | spec | 36.5 |
+| 12 | `T9.1` | Localisation and a11y on the demo path only | med | spec | 37.5 |
+| 13 | `T9.2` | Verification spot checks V1 to V9 | HIGH | - | 38.5 |
+
+**13 nodes, down from 22.** Restructured 2026-08-24 for a reduced token budget:
+`T3.1`, `T7.3` and `T8.3` dropped; twelve nodes merged into `M1`, `M2` and `M3` so their
+shared reads load once. Retired ids keep their records in the graph and are not executed.
+
+**Verification is proportional to risk, not uniform.** `M2` carries the trust boundary and
+is the only node with full adversarial verification: spec, boundary and invention, repeated
+until all three pass, concentrated on the anonymiser and the two Firestore writers.
+Everywhere else is one spec verifier, one round. G6 and the browser gate cover the rest.
 
 `T4.2` clears the riskiest work by hour 9.5. `T8.2` puts the **required live demo link** in
 place by hour 14 rather than hour 24.
@@ -262,7 +280,7 @@ a value), then continue. The spec stays the single source of truth.
 
 | File | Kind | You may |
 |---|---|---|
-| `graph/build_graph.json` | commit DAG: 22 nodes, typed edges, gates, status. Your execution order and resume checkpoint. | write status |
+| `graph/build_graph.json` | commit DAG: 13 active nodes plus retired records, typed edges, gates, status. Your execution order and resume checkpoint. | write status |
 | `graph/spec_graph.json` | 115 facts: every number, colour and dimension, with provenance | **frozen** |
 | `graph/knowledge_graph.json` | project brain: 139 entities, 366 edges, 15 classes with domain/range | append via `kg.py` only |
 | `graph/runs.jsonl`, `graph/verifications.jsonl` | provenance | append |

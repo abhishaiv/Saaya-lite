@@ -313,8 +313,8 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 338,
-  "edges": 638,
+  "entities": 342,
+  "edges": 647,
   "events": 63
  },
  "entities": [
@@ -864,7 +864,9 @@
    "label": "Firebase wiring, anonymous auth (project exists)",
    "risk": "low",
    "shape": "serial",
-   "seq": 5
+   "seq": 5,
+   "superseded_by": "merged into M2 2026-08-24",
+   "merged_into": "M2"
   },
   {
    "id": "node.T8.1",
@@ -872,7 +874,9 @@
    "label": "Seed zones to Firestore",
    "risk": "low",
    "shape": "serial",
-   "seq": 6
+   "seq": 6,
+   "superseded_by": "merged into M3 2026-08-24",
+   "merged_into": "M3"
   },
   {
    "id": "node.T8.2",
@@ -880,7 +884,9 @@
    "label": "State view console route",
    "risk": "HIGH",
    "shape": "serial",
-   "seq": 7
+   "seq": 7,
+   "superseded_by": "merged into M3 2026-08-24",
+   "merged_into": "M3"
   },
   {
    "id": "node.T1.3",
@@ -888,7 +894,7 @@
    "label": "Component library C1 to C14 (React)",
    "risk": "med",
    "shape": "diamond",
-   "seq": 8
+   "seq": 5
   },
   {
    "id": "node.T2.2",
@@ -896,7 +902,7 @@
    "label": "Map screen: Leaflet, CARTO tiles, zones, her dot",
    "risk": "med",
    "shape": "serial",
-   "seq": 9
+   "seq": 8
   },
   {
    "id": "node.T4.3",
@@ -912,7 +918,9 @@
    "label": "Zone detail sheet, nearest station",
    "risk": "low",
    "shape": "serial",
-   "seq": 11
+   "seq": 11,
+   "superseded_by": "dropped from scope 2026-08-24",
+   "dropped_reason": "Not on the judged demo path. The zone sheet is reachable but nothing in DEMO_SCRIPT.md opens it."
   },
   {
    "id": "node.T3.2",
@@ -920,7 +928,9 @@
    "label": "Onboarding, permissions, favourites, PIN (Web Crypto)",
    "risk": "med",
    "shape": "serial",
-   "seq": 12
+   "seq": 12,
+   "superseded_by": "merged into M1 2026-08-24",
+   "merged_into": "M1"
   },
   {
    "id": "node.T5.1",
@@ -928,7 +938,9 @@
    "label": "Check-in 1 and 2, Notification API, full-screen overlay",
    "risk": "HIGH",
    "shape": "serial",
-   "seq": 13
+   "seq": 13,
+   "superseded_by": "merged into M1 2026-08-24",
+   "merged_into": "M1"
   },
   {
    "id": "node.T6.1",
@@ -936,7 +948,9 @@
    "label": "Family escalation builder and screen",
    "risk": "med",
    "shape": "serial",
-   "seq": 14
+   "seq": 14,
+   "superseded_by": "merged into M1 2026-08-24",
+   "merged_into": "M1"
   },
   {
    "id": "node.T6.2",
@@ -944,7 +958,9 @@
    "label": "Offline queue in IndexedDB with backoff",
    "risk": "med",
    "shape": "serial",
-   "seq": 15
+   "seq": 15,
+   "superseded_by": "merged into M2 2026-08-24",
+   "merged_into": "M2"
   },
   {
    "id": "node.T7.1",
@@ -952,7 +968,9 @@
    "label": "SOS screen and PIN entry",
    "risk": "HIGH",
    "shape": "serial",
-   "seq": 16
+   "seq": 16,
+   "superseded_by": "merged into M1 2026-08-24",
+   "merged_into": "M1"
   },
   {
    "id": "node.T7.2",
@@ -960,7 +978,9 @@
    "label": "Anonymiser and the two Firestore writers",
    "risk": "HIGHEST",
    "shape": "serial",
-   "seq": 17
+   "seq": 17,
+   "superseded_by": "merged into M2 2026-08-24",
+   "merged_into": "M2"
   },
   {
    "id": "node.T7.3",
@@ -968,7 +988,9 @@
    "label": "What the police see, in the citizen app",
    "risk": "low",
    "shape": "serial",
-   "seq": 18
+   "seq": 18,
+   "superseded_by": "dropped from scope 2026-08-24",
+   "dropped_reason": "The console already shows what the police see. Building it twice buys nothing a judge will look at."
   },
   {
    "id": "node.T8.3",
@@ -976,7 +998,9 @@
    "label": "Console live journey trigger",
    "risk": "med",
    "shape": "serial",
-   "seq": 19
+   "seq": 19,
+   "superseded_by": "dropped from scope 2026-08-24",
+   "dropped_reason": "The live update arriving without a refresh is the point; a button that triggers it is not."
   },
   {
    "id": "node.T9.0",
@@ -984,23 +1008,23 @@
    "label": "Submission page: video, summary, disclosures",
    "risk": "low",
    "shape": "serial",
-   "seq": 20
+   "seq": 11
   },
   {
    "id": "node.T9.1",
    "class": "BuildNode",
-   "label": "Localisation, low-end, font scale, a11y",
+   "label": "Localisation and a11y on the demo path only",
    "risk": "med",
    "shape": "diamond",
-   "seq": 21
+   "seq": 12
   },
   {
    "id": "node.T9.2",
    "class": "BuildNode",
-   "label": "Verification sweep V1 to V8",
+   "label": "Verification spot checks V1 to V9",
    "risk": "HIGH",
    "shape": "diamond+cycle",
-   "seq": 22
+   "seq": 13
   },
   {
    "id": "f.oxfam.budget",
@@ -2747,6 +2771,54 @@
    "class": "Decision",
    "at": "2026-08-24",
    "label": "Where a spec shows a pattern that will be copied, show the complete set generated from the facts rather than one specimen to extrapolate from. The full type scale is now emitted from spec_graph and asserted against it, so a name and its value cannot drift apart."
+  },
+  {
+   "id": "node.M1",
+   "class": "BuildNode",
+   "label": "Session UI: onboarding, check-ins, family escalation, SOS",
+   "risk": "med",
+   "shape": "serial",
+   "seq": 7,
+   "at": "2026-08-24",
+   "merged_from": [
+    "T3.2",
+    "T5.1",
+    "T6.1",
+    "T7.1"
+   ]
+  },
+  {
+   "id": "node.M2",
+   "class": "BuildNode",
+   "label": "Data and trust boundary: Firebase, offline queue, anonymiser, writers",
+   "risk": "high",
+   "shape": "serial",
+   "seq": 6,
+   "at": "2026-08-24",
+   "merged_from": [
+    "T1.2",
+    "T6.2",
+    "T7.2"
+   ]
+  },
+  {
+   "id": "node.M3",
+   "class": "BuildNode",
+   "label": "Console: seed zones and the state view",
+   "risk": "med",
+   "shape": "serial",
+   "seq": 9,
+   "at": "2026-08-24",
+   "merged_from": [
+    "T8.1",
+    "T8.2"
+   ]
+  },
+  {
+   "id": "d.token_restructure",
+   "class": "Decision",
+   "at": "2026-08-24",
+   "label": "Restructured the build graph for a reduced Codex token budget: dropped T3.1, T7.3 and T8.3 as off the judged path or duplicative; merged twelve nodes into M1, M2 and M3 so shared reads load once rather than per node; cut verifier lenses to spec-only everywhere except M2, which keeps full adversarial verification because it carries the trust boundary. 22 nodes to 13, 38.5h to 32.0h pending. Retired node records keep their history and are excluded from execution, not deleted."
   }
  ],
  "edges": [
@@ -7850,6 +7922,78 @@
    "from": "d.generate_examples",
    "rel": "motivated_by",
    "to": "fail.example_wrong_fact",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "node.M1",
+   "rel": "supersedes",
+   "to": "node.T3.2",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "node.M1",
+   "rel": "supersedes",
+   "to": "node.T5.1",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "node.M1",
+   "rel": "supersedes",
+   "to": "node.T6.1",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "node.M1",
+   "rel": "supersedes",
+   "to": "node.T7.1",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "node.M2",
+   "rel": "supersedes",
+   "to": "node.T1.2",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "node.M2",
+   "rel": "supersedes",
+   "to": "node.T6.2",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "node.M2",
+   "rel": "supersedes",
+   "to": "node.T7.2",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "node.M3",
+   "rel": "supersedes",
+   "to": "node.T8.1",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "node.M3",
+   "rel": "supersedes",
+   "to": "node.T8.2",
    "at": "2026-08-24",
    "by": "claude",
    "confidence": "high"

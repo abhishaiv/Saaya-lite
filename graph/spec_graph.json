@@ -3,7 +3,7 @@
  "kind": "knowledge_graph",
  "note": "Domain facts with provenance. Never merge with build_graph.json - different truth standards.",
  "rule": "Every numeric or colour literal in source must trace to a fact id here, or the grounded checker fails the node.",
- "count": 379,
+ "count": 381,
  "facts": [
   {
    "id": "ladder.cd1",
@@ -4220,6 +4220,28 @@
    "governs": "DESIGN_SYSTEM.md",
    "frozen": true,
    "platform": "any"
+  },
+  {
+   "id": "perf.site.size",
+   "kind": "number",
+   "value": 25,
+   "unit": "MB",
+   "means": "deployed site total transfer ceiling. Reasonable, not tuned.",
+   "sourced_from": "RESPONSIVE_SPEC.md budget table",
+   "governs": "RESPONSIVE_SPEC.md",
+   "frozen": true,
+   "platform": "web"
+  },
+  {
+   "id": "motion.reduced.duration",
+   "kind": "number",
+   "value": 0.01,
+   "unit": "ms",
+   "means": "duration used under prefers-reduced-motion: effectively zero, but non-zero so transition and animation end events still fire",
+   "sourced_from": "MOTION_SPEC.md reduced-motion block",
+   "governs": "MOTION_SPEC.md",
+   "frozen": true,
+   "platform": "web"
   }
  ]
 }

@@ -87,7 +87,7 @@ install it before she ever needed it.** Both survive the AI cut intact.
 |---|---|---|
 | App | **Next.js + TypeScript, mobile-first web** | Pivoted 2026-08-19: the brief states reviewers will not download a mobile app. ~94% of this spec transferred unchanged. |
 | Backend | Firebase, **a NEW project**, never Saaya production | Protects the live iOS product. |
-| State view console | Static page on Firebase Hosting reading Firestore | The live demo link. No install, no login, no access request. |
+| State view console | A route in the same Next.js app on Vercel, reading Firestore | The live demo link. No install, no login, no access request. |
 | Zone data | Existing audited Vizag dataset, verified present 2026-08-18 | 24 classified zones, station points, info cards. A port, not a build. |
 | AI | **None** | Founder decision. No OpenAI API key required. |
 | Build assistant | Codex CLI | Load-bearing. See below. |

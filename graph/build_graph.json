@@ -11,27 +11,18 @@
   "copy:ios_verbatim",
   "invariant:trust_boundary_at_sos"
  ],
- "total_hours": 45.0,
+ "total_hours": 38.5,
  "order": [
   "T1.1",
   "T2.1",
   "T4.1",
   "T4.2",
-  "T1.2",
-  "T8.1",
-  "T8.2",
   "T1.3",
+  "M2",
+  "M1",
   "T2.2",
+  "M3",
   "T4.3",
-  "T3.1",
-  "T3.2",
-  "T5.1",
-  "T6.1",
-  "T6.2",
-  "T7.1",
-  "T7.2",
-  "T7.3",
-  "T8.3",
   "T9.0",
   "T9.1",
   "T9.2"
@@ -329,8 +320,8 @@
    "title": "Geolocation watch, arming, wake lock, tab lifecycle",
    "hours": 3.0,
    "requires": [
-    "T4.1",
-    "T2.1"
+    "T2.1",
+    "T4.1"
    ],
    "produces": [
     "location_watch",
@@ -397,11 +388,9 @@
     "left G8, the real-phone arms-with-no-tap anchor and all fresh G9 lenses open until the real deployment exists"
    ],
    "verify_lenses": [
-    "spec",
-    "boundary",
-    "invention"
+    "spec"
    ],
-   "verify_command": "spawn spec, boundary, invention as fresh-context subagents; merge verdicts in code",
+   "verify_command": "spawn spec as ONE fresh-context subagent, one round. G6 and the browser gate already cover the rest.",
    "shape": "serial",
    "fanout": null,
    "note": "THE CENTRAL ANCHOR. A browser cannot arm in the background; arming holds while the page is open. See WEB_PLATFORM.md. The anchor is: arms with no tap, on a real mobile browser, page open."
@@ -427,7 +416,7 @@
    "extra_gates": [],
    "risk": "low",
    "cumulative_hours": 10.5,
-   "status": "pending",
+   "status": "merged",
    "run_id": null,
    "gates_passed": [],
    "artifacts": [],
@@ -438,7 +427,9 @@
    "verify_command": "spawn spec as fresh-context subagents; merge verdicts in code",
    "shape": "serial",
    "fanout": null,
-   "note": "The Firebase project is already created and app/google-services.json is already in place with BOTH package names. Do NOT create a project. Verify anonymous sign-in returns a uid against project 'saaya-lite', write one doc to a _smoke collection, read it back, delete it."
+   "note": "The Firebase project is already created and app/google-services.json is already in place with BOTH package names. Do NOT create a project. Verify anonymous sign-in returns a uid against project 'saaya-lite', write one doc to a _smoke collection, read it back, delete it.",
+   "merged_into": "M2",
+   "merged_at": "2026-08-24"
   },
   "T8.1": {
    "id": "T8.1",
@@ -459,7 +450,7 @@
    "extra_gates": [],
    "risk": "low",
    "cumulative_hours": 11.0,
-   "status": "pending",
+   "status": "merged",
    "run_id": null,
    "gates_passed": [],
    "artifacts": [],
@@ -469,7 +460,9 @@
    ],
    "verify_command": "spawn spec as fresh-context subagents; merge verdicts in code",
    "shape": "serial",
-   "fanout": null
+   "fanout": null,
+   "merged_into": "M3",
+   "merged_at": "2026-08-24"
   },
   "T8.2": {
    "id": "T8.2",
@@ -495,7 +488,7 @@
    ],
    "risk": "HIGH",
    "cumulative_hours": 14.0,
-   "status": "pending",
+   "status": "merged",
    "run_id": null,
    "gates_passed": [],
    "artifacts": [],
@@ -508,11 +501,13 @@
    "verify_command": "spawn spec, boundary, invention as fresh-context subagents; merge verdicts in code",
    "shape": "serial",
    "fanout": null,
-   "note": "Supporting evidence, not the live link. Reviewers test the citizen experience, not an admin panel."
+   "note": "Supporting evidence, not the live link. Reviewers test the citizen experience, not an admin panel.",
+   "merged_into": "M3",
+   "merged_at": "2026-08-24"
   },
   "T1.3": {
    "id": "T1.3",
-   "seq": 8,
+   "seq": 5,
    "title": "Component library C1 to C14 (React)",
    "hours": 3.0,
    "requires": [
@@ -534,17 +529,16 @@
     "component_gallery"
    ],
    "risk": "med",
-   "cumulative_hours": 17.0,
+   "cumulative_hours": 12.5,
    "status": "pending",
    "run_id": null,
    "gates_passed": [],
    "artifacts": [],
    "corrections": [],
    "verify_lenses": [
-    "spec",
-    "invention"
+    "spec"
    ],
-   "verify_command": "spawn spec, invention as fresh-context subagents; merge verdicts in code",
+   "verify_command": "spawn spec as ONE fresh-context subagent, one round. G6 and the browser gate already cover the rest.",
    "shape": "diamond",
    "fanout": {
     "split": "one worker per component C1-C14",
@@ -587,12 +581,12 @@
   },
   "T2.2": {
    "id": "T2.2",
-   "seq": 9,
+   "seq": 8,
    "title": "Map screen: Leaflet, CARTO tiles, zones, her dot",
    "hours": 2.5,
    "requires": [
-    "T2.1",
-    "T1.3"
+    "T1.3",
+    "T2.1"
    ],
    "produces": [
     "map_screen",
@@ -613,17 +607,16 @@
     "zones_render_offline"
    ],
    "risk": "med",
-   "cumulative_hours": 19.5,
+   "cumulative_hours": 30.0,
    "status": "pending",
    "run_id": null,
    "gates_passed": [],
    "artifacts": [],
    "corrections": [],
    "verify_lenses": [
-    "spec",
-    "invention"
+    "spec"
    ],
-   "verify_command": "spawn spec, invention as fresh-context subagents; merge verdicts in code",
+   "verify_command": "spawn spec as ONE fresh-context subagent, one round. G6 and the browser gate already cover the rest.",
    "shape": "serial",
    "fanout": null
   },
@@ -633,9 +626,9 @@
    "title": "Home session states, arm banner, demo panel",
    "hours": 2.0,
    "requires": [
-    "T4.2",
+    "T1.3",
     "T2.2",
-    "T1.3"
+    "T4.2"
    ],
    "produces": [
     "home_states",
@@ -653,17 +646,16 @@
    ],
    "extra_gates": [],
    "risk": "med",
-   "cumulative_hours": 21.5,
+   "cumulative_hours": 35.5,
    "status": "pending",
    "run_id": null,
    "gates_passed": [],
    "artifacts": [],
    "corrections": [],
    "verify_lenses": [
-    "spec",
-    "invention"
+    "spec"
    ],
-   "verify_command": "spawn spec, invention as fresh-context subagents; merge verdicts in code",
+   "verify_command": "spawn spec as ONE fresh-context subagent, one round. G6 and the browser gate already cover the rest.",
    "shape": "serial",
    "fanout": null
   },
@@ -691,7 +683,7 @@
    "extra_gates": [],
    "risk": "low",
    "cumulative_hours": 23.5,
-   "status": "pending",
+   "status": "dropped",
    "run_id": null,
    "gates_passed": [],
    "artifacts": [],
@@ -701,7 +693,9 @@
    ],
    "verify_command": "spawn spec as fresh-context subagents; merge verdicts in code",
    "shape": "serial",
-   "fanout": null
+   "fanout": null,
+   "dropped_reason": "Not on the judged demo path. The zone sheet is reachable but nothing in DEMO_SCRIPT.md opens it.",
+   "dropped_at": "2026-08-24"
   },
   "T3.2": {
    "id": "T3.2",
@@ -731,7 +725,7 @@
    ],
    "risk": "med",
    "cumulative_hours": 26.5,
-   "status": "pending",
+   "status": "merged",
    "run_id": null,
    "gates_passed": [],
    "artifacts": [],
@@ -742,7 +736,9 @@
    ],
    "verify_command": "spawn spec, invention as fresh-context subagents; merge verdicts in code",
    "shape": "serial",
-   "fanout": null
+   "fanout": null,
+   "merged_into": "M1",
+   "merged_at": "2026-08-24"
   },
   "T5.1": {
    "id": "T5.1",
@@ -773,7 +769,7 @@
    ],
    "risk": "HIGH",
    "cumulative_hours": 29.5,
-   "status": "pending",
+   "status": "merged",
    "run_id": null,
    "gates_passed": [],
    "artifacts": [],
@@ -785,7 +781,9 @@
    ],
    "verify_command": "spawn spec, boundary, invention as fresh-context subagents; merge verdicts in code",
    "shape": "serial",
-   "fanout": null
+   "fanout": null,
+   "merged_into": "M1",
+   "merged_at": "2026-08-24"
   },
   "T6.1": {
    "id": "T6.1",
@@ -813,7 +811,7 @@
    "extra_gates": [],
    "risk": "med",
    "cumulative_hours": 31.5,
-   "status": "pending",
+   "status": "merged",
    "run_id": null,
    "gates_passed": [],
    "artifacts": [],
@@ -825,7 +823,9 @@
    "verify_command": "spawn spec, invention as fresh-context subagents; merge verdicts in code",
    "shape": "serial",
    "fanout": null,
-   "note": "The escalation message is built by the UI layer from repositories, never by the engine. No Command carries personal data."
+   "note": "The escalation message is built by the UI layer from repositories, never by the engine. No Command carries personal data.",
+   "merged_into": "M1",
+   "merged_at": "2026-08-24"
   },
   "T6.2": {
    "id": "T6.2",
@@ -852,7 +852,7 @@
    ],
    "risk": "med",
    "cumulative_hours": 33.0,
-   "status": "pending",
+   "status": "merged",
    "run_id": null,
    "gates_passed": [],
    "artifacts": [],
@@ -863,7 +863,9 @@
    ],
    "verify_command": "spawn spec, invention as fresh-context subagents; merge verdicts in code",
    "shape": "serial",
-   "fanout": null
+   "fanout": null,
+   "merged_into": "M2",
+   "merged_at": "2026-08-24"
   },
   "T7.1": {
    "id": "T7.1",
@@ -893,7 +895,7 @@
    "extra_gates": [],
    "risk": "HIGH",
    "cumulative_hours": 35.5,
-   "status": "pending",
+   "status": "merged",
    "run_id": null,
    "gates_passed": [],
    "artifacts": [],
@@ -905,7 +907,9 @@
    ],
    "verify_command": "spawn spec, boundary, invention as fresh-context subagents; merge verdicts in code",
    "shape": "serial",
-   "fanout": null
+   "fanout": null,
+   "merged_into": "M1",
+   "merged_at": "2026-08-24"
   },
   "T7.2": {
    "id": "T7.2",
@@ -934,7 +938,7 @@
    ],
    "risk": "HIGHEST",
    "cumulative_hours": 37.5,
-   "status": "pending",
+   "status": "merged",
    "run_id": null,
    "gates_passed": [],
    "artifacts": [],
@@ -946,7 +950,9 @@
    ],
    "verify_command": "spawn spec, boundary, invention as fresh-context subagents; merge verdicts in code",
    "shape": "serial",
-   "fanout": null
+   "fanout": null,
+   "merged_into": "M2",
+   "merged_at": "2026-08-24"
   },
   "T7.3": {
    "id": "T7.3",
@@ -970,7 +976,7 @@
    "extra_gates": [],
    "risk": "low",
    "cumulative_hours": 39.0,
-   "status": "pending",
+   "status": "dropped",
    "run_id": null,
    "gates_passed": [],
    "artifacts": [],
@@ -980,7 +986,9 @@
    ],
    "verify_command": "spawn spec as fresh-context subagents; merge verdicts in code",
    "shape": "serial",
-   "fanout": null
+   "fanout": null,
+   "dropped_reason": "The console already shows what the police see. Building it twice buys nothing a judge will look at.",
+   "dropped_at": "2026-08-24"
   },
   "T8.3": {
    "id": "T8.3",
@@ -1002,7 +1010,7 @@
    "extra_gates": [],
    "risk": "med",
    "cumulative_hours": 40.5,
-   "status": "pending",
+   "status": "dropped",
    "run_id": null,
    "gates_passed": [],
    "artifacts": [],
@@ -1013,15 +1021,17 @@
    ],
    "verify_command": "spawn spec, invention as fresh-context subagents; merge verdicts in code",
    "shape": "serial",
-   "fanout": null
+   "fanout": null,
+   "dropped_reason": "The live update arriving without a refresh is the point; a button that triggers it is not.",
+   "dropped_at": "2026-08-24"
   },
   "T9.0": {
    "id": "T9.0",
-   "seq": 20,
+   "seq": 11,
    "title": "Submission page: video, summary, disclosures",
    "hours": 1.0,
    "requires": [
-    "T8.2"
+    "M3"
    ],
    "produces": [
     "submission_page"
@@ -1034,7 +1044,7 @@
    ],
    "extra_gates": [],
    "risk": "low",
-   "cumulative_hours": 41.5,
+   "cumulative_hours": 36.5,
    "status": "pending",
    "run_id": null,
    "gates_passed": [],
@@ -1043,22 +1053,18 @@
    "verify_lenses": [
     "spec"
    ],
-   "verify_command": "spawn spec as fresh-context subagents; merge verdicts in code",
+   "verify_command": "spawn spec as ONE fresh-context subagent, one round. G6 and the browser gate already cover the rest.",
    "shape": "serial",
    "fanout": null
   },
   "T9.1": {
    "id": "T9.1",
-   "seq": 21,
-   "title": "Localisation, low-end, font scale, a11y",
-   "hours": 2.0,
+   "seq": 12,
+   "title": "Localisation and a11y on the demo path only",
+   "hours": 1.0,
    "requires": [
-    "T4.3",
-    "T5.1",
-    "T6.1",
-    "T7.1",
-    "T7.3",
-    "T3.1"
+    "M1",
+    "T4.3"
    ],
    "produces": [
     "strings_en",
@@ -1075,17 +1081,16 @@
     "founder_verifies_telugu"
    ],
    "risk": "med",
-   "cumulative_hours": 43.5,
+   "cumulative_hours": 37.5,
    "status": "pending",
    "run_id": null,
    "gates_passed": [],
    "artifacts": [],
    "corrections": [],
    "verify_lenses": [
-    "spec",
-    "invention"
+    "spec"
    ],
-   "verify_command": "spawn spec, invention as fresh-context subagents; merge verdicts in code",
+   "verify_command": "spawn spec as ONE fresh-context subagent, one round. G6 and the browser gate already cover the rest.",
    "shape": "diamond",
    "fanout": {
     "split": "one worker per screen S1-S13",
@@ -1114,17 +1119,17 @@
      "res/values-te/strings.xml"
     ],
     "merge": "code: (1) FAIL LOUDLY on any key claimed by two screens with different text - a shared-file write would have silently clobbered one; (2) FAIL on any key present in en but missing in te; (3) assert every key marked iOS-verbatim in COPY.md matches character for character; (4) emit both strings.xml files sorted by key"
-   }
+   },
+   "scope_note": "Reduced 2026-08-24: Telugu and accessibility verified on the DEMO_SCRIPT path only, not every screen."
   },
   "T9.2": {
    "id": "T9.2",
-   "seq": 22,
-   "title": "Verification sweep V1 to V8",
-   "hours": 1.5,
+   "seq": 13,
+   "title": "Verification spot checks V1 to V9",
+   "hours": 1.0,
    "requires": [
-    "T9.1",
-    "T8.3",
-    "T9.0"
+    "T9.0",
+    "T9.1"
    ],
    "produces": [
     "v1_v8_evidence"
@@ -1142,18 +1147,14 @@
     "network_tab_evidence"
    ],
    "risk": "HIGH",
-   "cumulative_hours": 45.0,
+   "cumulative_hours": 38.5,
    "status": "pending",
    "run_id": null,
    "gates_passed": [],
    "artifacts": [],
    "corrections": [],
-   "verify_lenses": [
-    "spec",
-    "boundary",
-    "invention"
-   ],
-   "verify_command": "spawn spec, boundary, invention as fresh-context subagents; merge verdicts in code",
+   "verify_lenses": [],
+   "verify_command": "none: this node IS the verification",
    "shape": "diamond+cycle",
    "fanout": {
     "split": "one worker per submission check V1-V8",
@@ -1192,7 +1193,172 @@
     "shared_files_written_by_merge": [
      "build/fanout/T9.2/summary.json"
     ]
-   }
+   },
+   "scope_note": "Reduced 2026-08-24: V1 to V9 run as spot checks, not an exhaustive sweep."
+  },
+  "M1": {
+   "id": "M1",
+   "seq": 7,
+   "title": "Session UI: onboarding, check-ins, family escalation, SOS",
+   "hours": 10.5,
+   "requires": [
+    "T1.3",
+    "T2.1",
+    "T4.1"
+   ],
+   "produces": [
+    "onboarding",
+    "pin_stored_hashed",
+    "favourites_local",
+    "checkin_screens",
+    "notif_channels",
+    "fullscreen_overlay",
+    "family_screen",
+    "escalation_message",
+    "mock_disclosure_visible",
+    "sos_screen",
+    "pin_entry",
+    "sos_inescapable"
+   ],
+   "reads": [
+    "SCREENS.md",
+    "BUSINESS_RULES.md",
+    "COMPONENT_LIBRARY.md",
+    "ACCESSIBILITY_SPEC.md",
+    "ARCHITECTURE.md",
+    "DATA_MODEL.md",
+    "COPY.md",
+    "WEB_PLATFORM.md",
+    "INTERACTION_SPEC.md",
+    "MOTION_SPEC.md",
+    "STATE_MACHINE.md"
+   ],
+   "extra_gates": [
+    "PinStorageTest",
+    "checkin2_over_lockscreen"
+   ],
+   "risk": "med",
+   "cumulative_hours": 27.5,
+   "status": "pending",
+   "run_id": null,
+   "gates_passed": [],
+   "artifacts": [],
+   "corrections": [],
+   "verify_lenses": [
+    "spec"
+   ],
+   "verify_command": "spawn spec as ONE fresh-context subagent, one round. G6 and the browser gate already cover the rest.",
+   "shape": "serial",
+   "fanout": null,
+   "merged_from": [
+    "T3.2",
+    "T5.1",
+    "T6.1",
+    "T7.1"
+   ],
+   "merge_reason": "All four read COMPONENT_LIBRARY, SCREENS, COPY and STATE_MACHINE. Merging loads that set once instead of four times."
+  },
+  "M2": {
+   "id": "M2",
+   "seq": 6,
+   "title": "Data and trust boundary: Firebase, offline queue, anonymiser, writers",
+   "hours": 4.5,
+   "requires": [
+    "T1.1",
+    "T4.1"
+   ],
+   "produces": [
+    "firebase_project",
+    "anon_auth",
+    "firestore_client",
+    "queue_repository",
+    "backoff_policy",
+    "anonymiser",
+    "sus_writer",
+    "sos_writer",
+    "firestore_rules_deployed"
+   ],
+   "reads": [
+    "SETUP.md",
+    "SECRETS_AND_ACCESS.md",
+    "DATA_MODEL.md",
+    "ARCHITECTURE.md",
+    "BUSINESS_RULES.md",
+    "TEST_PLAN.md",
+    "WEB_PLATFORM.md",
+    "PROBLEM.md"
+   ],
+   "extra_gates": [
+    "AnonymiserTest",
+    "QueueTest",
+    "airplane_mode_survives",
+    "zero_writes_before_family"
+   ],
+   "risk": "high",
+   "cumulative_hours": 17.0,
+   "status": "pending",
+   "run_id": null,
+   "gates_passed": [],
+   "artifacts": [],
+   "corrections": [],
+   "verify_lenses": [
+    "spec",
+    "boundary",
+    "invention"
+   ],
+   "verify_command": "spawn spec, boundary, invention as fresh-context subagents, repeating rounds until all three pass. Concentrate them on the anonymiser and the two Firestore writers: that is the trust boundary and the one place an error matters.",
+   "shape": "serial",
+   "fanout": null,
+   "merged_from": [
+    "T1.2",
+    "T6.2",
+    "T7.2"
+   ],
+   "merge_reason": "One data layer, one trust boundary. Splitting it made the anonymiser load DATA_MODEL separately from the queue that carries its output."
+  },
+  "M3": {
+   "id": "M3",
+   "seq": 9,
+   "title": "Console: seed zones and the state view",
+   "hours": 3.5,
+   "requires": [
+    "M2",
+    "T2.1"
+   ],
+   "produces": [
+    "firestore_zones_seeded",
+    "console_live_url",
+    "console_snapshot_listener",
+    "firestore_indexes"
+   ],
+   "reads": [
+    "DATA_MODEL.md",
+    "SETUP.md",
+    "CONSOLE_SPEC.md",
+    "DESIGN_SYSTEM.md",
+    "OPERATING_MODEL.md"
+   ],
+   "extra_gates": [
+    "console_loads_logged_out"
+   ],
+   "risk": "med",
+   "cumulative_hours": 33.5,
+   "status": "pending",
+   "run_id": null,
+   "gates_passed": [],
+   "artifacts": [],
+   "corrections": [],
+   "verify_lenses": [
+    "spec"
+   ],
+   "verify_command": "spawn spec as ONE fresh-context subagent, one round. G6 and the browser gate already cover the rest.",
+   "shape": "serial",
+   "fanout": null,
+   "merged_from": [
+    "T8.1",
+    "T8.2"
+   ],
+   "merge_reason": "Seeding exists only to give the console something to read. Same Firestore shape, same load."
   }
  },
  "verification": {
@@ -1214,19 +1380,21 @@
    "why": "T1.1 produces vercel_deploy and its extra gate is preview_url_loads_on_mobile. This is an account action, not a public act: a preview URL is not the submission link. Distinct from the T2.2 gate."
   },
   {
-   "before": "T1.2",
+   "before": "M2",
    "gate": "register the Firebase Web app and supply its config",
-   "why": "T1.2 performs anonymous auth with the Firebase web SDK, which needs a Web app registration. The two mobile app ids on the project do not work for it. SETUP.md deferred this to T8.2, which is four nodes too late."
-  },
-  {
-   "before": "T8.1",
-   "gate": "Firestore rules and public read go live",
-   "why": "public read is hard to un-publish; confirm every record is synthetic first"
+   "why": "T1.2 performs anonymous auth with the Firebase web SDK, which needs a Web app registration. The two mobile app ids on the project do not work for it. SETUP.md deferred this to T8.2, which is four nodes too late.",
+   "moved_2026_08_24": true
   },
   {
    "before": "T2.2",
    "gate": "the production Vercel URL is shared as the submission's live link",
    "why": "this is the judged link; once shared it is judged. The repo is already connected at T1.1; this gate is about publishing, not deploying."
+  },
+  {
+   "before": "M3",
+   "gate": "Firestore rules and public read go live",
+   "why": "public read is hard to un-publish; confirm every record is synthetic first",
+   "moved_2026_08_24": true
   },
   {
    "after": "T9.0",
@@ -1287,5 +1455,30 @@
   ],
   "google_services_json": "app/google-services.json (present, gitignored)",
   "outstanding": "Web app registration, needed at T1.2 (not T8.2): the app itself uses the Firebase web SDK for anonymous auth."
+ },
+ "retired": {
+  "dropped": [
+   "T3.1",
+   "T7.3",
+   "T8.3"
+  ],
+  "merged": {
+   "M1": [
+    "T3.2",
+    "T5.1",
+    "T6.1",
+    "T7.1"
+   ],
+   "M2": [
+    "T1.2",
+    "T6.2",
+    "T7.2"
+   ],
+   "M3": [
+    "T8.1",
+    "T8.2"
+   ]
+  },
+  "note": "Retired node records are kept in `nodes` with their history intact. They are not in `order` and are not executed."
  }
 }

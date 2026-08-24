@@ -90,7 +90,7 @@ cat graph/runs.jsonl graph/verifications.jsonl
 python3 scripts/codex_contribution.py
 ```
 
-**The method, in one paragraph.** The build is a graph of **22 nodes**, not a
+**The method, in one paragraph.** The build is a graph of **13 nodes**, not a
 chat. Each node names the only documents it may read, so context stays bounded across a long
 run. **18 nodes are serial** because sequential
 reasoning degrades when you split it; **4 fan out** into

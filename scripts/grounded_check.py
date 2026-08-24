@@ -14,7 +14,7 @@ import json,re,sys,subprocess,os
 
 ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 G=json.load(open(os.path.join(ROOT,"graph/spec_graph.json")))
-NUMS={}; COLORS={}
+NUMS={}; COLORS={}; GOVS={}
 SUPERSEDED=0; LIVE=0
 for f in G["facts"]:
     # A fact from a retired platform must never provide provenance for current code.
@@ -24,7 +24,9 @@ for f in G["facts"]:
     LIVE+=1
     v=f["value"]
     if f["kind"]=="color": COLORS.setdefault(str(v).upper(),[]).append(f["id"])
-    elif isinstance(v,(int,float)): NUMS.setdefault(float(v),[]).append(f["id"])
+    elif isinstance(v,(int,float)):
+        NUMS.setdefault(float(v),[]).append(f["id"])
+        GOVS.setdefault(float(v),set()).add(f.get("governs",""))
 
 # Literals that are structurally trivial and never encode a product decision.
 TRIVIAL={0.0,1.0,2.0,3.0,-1.0}
@@ -105,7 +107,14 @@ def explain(path):
             except: continue
             if v in TRIVIAL: continue
             ids=NUMS.get(v)
-            print(f"  {path}:{i}  {m.group(1):>10}  ->  {', '.join(ids) if ids else 'UNGROUNDED'}")
+            # Value-matching is necessary, not sufficient. When several live facts share a
+            # value AND they govern different documents, a green gate proves only that the
+            # number is known somewhere, never that it is the right one here. This has
+            # blocked the build twice; say so rather than printing a plausible first hit.
+            flag=""
+            if ids and len(ids)>1 and len(GOVS.get(v,()))>1:
+                flag=f"   <-- AMBIGUOUS across {len(GOVS[v])} docs, check the id, not the number"
+            print(f"  {path}:{i}  {m.group(1):>10}  ->  {', '.join(ids) if ids else 'UNGROUNDED'}{flag}")
 
 def main():
     if "--explain" in sys.argv:

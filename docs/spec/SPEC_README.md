@@ -24,11 +24,11 @@ Stop and ask rather than guessing, then the answer gets written into the spec.
 **Look and feel, all founder-decided on 2026-08-18. Read all seven before writing any UI:**
 
 7. **`DESIGN_SYSTEM.md`** - colour, Poppins type scale, shape, the escalation grading.
-8. **`COMPONENT_LIBRARY.md`** - every shared composable at exact dp, in every state.
+8. **`COMPONENT_LIBRARY.md`** - every shared component at exact px, in every state.
 9. **`ICONOGRAPHY.md`** - Material Symbols Rounded, and the SF Symbols mapping.
 10. **`MOTION_SPEC.md`** - every animation, and the two things that must never animate.
 11. **`INTERACTION_SPEC.md`** - gestures, haptics, sound, back behaviour per screen.
-12. **`RESPONSIVE_SPEC.md`** - 320 dp up, font scale to 2.0x, insets, low-end budgets.
+12. **`RESPONSIVE_SPEC.md`** - 320 px up, browser text size to 2.0x, safe-area insets, low-end budgets.
 13. **`STATES_CATALOGUE.md`** - loading, empty, error, offline, denied, for all 12 screens.
 14. **`ACCESSIBILITY_SPEC.md`** - screen reader, focus, contrast, motor, cognitive.
 
@@ -56,9 +56,9 @@ the ladder ends up untested.
 
 | Do NOT build | |
 |---|---|
-| R8, minification, obfuscation | breaks Room and serialization in ways that eat evenings |
-| Release keystore ceremony | debug signing installs fine when sideloaded |
-| Broad instrumented test coverage | slow to write, needs a device, protects little |
+| A Service Worker that caches anything | ours posts notifications and holds no cache; see `WEB_PLATFORM.md` |
+| Offline first launch, installability claims | there is no cached shell; do not promise it |
+| Broad end-to-end test coverage | slow to write, needs a device, protects little |
 | Foldables, tablets, landscape | portrait phone only |
 | Bundle size micro-tuning | hit `perf.bundle`, then stop |
 | Crash reporting, analytics, telemetry | we collect nothing, deliberately |
@@ -110,7 +110,7 @@ These have a reason behind them that is not obvious from the code. Do not "impro
 8. **All demo data is synthetic.** No real names, numbers, Aadhaar, PAN, OTP or payment
    data, ever, including in test fixtures.
 9. **The escalation accent never animates.** Lavender, amber, red, static, with the border
-   stroke firming 1.0 / 1.5 / 2.0 dp. This is a founder contract carried from the iOS app:
+   stroke firming 1.0 / 1.5 / 2.0 px. This is a founder contract carried from the iOS app:
    the colour alone carries the urgency. No pulse, no flash, no tween.
 10. **SOS appears instantly.** No animation, ever.
 11. **They are called favourites**, never contacts. See the vocabulary table in `COPY.md`.
@@ -226,7 +226,7 @@ those costs a round trip for nothing.
 Add a `Decision` entity via `kg.py`, mention it in one line of your report, and continue:
 
 - The **shape of an internal type** the spec names but does not fully specify: parameter
-  lists, whether something is a data class or an object, nullability of internal fields.
+  lists, whether something is an interface or a type alias, optionality of internal fields.
 - **Adding a `Command` case** for an effect the specification already requires. If
   `STATE_MACHINE` says the arm banner appears, a command for it is implementation.
 - **Naming** of files, classes and functions inside the stated package layout.

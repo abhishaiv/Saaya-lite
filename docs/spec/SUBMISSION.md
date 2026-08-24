@@ -190,7 +190,7 @@ We would rather be checked than believed.
 | # | Check | Done |
 |---|---|---|
 | 1 | Console loads, logged out, private window, phone, different network | |
-| 2 | deployed site downloads and installs on a clean device | |
+| 2 | the deployed site loads on a clean phone from the submission link, private window, no sign-in | |
 | 3 | Video plays with no sign-in, under 3:00 | |
 | 4 | Repo opens with no access request | |
 | 5 | No government logo anywhere, no implied endorsement | |
