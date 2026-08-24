@@ -312,8 +312,8 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 231,
-  "edges": 531,
+  "entities": 238,
+  "edges": 538,
   "events": 48
  },
  "entities": [
@@ -2002,6 +2002,48 @@
    "path": "assets/brand/SAAYA_BRAND_BIBLE.md",
    "tier": "2",
    "always_read": "False"
+  },
+  {
+   "id": "d.deps.devset",
+   "class": "Decision",
+   "label": "Dev dependencies are part of the closed list, not a widening of it: react-dom, four @types, vitest, eslint, eslint-config-next. ESLint stays on 8.x because eslint-config-next 14.2.15 rejects 9.x.",
+   "at": "2026-08-24"
+  },
+  {
+   "id": "d.nodomtests",
+   "class": "Decision",
+   "label": "No jsdom, happy-dom or Testing Library. vitest covers the pure engine; UI correctness is verified in a real mobile browser under G8, where tab-lifecycle bugs actually appear.",
+   "at": "2026-08-24"
+  },
+  {
+   "id": "d.vercelgate",
+   "class": "Decision",
+   "label": "Connecting the repo to Vercel (a T1.1 human gate) and publishing the production URL as the submission link (the T2.2 gate) are separate actions. Conflating them made T1.1 unbuildable.",
+   "at": "2026-08-24"
+  },
+  {
+   "id": "fail.arch_pivot_sed",
+   "class": "Failure",
+   "label": "ARCHITECTURE.md was mass-find-replaced during the web pivot rather than rewritten, leaving Hilt modules, EncryptedSharedPreferences, setExactAndAllowWhileIdle and a mangled org.Leaflet:Leaflet-android:6.1.20. 14 of 22 nodes read this file. Codex caught it at T1.1.",
+   "at": "2026-08-24"
+  },
+  {
+   "id": "fail.audit_grep_scope",
+   "class": "Failure",
+   "label": "The pre-handover audit reporting zero stale platform references grepped root *.md and scripts/ but not docs/, where the specification lives.",
+   "at": "2026-08-24"
+  },
+  {
+   "id": "fail.explain_ext_drift",
+   "class": "Failure",
+   "label": "grounded_check --explain still listed the Kotlin extension set, so --explain on a .ts or .tsx silently examined nothing while the gate examined the file.",
+   "at": "2026-08-24"
+  },
+  {
+   "id": "fail.webstack_unfacted",
+   "class": "Failure",
+   "label": "The pivot added BUILD_CONFIG.md but never added its values to spec_graph, so every pinned web version would have failed G6 as an invented literal.",
+   "at": "2026-08-24"
   }
  ],
  "edges": [
@@ -6250,6 +6292,62 @@
    "rel": "supersedes",
    "to": "d.t42.androidtest_names",
    "at": "2026-08-19",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.web",
+   "rel": "caused",
+   "to": "fail.arch_pivot_sed",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.web",
+   "rel": "caused",
+   "to": "fail.webstack_unfacted",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.audit_grep_scope",
+   "rel": "relates_to",
+   "to": "fail.arch_pivot_sed",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.deps.devset",
+   "rel": "constrains",
+   "to": "node.T1.1",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.vercelgate",
+   "rel": "constrains",
+   "to": "node.T1.1",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.nodomtests",
+   "rel": "constrains",
+   "to": "node.T3.1",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.arch_pivot_sed",
+   "rel": "relates_to",
+   "to": "node.T1.1",
+   "at": "2026-08-24",
    "by": "claude",
    "confidence": "high"
   }
