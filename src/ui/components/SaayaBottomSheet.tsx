@@ -7,6 +7,12 @@ import type {
   ReactNode,
 } from "react";
 
+import { capturePointer, releasePointer } from "../../platform/pointerCapture";
+import {
+  bottomSheetOffset,
+  bottomSheetRelease,
+} from "./saayaStyles";
+
 export type SaayaBottomSheetPosition = "peek" | "expanded";
 
 export type SaayaBottomSheetProps = Readonly<{
@@ -30,16 +36,6 @@ type DragState = Readonly<{
 
 export const SAAYA_BOTTOM_SHEET_PEEK_PX = 160;
 
-const DISMISS_THRESHOLD_PERCENT = 40;
-const FULL_PERCENT = 100;
-
-function offsetFor(
-  position: SaayaBottomSheetPosition,
-  dragRangePx: number,
-) {
-  return position === "expanded" ? 0 : dragRangePx;
-}
-
 /** C8's controlled two-snap sheet. Its caller supplies the actual pixel drag range. */
 export function SaayaBottomSheet({
   position,
@@ -52,15 +48,12 @@ export function SaayaBottomSheet({
 }: SaayaBottomSheetProps) {
   const [drag, setDrag] = useState<DragState | null>(null);
   const actualDragRangePx = Math.max(0, dragRangePx);
-  const settledOffsetPx = offsetFor(position, actualDragRangePx);
+  const settledOffsetPx = bottomSheetOffset(
+    position === "expanded",
+    actualDragRangePx,
+  );
   const renderedOffsetPx = drag?.offsetPx ?? settledOffsetPx;
   const classes = ["saaya-bottom-sheet", className].filter(Boolean).join(" ");
-
-  function releasePointer(event: ReactPointerEvent<HTMLButtonElement>) {
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-      event.currentTarget.releasePointerCapture(event.pointerId);
-    }
-  }
 
   function handlePointerDown(event: ReactPointerEvent<HTMLButtonElement>) {
     if (!event.isPrimary || event.button !== 0) {
@@ -68,7 +61,7 @@ export function SaayaBottomSheet({
     }
 
     event.preventDefault();
-    event.currentTarget.setPointerCapture(event.pointerId);
+    capturePointer(event.currentTarget, event.pointerId);
     setDrag({
       pointerId: event.pointerId,
       startClientY: event.clientY,
@@ -96,32 +89,23 @@ export function SaayaBottomSheet({
     }
 
     event.preventDefault();
-    releasePointer(event);
+    releasePointer(event.currentTarget, event.pointerId);
 
     const deltaY = event.clientY - drag.startClientY;
-    const draggedPercent = (deltaY / actualDragRangePx) * FULL_PERCENT;
+    const release = bottomSheetRelease(
+      deltaY,
+      actualDragRangePx,
+      position,
+    );
 
     setDrag(null);
 
-    if (
-      actualDragRangePx > 0 &&
-      draggedPercent > DISMISS_THRESHOLD_PERCENT
-    ) {
+    if (release === "dismiss") {
       onDismiss();
       return;
     }
 
-    if (deltaY < 0) {
-      onPositionChange("expanded");
-      return;
-    }
-
-    if (deltaY > 0) {
-      onPositionChange("peek");
-      return;
-    }
-
-    onPositionChange(position === "peek" ? "expanded" : "peek");
+    onPositionChange(release);
   }
 
   function handlePointerCancel(event: ReactPointerEvent<HTMLButtonElement>) {
@@ -129,7 +113,7 @@ export function SaayaBottomSheet({
       return;
     }
 
-    releasePointer(event);
+    releasePointer(event.currentTarget, event.pointerId);
     setDrag(null);
   }
 
@@ -170,11 +154,11 @@ export function SaayaBottomSheet({
           position: fixed;
           inset-inline: 0;
           inset-block-end: 0;
-          block-size: 55vh;
+          block-size: var(--sheet-expanded-height);
           overflow: hidden;
-          border-radius: 22px 22px 0 0;
+          border-radius: var(--radius-card) var(--radius-card) 0 0;
           background: var(--color-card-fill);
-          transition: transform 340ms cubic-bezier(0.22, 1, 0.36, 1);
+          transition: transform var(--motion-340) var(--motion-spring-soft);
           will-change: transform;
         }
 
@@ -185,7 +169,7 @@ export function SaayaBottomSheet({
         .saaya-bottom-sheet__drag-target {
           position: absolute;
           inset-block-start: 0;
-          inset-inline-start: 50%;
+          inset-inline-start: 50%; /* GROUNDED-EXEMPT: structural centring of the drag target */
           inline-size: 48px;
           block-size: 48px;
           padding: 0;
@@ -194,7 +178,7 @@ export function SaayaBottomSheet({
           color: inherit;
           cursor: grab;
           touch-action: none;
-          transform: translateX(-50%);
+          transform: translateX(-50%); /* GROUNDED-EXEMPT: structural half-width centring transform */
         }
 
         .saaya-bottom-sheet__drag-target:active {
@@ -204,16 +188,16 @@ export function SaayaBottomSheet({
         .saaya-bottom-sheet__handle {
           position: absolute;
           inset-block-start: 8px;
-          inset-inline-start: 50%;
+          inset-inline-start: 50%; /* GROUNDED-EXEMPT: structural centring of the visual handle */
           inline-size: 32px;
           block-size: 4px;
           background: rgb(from var(--color-text-primary) r g b / 0.3);
-          transform: translateX(-50%);
+          transform: translateX(-50%); /* GROUNDED-EXEMPT: structural half-width centring transform */
           transition: none;
         }
 
         .saaya-bottom-sheet__content {
-          block-size: 100%;
+          block-size: 100%; /* GROUNDED-EXEMPT: content fills the specified sheet surface */
           overflow: auto;
           transition: none;
         }

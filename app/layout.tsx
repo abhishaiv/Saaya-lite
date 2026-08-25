@@ -25,6 +25,22 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <html lang="en">
+      <head>
+        <link
+          as="font"
+          crossOrigin="anonymous"
+          href="/fonts/poppins-latin-400.woff2"
+          rel="preload"
+          type="font/woff2"
+        />
+        <link
+          as="font"
+          crossOrigin="anonymous"
+          href="/fonts/poppins-latin-600.woff2"
+          rel="preload"
+          type="font/woff2"
+        />
+      </head>
       <body>
         <NotificationWorkerBootstrap />
         {children}

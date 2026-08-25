@@ -17,10 +17,7 @@ export const saayaTheme = {
     danger: "#FF3B30",
   },
   type: {
-    family: {
-      english: "Poppins",
-      telugu: "Noto Sans Telugu",
-    },
+    family: ["Poppins", "Noto Sans Telugu", "sans-serif"],
     numeralFeature: "tnum",
     weights: {
       regular: 400,
@@ -36,6 +33,7 @@ export const saayaTheme = {
       cardBody: { size: 14, lineHeight: 20, weight: 400 },
       caption: { size: 13, lineHeight: 18, weight: 400 },
       label: { size: 11, lineHeight: 14, weight: 600, tracking: 0.5, uppercase: true },
+      bigAction: { size: 20, weight: 700 },
     },
   },
   shape: {

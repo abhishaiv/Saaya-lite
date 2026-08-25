@@ -17,6 +17,8 @@ type NativeButtonProps = Omit<
 type SharedSaayaButtonProps = NativeButtonProps & {
   children: ReactNode;
   loading?: boolean;
+  /** Localized COPY.md `state_working` value used while loading. */
+  workingLabel: string;
 };
 
 type AccentSaayaButtonProps = SharedSaayaButtonProps & {
@@ -61,6 +63,7 @@ export function SaayaButton(props: SaayaButtonProps) {
     loading = false,
     type = "button",
     variant = "primary",
+    workingLabel,
     ...nativeProps
   } = props;
 
@@ -81,7 +84,7 @@ export function SaayaButton(props: SaayaButtonProps) {
       <button
         {...nativeProps}
         aria-busy={loading || undefined}
-        aria-label={loading ? "Working" : ariaLabel}
+        aria-label={loading ? workingLabel : ariaLabel}
         className={classes}
         data-loading={loading ? "true" : undefined}
         disabled={isDisabled}
@@ -150,7 +153,7 @@ export function SaayaButton(props: SaayaButtonProps) {
           line-height: var(--type-body-line-height);
           text-align: center;
           transform: scale(1);
-          transition: transform 180ms cubic-bezier(0.34, 1.3, 0.64, 1);
+          transition: transform var(--motion-180) var(--motion-spring);
           user-select: none;
         }
 
@@ -220,7 +223,7 @@ export function SaayaButton(props: SaayaButtonProps) {
 
         .saaya-button:not(:disabled):active .saaya-button__surface {
           transform: scale(0.97);
-          transition-duration: 120ms;
+          transition-duration: var(--motion-120);
         }
 
         .saaya-button--primary:not(:disabled):active
@@ -231,7 +234,11 @@ export function SaayaButton(props: SaayaButtonProps) {
         .saaya-button--accent:not(:disabled):active .saaya-button__surface,
         .saaya-button--destructive:not(:disabled):active
           .saaya-button__surface {
-          filter: brightness(calc(100% - var(--saaya-button-pressed-darkening))); /* GROUNDED-EXEMPT: 100% is the structural brightness baseline for the specified 8% darkening */
+          background: color-mix(
+            in srgb,
+            black var(--saaya-button-pressed-darkening),
+            var(--saaya-button-fill)
+          );
         }
 
         .saaya-button:disabled {

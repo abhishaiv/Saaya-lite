@@ -42,7 +42,7 @@ export function PinEntryBox(props: PinEntryBoxProps) {
   } = props;
   const lockoutDescriptionId = useId();
   const isLocked = state === "locked";
-  const currentIndex = Math.min(value.length, PIN_LENGTH - 1);
+  const currentIndex = value.length >= PIN_LENGTH ? -1 : value.length;
   const classes = ["pin-entry", `pin-entry--${state}`, className]
     .filter(Boolean)
     .join(" ");
@@ -174,7 +174,7 @@ export function PinEntryBox(props: PinEntryBoxProps) {
           border-color: var(--color-brand);
         }
 
-        .pin-entry--error .pin-entry__box {
+        .pin-entry.pin-entry--error .pin-entry__box {
           border-color: var(--color-danger);
         }
 

@@ -1,3 +1,4 @@
+@import "../src/ui/theme/fonts.css";
 @import "../src/ui/theme/tokens.css";
 
 * {
@@ -13,7 +14,7 @@ body {
   margin: 0;
   background: var(--color-background);
   color: var(--color-text-primary);
-  font-family: var(--font-family-english);
+  font-family: var(--font-family);
   font-size: var(--type-body-size);
   line-height: var(--type-body-line-height);
 }
@@ -39,4 +40,19 @@ textarea {
   font-size: var(--type-title-size);
   font-weight: var(--weight-bold);
   line-height: var(--type-title-line-height);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: var(--motion-reduced) !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: var(--motion-reduced) !important;
+  }
+
+  .countdown-ring__progress {
+    transition-duration: var(--motion-1000) !important;
+  }
 }

@@ -1,5 +1,10 @@
 import type { ReactNode } from "react";
 
+import {
+  MaterialSymbol,
+  type MaterialSymbolName,
+} from "../icons/MaterialSymbol";
+
 export type LadderCardRung =
   | "CHECKIN_1"
   | "CHECKIN_2"
@@ -42,7 +47,7 @@ export const LADDER_CARD_BACK_POLICY: Readonly<
 };
 
 const rungPresentation: Readonly<
-  Record<LadderCardRung, { className: string; icon: string }>
+  Record<LadderCardRung, { className: string; icon: MaterialSymbolName }>
 > = {
   CHECKIN_1: {
     className: "ladder-card--checkin-one",
@@ -118,7 +123,12 @@ export function LadderCard(props: LadderCardProps) {
 
         <div className="ladder-card__surface">
           <span aria-hidden="true" className="ladder-card__icon">
-            {presentation.icon}
+            <MaterialSymbol
+              decorative
+              fill="state"
+              name={presentation.icon}
+              size={40}
+            />
           </span>
           <h2 className="ladder-card__title" id={titleId}>
             {title}
@@ -187,27 +197,13 @@ export function LadderCard(props: LadderCardProps) {
         }
 
         .ladder-card__icon {
+          display: inline-flex;
           align-self: center;
           inline-size: 40px;
           block-size: 40px;
+          align-items: center;
+          justify-content: center;
           color: var(--ladder-card-accent);
-          font-family: "Material Symbols Rounded";
-          font-size: 40px;
-          font-style: normal;
-          font-weight: normal;
-          font-variation-settings:
-            "FILL" 1,
-            "wght" 400,
-            "GRAD" 0,
-            "opsz" 40;
-          line-height: 40px;
-          text-align: center;
-          text-transform: none;
-          white-space: nowrap;
-          word-wrap: normal;
-          direction: ltr;
-          font-feature-settings: "liga";
-          user-select: none;
         }
 
         .ladder-card__title {
@@ -234,18 +230,18 @@ export function LadderCard(props: LadderCardProps) {
         }
 
         .ladder-card--entering .ladder-card__scrim {
-          animation: ladder-card-scrim-enter 180ms
-            cubic-bezier(0.4, 0, 0.2, 1) both;
+          animation: ladder-card-scrim-enter var(--motion-180)
+            var(--motion-standard) both;
         }
 
         .ladder-card--entering .ladder-card__surface {
-          animation: ladder-card-enter 320ms
-            cubic-bezier(0.34, 1.3, 0.64, 1) both;
+          animation: ladder-card-enter var(--motion-320)
+            var(--motion-spring) both;
         }
 
         .ladder-card--answered .ladder-card__surface {
-          animation: ladder-card-answer 160ms
-            cubic-bezier(0.4, 0, 0.2, 1) both;
+          animation: ladder-card-answer var(--motion-160)
+            var(--motion-standard) both;
         }
 
         @keyframes ladder-card-scrim-enter {

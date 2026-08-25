@@ -1,3 +1,5 @@
+import { MaterialSymbol } from "../icons/MaterialSymbol";
+
 export type DisclosureKind = "mock" | "prototype-limitation";
 
 export type DisclosureBannerProps = Readonly<{
@@ -5,8 +7,6 @@ export type DisclosureBannerProps = Readonly<{
   content: string;
   kind: DisclosureKind;
 }>;
-
-const INFO_GLYPH = "\uE88E";
 
 /** C7 disclosure treatment for mocks and prototype limitations. */
 export function DisclosureBanner({
@@ -24,7 +24,12 @@ export function DisclosureBanner({
         role="note"
       >
         <span aria-hidden="true" className="disclosure-banner__icon">
-          {INFO_GLYPH}
+          <MaterialSymbol
+            decorative
+            fill="state"
+            name="info"
+            size={20}
+          />
         </span>
         <span className="disclosure-banner__content">{content}</span>
       </div>
@@ -48,26 +53,13 @@ export function DisclosureBanner({
         }
 
         .disclosure-banner__icon {
-          display: inline-block;
+          display: inline-flex;
           flex: 0 0 20px;
           inline-size: 20px;
           block-size: 20px;
+          align-items: center;
+          justify-content: center;
           color: var(--color-amber);
-          font-family: "Material Symbols Rounded";
-          font-size: 20px;
-          font-style: normal;
-          font-weight: normal;
-          font-variation-settings:
-            "FILL" 1,
-            "wght" 400,
-            "GRAD" 0,
-            "opsz" 20;
-          line-height: 20px;
-          text-align: start;
-          text-transform: none;
-          white-space: nowrap;
-          direction: ltr;
-          user-select: none;
         }
 
         .disclosure-banner__content {

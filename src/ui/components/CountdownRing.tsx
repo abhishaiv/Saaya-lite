@@ -140,7 +140,7 @@ export function CountdownRing({
 
         .countdown-ring__progress {
           stroke: var(--countdown-ring-accent);
-          transition: stroke-dashoffset 1000ms linear;
+          transition: stroke-dashoffset var(--motion-1000) linear;
         }
 
         .countdown-ring__numeral {
@@ -162,11 +162,6 @@ export function CountdownRing({
           white-space: nowrap;
         }
 
-        @media (prefers-reduced-motion: reduce) {
-          .countdown-ring__progress {
-            transition-duration: 1000ms !important;
-          }
-        }
       `}</style>
     </div>
   );

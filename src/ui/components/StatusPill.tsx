@@ -1,34 +1,32 @@
 import type { ArmMode, SessionState } from "../../domain/model/session";
+import {
+  MaterialSymbol,
+  type MaterialSymbolName,
+} from "../icons/MaterialSymbol";
 
 export type StatusPillState = Exclude<SessionState, "RESOLVED">;
 
-export type StatusPillIcon =
-  | "verified_user"
-  | "gpp_maybe"
-  | "shield"
-  | "sos"
-  | "my_location"
-  | "call"
-  | "settings"
-  | "visibility"
-  | "home"
-  | "group"
-  | "chevron_right"
-  | "close"
-  | "check_circle"
-  | "warning"
-  | "cloud_off"
-  | "lock";
+export type StatusPillLabels = Readonly<{
+  checkIn1: string;
+  checkIn2: string;
+  family: string;
+  idle: string;
+  shadowAuto: string;
+  shadowManual: string;
+  sos: string;
+}>;
 
 type SharedStatusPillProps = {
   className?: string;
+  /** Localized values for all seven COPY.md status keys. */
+  labels: StatusPillLabels;
 };
 
 type IdleStatusPillProps = SharedStatusPillProps & {
   state: "IDLE";
   armMode?: never;
   /** C5 does not specify IDLE's icon, so its caller must choose from the frozen set. */
-  icon: StatusPillIcon;
+  icon: MaterialSymbolName;
 };
 
 type ShadowStatusPillProps = SharedStatusPillProps & {
@@ -49,8 +47,8 @@ export type StatusPillProps = Readonly<
 
 type StatusPillPresentation = {
   accentClassName: string;
-  icon: StatusPillIcon;
-  label: string;
+  icon: MaterialSymbolName;
+  labelKey: keyof StatusPillLabels;
 };
 
 const activePresentation: Readonly<
@@ -59,22 +57,22 @@ const activePresentation: Readonly<
   CHECKIN_1: {
     accentClassName: "status-pill--brand",
     icon: "verified_user",
-    label: "CHECKING IN",
+    labelKey: "checkIn1",
   },
   CHECKIN_2: {
     accentClassName: "status-pill--amber",
     icon: "verified_user",
-    label: "STILL THERE?",
+    labelKey: "checkIn2",
   },
   FAMILY_ESCALATED: {
     accentClassName: "status-pill--danger",
     icon: "gpp_maybe",
-    label: "TELLING YOUR FAVOURITES",
+    labelKey: "family",
   },
   SOS_ACTIVE: {
     accentClassName: "status-pill--danger",
     icon: "sos",
-    label: "SOS ACTIVE",
+    labelKey: "sos",
   },
 };
 
@@ -83,7 +81,7 @@ function presentationFor(props: StatusPillProps): StatusPillPresentation {
     return {
       accentClassName: "status-pill--idle",
       icon: props.icon,
-      label: "NOT WATCHING",
+      labelKey: "idle",
     };
   }
 
@@ -91,8 +89,8 @@ function presentationFor(props: StatusPillProps): StatusPillPresentation {
     return {
       accentClassName: "status-pill--brand",
       icon: "shield",
-      label:
-        props.armMode === "AUTO_ZONE" ? "WATCHING THIS STRETCH" : "WATCHING",
+      labelKey:
+        props.armMode === "AUTO_ZONE" ? "shadowAuto" : "shadowManual",
     };
   }
 
@@ -121,9 +119,16 @@ export function StatusPill(props: StatusPillProps) {
       >
         <span className="status-pill__content">
           <span aria-hidden="true" className="status-pill__icon">
-            {presentation.icon}
+            <MaterialSymbol
+              decorative
+              fill="state"
+              name={presentation.icon}
+              size={16}
+            />
           </span>{" "}
-          <span className="status-pill__label">{presentation.label}</span>
+          <span className="status-pill__label">
+            {props.labels[presentation.labelKey]}
+          </span>
         </span>
       </span>
 
@@ -140,7 +145,7 @@ export function StatusPill(props: StatusPillProps) {
           align-items: center;
           block-size: 36px;
           padding-inline: var(--space-14);
-          border: var(--status-pill-border-width) solid
+          border: 1px solid
             rgb(from var(--status-pill-accent) r g b / 0.4);
           border-radius: 18px;
           background: rgb(from var(--color-card-fill) r g b / 0.92);
@@ -173,26 +178,12 @@ export function StatusPill(props: StatusPillProps) {
         }
 
         .status-pill__icon {
-          display: inline-block;
+          display: inline-flex;
           inline-size: 16px;
           block-size: 16px;
           color: var(--status-pill-accent);
-          font-family: "Material Symbols Rounded";
-          font-size: 16px;
-          font-style: normal;
-          font-weight: normal;
-          font-variation-settings: var(
-            --status-pill-icon-variation-settings
-          );
-          line-height: 16px;
-          text-align: center;
-          text-transform: none;
-          vertical-align: middle;
-          white-space: nowrap;
-          word-wrap: normal;
-          direction: ltr;
-          font-feature-settings: "liga";
-          user-select: none;
+          align-items: center;
+          justify-content: center;
           animation: none;
           transition: none;
         }
@@ -202,7 +193,6 @@ export function StatusPill(props: StatusPillProps) {
           font-weight: var(--weight-semibold);
           letter-spacing: var(--type-label-tracking);
           line-height: var(--type-label-line-height);
-          text-transform: uppercase;
           vertical-align: middle;
           animation: none;
           transition: none;

@@ -14,6 +14,13 @@ describe("Saaya theme contract", () => {
 
   it("maps the design-system typography without adding a fourth weight", () => {
     expect(saayaTheme.type.weights).toEqual({ regular: 400, semibold: 600, bold: 700 });
+    expect(saayaTheme.type.family).toEqual([
+      "Poppins",
+      "Noto Sans Telugu",
+      "sans-serif",
+    ]);
+    expect(saayaTheme.type.styles.title.size).toBe(24);
+    expect(saayaTheme.type.styles.cardTitle.size).toBe(20);
     expect(saayaTheme.type.styles.headline.weight).toBe(600);
   });
 

@@ -12,6 +12,8 @@ export type BigActionButtonProps = NativeButtonProps & {
   countdownSeconds?: number;
   label: string;
   loading?: boolean;
+  /** Localized COPY.md `state_working` value used while loading. */
+  workingLabel: string;
 };
 
 const accentClassNames: Record<BigActionButtonAccent, string> = {
@@ -33,6 +35,7 @@ export function BigActionButton({
   label,
   loading = false,
   type = "button",
+  workingLabel,
   ...nativeProps
 }: BigActionButtonProps) {
   const hasCountdown =
@@ -54,7 +57,7 @@ export function BigActionButton({
       <button
         {...nativeProps}
         aria-busy={loading || undefined}
-        aria-label={loading ? "Working" : ariaLabel}
+        aria-label={loading ? workingLabel : ariaLabel}
         className={classes}
         data-loading={loading ? "true" : undefined}
         data-testid="checkin-imok"
@@ -115,7 +118,7 @@ export function BigActionButton({
           line-height: normal;
           text-align: center;
           transform: scale(1);
-          transition: transform 180ms cubic-bezier(0.34, 1.3, 0.64, 1);
+          transition: transform var(--motion-180) var(--motion-spring);
           user-select: none;
         }
 
@@ -157,7 +160,7 @@ export function BigActionButton({
             var(--big-action-button-fill)
           );
           transform: scale(0.97);
-          transition-duration: 120ms;
+          transition-duration: var(--motion-120);
         }
 
         .big-action-button:disabled {

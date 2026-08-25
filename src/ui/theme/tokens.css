@@ -15,30 +15,44 @@
   --color-amber: #F09921;
   --color-danger: #FF3B30;
 
-  --font-family-english: "Poppins", sans-serif;
-  --font-family-telugu: "Noto Sans Telugu", sans-serif;
+  --font-family: "Poppins", "Noto Sans Telugu", sans-serif;
   --font-feature-numerals: "tnum";
   --weight-regular: 400;
   --weight-semibold: 600;
   --weight-bold: 700;
 
-  --type-display-size: 34px;
-  --type-display-line-height: 40px;
-  --type-title-size: 24px;
-  --type-title-line-height: 30px;
-  --type-card-title-size: 20px;
-  --type-card-title-line-height: 26px;
-  --type-headline-size: 18px;
-  --type-headline-line-height: 24px;
-  --type-body-size: 16px;
-  --type-body-line-height: 24px;
-  --type-card-body-size: 14px;
-  --type-card-body-line-height: 20px;
-  --type-caption-size: 13px;
-  --type-caption-line-height: 18px;
-  --type-label-size: 11px;
-  --type-label-line-height: 14px;
-  --type-label-tracking: 0.5px;
+  --type-display-size: calc(34 / 16 * 1rem); /* type.display / type.rem.base */
+  --type-display-line-height: calc(40 / 16 * 1rem); /* type.display.lineheight / type.rem.base */
+  --type-title-size: calc(24 / 16 * 1rem); /* type.title / type.rem.base */
+  --type-title-line-height: calc(30 / 16 * 1rem); /* type.title.lineheight / type.rem.base */
+  --type-card-title-size: calc(20 / 16 * 1rem); /* type.cardTitle / type.rem.base */
+  --type-card-title-line-height: calc(26 / 16 * 1rem); /* type.cardTitle.lineheight / type.rem.base */
+  --type-headline-size: calc(18 / 16 * 1rem); /* type.headline / type.rem.base */
+  --type-headline-line-height: calc(24 / 16 * 1rem); /* type.headline.lineheight / type.rem.base */
+  --type-body-size: calc(16 / 16 * 1rem); /* type.body / type.rem.base */
+  --type-body-line-height: calc(24 / 16 * 1rem); /* type.body.lineheight / type.rem.base */
+  --type-card-body-size: calc(14 / 16 * 1rem); /* type.cardBody / type.rem.base */
+  --type-card-body-line-height: calc(20 / 16 * 1rem); /* type.cardBody.lineheight / type.rem.base */
+  --type-caption-size: calc(13 / 16 * 1rem); /* type.caption / type.rem.base */
+  --type-caption-line-height: calc(18 / 16 * 1rem); /* type.caption.lineheight / type.rem.base */
+  --type-label-size: calc(11 / 16 * 1rem); /* type.label / type.rem.base */
+  --type-label-line-height: calc(14 / 16 * 1rem); /* type.label.lineheight / type.rem.base */
+  --type-label-tracking: calc(0.5 / 16 * 1rem); /* type.label.tracking / type.rem.base */
+  --type-big-action-size: calc(20 / 16 * 1rem); /* type.bigAction.size / type.rem.base */
+
+  --motion-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --motion-spring: cubic-bezier(0.34, 1.3, 0.64, 1);
+  --motion-spring-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --motion-120: 120ms;
+  --motion-160: 160ms;
+  --motion-180: 180ms;
+  --motion-200: 200ms;
+  --motion-300: 300ms;
+  --motion-320: 320ms;
+  --motion-340: 340ms;
+  --motion-1000: 1000ms;
+  --motion-reduced: 0.01ms;
+  --arm-banner-delay: 6s;
 
   --radius-card: 22px;
   --radius-control: 14px;
@@ -59,7 +73,7 @@
   --screen-padding: 20px;
   --minimum-touch-target: 48px;
   --sheet-peek-height: 160px;
-  --sheet-expanded-height: 55%;
+  --sheet-expanded-height: 55dvh;
   --viewport-floor: 320px;
 
   --accent-shadow: #A78BFA;
