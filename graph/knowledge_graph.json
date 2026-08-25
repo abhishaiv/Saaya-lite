@@ -313,8 +313,8 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 342,
-  "edges": 647,
+  "entities": 346,
+  "edges": 652,
   "events": 63
  },
  "entities": [
@@ -902,7 +902,9 @@
    "label": "Map screen: Leaflet, CARTO tiles, zones, her dot",
    "risk": "med",
    "shape": "serial",
-   "seq": 8
+   "seq": 8,
+   "superseded_by": "merged into M4 2026-08-24",
+   "merged_into": "M4"
   },
   {
    "id": "node.T4.3",
@@ -910,7 +912,9 @@
    "label": "Home session states, arm banner, demo panel",
    "risk": "med",
    "shape": "serial",
-   "seq": 10
+   "seq": 10,
+   "superseded_by": "merged into M4 2026-08-24",
+   "merged_into": "M4"
   },
   {
    "id": "node.T3.1",
@@ -1008,7 +1012,9 @@
    "label": "Submission page: video, summary, disclosures",
    "risk": "low",
    "shape": "serial",
-   "seq": 11
+   "seq": 11,
+   "superseded_by": "merged into M5 2026-08-24",
+   "merged_into": "M5"
   },
   {
    "id": "node.T9.1",
@@ -1016,7 +1022,9 @@
    "label": "Localisation and a11y on the demo path only",
    "risk": "med",
    "shape": "diamond",
-   "seq": 12
+   "seq": 12,
+   "superseded_by": "merged into M5 2026-08-24",
+   "merged_into": "M5"
   },
   {
    "id": "node.T9.2",
@@ -1024,7 +1032,9 @@
    "label": "Verification spot checks V1 to V9",
    "risk": "HIGH",
    "shape": "diamond+cycle",
-   "seq": 13
+   "seq": 13,
+   "superseded_by": "merged into M5 2026-08-24",
+   "merged_into": "M5"
   },
   {
    "id": "f.oxfam.budget",
@@ -2793,7 +2803,7 @@
    "label": "Data and trust boundary: Firebase, offline queue, anonymiser, writers",
    "risk": "high",
    "shape": "serial",
-   "seq": 6,
+   "seq": 8,
    "at": "2026-08-24",
    "merged_from": [
     "T1.2",
@@ -2819,6 +2829,45 @@
    "class": "Decision",
    "at": "2026-08-24",
    "label": "Restructured the build graph for a reduced Codex token budget: dropped T3.1, T7.3 and T8.3 as off the judged path or duplicative; merged twelve nodes into M1, M2 and M3 so shared reads load once rather than per node; cut verifier lenses to spec-only everywhere except M2, which keeps full adversarial verification because it carries the trust boundary. 22 nodes to 13, 38.5h to 32.0h pending. Retired node records keep their history and are excluded from execution, not deleted."
+  },
+  {
+   "id": "node.M4",
+   "class": "BuildNode",
+   "label": "Home: map, zones, her dot, session states, arm banner, demo panel",
+   "risk": "med",
+   "shape": "serial",
+   "seq": 6,
+   "at": "2026-08-24",
+   "merged_from": [
+    "T2.2",
+    "T4.3"
+   ]
+  },
+  {
+   "id": "node.M5",
+   "class": "BuildNode",
+   "label": "Ship: submission page, demo-path Telugu and a11y, spot checks",
+   "risk": "med",
+   "shape": "serial",
+   "seq": 10,
+   "at": "2026-08-24",
+   "merged_from": [
+    "T9.0",
+    "T9.1",
+    "T9.2"
+   ]
+  },
+  {
+   "id": "d.mvp_sequencing",
+   "class": "Decision",
+   "at": "2026-08-24",
+   "label": "Re-sequenced for demoability under a hard credit ceiling rather than purely risk-first. With a fixed budget the order decides what exists if it runs out, so the visible spine comes first: Home, then the ladder, then the data layer and console, then ship. Five checkpoints are recorded in the graph, and the one after M1 is the MVP line: if everything stops there, a working four-step escalation still runs on a phone. M2 keeps full adversarial verification despite being later, because its risk is that errors matter, not that it might fail to build."
+  },
+  {
+   "id": "d.publish_gate_moved",
+   "class": "Decision",
+   "at": "2026-08-24",
+   "label": "The publish-the-production-URL human gate moved from the map node to M5. Publishing the link never blocked building the map; gating it there stalled work for no reason. It belongs where the link is actually published, which is also where it is first judged."
   }
  ],
  "edges": [
@@ -7994,6 +8043,46 @@
    "from": "node.M3",
    "rel": "supersedes",
    "to": "node.T8.2",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "node.M4",
+   "rel": "supersedes",
+   "to": "node.T2.2",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "node.M4",
+   "rel": "supersedes",
+   "to": "node.T4.3",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "node.M5",
+   "rel": "supersedes",
+   "to": "node.T9.0",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "node.M5",
+   "rel": "supersedes",
+   "to": "node.T9.1",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "node.M5",
+   "rel": "supersedes",
+   "to": "node.T9.2",
    "at": "2026-08-24",
    "by": "claude",
    "confidence": "high"

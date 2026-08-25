@@ -146,26 +146,23 @@ Risk-first, not phase-first. Do not reorder it.
 |  3 | `T4.1` ✓ | Session engine, pure TypeScript, zero browser API | HIGH | spec, boundary, invention | 6.5 |
 |  4 | `T4.2` | Geolocation watch, arming, wake lock, tab lifecycle | HIGHEST | spec | 9.5 |
 |  5 | `T1.3` | Component library C1 to C14 (React) | med | spec | 12.5 |
-|  6 | `M2` | Data and trust boundary: Firebase, offline queue, anonymiser, writers | high | spec, boundary, invention | 17.0 |
+|  6 | `M4` | Home: map, zones, her dot, session states, arm banner, demo panel | med | spec | 17.0 |
 |  7 | `M1` | Session UI: onboarding, check-ins, family escalation, SOS | med | spec | 27.5 |
-|  8 | `T2.2` | Map screen: Leaflet, CARTO tiles, zones, her dot | med | spec | 30.0 |
-|  9 | `M3` | Console: seed zones and the state view | med | spec | 33.5 |
-| 10 | `T4.3` | Home session states, arm banner, demo panel | med | spec | 35.5 |
-| 11 | `T9.0` | Submission page: video, summary, disclosures | low | spec | 36.5 |
-| 12 | `T9.1` | Localisation and a11y on the demo path only | med | spec | 37.5 |
-| 13 | `T9.2` | Verification spot checks V1 to V9 | HIGH | - | 38.5 |
+|  8 | `M2` | Data and trust boundary: Firebase, offline queue, anonymiser, writers | high | spec, boundary, invention | 32.0 |
+|  9 | `M3` | Console: seed zones and the state view | med | spec | 35.5 |
+| 10 | `M5` | Ship: submission page, demo-path Telugu and a11y, spot checks | med | spec | 38.5 |
 
-**13 nodes, down from 22.** Restructured 2026-08-24 for a reduced token budget:
-`T3.1`, `T7.3` and `T8.3` dropped; twelve nodes merged into `M1`, `M2` and `M3` so their
-shared reads load once. Retired ids keep their records in the graph and are not executed.
+**10 nodes, down from 22.** Restructured 2026-08-24 for a fixed weekly credit budget.
+Dropped `T3.1`, `T7.3`, `T8.3`. Merged seventeen ids into `M1` to `M5` so shared reads load
+once. Retired ids keep their records and are not executed.
 
-**Verification is proportional to risk, not uniform.** `M2` carries the trust boundary and
-is the only node with full adversarial verification: spec, boundary and invention, repeated
-until all three pass, concentrated on the anonymiser and the two Firestore writers.
-Everywhere else is one spec verifier, one round. G6 and the browser gate cover the rest.
+**Order is demoability-first, not purely risk-first.** With a hard ceiling the order decides
+what exists if the budget runs out, so the visible spine comes first. Checkpoints are in
+`graph/build_graph.json`; the one after `M1` is the MVP line.
 
-`T4.2` clears the riskiest work by hour 9.5. `T8.2` puts the **required live demo link** in
-place by hour 14 rather than hour 24.
+**Verification is proportional to risk.** `M2` alone gets spec, boundary and invention,
+repeated until all pass, on the anonymiser and the two Firestore writers. Everywhere else is
+one spec verifier, one round.
 
 ---
 

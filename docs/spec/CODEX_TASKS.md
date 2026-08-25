@@ -29,6 +29,7 @@ Hard rules:
 ```
 
 
+
 ## The tasks
 
 ### T1.1 — Scaffold: Next.js, TypeScript, theme tokens, Vercel
@@ -65,106 +66,81 @@ Hard rules:
 
 > **Diamond:** 14 workers. one worker per component C1-C14. Then `fanout_check.py`, then merge in code.
 
-### M2 — Data and trust boundary: Firebase, offline queue, anonymiser, writers
+> **CHECKPOINT.** Components exist. Nothing user-visible yet.
 
-**Risk:** high · **Verify:** spec, boundary, invention · **Hours:** 4.5
-**Reads:** `SETUP.md`, `SECRETS_AND_ACCESS.md`, `DATA_MODEL.md`, `ARCHITECTURE.md`, `BUSINESS_RULES.md`, `TEST_PLAN.md`, `WEB_PLATFORM.md`, `PROBLEM.md`
+### M4 — Home: map, zones, her dot, session states, arm banner, demo panel
 
-**Merged node.** Replaces `T1.2`, `T6.2`, `T7.2`, whose records stay in the graph. One data layer, one trust boundary. Splitting it made the anonymiser load DATA_MODEL separately from the queue that carries its output. Load the reads ONCE and build all parts before reporting.
+**Risk:** med · **Verify:** spec · **Hours:** 4.5
+**Reads:** `MAP_SPEC.md`, `SCREENS.md`, `RESPONSIVE_SPEC.md`, `STATES_CATALOGUE.md`, `ARCHITECTURE.md`, `COMPONENT_LIBRARY.md`, `DESIGN_SYSTEM.md`, `WEB_PLATFORM.md`, `COPY.md`, `MOTION_SPEC.md`, `STATE_MACHINE.md`
 
-- **T1.2 — Firebase wiring, anonymous auth (project exists)**
-  The Firebase project already exists with anonymous auth enabled. Do NOT create one. Wire the web SDK from `console/firebase-config.js`, sign in anonymously, write one doc to `_smoke`, read it back, delete it.
-  *Done when:* anonymous sign-in returns a uid against project `saaya-lite` and the smoke doc round-trips.
-- **T6.2 — Offline queue in IndexedDB with backoff**
-  IndexedDB `queued_event` store, a flusher with the 5/15/60/300/900 s backoff plus an `online` listener, SOS priority over SUS, and `FAILED_PERMANENT` after 20 attempts surfaced in UI state. Every Firestore write goes through the queue.
-  *Done when:* `queue.test.ts` passes and, with the network offline, running the ladder loses nothing and flushes on reconnect.
-- **T7.2 — Anonymiser and the two Firestore writers**
-  `src/domain/anonymiser.ts` producing the SUS payload from an ALLOW-LIST, never by filtering a larger object, so emitting a coordinate or session id is structurally impossible. The SOS payload with precise location, the timeline, nearest station and `contactsNotified` as a number. Deploy the Firestore rules including the `hasAny` guard.
-  *Done when:* every `anonymiser.test.ts` case passes, especially the one asserting **zero** write commands across IDLE to SHADOW to CHECKIN_1 to CHECKIN_2.
+**Merged node.** Replaces `T2.2`, `T4.3`. Both are the Home surface and share SCREENS, COMPONENT_LIBRARY, ARCHITECTURE and DESIGN_SYSTEM. Splitting them meant drawing the map, dropping context, then reloading it to put state on top of it. Load the reads ONCE and build every part before reporting.
+
+- **T2.2 — Map screen: Leaflet, CARTO tiles, zones, her dot**
+  Home: full-bleed Leaflet map per `MAP_SPEC.md`, CARTO Dark Matter tiles, no key. Render the 19 non-SAFE zones in four layers ordered by `risk_score`. **SAFE zones must not be drawn.** Her dot with no heading cone. Attribution bottom-left, always visible. Zones must paint before tiles load.
+  *Done when:* 19 polygons render correctly over Vizag on a mobile browser, attribution is visible, and **with the page already open, disabling the network leaves the zones still rendered** with the map-offline note.
+- **T4.3 — Home session states, arm banner, demo panel**
+  Wire Home to session state: status pill, arm banner naming zone and hour, arm and disarm. Build the demo panel with the speed toggle, zone simulation, ladder jumps and reset, plus the permanent labelled banner while demo speed is on.
+  *Done when:* entering a simulated zone arms with no tap and the demo banner appears in every screenshot.
+
+> **CHECKPOINT.** HOME IS LIVE. Map, zones, her dot, session states and the demo panel on a real phone. First thing worth showing anyone.
 
 ### M1 — Session UI: onboarding, check-ins, family escalation, SOS
 
 **Risk:** med · **Verify:** spec · **Hours:** 10.5
 **Reads:** `SCREENS.md`, `BUSINESS_RULES.md`, `COMPONENT_LIBRARY.md`, `ACCESSIBILITY_SPEC.md`, `ARCHITECTURE.md`, `DATA_MODEL.md`, `COPY.md`, `WEB_PLATFORM.md`, `INTERACTION_SPEC.md`, `MOTION_SPEC.md`, `STATE_MACHINE.md`
 
-**Merged node.** Replaces `T3.2`, `T5.1`, `T6.1`, `T7.1`, whose records stay in the graph. All four read COMPONENT_LIBRARY, SCREENS, COPY and STATE_MACHINE. Merging loads that set once instead of four times. Load the reads ONCE and build all parts before reporting.
+**Merged node.** Replaces `T3.2`, `T5.1`, `T6.1`, `T7.1`. All four read COMPONENT_LIBRARY, SCREENS, COPY and STATE_MACHINE. Merging loads that set once instead of four times. Load the reads ONCE and build every part before reporting.
 
-- **T3.2 — Onboarding, permissions, favourites, PIN (Web Crypto)**
-  Four-step onboarding. Rationale screens BEFORE each browser permission prompt, never on load. Geolocation denial must not dead-end. PIN via Web Crypto: 16-byte random salt, SHA-256 over salt+pin, stored in IndexedDB. Favourites in IndexedDB, never uploaded.
-  *Done when:* onboarding completes in under 90 seconds; denying geolocation still reaches Home; and a test proves the plaintext PIN appears nowhere in IndexedDB, localStorage or the console.
-- **T5.1 — Check-in 1 and 2, Notification API, full-screen overlay**
-  Check-in 1 as a gentle in-page card plus a Notification, 90 s ring, `brand` accent, 1.0 px border, showing why it checked now. Check-in 2 full-screen overlay, 60 s ring, `amber`, 1.5 px, `requireInteraction: true`, alarm sound, long vibration. Both wire OK and Help Now into the engine. Countdown announcements at 60, 30 and 10 s via a live region. Back and Escape consumed on check-in 2.
-  *Done when:* the ladder runs 90 then 60 seconds with correct accents and borders, and dismissing the Notification does not stop the countdown.
-- **T6.1 — Family escalation builder and screen**
-  Build the family message exactly per `BUSINESS_RULES.md` section 8, including the non-removable prototype disclosure line. The UI layer builds it from repositories; the engine only emits `NotifyFamily`. Screen per `SCREENS.md` S7 with the rendered message, the 60 s `danger` ring, cancel, and the no-favourite path that continues the ladder.
-  *Done when:* escalation fires, the message is correct, cancel works, and the mock disclosure is on screen rather than only in the write-up.
-- **T7.1 — SOS screen and PIN entry**
-  SOS screen: no entry animation, elapsed timer, the statement that the state view now has it, the itemised list of what was sent with favourites as a COUNT only, `tel:` quick dial for 112, 181 and the nearest station. PIN entry with the lockout schedule and no recovery path. Implement the SOS entry common block including the catch-up SUS event when the ladder was skipped.
-  *Done when:* no navigation, back or refresh escapes SOS; only the correct PIN stops it; five wrong attempts lock out.
+**Build in this order:**
 
-### T2.2 — Map screen: Leaflet, CARTO tiles, zones, her dot
+1. Onboarding, MINIMAL: one flow for name + phone, PIN, and the location prompt. Everything after depends on a favourite and a PIN existing.
+2. Check-in 1 and check-in 2, with the Notification API and the full-screen in-page overlay.
+3. Family escalation: the composer and its screen.
+4. SOS screen and PIN entry.
+5. REDUCIBLE TAIL, only if budget allows: onboarding polish. Language selector, second and third contacts, progress-dot animation.
 
-**Risk:** med · **Verify:** spec · **Hours:** 2.5
-**Reads:** `MAP_SPEC.md`, `SCREENS.md`, `RESPONSIVE_SPEC.md`, `STATES_CATALOGUE.md`, `ARCHITECTURE.md`, `COMPONENT_LIBRARY.md`, `DESIGN_SYSTEM.md`, `WEB_PLATFORM.md`
+> **Cut line.** Steps 1 to 4 are the product. Step 5 is polish and may be dropped without the demo suffering. Commit after each step.
 
-**Prompt:** Home: full-bleed Leaflet map per `MAP_SPEC.md`, CARTO Dark Matter tiles, no key. Render the 19 non-SAFE zones in four layers ordered by `risk_score`. **SAFE zones must not be drawn.** Her dot with no heading cone. Attribution bottom-left, always visible. Zones must paint before tiles load.
+> **CHECKPOINT.** THE LADDER RUNS. Shadow, check-in 1, check-in 2, family escalation, SOS, end to end on a phone. This is the MVP: if everything stops here, there is still a working product to demo.
 
-**Done when:** 19 polygons render correctly over Vizag on a mobile browser, attribution is visible, and **with the page already open, disabling the network leaves the zones still rendered** with the map-offline note.
+### M2 — Data and trust boundary: Firebase, offline queue, anonymiser, writers
+
+**Risk:** high · **Verify:** spec, boundary, invention · **Hours:** 4.5
+**Reads:** `SETUP.md`, `SECRETS_AND_ACCESS.md`, `DATA_MODEL.md`, `ARCHITECTURE.md`, `BUSINESS_RULES.md`, `TEST_PLAN.md`, `WEB_PLATFORM.md`, `PROBLEM.md`
+
+**Merged node.** Replaces `T1.2`, `T6.2`, `T7.2`. One data layer, one trust boundary. Splitting it made the anonymiser load DATA_MODEL separately from the queue that carries its output. Load the reads ONCE and build every part before reporting.
+
+- **T1.2 — Firebase wiring, anonymous auth (project exists)**
+- **T6.2 — Offline queue in IndexedDB with backoff**
+- **T7.2 — Anonymiser and the two Firestore writers**
 
 ### M3 — Console: seed zones and the state view
 
 **Risk:** med · **Verify:** spec · **Hours:** 3.5
 **Reads:** `DATA_MODEL.md`, `SETUP.md`, `CONSOLE_SPEC.md`, `DESIGN_SYSTEM.md`, `OPERATING_MODEL.md`
 
-**Merged node.** Replaces `T8.1`, `T8.2`, whose records stay in the graph. Seeding exists only to give the console something to read. Same Firestore shape, same load. Load the reads ONCE and build all parts before reporting.
+**Merged node.** Replaces `T8.1`, `T8.2`. Seeding exists only to give the console something to read. Same Firestore shape, same load. Load the reads ONCE and build every part before reporting.
 
 - **T8.1 — Seed zones to Firestore**
-  A Node script seeding `zones/{stationId}` from the same GeoJSON. Idempotent and re-runnable. Run it once.
-  *Done when:* 24 zone documents exist and the console can draw the same map as the app.
 - **T8.2 — State view console route**
-  The state view at its own route per `CONSOLE_SPEC.md`. Same dark palette. SUS markers at zone centroids, SOS at precise coordinates, the stat strip including the false-positive rate, the record list with expandable SOS timelines, the three time filters, every non-negotiable page element. `onSnapshot` for live updates. Create the composite indexes now, not at the end.
-  *Done when:* the route loads in a logged-out private window on a phone and shows an incident created minutes earlier, without a refresh.
 
-### T4.3 — Home session states, arm banner, demo panel
+> **CHECKPOINT.** THE ARGUMENT IS COMPLETE. The console receives the anonymous SUS event and the SOS incident live. This is what the submission is actually about.
 
-**Risk:** med · **Verify:** spec · **Hours:** 2.0
-**Reads:** `SCREENS.md`, `COPY.md`, `COMPONENT_LIBRARY.md`, `MOTION_SPEC.md`, `ARCHITECTURE.md`, `DESIGN_SYSTEM.md`, `STATE_MACHINE.md`
+### M5 — Ship: submission page, demo-path Telugu and a11y, spot checks
 
-**Prompt:** Wire Home to session state: status pill, arm banner naming zone and hour, arm and disarm. Build the demo panel with the speed toggle, zone simulation, ladder jumps and reset, plus the permanent labelled banner while demo speed is on.
+**Risk:** med · **Verify:** spec · **Hours:** 3.0
+**Reads:** `SUBMISSION.md`, `COMPLIANCE.md`, `EVIDENCE.md`, `DEMO_SCRIPT.md`, `COPY.md`, `RESPONSIVE_SPEC.md`, `ACCESSIBILITY_SPEC.md`, `TEST_PLAN.md`, `BUILD_PLAN.md`
 
-**Done when:** entering a simulated zone arms with no tap and the demo banner appears in every screenshot.
+**Merged node.** Replaces `T9.0`, `T9.1`, `T9.2`. Three small nodes over the same submission and compliance set. Merged they load it once. Load the reads ONCE and build every part before reporting.
 
-### T9.0 — Submission page: video, summary, disclosures
+- **T9.0 — Submission page: video, summary, disclosures**
+  Build the submission page: the 250-word summary, the embedded video, the what-is-real and what-is-mocked lists side by side at equal prominence, and every disclaimer. State plainly that no login is required.
+  *Done when:* the page loads logged out and every link resolves.
+- **T9.1 — Localisation and a11y on the demo path only**
+  Extract every string to `en` and `te` resource files from `COPY.md`, honouring the locked vocabulary (favourites, never contacts) and keeping every string marked (iOS verbatim) character for character. Run the 320 px, 2.0x text-zoom and throttled-3G passes.
+  *Done when:* no hardcoded user-facing string remains; every screen works at 320 px and 2.0x zoom; Lighthouse mobile performance is 85 or better.
+- **T9.2 — Verification spot checks V1 to V9**
+  Run V1 through V8 and paste the raw output into `CODEX_LOG.md`, including the no-AI grep and the network-tab evidence that nothing identifying leaves the device before SOS.
+  *Done when:* all eight pass and the evidence is in the log, because the write-up quotes it.
 
-**Risk:** low · **Verify:** spec · **Hours:** 1.0
-**Reads:** `SUBMISSION.md`, `COMPLIANCE.md`, `EVIDENCE.md`, `DEMO_SCRIPT.md`
-
-**Prompt:** Build the submission page: the 250-word summary, the embedded video, the what-is-real and what-is-mocked lists side by side at equal prominence, and every disclaimer. State plainly that no login is required.
-
-**Done when:** the page loads logged out and every link resolves.
-
-### T9.1 — Localisation and a11y on the demo path only
-
-**Risk:** med · **Verify:** spec · **Hours:** 1.0
-**Reads:** `COPY.md`, `RESPONSIVE_SPEC.md`, `ACCESSIBILITY_SPEC.md`, `COMPLIANCE.md`
-
-**Prompt:** Extract every string to `en` and `te` resource files from `COPY.md`, honouring the locked vocabulary (favourites, never contacts) and keeping every string marked (iOS verbatim) character for character. Run the 320 px, 2.0x text-zoom and throttled-3G passes.
-
-**Done when:** no hardcoded user-facing string remains; every screen works at 320 px and 2.0x zoom; Lighthouse mobile performance is 85 or better.
-
-> **Diamond:** 13 workers. one worker per screen S1-S13. Then `fanout_check.py`, then merge in code.
-
-> **Scope reduced 2026-08-24.** Reduced 2026-08-24: Telugu and accessibility verified on the DEMO_SCRIPT path only, not every screen.
-
-### T9.2 — Verification spot checks V1 to V9
-
-**Risk:** HIGH · **Verify:** none · **Hours:** 1.0
-**Reads:** `TEST_PLAN.md`, `SUBMISSION.md`, `COMPLIANCE.md`, `EVIDENCE.md`, `BUILD_PLAN.md`, `DEMO_SCRIPT.md`
-
-**Prompt:** Run V1 through V8 and paste the raw output into `CODEX_LOG.md`, including the no-AI grep and the network-tab evidence that nothing identifying leaves the device before SOS.
-
-**Done when:** all eight pass and the evidence is in the log, because the write-up quotes it.
-
-> **Diamond:** 8 workers. one worker per submission check V1-V8. Then `fanout_check.py`, then merge in code.
-
-> **Scope reduced 2026-08-24.** Reduced 2026-08-24: V1 to V9 run as spot checks, not an exhaustive sweep.
+> **CHECKPOINT.** SUBMITTABLE.

@@ -13,11 +13,12 @@ token budget.** Do not re-derive where the build is: it is written below and in 
 |---|---|
 | Complete | `T1.1`, `T2.1`, `T4.1` |
 | Committed, not closed | `T4.2` at `da15bf9`. Code done. Waits on G8, the real-phone anchor and G9, all of which need the Vercel preview URL. |
-| In progress | `T1.3`, components C1 to C6 done. Fonts done, subset shaping gate passed (`anchor.font_gate_passed`). |
-| Remaining | 10 nodes, 32.0h |
+| In progress | `T1.3`. Components C1 to C6 done and more uncommitted in the worktree. Fonts done, subset shaping gate passed (`anchor.font_gate_passed`). |
+| Remaining | **7 nodes, 32.0h** |
 | Deadline | **2026-08-28 20:00 IST. No grace period.** |
 
-**Start at `T1.3`, component C7.** Then follow `graph/build_graph.json` order.
+**Start by committing the uncommitted `T1.3` work in the worktree, then finish `T1.3`.**
+Then follow `graph/build_graph.json` order. `git pull` first: the graph changed under you.
 
 ## Read once, now, then start
 
@@ -30,28 +31,67 @@ Then per node: `always_read` plus that node's `reads`. Nothing else.
 ## What changed on 2026-08-24, so you do not look for it
 
 **Dropped.** `T3.1` zone detail sheet, `T7.3` police view in-app, `T8.3` console live
-trigger. Off the judged path or duplicative. Their records stay in the graph with reasons;
-they are not in `order` and you do not build them.
+trigger. Off the judged path or duplicative. Records stay in the graph; you do not build them.
 
-**Merged.** Twelve nodes became three, so their shared reads load once:
+**Merged.** Seventeen ids became five nodes so their shared reads load once:
 
-| New | Replaces | Why |
-|---|---|---|
-| `M1` Session UI | `T3.2` `T5.1` `T6.1` `T7.1` | all four read COMPONENT_LIBRARY, SCREENS, COPY, STATE_MACHINE |
-| `M2` Data and trust boundary | `T1.2` `T6.2` `T7.2` | one data layer, one boundary |
-| `M3` Console | `T8.1` `T8.2` | seeding exists to give the console something to read |
+| New | Replaces |
+|---|---|
+| `M1` Session UI | `T3.2` `T5.1` `T6.1` `T7.1` |
+| `M2` Data and trust boundary | `T1.2` `T6.2` `T7.2` |
+| `M3` Console | `T8.1` `T8.2` |
+| `M4` Home | `T2.2` `T4.3` |
+| `M5` Ship | `T9.0` `T9.1` `T9.2` |
 
-A merged node is **one** node: load its reads once, build every part, report once. The old
-ids still resolve in the knowledge graph if you query them.
+A merged node is **one** node: load its reads once, build every part, report once. Old ids
+still resolve in the knowledge graph if you query them.
 
-**Verification is now proportional to risk.** This is the big change.
+**Order is demoability-first now, not purely risk-first.** The budget is fixed, so the order
+decides what exists if it runs out. The visible spine comes first.
 
-- `M2` **only**: full adversarial verification. Spec, boundary and invention lenses, as
-  fresh-context subagents, repeated until all three pass. Concentrate them on the
-  **anonymiser and the two Firestore writers**. That is the trust boundary and the one place
-  an error actually matters.
-- Everywhere else: **one spec verifier, one round.** G6 and the browser gate already cover
-  the mechanical part. Do not spawn more.
+| # | Node | Title | h |
+|---|---|---|---|
+| 4 | `T4.2` | Geolocation watch, arming, wake lock, tab lifecycle | 3.0 |
+| 5 | `T1.3` | Component library C1 to C14 (React) | 3.0 |
+| 6 | `M4` | Home: map, zones, her dot, session states, arm banner, demo panel | 4.5 |
+| 7 | `M1` | Session UI: onboarding, check-ins, family escalation, SOS | 10.5 |
+| 8 | `M2` | Data and trust boundary: Firebase, offline queue, anonymiser, writers | 4.5 |
+| 9 | `M3` | Console: seed zones and the state view | 3.5 |
+| 10 | `M5` | Ship: submission page, demo-path Telugu and a11y, spot checks | 3.0 |
+
+**Checkpoints. Commit at every one.**
+
+| | |
+|---|---|
+| after `T1.3` | Components exist. Nothing user-visible yet. |
+| after `M4` | HOME IS LIVE. Map, zones, her dot, session states and the demo panel on a real phone. First thing worth showing anyone. |
+| after `M1` | THE LADDER RUNS. Shadow, check-in 1, check-in 2, family escalation, SOS, end to end on a phone. This is the MVP: if everything stops here, there is still a working product to demo. |
+| after `M3` | THE ARGUMENT IS COMPLETE. The console receives the anonymous SUS event and the SOS incident live. This is what the submission is actually about. |
+| after `M5` | SUBMITTABLE. |
+
+**`M1` has a cut line inside it.** Build in the order the node states. Steps 1 to 4 are the
+product; step 5 is onboarding polish and may be dropped without the demo suffering.
+
+**Verification is proportional to risk.** `M2` **only** gets full adversarial verification:
+spec, boundary and invention as fresh-context subagents, repeated until all three pass,
+concentrated on the **anonymiser and the two Firestore writers**. Everywhere else is **one
+spec verifier, one round**. Do not spawn more.
+
+## The budget is fixed and it is the real constraint
+
+One weekly credit window. It will not be topped up mid-build. Behave accordingly:
+
+- **Commit at every checkpoint, and after every numbered step inside `M1`.** Uncommitted
+  work is work that did not happen if the window closes.
+- **Never rebuild something that is already committed.** `T1.1`, `T2.1` and `T4.1` are
+  complete. `T4.2` is committed and only waits on its anchor. Components C1 to C6 exist.
+- **Prefer finishing a node over polishing one.** A working ugly screen beats a beautiful
+  half-screen, every time, at this budget.
+- **If you judge the budget is running low**, stop at the next checkpoint, commit, and write
+  a five-line state note: what is done, what is next, what is half-done, which gates are
+  open. Do not start a node you cannot finish.
+- **Do not spend budget re-reading.** See the token discipline below; it is the whole reason
+  this restructure happened.
 
 ## Token discipline
 
@@ -81,15 +121,15 @@ npx vitest run                              must stay green
 different documents. A green G6 proves a number is known somewhere, never that it is the
 right one here. That has blocked this build twice. Check the fact id, not the number.
 
-## Human gates, both still open
+## Human gates
 
-| Before | Gate | Blocks |
-|---|---|---|
-| `T1.1` | connect the repo to Vercel | closing `T4.2`'s anchor |
-| `M2` | Firebase Web app config as `NEXT_PUBLIC_FIREBASE_*` | `M2`, `M3`, `T9.0` |
-| `T2.2` | publish the production URL as the submission link | |
-| `M3` | Firestore rules and public read go live | |
-| after `T9.0` | submission form | |
+| Gate point | What the founder must do |
+|---|---|
+| `T1.1` | connect the GitHub repo to Vercel so previews build |
+| `M2` | register the Firebase Web app and supply its config |
+| `M3` | Firestore rules and public read go live |
+| `M5` | the production Vercel URL is shared as the submission's live link |
+| `after M5` | submission form |
 
 If you reach a gated node and its gate is still open, **say so in one line and move to the
 next node that is not gated.** Do not stall, do not invent a workaround, do not weaken a

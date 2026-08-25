@@ -18,14 +18,11 @@
   "T4.1",
   "T4.2",
   "T1.3",
-  "M2",
+  "M4",
   "M1",
-  "T2.2",
+  "M2",
   "M3",
-  "T4.3",
-  "T9.0",
-  "T9.1",
-  "T9.2"
+  "M5"
  ],
  "nodes": {
   "T1.1": {
@@ -608,7 +605,7 @@
    ],
    "risk": "med",
    "cumulative_hours": 30.0,
-   "status": "pending",
+   "status": "merged",
    "run_id": null,
    "gates_passed": [],
    "artifacts": [],
@@ -618,7 +615,9 @@
    ],
    "verify_command": "spawn spec as ONE fresh-context subagent, one round. G6 and the browser gate already cover the rest.",
    "shape": "serial",
-   "fanout": null
+   "fanout": null,
+   "merged_into": "M4",
+   "merged_at": "2026-08-24"
   },
   "T4.3": {
    "id": "T4.3",
@@ -647,7 +646,7 @@
    "extra_gates": [],
    "risk": "med",
    "cumulative_hours": 35.5,
-   "status": "pending",
+   "status": "merged",
    "run_id": null,
    "gates_passed": [],
    "artifacts": [],
@@ -657,7 +656,9 @@
    ],
    "verify_command": "spawn spec as ONE fresh-context subagent, one round. G6 and the browser gate already cover the rest.",
    "shape": "serial",
-   "fanout": null
+   "fanout": null,
+   "merged_into": "M4",
+   "merged_at": "2026-08-24"
   },
   "T3.1": {
    "id": "T3.1",
@@ -1045,7 +1046,7 @@
    "extra_gates": [],
    "risk": "low",
    "cumulative_hours": 36.5,
-   "status": "pending",
+   "status": "merged",
    "run_id": null,
    "gates_passed": [],
    "artifacts": [],
@@ -1055,7 +1056,9 @@
    ],
    "verify_command": "spawn spec as ONE fresh-context subagent, one round. G6 and the browser gate already cover the rest.",
    "shape": "serial",
-   "fanout": null
+   "fanout": null,
+   "merged_into": "M5",
+   "merged_at": "2026-08-24"
   },
   "T9.1": {
    "id": "T9.1",
@@ -1082,7 +1085,7 @@
    ],
    "risk": "med",
    "cumulative_hours": 37.5,
-   "status": "pending",
+   "status": "merged",
    "run_id": null,
    "gates_passed": [],
    "artifacts": [],
@@ -1120,7 +1123,9 @@
     ],
     "merge": "code: (1) FAIL LOUDLY on any key claimed by two screens with different text - a shared-file write would have silently clobbered one; (2) FAIL on any key present in en but missing in te; (3) assert every key marked iOS-verbatim in COPY.md matches character for character; (4) emit both strings.xml files sorted by key"
    },
-   "scope_note": "Reduced 2026-08-24: Telugu and accessibility verified on the DEMO_SCRIPT path only, not every screen."
+   "scope_note": "Reduced 2026-08-24: Telugu and accessibility verified on the DEMO_SCRIPT path only, not every screen.",
+   "merged_into": "M5",
+   "merged_at": "2026-08-24"
   },
   "T9.2": {
    "id": "T9.2",
@@ -1148,7 +1153,7 @@
    ],
    "risk": "HIGH",
    "cumulative_hours": 38.5,
-   "status": "pending",
+   "status": "merged",
    "run_id": null,
    "gates_passed": [],
    "artifacts": [],
@@ -1194,7 +1199,9 @@
      "build/fanout/T9.2/summary.json"
     ]
    },
-   "scope_note": "Reduced 2026-08-24: V1 to V9 run as spot checks, not an exhaustive sweep."
+   "scope_note": "Reduced 2026-08-24: V1 to V9 run as spot checks, not an exhaustive sweep.",
+   "merged_into": "M5",
+   "merged_at": "2026-08-24"
   },
   "M1": {
    "id": "M1",
@@ -1256,11 +1263,19 @@
     "T6.1",
     "T7.1"
    ],
-   "merge_reason": "All four read COMPONENT_LIBRARY, SCREENS, COPY and STATE_MACHINE. Merging loads that set once instead of four times."
+   "merge_reason": "All four read COMPONENT_LIBRARY, SCREENS, COPY and STATE_MACHINE. Merging loads that set once instead of four times.",
+   "build_order": [
+    "1. Onboarding, MINIMAL: one flow for name + phone, PIN, and the location prompt. Everything after depends on a favourite and a PIN existing.",
+    "2. Check-in 1 and check-in 2, with the Notification API and the full-screen in-page overlay.",
+    "3. Family escalation: the composer and its screen.",
+    "4. SOS screen and PIN entry.",
+    "5. REDUCIBLE TAIL, only if budget allows: onboarding polish. Language selector, second and third contacts, progress-dot animation."
+   ],
+   "cut_line": "Steps 1 to 4 are the product. Step 5 is polish and may be dropped without the demo suffering. Commit after each step."
   },
   "M2": {
    "id": "M2",
-   "seq": 6,
+   "seq": 8,
    "title": "Data and trust boundary: Firebase, offline queue, anonymiser, writers",
    "hours": 4.5,
    "requires": [
@@ -1295,7 +1310,7 @@
     "zero_writes_before_family"
    ],
    "risk": "high",
-   "cumulative_hours": 17.0,
+   "cumulative_hours": 32.0,
    "status": "pending",
    "run_id": null,
    "gates_passed": [],
@@ -1342,7 +1357,7 @@
     "console_loads_logged_out"
    ],
    "risk": "med",
-   "cumulative_hours": 33.5,
+   "cumulative_hours": 35.5,
    "status": "pending",
    "run_id": null,
    "gates_passed": [],
@@ -1359,6 +1374,112 @@
     "T8.2"
    ],
    "merge_reason": "Seeding exists only to give the console something to read. Same Firestore shape, same load."
+  },
+  "M4": {
+   "id": "M4",
+   "seq": 6,
+   "title": "Home: map, zones, her dot, session states, arm banner, demo panel",
+   "hours": 4.5,
+   "requires": [
+    "T1.3",
+    "T2.1",
+    "T4.2"
+   ],
+   "produces": [
+    "map_screen",
+    "zones_rendered",
+    "attribution_visible",
+    "home_states",
+    "arm_banner",
+    "demo_panel"
+   ],
+   "reads": [
+    "MAP_SPEC.md",
+    "SCREENS.md",
+    "RESPONSIVE_SPEC.md",
+    "STATES_CATALOGUE.md",
+    "ARCHITECTURE.md",
+    "COMPONENT_LIBRARY.md",
+    "DESIGN_SYSTEM.md",
+    "WEB_PLATFORM.md",
+    "COPY.md",
+    "MOTION_SPEC.md",
+    "STATE_MACHINE.md"
+   ],
+   "extra_gates": [
+    "zones_render_offline"
+   ],
+   "risk": "med",
+   "cumulative_hours": 17.0,
+   "status": "pending",
+   "run_id": null,
+   "gates_passed": [],
+   "artifacts": [],
+   "corrections": [],
+   "verify_lenses": [
+    "spec"
+   ],
+   "verify_command": "spawn spec as ONE fresh-context subagent, one round.",
+   "shape": "serial",
+   "fanout": null,
+   "merged_from": [
+    "T2.2",
+    "T4.3"
+   ],
+   "merge_reason": "Both are the Home surface and share SCREENS, COMPONENT_LIBRARY, ARCHITECTURE and DESIGN_SYSTEM. Splitting them meant drawing the map, dropping context, then reloading it to put state on top of it."
+  },
+  "M5": {
+   "id": "M5",
+   "seq": 10,
+   "title": "Ship: submission page, demo-path Telugu and a11y, spot checks",
+   "hours": 3.0,
+   "requires": [
+    "M1",
+    "M3",
+    "M4"
+   ],
+   "produces": [
+    "submission_page",
+    "strings_en",
+    "strings_te",
+    "a11y_pass",
+    "v1_v8_evidence"
+   ],
+   "reads": [
+    "SUBMISSION.md",
+    "COMPLIANCE.md",
+    "EVIDENCE.md",
+    "DEMO_SCRIPT.md",
+    "COPY.md",
+    "RESPONSIVE_SPEC.md",
+    "ACCESSIBILITY_SPEC.md",
+    "TEST_PLAN.md",
+    "BUILD_PLAN.md"
+   ],
+   "extra_gates": [
+    "all_anchors_green",
+    "founder_verifies_telugu",
+    "network_tab_evidence"
+   ],
+   "risk": "med",
+   "cumulative_hours": 38.5,
+   "status": "pending",
+   "run_id": null,
+   "gates_passed": [],
+   "artifacts": [],
+   "corrections": [],
+   "verify_lenses": [
+    "spec"
+   ],
+   "verify_command": "spawn spec as ONE fresh-context subagent, one round.",
+   "shape": "serial",
+   "fanout": null,
+   "merged_from": [
+    "T9.0",
+    "T9.1",
+    "T9.2"
+   ],
+   "merge_reason": "Three small nodes over the same submission and compliance set. Merged they load it once."
   }
  },
  "verification": {
@@ -1386,20 +1507,20 @@
    "moved_2026_08_24": true
   },
   {
-   "before": "T2.2",
-   "gate": "the production Vercel URL is shared as the submission's live link",
-   "why": "this is the judged link; once shared it is judged. The repo is already connected at T1.1; this gate is about publishing, not deploying."
-  },
-  {
    "before": "M3",
    "gate": "Firestore rules and public read go live",
    "why": "public read is hard to un-publish; confirm every record is synthetic first",
    "moved_2026_08_24": true
   },
   {
-   "after": "T9.0",
+   "before": "M5",
+   "gate": "the production Vercel URL is shared as the submission's live link",
+   "why": "This is the judged link; once shared it is judged. Moved off the map node 2026-08-24: publishing the URL never blocked BUILDING the map, and gating it there stalled work for no reason. It belongs where the link is actually published."
+  },
+  {
+   "after": "M5",
    "gate": "submission form",
-   "why": "no grace period after 2026-08-28 20:00 IST"
+   "why": "no grace period after 2026-08-28 20:00 IST (T9.0 merged into M5 2026-08-24)"
   }
  ],
  "architecture": {
@@ -1477,8 +1598,39 @@
    "M3": [
     "T8.1",
     "T8.2"
+   ],
+   "M4": [
+    "T2.2",
+    "T4.3"
+   ],
+   "M5": [
+    "T9.0",
+    "T9.1",
+    "T9.2"
    ]
   },
   "note": "Retired node records are kept in `nodes` with their history intact. They are not in `order` and are not executed."
- }
+ },
+ "checkpoints": [
+  {
+   "after": "T1.3",
+   "state": "Components exist. Nothing user-visible yet."
+  },
+  {
+   "after": "M4",
+   "state": "HOME IS LIVE. Map, zones, her dot, session states and the demo panel on a real phone. First thing worth showing anyone."
+  },
+  {
+   "after": "M1",
+   "state": "THE LADDER RUNS. Shadow, check-in 1, check-in 2, family escalation, SOS, end to end on a phone. This is the MVP: if everything stops here, there is still a working product to demo."
+  },
+  {
+   "after": "M3",
+   "state": "THE ARGUMENT IS COMPLETE. The console receives the anonymous SUS event and the SOS incident live. This is what the submission is actually about."
+  },
+  {
+   "after": "M5",
+   "state": "SUBMITTABLE."
+  }
+ ]
 }
