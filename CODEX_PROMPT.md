@@ -162,5 +162,8 @@ Each is disclosed in the write-up. Claiming any of them is worse than lacking th
 
 ## Start
 
-Print the node count from `graph/build_graph.json` and the entity/edge counts from
-`kg.py check`, in two lines. Then resume `T1.3` at C7 and run continuously.
+1. `git pull`. The graph changed under you.
+2. Commit the uncommitted `T1.3` work already in the worktree before anything else.
+3. Print the node count from `graph/build_graph.json` and the entity/edge counts from
+   `kg.py check`, in two lines.
+4. Finish `T1.3`, then run continuously through `graph/build_graph.json` order.
