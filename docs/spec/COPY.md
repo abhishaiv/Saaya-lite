@@ -85,6 +85,15 @@ demo video.
 | **Demo** | | |
 | `demo_mode_active` | Demo speed is on. Timers are 6x faster than the real product. | డెమో వేగం ఆన్‌లో ఉంది. టైమర్లు అసలు ఉత్పత్తి కంటే 6 రెట్లు వేగంగా ఉన్నాయి. |
 | `demo_panel_header` | These are prototype controls for demonstrating the journey. They are not product features. | ఇవి ప్రయాణాన్ని చూపించడానికి ప్రోటోటైప్ నియంత్రణలు. ఇవి ఉత్పత్తి ఫీచర్లు కావు. |
+| `demo_speed_toggle` | Demo speed | డెమో వేగం |
+| `demo_speed_note` | Timers run %1$dx faster. The full ladder takes %2$d seconds instead of %3$d. | టైమర్లు %1$d రెట్లు వేగంగా నడుస్తాయి. పూర్తి నిచ్చెన %3$d సెకన్లకు బదులు %2$d సెకన్లు పడుతుంది. |
+| `demo_pick_zone` | Simulate entering a zone | ఒక జోన్‌లోకి ప్రవేశించినట్టు చూపించు |
+| `demo_pick_zone_hint` | Choose any of the 24 Visakhapatnam zones. | విశాఖపట్నంలోని 24 జోన్లలో ఏదైనా ఎంచుకోండి. |
+| `demo_miss_checkin` | Simulate a missed check-in | చెక్-ఇన్ మిస్ అయినట్టు చూపించు |
+| `demo_jump_family` | Jump to family escalation | ఆత్మీయుల దశకు వెళ్లు |
+| `demo_trigger_sos` | Trigger SOS | SOS ప్రారంభించు |
+| `demo_reset` | Reset session | సెషన్‌ను రీసెట్ చేయి |
+| `demo_reset_done` | Session reset. Nothing was sent. | సెషన్ రీసెట్ అయింది. ఏదీ పంపబడలేదు. |
 | **Common** | | |
 | `cta_continue` | Continue | కొనసాగించు |
 | `cta_add_another` | Add another favourite | మరో ఆత్మీయుడిని జోడించు |
@@ -152,6 +161,8 @@ its picture. These are the strings. A `contentDescription` that names an icon
 | `cd_back` | Go back | వెనక్కి వెళ్ళు |
 | `cd_close_sheet` | Close | మూసివేయి |
 | `cd_demo_panel` | Open prototype demo controls | ప్రోటోటైప్ డెమో నియంత్రణలు తెరువు |
+| `cd_demo_zone_picker` | Choose a zone to simulate entering | ప్రవేశించినట్టు చూపించడానికి ఒక జోన్ ఎంచుకోండి |
+| `cd_demo_reset` | Reset the demo session. Nothing is sent. | డెమో సెషన్‌ను రీసెట్ చేయి. ఏదీ పంపబడదు. |
 
 ### Announcements (`LiveRegion`, not visible text)
 

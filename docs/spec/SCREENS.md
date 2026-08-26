@@ -184,10 +184,19 @@ Contacts (add, edit, delete, min 0 allowed), language, change PIN (requires curr
 ## S12. DemoPanel (D1)
 Reachable from Settings, and clearly labelled, in both build types.
 
-- Toggle `DEMO` speed (divisor 6). Shows resulting ladder timings live.
-- "Simulate entering zone" with a zone picker over all 24.
-- "Simulate check-in miss", "Jump to family escalation", "Trigger SOS".
-- Reset session.
+**Every label is a `COPY.md` key.** These controls are on the judged path: a reviewer uses
+them to reproduce the journey without walking into a Vizag zone at 4 a.m. English-only
+labels would break the demo for exactly the Telugu-speaking reviewer this is built for.
+
+| Control | Key |
+|---|---|
+| Speed toggle, divisor `demo.divisor` | `demo_speed_toggle`, with `demo_speed_note` showing the resulting ladder timings live |
+| Zone picker over all 24 | `demo_pick_zone`, hint `demo_pick_zone_hint`, a11y `cd_demo_zone_picker` |
+| Simulate a missed check-in | `demo_miss_checkin` |
+| Jump to family escalation | `demo_jump_family` |
+| Trigger SOS | `demo_trigger_sos` |
+| Reset session | `demo_reset`, confirmation `demo_reset_done`, a11y `cd_demo_reset` |
+
 - Permanent header: `demo_panel_header` stating this is a prototype control, not a
   product feature.
 
