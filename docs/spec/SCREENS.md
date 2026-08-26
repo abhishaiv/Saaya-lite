@@ -90,17 +90,31 @@ re-tessellate on every frame.
 
 ## S4. Zone detail sheet (F7, F8)
 
-Opens on zone tap. Bottom sheet, 14 px radius, drag to dismiss.
+Opens on zone tap, **at C8's expanded state (55% of screen height), not the 160 px peek.**
+The details are the reason the sheet exists, so it opens showing them. Swipe down dismisses;
+there is no intermediate peek for this sheet. Bottom sheet, top radius per C8, drag to dismiss.
 
 - Header: `area_name`, `ZoneChip` with `risk_level`.
-- Stat row: `incident_count` total, `women_safety_count` women-safety. Label the second
-  clearly; it is the number she actually cares about.
-- Hour-aware line: current display risk band per `BUSINESS_RULES.md` §10.
-- `top_crimes` string, rendered as-is from `zone_info_cards.json`.
+- Stat row: `incident_count` labelled `zone_stat_incidents`, `women_safety_count` labelled
+  `zone_stat_women`. Label the second clearly; it is the number she actually cares about.
+- Hour-aware line: reuse `home_hour_context` ("Right now, %1$s reads %2$s") with the band
+  name from `risk_band_low` / `_moderate` / `_elevated` / `_high`, thresholds per
+  `BUSINESS_RULES.md` §10. **Display only.** It never changes the arming matrix, and the
+  static `risk_level` chip in the header is a different value: do not reconcile them.
+- `top_crimes` under the label `zone_top_crimes`, string rendered as-is from `zone_info_cards.json`.
 - `risk_notes` as body text.
-- Nearest station block: name, distance, **Call** button (`ACTION_DIAL`, never
-  `ACTION_CALL`, so she confirms). If `coordPrecision == "locality-approx"`, show
-  `zone_station_approx`.
+- Nearest station block under `zone_station`: name, distance formatted per
+  `BUSINESS_RULES.md` (`zone_distance_m` under 1000 m, `zone_distance_km` at or above),
+  and a `cta_call` button that is a plain `tel:` link.
+
+  **Always show the number as selectable text, and always show Call.** A browser cannot
+  reliably detect whether a `tel:` handler exists, so hiding the button on that basis is
+  not implementable. `tel:` is already the web equivalent of the Android `ACTION_DIAL` rule
+  this line used to carry: it hands off with the number filled in and she confirms the call
+  herself. Nothing dials without her.
+
+  If `coordPrecision == "locality-approx"`, show `zone_station_approx`.
+  If nothing is within 20 km, show `err_no_station` and drop the block.
 - Footer: `zone_data_source` crediting NCRB 2023 calibration.
 
 **A `SAFE` zone has no card.** Tapping one shows `zone_safe_no_data`, and we say honestly

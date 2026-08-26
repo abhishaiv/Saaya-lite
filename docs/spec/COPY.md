@@ -46,6 +46,17 @@ demo video.
 | `zone_station_approx` | This station location is approximate to the locality. | ఈ స్టేషన్ స్థానం ఆ ప్రాంతానికి సుమారుగా ఉంది. |
 | `zone_safe_no_data` | This area has few records. Fewer records is not the same as safe, it can also mean fewer reports. | ఈ ప్రాంతంలో తక్కువ రికార్డులు ఉన్నాయి. తక్కువ రికార్డులు అంటే సురక్షితం అని కాదు, తక్కువ ఫిర్యాదులు అని కూడా కావచ్చు. |
 | `zone_data_source` | Visakhapatnam records, calibrated against NCRB 2023 city data. | విశాఖపట్నం రికార్డులు, NCRB 2023 నగర డేటా ఆధారంగా. |
+| `zone_stat_incidents` | Total incidents | మొత్తం ఘటనలు |
+| `zone_stat_women` | Women-safety incidents | మహిళా భద్రత ఘటనలు |
+| `zone_top_crimes` | Most common | ఎక్కువగా జరిగేవి |
+| `zone_station` | Nearest station | సమీప స్టేషన్ |
+| `zone_distance_m` | %1$d m away | %1$d మీ. దూరంలో |
+| `zone_distance_km` | %1$s km away | %1$s కి.మీ. దూరంలో |
+| `cta_call` | Call | కాల్ చేయి |
+| `risk_band_low` | Low | తక్కువ |
+| `risk_band_moderate` | Moderate | మధ్యస్థం |
+| `risk_band_elevated` | Elevated | ఎక్కువ |
+| `risk_band_high` | High | అత్యధికం |
 | **Check-ins** | | |
 | `checkin1_title` | Just checking in | ఒకసారి చూస్తున్నాం |
 | `checkin1_body` **(iOS verbatim)** | All good? Tap I'm OK and we'll keep quietly watching over you. | అంతా బాగుందా? "నేను బాగున్నాను" నొక్కండి, మేము నిశ్శబ్దంగా మిమ్మల్ని గమనిస్తూ ఉంటాం. |
