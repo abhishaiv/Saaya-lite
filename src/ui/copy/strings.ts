@@ -46,6 +46,7 @@ export type M4Copy = Readonly<{
   statusSos: string;
   warnKeepOpenBody: string;
   warnLocationDenied: string;
+  warnPageStopped: string;
   zoneDataSource: string;
   zoneDistanceKm: string;
   zoneDistanceM: string;
@@ -104,6 +105,7 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     statusSos: "SOS active",
     warnKeepOpenBody: "Keep this tab open while you are on the stretch. If you close it, Saaya stops watching.",
     warnLocationDenied: "Saaya cannot wake on its own without location.",
+    warnPageStopped: "Your browser stopped Saaya while you were travelling. Nothing was sent.",
     zoneDataSource: "Visakhapatnam records, calibrated against NCRB 2023 city data.",
     zoneDistanceKm: "%1$s km away",
     zoneDistanceM: "%1$d m away",
@@ -160,6 +162,7 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     statusSos: "SOS యాక్టివ్",
     warnKeepOpenBody: "మీరు ఆ మార్గంలో ఉన్నంత సేపు ఈ ట్యాబ్ తెరిచి ఉంచండి. మూసివేస్తే సాయ గమనించడం ఆగిపోతుంది.",
     warnLocationDenied: "లొకేషన్ లేకుండా సాయ దానంతట అదే మేల్కొనదు.",
+    warnPageStopped: "మీరు ప్రయాణిస్తున్నప్పుడు మీ బ్రౌజర్ సాయను ఆపింది. ఏదీ పంపబడలేదు.",
     zoneDataSource: "విశాఖపట్నం రికార్డులు, NCRB 2023 నగర డేటా ఆధారంగా.",
     zoneDistanceKm: "%1$s కి.మీ. దూరంలో",
     zoneDistanceM: "%1$d మీ. దూరంలో",

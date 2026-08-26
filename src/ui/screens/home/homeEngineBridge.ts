@@ -4,6 +4,7 @@ import type {
   Command,
   HourBand,
   Outcome,
+  PersistedSession,
   Rules,
   SessionEvent,
   SessionState,
@@ -16,6 +17,9 @@ import type {
 
 export interface HomeEngineView extends RuntimeSessionSnapshot {
   readonly armMode: ArmMode;
+  readonly armedAtEpochMs: number | null;
+  readonly armedHourBand: HourBand | null;
+  readonly deadlineEpochMs: number | null;
   readonly outcome: Outcome | null;
 }
 
@@ -29,6 +33,9 @@ interface HomeEngineMemory {
   armedAtEpochMs: number | null;
   armedHourBand: HourBand | null;
   armMode: ArmMode;
+  cooldowns: Record<string, number>;
+  deadlineEpochMs: number | null;
+  sessionId: string | null;
   state: SessionState;
   susEventWritten: boolean;
 }
@@ -39,6 +46,9 @@ export class HomeEngineBridge implements RuntimeSessionBridge {
     armedAtEpochMs: null,
     armedHourBand: null,
     armMode: "MANUAL",
+    cooldowns: {},
+    deadlineEpochMs: null,
+    sessionId: null,
     state: "IDLE",
     susEventWritten: false,
   };
@@ -47,6 +57,7 @@ export class HomeEngineBridge implements RuntimeSessionBridge {
     private readonly rules: Rules,
     private readonly hourBandAt: (epochMs: number) => HourBand,
     private readonly callbacks: HomeEngineCallbacks,
+    private readonly createSessionId: () => string,
   ) {}
 
   snapshot(): RuntimeSessionSnapshot {
@@ -60,6 +71,49 @@ export class HomeEngineBridge implements RuntimeSessionBridge {
     return this.currentView(null);
   }
 
+  persistedSession(): PersistedSession | null {
+    if (
+      this.memory.sessionId === null ||
+      this.memory.armedAtEpochMs === null ||
+      this.memory.state === "IDLE"
+    ) {
+      return null;
+    }
+    return {
+      sessionId: this.memory.sessionId,
+      state: this.memory.state,
+      armMode: this.memory.armMode,
+      zoneId: this.memory.activeZoneId,
+      armedAtEpochMs: this.memory.armedAtEpochMs,
+      armedHourBand: this.memory.armedHourBand,
+      deadlineEpochMs: this.memory.deadlineEpochMs,
+      susEventWritten: this.memory.susEventWritten,
+    };
+  }
+
+  setDeadlineEpochMs(deadlineEpochMs: number | null): void {
+    if (this.memory.state === "IDLE") return;
+    this.memory.deadlineEpochMs = deadlineEpochMs;
+  }
+
+  recover(
+    persisted: PersistedSession,
+    input: { readonly nowEpochMs: number; readonly zone: Zone | null },
+  ): RuntimeSessionSnapshot {
+    this.memory = {
+      activeZoneId: persisted.zoneId,
+      armedAtEpochMs: persisted.armedAtEpochMs,
+      armedHourBand: persisted.armedHourBand,
+      armMode: persisted.armMode,
+      cooldowns: this.memory.cooldowns,
+      deadlineEpochMs: persisted.deadlineEpochMs,
+      sessionId: persisted.sessionId,
+      state: persisted.state,
+      susEventWritten: persisted.susEventWritten,
+    };
+    return this.dispatch({ kind: "AppKilledRestart", persisted }, input);
+  }
+
   dispatch(
     event: SessionEvent,
     input: { readonly nowEpochMs: number; readonly zone: Zone | null },
@@ -69,8 +123,8 @@ export class HomeEngineBridge implements RuntimeSessionBridge {
       armMode: this.memory.armMode,
       armedAtEpochMs: this.memory.armedAtEpochMs,
       armedHourBand: this.memory.armedHourBand,
-      cooldowns: {},
-      deadlineEpochMs: null,
+      cooldowns: this.memory.cooldowns,
+      deadlineEpochMs: this.memory.deadlineEpochMs,
       hasFavourite: false,
       hourBand,
       nowEpochMs: input.nowEpochMs,
@@ -86,14 +140,30 @@ export class HomeEngineBridge implements RuntimeSessionBridge {
         armedAtEpochMs: input.nowEpochMs,
         armedHourBand: auto ? hourBand : null,
         armMode: auto ? "AUTO_ZONE" : "MANUAL",
+        cooldowns: this.memory.cooldowns,
+        deadlineEpochMs: null,
+        sessionId: this.createSessionId(),
         state: "SHADOW",
         susEventWritten: false,
       };
     } else {
       this.memory.state = result.state;
+      if (
+        event.kind === "CheckInTimerFired" ||
+        event.kind === "CountdownExpired"
+      ) {
+        this.memory.deadlineEpochMs = null;
+      }
       if (result.commands.some(({ kind }) => kind === "WriteSusEvent")) {
         this.memory.susEventWritten = true;
       }
+    }
+
+    for (const command of result.commands) {
+      if (command.kind !== "StartCooldown") continue;
+      const epochMsPerMinute = 60_000; // GROUNDED-EXEMPT: SI conversion for the already-frozen cooldown duration.
+      this.memory.cooldowns[command.zoneId] =
+        input.nowEpochMs + command.minutes * epochMsPerMinute;
     }
 
     const resolvedOutcome = result.outcome ?? null;
@@ -109,6 +179,9 @@ export class HomeEngineBridge implements RuntimeSessionBridge {
         armedAtEpochMs: null,
         armedHourBand: null,
         armMode: "MANUAL",
+        cooldowns: this.memory.cooldowns,
+        deadlineEpochMs: null,
+        sessionId: null,
         state: "IDLE",
         susEventWritten: false,
       };
@@ -122,6 +195,9 @@ export class HomeEngineBridge implements RuntimeSessionBridge {
     return {
       activeZoneId: this.memory.activeZoneId,
       armMode: this.memory.armMode,
+      armedAtEpochMs: this.memory.armedAtEpochMs,
+      armedHourBand: this.memory.armedHourBand,
+      deadlineEpochMs: this.memory.deadlineEpochMs,
       outcome,
       state: this.memory.state,
     };

@@ -8,19 +8,47 @@ import type {
   MapZone,
   ZoneDetail,
 } from "../../../data/repository/zoneRepository";
-import { DEFAULT_RULES } from "../../../domain/engine/rules";
+import { IndexedDbSessionRepository } from "../../../data/db/indexedDbSessionRepository";
+import {
+  containingZones,
+  prepareContainmentZones,
+} from "../../../data/zone/containment";
+import { selectHighestRiskZone } from "../../../domain/engine/armingEvaluator";
+import {
+  DEFAULT_RULES,
+  displayRisk,
+  displayRiskLabel,
+} from "../../../domain/engine/rules";
 import type { Command, SessionState } from "../../../domain/model/session";
 import type { PoliceStation } from "../../../domain/model/policeStation";
 import { browserClock } from "../../../platform/clock";
 import { readGeolocationPermissionState } from "../../../platform/geolocationPermission";
+import {
+  createLocalSessionId,
+  HomeSessionRuntime,
+} from "../../../platform/homeSessionRuntime";
 import { hourBandAtEpochMs } from "../../../platform/hourBandClock";
+import { formatIndiaHour } from "../../../platform/indiaTime";
 import type { LeafletMapController, TileAvailability } from "../../../platform/leafletMap";
 import type { LiveLocationFix, LocationStatus } from "../../../platform/locationWatch";
 import { PageLocationRuntime } from "../../../platform/pageLocationRuntime";
+import {
+  browserVisibilitySource,
+  createPageOwnerId,
+  TabLifecycleController,
+} from "../../../platform/tabLifecycle";
+import {
+  browserWakeLockApi,
+  WakeLockController,
+} from "../../../platform/wakeLock";
 import { MapControlButton, MapControlButtonStack } from "../../components/MapControlButton";
 import { formatCopy, M4_COPY, type SaayaLocale } from "../../copy/strings";
 import { HomeEngineBridge, type HomeEngineView } from "./homeEngineBridge";
 import { HomeMap } from "./HomeMap";
+import {
+  HomeSessionSurface,
+  type ArmAcknowledgement,
+} from "./HomeSessionSurface";
 import { ZoneDetailSheet } from "./ZoneDetailSheet";
 
 export interface HomeScreenProps {
@@ -45,15 +73,27 @@ export function HomeScreen({
   const [selectedZoneId, setSelectedZoneId] = useState<string | null>(null);
   const [tileAvailability, setTileAvailability] =
     useState<TileAvailability>("loading");
+  const [nowEpochMs, setNowEpochMs] = useState(() =>
+    browserClock.nowEpochMs(),
+  );
+  const [armAcknowledgement, setArmAcknowledgement] =
+    useState<ArmAcknowledgement | null>(null);
+  const [armBannerVisible, setArmBannerVisible] = useState(false);
+  const [pageStoppedWarning, setPageStoppedWarning] = useState(false);
   const [engineView, setEngineView] = useState<HomeEngineView>({
     activeZoneId: null,
     armMode: "MANUAL",
+    armedAtEpochMs: null,
+    armedHourBand: null,
+    deadlineEpochMs: null,
     outcome: null,
     state: "IDLE",
   });
   const mapControllerRef = useRef<LeafletMapController | null>(null);
   const locationRuntimeRef = useRef<PageLocationRuntime | null>(null);
-  const commandListenerRef = useRef<(commands: readonly Command[]) => void>(() => undefined);
+  const commandListenerRef = useRef<
+    (commands: readonly Command[], view: HomeEngineView) => void
+  >(() => undefined);
   const engineRef = useRef<HomeEngineBridge | null>(null);
 
   if (engineRef.current === null) {
@@ -61,13 +101,14 @@ export function HomeScreen({
       DEFAULT_RULES,
       hourBandAtEpochMs,
       {
-        onCommands(commands) {
-          commandListenerRef.current(commands);
+        onCommands(commands, view) {
+          commandListenerRef.current(commands, view);
         },
         onView(view) {
           setEngineView(view);
         },
       },
+      createLocalSessionId,
     );
   }
 
@@ -79,10 +120,36 @@ export function HomeScreen({
         : zoneDetails.find(({ id }) => id === selectedZoneId) ?? null,
     [selectedZoneId, zoneDetails],
   );
+  const preparedZones = useMemo(() => prepareContainmentZones(zones), [zones]);
+  const currentZone = useMemo(
+    () =>
+      location === null
+        ? null
+        : selectHighestRiskZone(containingZones(preparedZones, location)),
+    [location, preparedZones],
+  );
+  const currentZoneDetail = useMemo(
+    () =>
+      currentZone === null
+        ? null
+        : zoneDetails.find(({ id }) => id === currentZone.stationId) ?? null,
+    [currentZone, zoneDetails],
+  );
+  const contextLine = useMemo(() => {
+    if (currentZoneDetail === null) return null;
+    const band = hourBandAtEpochMs(nowEpochMs);
+    const riskBand = localizedRiskBand(
+      copy,
+      displayRiskLabel(displayRisk(currentZoneDetail.zone.riskScore, band)),
+    );
+    return formatCopy(copy.homeHourContext, currentZoneDetail.label, riskBand);
+  }, [copy, currentZoneDetail, nowEpochMs]);
 
   useEffect(() => {
     const engine = engineRef.current;
     if (engine === null) return;
+    const sessions = new IndexedDbSessionRepository();
+    const wakeLock = new WakeLockController(browserWakeLockApi());
     const runtime = new PageLocationRuntime(
       zones,
       DEFAULT_RULES,
@@ -95,14 +162,94 @@ export function HomeScreen({
         },
         onLiveFix(fix) {
           setLocation(fix);
+          setNowEpochMs(fix.observedAtEpochMs);
         },
         onStatus(status) {
           setLocationStatus(status);
         },
       },
     );
+    const sessionRuntime = new HomeSessionRuntime(
+      engine,
+      sessions,
+      zones,
+      runtime,
+      wakeLock,
+      {
+        onCommand(command) {
+          if (command.kind === "ShowArmBanner") {
+            const detail = zoneDetails.find(({ id }) => id === command.zoneId);
+            if (detail === undefined) return;
+            const armedAtEpochMs =
+              engine.view().armedAtEpochMs ?? browserClock.nowEpochMs();
+            setArmAcknowledgement({
+              body: formatCopy(
+                copy.homeArmBannerBody,
+                detail.label,
+                formatIndiaHour(armedAtEpochMs, locale),
+              ),
+              title: copy.homeArmBannerTitle,
+            });
+            setArmBannerVisible(true);
+          }
+          if (command.kind === "ShowPermissionWarning") {
+            setLocationStatus("PERMISSION_DENIED");
+          }
+        },
+        onError() {
+          setPageStoppedWarning(true);
+        },
+      },
+    );
+    commandListenerRef.current = (commands, view) => {
+      sessionRuntime.handle(commands, view.state);
+    };
     locationRuntimeRef.current = runtime;
     let disposed = false;
+    const lifecycle = new TabLifecycleController(
+      browserVisibilitySource(),
+      sessions,
+      {
+        async recover(persisted, recoveredAtEpochMs) {
+          const zone =
+            zones.find((candidate) => candidate.stationId === persisted.zoneId) ??
+            null;
+          if (persisted.armMode === "AUTO_ZONE" && persisted.zoneId !== null) {
+            const detail = zoneDetails.find(({ id }) => id === persisted.zoneId);
+            if (detail !== undefined) {
+              setArmAcknowledgement({
+                body: formatCopy(
+                  copy.homeArmBannerBody,
+                  detail.label,
+                  formatIndiaHour(persisted.armedAtEpochMs, locale),
+                ),
+                title: copy.homeArmBannerTitle,
+              });
+              setArmBannerVisible(false);
+            }
+          }
+          return engine.recover(persisted, {
+            nowEpochMs: recoveredAtEpochMs,
+            zone,
+          });
+        },
+        mayResumeLocation: () => true,
+      },
+      runtime,
+      wakeLock,
+      createPageOwnerId(),
+      {
+        onPageStopped() {
+          setPageStoppedWarning(true);
+        },
+        onRecoveryError() {
+          setPageStoppedWarning(true);
+        },
+      },
+    );
+    void lifecycle.start().catch(() => {
+      if (!disposed) setPageStoppedWarning(true);
+    });
     void readGeolocationPermissionState().then((permission) => {
       if (disposed) return;
       if (permission === "granted") runtime.resumePreviouslyConsented();
@@ -111,10 +258,18 @@ export function HomeScreen({
 
     return () => {
       disposed = true;
-      runtime.stop();
+      commandListenerRef.current = () => undefined;
+      sessionRuntime.dispose();
+      void lifecycle.stop();
       locationRuntimeRef.current = null;
     };
-  }, [zones]);
+  }, [copy, locale, zoneDetails, zones]);
+
+  useEffect(() => {
+    if (engineView.state !== "IDLE") return;
+    setArmAcknowledgement(null);
+    setArmBannerVisible(false);
+  }, [engineView.state]);
 
   const handleMapController = useCallback(
     (controller: LeafletMapController | null) => {
@@ -128,6 +283,23 @@ export function HomeScreen({
   const handleZoneSelected = useCallback((zoneId: string | null) => {
     setSelectedZoneId(zoneId);
   }, []);
+  const handleManualArm = useCallback(() => {
+    setPageStoppedWarning(false);
+    setNowEpochMs(browserClock.nowEpochMs());
+    engineRef.current?.dispatch(
+      { kind: "ManualArm" },
+      { nowEpochMs: browserClock.nowEpochMs(), zone: currentZone },
+    );
+  }, [currentZone]);
+  const handleManualDisarm = useCallback(() => {
+    const activeZone =
+      zones.find(({ stationId }) => stationId === engineView.activeZoneId) ??
+      currentZone;
+    engineRef.current?.dispatch(
+      { kind: "ManualDisarm" },
+      { nowEpochMs: browserClock.nowEpochMs(), zone: activeZone },
+    );
+  }, [currentZone, engineView.activeZoneId, zones]);
 
   const mapCopy = useMemo(
     () => ({
@@ -152,6 +324,19 @@ export function HomeScreen({
         selectedZoneId={selectedZoneId}
         sessionState={engineView.state}
         tileAvailability={tileAvailability}
+      />
+
+      <HomeSessionSurface
+        armAcknowledgement={armAcknowledgement}
+        armBannerVisible={armBannerVisible}
+        contextLine={contextLine}
+        copy={copy}
+        engineView={engineView}
+        locationStatus={locationStatus}
+        onArmBannerHidden={() => setArmBannerVisible(false)}
+        onManualArm={handleManualArm}
+        onManualDisarm={handleManualDisarm}
+        pageStoppedWarning={pageStoppedWarning}
       />
 
       <div className="home-screen__controls">
@@ -201,4 +386,20 @@ export function HomeScreen({
       `}</style>
     </main>
   );
+}
+
+function localizedRiskBand(
+  copy: (typeof M4_COPY)[SaayaLocale],
+  label: ReturnType<typeof displayRiskLabel>,
+): string {
+  switch (label) {
+    case "Low":
+      return copy.riskBandLow;
+    case "Moderate":
+      return copy.riskBandModerate;
+    case "Elevated":
+      return copy.riskBandElevated;
+    case "High":
+      return copy.riskBandHigh;
+  }
 }

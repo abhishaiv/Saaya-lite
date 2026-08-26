@@ -19,7 +19,7 @@ export type SaayaBottomSheetProps = Readonly<{
   /** The parent owns the snap point so screen state remains authoritative. */
   position: SaayaBottomSheetPosition;
   /** Expanded height minus the 160 px peek, measured outside this UI component. */
-  dragRangePx: number;
+  dragRangePx: number | null;
   ariaLabel: string;
   children: ReactNode;
   className?: string;
@@ -47,12 +47,16 @@ export function SaayaBottomSheet({
   onDismiss,
 }: SaayaBottomSheetProps) {
   const [drag, setDrag] = useState<DragState | null>(null);
-  const actualDragRangePx = Math.max(0, dragRangePx);
+  const actualDragRangePx = Math.max(0, dragRangePx ?? 0);
   const settledOffsetPx = bottomSheetOffset(
     position === "expanded",
     actualDragRangePx,
   );
   const renderedOffsetPx = drag?.offsetPx ?? settledOffsetPx;
+  const renderedTransform =
+    dragRangePx === null && drag === null && position === "peek"
+      ? "translate3d(0, calc(var(--sheet-expanded-height) - var(--sheet-peek-height)), 0)"
+      : `translate3d(0, ${renderedOffsetPx}px, 0)`;
   const classes = ["saaya-bottom-sheet", className].filter(Boolean).join(" ");
 
   function handlePointerDown(event: ReactPointerEvent<HTMLButtonElement>) {
@@ -131,7 +135,7 @@ export function SaayaBottomSheet({
       className={classes}
       data-dragging={drag === null ? undefined : "true"}
       data-position={position}
-      style={{ transform: `translate3d(0, ${renderedOffsetPx}px, 0)` }}
+      style={{ transform: renderedTransform }}
     >
       <div className="saaya-bottom-sheet__content">{children}</div>
 

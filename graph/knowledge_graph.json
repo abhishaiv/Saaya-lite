@@ -313,7 +313,7 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 362,
+  "entities": 363,
   "edges": 665,
   "events": 65
  },
@@ -2964,6 +2964,12 @@
    "class": "Failure",
    "at": "2026-08-24",
    "label": "The scope cut dropped T3.1 and T7.3 and never swept the specs for what depended on them. Both were wrong cuts, and both were found by Codex hitting the dangling affordance rather than by the cut being reviewed. T3.1 was worse: SCOPE names zone detail and nearest station as why she installs it on a calm day, saying without it we would be shipping an engine nobody has a reason to own, and both the demo script and the submission video outline open the sheet on camera. A cut is not done when the node is marked dropped; it is done when every document that claimed the feature has been reconciled."
+  },
+  {
+   "id": "d.m4.session_runtime_composition",
+   "class": "Decision",
+   "label": "Home composes the existing pure SessionEngine with one platform command runtime for IndexedDB deadlines, geolocation, Wake Lock and tab recovery; React projects engine state and does not own a second state machine.",
+   "node": "M4"
   }
  ],
  "edges": [

@@ -155,7 +155,7 @@ export function ZoneDetailSheet({
           flex-direction: column;
           gap: var(--space-16);
           min-block-size: 100%; /* GROUNDED-EXEMPT: content fills the sheet surface. */
-          padding: var(--space-40) var(--screen-padding)
+          padding: var(--space-48) var(--screen-padding)
             calc(var(--space-24) + env(safe-area-inset-bottom));
           color: var(--color-text-primary);
         }
@@ -221,7 +221,7 @@ export function ZoneDetailSheet({
 
         .zone-detail__section {
           display: grid;
-          gap: var(--space-6);
+          gap: var(--space-8);
         }
 
         .zone-detail__section h3,
@@ -350,7 +350,7 @@ function StationBlock({ copy, stationDistance }: StationBlockProps) {
           flex: 0 0 auto;
           align-items: center;
           justify-content: center;
-          gap: var(--space-6);
+          gap: var(--space-8);
           min-block-size: var(--minimum-touch-target);
           padding: 0 var(--space-14);
           border-radius: var(--radius-control);

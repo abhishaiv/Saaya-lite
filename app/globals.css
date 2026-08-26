@@ -54,6 +54,12 @@ textarea {
   z-index: 6; /* GROUNDED-EXEMPT: local stacking order above map controls. */
 }
 
+.home-session-sheet {
+  --sheet-expanded-height: 55dvh; /* sheet.expanded */
+
+  z-index: 5; /* GROUNDED-EXEMPT: local stacking order above the map. */
+}
+
 .saaya-map-label-shell {
   inline-size: auto !important;
   block-size: auto !important;
