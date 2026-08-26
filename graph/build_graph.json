@@ -527,11 +527,40 @@
    ],
    "risk": "med",
    "cumulative_hours": 12.5,
-   "status": "pending",
-   "run_id": null,
-   "gates_passed": [],
-   "artifacts": [],
-   "corrections": [],
+   "status": "complete",
+   "run_id": "run.T1.3.2026-08-26.web.001",
+   "gates_passed": [
+    "fanout_14_worker_manifests_disjoint_and_semantically_audited",
+    "G1_next_build_node_20",
+    "G2_tsc_and_next_lint_zero_errors_node_20",
+    "G3_vitest_93_tests",
+    "G4_component_and_gallery_17_tests",
+    "G5_c1_c14_gallery_and_exact_ladder_geometry",
+    "G6_grounded_67_source_files",
+    "G7_twelve_non_negotiables",
+    "G8_320px_browser_gallery_and_production_404",
+    "G9_fresh_spec_verifier_round3_pass",
+    "G10_reads_check_17_types_closed",
+    "font_gate_105_rows_1298_runs_17_glyphs_130272_bytes"
+   ],
+   "failed_attempts": {
+    "G9": 2
+   },
+   "artifacts": [
+    "art.t13.web_component_library",
+    "art.t13.web_component_gallery",
+    "art.t13.web_fonts",
+    "art.t13.web_icons",
+    "art.t13.web_font_gate",
+    "art.t13.web_component_tests"
+   ],
+   "corrections": [
+    "Centralized all 17 Material Symbols in one runtime allowlist and kept DOM pointer capture inside src/platform.",
+    "Merge audit corrected a pressed-button effect that darkened text, a focused PIN error border, font-axis assertions and the Material Symbols face weight range.",
+    "The behavioural font gate shaped 105 bilingual rows as 680 Poppins and 618 Noto runs with exact glyph ids and advances at 400, 600 and 700.",
+    "The first verifier process failed to return and therefore counted as a G9 kill; its replacement killed an invented LadderCard opacity fade, which was removed before fresh round 3 passed.",
+    "The component gallery passed at a 320 px viewport with no horizontal overflow or browser errors and returns HTTP 404 in production."
+   ],
    "verify_lenses": [
     "spec"
    ],

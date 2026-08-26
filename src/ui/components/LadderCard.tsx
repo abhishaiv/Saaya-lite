@@ -255,11 +255,9 @@ export function LadderCard(props: LadderCardProps) {
 
         @keyframes ladder-card-enter {
           from {
-            opacity: 0;
             transform: translateY(16px) scale(0.94);
           }
           to {
-            opacity: 1;
             transform: translateY(0) scale(1);
           }
         }

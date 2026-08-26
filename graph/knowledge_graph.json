@@ -313,9 +313,9 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 346,
-  "edges": 652,
-  "events": 63
+  "entities": 357,
+  "edges": 662,
+  "events": 64
  },
  "entities": [
   {
@@ -2868,6 +2868,72 @@
    "class": "Decision",
    "at": "2026-08-24",
    "label": "The publish-the-production-URL human gate moved from the map node to M5. Publishing the link never blocked building the map; gating it there stalled work for no reason. It belongs where the link is actually published, which is also where it is first judged."
+  },
+  {
+   "id": "art.t13.web_component_library",
+   "class": "Artifact",
+   "label": "React component library C1 through C14 with all specified variants and states",
+   "node": "T1.3"
+  },
+  {
+   "id": "art.t13.web_component_gallery",
+   "class": "Artifact",
+   "label": "Development-only gallery rendering every C1 through C14 state at the 320 px floor",
+   "node": "T1.3"
+  },
+  {
+   "id": "art.t13.web_fonts",
+   "class": "Artifact",
+   "label": "Self-hosted Poppins, Noto Sans Telugu and Material Symbols font subsets with shipped licences",
+   "node": "T1.3"
+  },
+  {
+   "id": "art.t13.web_icons",
+   "class": "Artifact",
+   "label": "Single 17-glyph Material Symbols runtime contract preserving FILL, GRAD, opsz and wght axes",
+   "node": "T1.3"
+  },
+  {
+   "id": "art.t13.web_font_gate",
+   "class": "Artifact",
+   "label": "Behavioural HarfBuzz comparison of upstream and shipped font runs plus glyph, axis, licence and budget checks",
+   "node": "T1.3"
+  },
+  {
+   "id": "art.t13.web_component_tests",
+   "class": "Artifact",
+   "label": "Node-only SSR and pure-function component contract tests plus gallery source audit",
+   "node": "T1.3"
+  },
+  {
+   "id": "d.t13.shared_icon_source",
+   "class": "Decision",
+   "label": "Use one JSON glyph allowlist for runtime rendering and font verification so the subset and components cannot drift",
+   "node": "T1.3"
+  },
+  {
+   "id": "d.t13.browser_api_boundary",
+   "class": "Decision",
+   "label": "Keep pointer capture in src/platform so reusable UI components do not own browser API calls",
+   "node": "T1.3"
+  },
+  {
+   "id": "v.t13.spec.round3",
+   "class": "Verification",
+   "label": "Fresh spec verifier round 3 passed T1.3 with kill false at confidence 0.98",
+   "node": "T1.3"
+  },
+  {
+   "id": "fail.t13.verifier_git_placeholder",
+   "class": "Failure",
+   "label": "The first fresh verifier did not return after inspecting an iCloud-offloaded Git pack and counted as a G9 kill",
+   "node": "T1.3"
+  },
+  {
+   "id": "fail.t13.card_fade",
+   "class": "Failure",
+   "label": "Spec verifier round 2 found an invented LadderCard opacity fade where only the scrim may fade; the card fade was removed",
+   "node": "T1.3"
   }
  ],
  "edges": [
@@ -8086,6 +8152,86 @@
    "at": "2026-08-24",
    "by": "claude",
    "confidence": "high"
+  },
+  {
+   "from": "art.t13.web_component_library",
+   "rel": "produced_by",
+   "to": "node.T1.3",
+   "at": "2026-08-26",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t13.web_component_gallery",
+   "rel": "produced_by",
+   "to": "node.T1.3",
+   "at": "2026-08-26",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t13.web_fonts",
+   "rel": "produced_by",
+   "to": "node.T1.3",
+   "at": "2026-08-26",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t13.web_icons",
+   "rel": "produced_by",
+   "to": "node.T1.3",
+   "at": "2026-08-26",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t13.web_font_gate",
+   "rel": "produced_by",
+   "to": "node.T1.3",
+   "at": "2026-08-26",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t13.web_component_tests",
+   "rel": "produced_by",
+   "to": "node.T1.3",
+   "at": "2026-08-26",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "node.T1.3",
+   "rel": "verified_by",
+   "to": "v.t13.spec.round3",
+   "at": "2026-08-26",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t13.web_font_gate",
+   "rel": "verified_by",
+   "to": "anchor.font_gate_passed",
+   "at": "2026-08-26",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.t13.web_icons",
+   "rel": "respects",
+   "to": "c.opsz_floor",
+   "at": "2026-08-26",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.t13.card_fade",
+   "rel": "caused_by",
+   "to": "art.t13.web_component_library",
+   "at": "2026-08-26",
+   "by": "codex",
+   "confidence": "high"
   }
  ],
  "events": [
@@ -8821,6 +8967,14 @@
     "art.t42.web_location_watch"
    ],
    "node": "T4.2"
+  },
+  {
+   "id": "ev.0064",
+   "type": "node_completed",
+   "at": "2026-08-26",
+   "actor": "codex",
+   "detail": "T1.3 completed C1 through C14, behavioural font and icon subsets, the 320 px gallery, and fresh spec verification after removing an invented card fade",
+   "node": "T1.3"
   }
  ]
 }
