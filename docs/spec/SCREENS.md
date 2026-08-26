@@ -8,7 +8,6 @@ Gate (no UI)
  ├─ not onboarded ─> Onboarding (4 steps) ─> Home
  └─ onboarded ─────> Home
 Home
- ├─ ZoneDetailSheet (bottom sheet)
  ├─ Settings ─> ContactEdit | PinChange | DemoPanel
  ├─ PoliceView ("What the police see")
  └─ session overlays, driven by state, not by navigation:
@@ -73,7 +72,7 @@ Full-bleed dark map, controls floating over it.
 | Top | `StatusPill` showing session state. Settings icon. |
 | Map | Vizag, 19 rendered zone polygons (5 safe zones not drawn), fill from zone data. Current location dot. |
 | Bottom sheet, collapsed | Current-hour context line, `home_hour_context`. Arm/Disarm button. |
-| Floating | "What the police see" entry point. |
+| Floating | "What the police see" entry point (S10). Tapping a zone selects it visually; there is no detail sheet in this build. |
 
 ### States
 | State | Home shows |
@@ -88,23 +87,15 @@ Full-bleed dark map, controls floating over it.
 Map must render usably on a 720x1280 device at 2 GB RAM. Cap polygon redraw; do not
 re-tessellate on every frame.
 
-## S4. Zone detail sheet (F7, F8)
+## S4. Zone detail sheet (F7, F8) — NOT IN THIS BUILD
 
-Opens on zone tap. Bottom sheet, 14 px radius, drag to dismiss.
+**Dropped from scope 2026-08-24 with `T3.1`.** It is not on the judged demo path: nothing in
+`DEMO_SCRIPT.md` opens it. Tapping a zone on Home selects it visually and nothing opens; see
+`INTERACTION_SPEC.md`.
 
-- Header: `area_name`, `ZoneChip` with `risk_level`.
-- Stat row: `incident_count` total, `women_safety_count` women-safety. Label the second
-  clearly; it is the number she actually cares about.
-- Hour-aware line: current display risk band per `BUSINESS_RULES.md` §10.
-- `top_crimes` string, rendered as-is from `zone_info_cards.json`.
-- `risk_notes` as body text.
-- Nearest station block: name, distance, **Call** button (`ACTION_DIAL`, never
-  `ACTION_CALL`, so she confirms). If `coordPrecision == "locality-approx"`, show
-  `zone_station_approx`.
-- Footer: `zone_data_source` crediting NCRB 2023 calibration.
-
-**A `SAFE` zone has no card.** Tapping one shows `zone_safe_no_data`, and we say honestly
-that low recorded crime is not the same as safe.
+The specification below the cut is retained in git history, not here, so nobody builds it by
+finding it. F7 and F8 are correspondingly not claimed as delivered anywhere: if you find a
+document still claiming them, that is a defect to report.
 
 ## S5. CheckIn1 (F15, F16, F17, F18)
 

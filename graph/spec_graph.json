@@ -3,7 +3,7 @@
  "kind": "knowledge_graph",
  "note": "Domain facts with provenance. Never merge with build_graph.json - different truth standards.",
  "rule": "Every numeric or colour literal in source must trace to a fact id here, or the grounded checker fails the node.",
- "count": 381,
+ "count": 389,
  "facts": [
   {
    "id": "ladder.cd1",
@@ -4242,6 +4242,94 @@
    "governs": "MOTION_SPEC.md",
    "frozen": true,
    "platform": "web"
+  },
+  {
+   "id": "type.map.attribution",
+   "kind": "number",
+   "value": 10,
+   "unit": "px",
+   "means": "map attribution type size",
+   "sourced_from": "MAP_SPEC.md:40",
+   "governs": "MAP_SPEC.md",
+   "frozen": true,
+   "platform": "any"
+  },
+  {
+   "id": "alpha.map.zone.selected.raise",
+   "kind": "number",
+   "value": 0.1,
+   "unit": "alpha",
+   "means": "selected-zone fill opacity increase",
+   "sourced_from": "MAP_SPEC.md:52",
+   "governs": "MAP_SPEC.md",
+   "frozen": true,
+   "platform": "any"
+  },
+  {
+   "id": "alpha.map.zone.glow",
+   "kind": "number",
+   "value": 0.15,
+   "unit": "alpha",
+   "means": "zone glow stroke opacity",
+   "sourced_from": "MAP_SPEC.md:53",
+   "governs": "MAP_SPEC.md",
+   "frozen": true,
+   "platform": "any"
+  },
+  {
+   "id": "dim.map.dot.ring",
+   "kind": "number",
+   "value": 2,
+   "unit": "px",
+   "means": "location-dot ring width",
+   "sourced_from": "MAP_SPEC.md:87",
+   "governs": "MAP_SPEC.md",
+   "frozen": true,
+   "platform": "any"
+  },
+  {
+   "id": "loc.map.accuracy.circle.after",
+   "kind": "number",
+   "value": 30,
+   "unit": "m",
+   "means": "show the accuracy circle only when accuracy is worse than this",
+   "sourced_from": "MAP_SPEC.md:88",
+   "governs": "MAP_SPEC.md",
+   "frozen": true,
+   "platform": "any"
+  },
+  {
+   "id": "motion.map.shadow.halo",
+   "kind": "number",
+   "value": 2,
+   "unit": "s",
+   "means": "SHADOW breathing-halo cycle, the only ambient animation in the product",
+   "sourced_from": "MAP_SPEC.md:90",
+   "governs": "MAP_SPEC.md",
+   "frozen": true,
+   "platform": "any"
+  },
+  {
+   "id": "perf.map.zone.first_paint",
+   "kind": "number",
+   "value": 400,
+   "unit": "ms",
+   "means": "first bundled-zone paint ceiling, independent of tiles",
+   "sourced_from": "MAP_SPEC.md:128",
+   "governs": "MAP_SPEC.md",
+   "frozen": true,
+   "platform": "any"
+  },
+  {
+   "id": "map.label.all_tiers.from",
+   "kind": "number",
+   "value": 14,
+   "unit": "z",
+   "means": "zoom at which every drawn tier shows its label",
+   "sourced_from": "MAP_SPEC.md:154",
+   "governs": "MAP_SPEC.md",
+   "frozen": true,
+   "platform": "any"
   }
  ]
 }

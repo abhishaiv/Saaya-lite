@@ -9,8 +9,8 @@ Regenerate with `python3 scripts/render_build_state.py`.
 |---|---|
 | Mode | **single continuous run**, order below |
 | Next node | **T4.2** - Geolocation watch, arming, wake lock, tab lifecycle |
-| Nodes complete | 3 of 10 |
-| Total work | 38.5 h |
+| Nodes complete | 4 of 10 |
+| Total work | 40.0 h |
 
 ## Node ledger
 
@@ -23,12 +23,12 @@ hour 14 rather than hour 24. Reasoning in `docs/spec/GRAPH_ENGINEERING.md`.
 | 2 | `T2.1` | Zone parsing to typed Zone/ZoneCard/PoliceStation (TS) | low | diamond | 3.5 | spec | complete |
 | 3 | `T4.1` | Session engine, pure TypeScript, zero browser API | HIGH | serial | 6.5 | spec, boundary, invention | complete |
 | 4 | `T4.2` | Geolocation watch, arming, wake lock, tab lifecycle | HIGHEST | serial | 9.5 | spec | pending |
-| 5 | `T1.3` | Component library C1 to C14 (React) | med | diamond | 12.5 | spec | pending |
+| 5 | `T1.3` | Component library C1 to C14 (React) | med | diamond | 12.5 | spec | complete |
 | 6 | `M4` | Home: map, zones, her dot, session states, arm banner, demo panel | med | serial | 17.0 | spec | pending |
 | 7 | `M1` | Session UI: onboarding, check-ins, family escalation, SOS | med | serial | 27.5 | spec | pending |
-| 8 | `M2` | Data and trust boundary: Firebase, offline queue, anonymiser, writers | high | serial | 32.0 | spec, boundary, invention | pending |
-| 9 | `M3` | Console: seed zones and the state view | med | serial | 35.5 | spec | pending |
-| 10 | `M5` | Ship: submission page, demo-path Telugu and a11y, spot checks | med | serial | 38.5 | spec | pending |
+| 8 | `M2` | Data and trust boundary: Firebase, queue, anonymiser, writers, and the trust screen | high | serial | 33.5 | spec, boundary, invention | pending |
+| 9 | `M3` | Console: seed zones and the state view | med | serial | 37.0 | spec | pending |
+| 10 | `M5` | Ship: submission page, demo-path Telugu and a11y, spot checks | med | serial | 40.0 | spec | pending |
 
 ## Human gates
 

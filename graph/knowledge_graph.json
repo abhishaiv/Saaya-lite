@@ -313,8 +313,8 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 360,
-  "edges": 663,
+  "entities": 361,
+  "edges": 664,
   "events": 64
  },
  "entities": [
@@ -993,8 +993,8 @@
    "risk": "low",
    "shape": "serial",
    "seq": 18,
-   "superseded_by": "dropped from scope 2026-08-24",
-   "dropped_reason": "The console already shows what the police see. Building it twice buys nothing a judge will look at."
+   "superseded_by": "merged into M2 2026-08-24",
+   "merged_into": "M2"
   },
   {
    "id": "node.T8.3",
@@ -2952,6 +2952,12 @@
    "class": "Decision",
    "at": "2026-08-24",
    "label": "Map labels use area_name from zone_info_cards joined on station_id, not station_name from the geojson. A station name is a jurisdiction, not a place: it would put 'II Town Police Station' over Soldierpet and 'IV Town Police Station' over Asilmetta. She is checking a stretch she recognises, and she recognises the locality. Labelling the map with police boundaries would be a different product, and it would also read as government branding the submission explicitly disclaims."
+  },
+  {
+   "id": "fail.dropped_trust_screen",
+   "class": "Failure",
+   "at": "2026-08-24",
+   "label": "T7.3 was dropped on the rationale that the console already shows what the police see. They are different screens: the console is a control-room view of every incident, S10 is her trust screen showing what the state can see about HER right now, which through Shadow and both check-ins is nothing, shown as the headline. F28 calls it the trust feature, worth more than a privacy policy she will not read, and DEMO_SCRIPT gives it 2:12 to 2:30 and calls it the screen we care about most, with the console as a separate segment at 2:30. The scope cut deleted the feature that makes the privacy claim demonstrable instead of asserted. Reinstated into M2."
   }
  ],
  "edges": [
@@ -8255,6 +8261,14 @@
    "from": "d.demo_panel_bilingual",
    "rel": "motivated_by",
    "to": "fail.stale_telugu",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.dropped_trust_screen",
+   "rel": "caused_by",
+   "to": "d.token_restructure",
    "at": "2026-08-24",
    "by": "claude",
    "confidence": "high"

@@ -49,7 +49,7 @@ library. CSS transitions with these curves, and nothing else.
 | Countdown numeral | every tick | **no animation.** `tnum` figures, straight swap | 0 |
 | Button press | touch down | scale to 0.97, `spring` | ~120 ms |
 | Button release | touch up | back to 1.0, `spring` | ~180 ms |
-| Zone tap | tap | polygon stroke 1 to 2 px, `standard` | 150 ms |
+| Zone tap | tap | polygon stroke **1.5 to 3 px** and fill opacity +0.1, `standard` | 150 ms |
 | Zone sheet | tap | as bottom sheet | ~340 ms |
 | Map camera to zone | tap | ease-in-out camera | 400 ms |
 | Ladder accent change | rung change | **none** | **0** |

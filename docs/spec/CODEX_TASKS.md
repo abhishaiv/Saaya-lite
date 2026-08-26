@@ -30,6 +30,7 @@ Hard rules:
 
 
 
+
 ## The tasks
 
 ### T1.1 — Scaffold: Next.js, TypeScript, theme tokens, Vercel
@@ -57,16 +58,7 @@ Hard rules:
 
 ### T1.3 — Component library C1 to C14 (React)
 
-**Risk:** med · **Verify:** spec · **Hours:** 3.0
-**Reads:** `COMPONENT_LIBRARY.md`, `DESIGN_SYSTEM.md`, `ICONOGRAPHY.md`, `MOTION_SPEC.md`, `ARCHITECTURE.md`
-
-**Prompt:** Build all 14 components C1 to C14 exactly as `COMPONENT_LIBRARY.md` specifies, at the exact px values, with every listed state. Subset Material Symbols Rounded to the icon list. Build a dev-only gallery route showing every component in every state.
-
-**Done when:** the gallery renders all 14 in all states and `C3 LadderCard` matches its geometry: fill `#1F1F1F`, radius 22, padding 22, margin 30, spacing 14, border at accent 50%.
-
-> **Diamond:** 14 workers. one worker per component C1-C14. Then `fanout_check.py`, then merge in code.
-
-> **CHECKPOINT.** Components exist. Nothing user-visible yet.
+**COMPLETE.** Do not rebuild.
 
 ### M4 — Home: map, zones, her dot, session states, arm banner, demo panel
 
@@ -76,11 +68,7 @@ Hard rules:
 **Merged node.** Replaces `T2.2`, `T4.3`. Both are the Home surface and share SCREENS, COMPONENT_LIBRARY, ARCHITECTURE and DESIGN_SYSTEM. Splitting them meant drawing the map, dropping context, then reloading it to put state on top of it. Load the reads ONCE and build every part before reporting.
 
 - **T2.2 — Map screen: Leaflet, CARTO tiles, zones, her dot**
-  Home: full-bleed Leaflet map per `MAP_SPEC.md`, CARTO Dark Matter tiles, no key. Render the 19 non-SAFE zones in four layers ordered by `risk_score`. **SAFE zones must not be drawn.** Her dot with no heading cone. Attribution bottom-left, always visible. Zones must paint before tiles load.
-  *Done when:* 19 polygons render correctly over Vizag on a mobile browser, attribution is visible, and **with the page already open, disabling the network leaves the zones still rendered** with the map-offline note.
 - **T4.3 — Home session states, arm banner, demo panel**
-  Wire Home to session state: status pill, arm banner naming zone and hour, arm and disarm. Build the demo panel with the speed toggle, zone simulation, ladder jumps and reset, plus the permanent labelled banner while demo speed is on.
-  *Done when:* entering a simulated zone arms with no tap and the demo banner appears in every screenshot.
 
 > **CHECKPOINT.** HOME IS LIVE. Map, zones, her dot, session states and the demo panel on a real phone. First thing worth showing anyone.
 
@@ -103,16 +91,18 @@ Hard rules:
 
 > **CHECKPOINT.** THE LADDER RUNS. Shadow, check-in 1, check-in 2, family escalation, SOS, end to end on a phone. This is the MVP: if everything stops here, there is still a working product to demo.
 
-### M2 — Data and trust boundary: Firebase, offline queue, anonymiser, writers
+### M2 — Data and trust boundary: Firebase, queue, anonymiser, writers, and the trust screen
 
-**Risk:** high · **Verify:** spec, boundary, invention · **Hours:** 4.5
-**Reads:** `SETUP.md`, `SECRETS_AND_ACCESS.md`, `DATA_MODEL.md`, `ARCHITECTURE.md`, `BUSINESS_RULES.md`, `TEST_PLAN.md`, `WEB_PLATFORM.md`, `PROBLEM.md`
+**Risk:** high · **Verify:** spec, boundary, invention · **Hours:** 6.0
+**Reads:** `SETUP.md`, `SECRETS_AND_ACCESS.md`, `DATA_MODEL.md`, `ARCHITECTURE.md`, `BUSINESS_RULES.md`, `TEST_PLAN.md`, `WEB_PLATFORM.md`, `PROBLEM.md`, `SCREENS.md`, `COPY.md`, `COMPONENT_LIBRARY.md`, `OPERATING_MODEL.md`
 
-**Merged node.** Replaces `T1.2`, `T6.2`, `T7.2`. One data layer, one trust boundary. Splitting it made the anonymiser load DATA_MODEL separately from the queue that carries its output. Load the reads ONCE and build every part before reporting.
+**Merged node.** Replaces `T1.2`, `T6.2`, `T7.2`, `T7.3`. One data layer, one trust boundary. Splitting it made the anonymiser load DATA_MODEL separately from the queue that carries its output. T7.3 rejoins here: the trust screen renders exactly what the anonymiser produces, so building it beside the anonymiser is the one place it can be verified truthful rather than illustrative. Load the reads ONCE and build every part before reporting.
 
 - **T1.2 — Firebase wiring, anonymous auth (project exists)**
 - **T6.2 — Offline queue in IndexedDB with backoff**
 - **T7.2 — Anonymiser and the two Firestore writers**
+- **T7.3 — What the police see, in the citizen app**
+  *Reinstated:* Dropped 2026-08-24 as duplicating the console. That was wrong: the console is a control-room view of every incident, S10 is HER trust screen showing what the state can see about her right now, which in Shadow and both check-ins is nothing. F28 calls it the trust feature. DEMO_SCRIPT gives it 2:12 to 2:30 and calls it the screen we care about most; the console is a separate segment at 2:30. Folded into M2, which owns the anonymiser whose output this screen renders.
 
 ### M3 — Console: seed zones and the state view
 
@@ -134,13 +124,7 @@ Hard rules:
 **Merged node.** Replaces `T9.0`, `T9.1`, `T9.2`. Three small nodes over the same submission and compliance set. Merged they load it once. Load the reads ONCE and build every part before reporting.
 
 - **T9.0 — Submission page: video, summary, disclosures**
-  Build the submission page: the 250-word summary, the embedded video, the what-is-real and what-is-mocked lists side by side at equal prominence, and every disclaimer. State plainly that no login is required.
-  *Done when:* the page loads logged out and every link resolves.
 - **T9.1 — Localisation and a11y on the demo path only**
-  Extract every string to `en` and `te` resource files from `COPY.md`, honouring the locked vocabulary (favourites, never contacts) and keeping every string marked (iOS verbatim) character for character. Run the 320 px, 2.0x text-zoom and throttled-3G passes.
-  *Done when:* no hardcoded user-facing string remains; every screen works at 320 px and 2.0x zoom; Lighthouse mobile performance is 85 or better.
 - **T9.2 — Verification spot checks V1 to V9**
-  Run V1 through V8 and paste the raw output into `CODEX_LOG.md`, including the no-AI grep and the network-tab evidence that nothing identifying leaves the device before SOS.
-  *Done when:* all eight pass and the evidence is in the log, because the write-up quotes it.
 
 > **CHECKPOINT.** SUBMITTABLE.

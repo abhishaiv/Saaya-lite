@@ -145,12 +145,12 @@ Risk-first, not phase-first. Do not reorder it.
 |  2 | `T2.1` ✓ | Zone parsing to typed Zone/ZoneCard/PoliceStation (TS) | low | spec | 3.5 |
 |  3 | `T4.1` ✓ | Session engine, pure TypeScript, zero browser API | HIGH | spec, boundary, invention | 6.5 |
 |  4 | `T4.2` | Geolocation watch, arming, wake lock, tab lifecycle | HIGHEST | spec | 9.5 |
-|  5 | `T1.3` | Component library C1 to C14 (React) | med | spec | 12.5 |
+|  5 | `T1.3` ✓ | Component library C1 to C14 (React) | med | spec | 12.5 |
 |  6 | `M4` | Home: map, zones, her dot, session states, arm banner, demo panel | med | spec | 17.0 |
 |  7 | `M1` | Session UI: onboarding, check-ins, family escalation, SOS | med | spec | 27.5 |
-|  8 | `M2` | Data and trust boundary: Firebase, offline queue, anonymiser, writers | high | spec, boundary, invention | 32.0 |
-|  9 | `M3` | Console: seed zones and the state view | med | spec | 35.5 |
-| 10 | `M5` | Ship: submission page, demo-path Telugu and a11y, spot checks | med | spec | 38.5 |
+|  8 | `M2` | Data and trust boundary: Firebase, queue, anonymiser, writers, and the trust screen | high | spec, boundary, invention | 33.5 |
+|  9 | `M3` | Console: seed zones and the state view | med | spec | 37.0 |
+| 10 | `M5` | Ship: submission page, demo-path Telugu and a11y, spot checks | med | spec | 40.0 |
 
 **10 nodes, down from 22.** Restructured 2026-08-24 for a fixed weekly credit budget.
 Dropped `T3.1`, `T7.3`, `T8.3`. Merged seventeen ids into `M1` to `M5` so shared reads load

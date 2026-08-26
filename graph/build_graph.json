@@ -11,7 +11,7 @@
   "copy:ios_verbatim",
   "invariant:trust_boundary_at_sos"
  ],
- "total_hours": 38.5,
+ "total_hours": 40.0,
  "order": [
   "T1.1",
   "T2.1",
@@ -1006,7 +1006,7 @@
    "extra_gates": [],
    "risk": "low",
    "cumulative_hours": 39.0,
-   "status": "dropped",
+   "status": "merged",
    "run_id": null,
    "gates_passed": [],
    "artifacts": [],
@@ -1017,8 +1017,9 @@
    "verify_command": "spawn spec as fresh-context subagents; merge verdicts in code",
    "shape": "serial",
    "fanout": null,
-   "dropped_reason": "The console already shows what the police see. Building it twice buys nothing a judge will look at.",
-   "dropped_at": "2026-08-24"
+   "merged_into": "M2",
+   "merged_at": "2026-08-24",
+   "reinstated_reason": "Dropped 2026-08-24 as duplicating the console. That was wrong: the console is a control-room view of every incident, S10 is HER trust screen showing what the state can see about her right now, which in Shadow and both check-ins is nothing. F28 calls it the trust feature. DEMO_SCRIPT gives it 2:12 to 2:30 and calls it the screen we care about most; the console is a separate segment at 2:30. Folded into M2, which owns the anonymiser whose output this screen renders."
   },
   "T8.3": {
    "id": "T8.3",
@@ -1305,8 +1306,8 @@
   "M2": {
    "id": "M2",
    "seq": 8,
-   "title": "Data and trust boundary: Firebase, offline queue, anonymiser, writers",
-   "hours": 4.5,
+   "title": "Data and trust boundary: Firebase, queue, anonymiser, writers, and the trust screen",
+   "hours": 6.0,
    "requires": [
     "T1.1",
     "T4.1"
@@ -1320,7 +1321,8 @@
     "anonymiser",
     "sus_writer",
     "sos_writer",
-    "firestore_rules_deployed"
+    "firestore_rules_deployed",
+    "police_view"
    ],
    "reads": [
     "SETUP.md",
@@ -1330,7 +1332,11 @@
     "BUSINESS_RULES.md",
     "TEST_PLAN.md",
     "WEB_PLATFORM.md",
-    "PROBLEM.md"
+    "PROBLEM.md",
+    "SCREENS.md",
+    "COPY.md",
+    "COMPONENT_LIBRARY.md",
+    "OPERATING_MODEL.md"
    ],
    "extra_gates": [
     "AnonymiserTest",
@@ -1339,7 +1345,7 @@
     "zero_writes_before_family"
    ],
    "risk": "high",
-   "cumulative_hours": 32.0,
+   "cumulative_hours": 33.5,
    "status": "pending",
    "run_id": null,
    "gates_passed": [],
@@ -1356,9 +1362,10 @@
    "merged_from": [
     "T1.2",
     "T6.2",
-    "T7.2"
+    "T7.2",
+    "T7.3"
    ],
-   "merge_reason": "One data layer, one trust boundary. Splitting it made the anonymiser load DATA_MODEL separately from the queue that carries its output."
+   "merge_reason": "One data layer, one trust boundary. Splitting it made the anonymiser load DATA_MODEL separately from the queue that carries its output. T7.3 rejoins here: the trust screen renders exactly what the anonymiser produces, so building it beside the anonymiser is the one place it can be verified truthful rather than illustrative."
   },
   "M3": {
    "id": "M3",
@@ -1386,7 +1393,7 @@
     "console_loads_logged_out"
    ],
    "risk": "med",
-   "cumulative_hours": 35.5,
+   "cumulative_hours": 37.0,
    "status": "pending",
    "run_id": null,
    "gates_passed": [],
@@ -1491,7 +1498,7 @@
     "network_tab_evidence"
    ],
    "risk": "med",
-   "cumulative_hours": 38.5,
+   "cumulative_hours": 40.0,
    "status": "pending",
    "run_id": null,
    "gates_passed": [],
@@ -1609,7 +1616,6 @@
  "retired": {
   "dropped": [
    "T3.1",
-   "T7.3",
    "T8.3"
   ],
   "merged": {
@@ -1622,7 +1628,8 @@
    "M2": [
     "T1.2",
     "T6.2",
-    "T7.2"
+    "T7.2",
+    "T7.3"
    ],
    "M3": [
     "T8.1",
