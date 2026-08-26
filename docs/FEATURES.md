@@ -72,8 +72,8 @@ Without this stage there is no product, only an engine. Nobody installs an engin
 | # | Feature | What she experiences | Why it helps her | Status |
 |---|---|---|---|---|
 | F6 | Visakhapatnam risk-zone map | 24 zones drawn over the city | She opens it to decide something, not because she is afraid. This is the habit that means the app is installed on the night it matters. | Real |
-| F7 | Tap a zone for detail | Risk level, total incidents, women-safety incidents | She can check a stretch before committing to it. Borker's study shows women already pay roughly Rs 18,800 a year making this decision blind. | **Cut 2026-08-24** |
-| F8 | Nearest police station, distance, call | Station name, metres, a call button | Standing somewhere and wanting to know how far help actually is. | **Cut 2026-08-24** |
+| F7 | Tap a zone for detail | Risk level, total incidents, women-safety incidents | She can check a stretch before committing to it. Borker's study shows women already pay roughly Rs 18,800 a year making this decision blind. | Real |
+| F8 | Nearest police station, distance, call | Station name, metres, a call button | Standing somewhere and wanting to know how far help actually is. | Real |
 | F9 | Risk that moves with the hour | The same zone reads differently at 14:00 and 02:00 | A static hotspot table cannot say this, and the hour is most of the risk. | Real |
 
 ## Stage 3: Shadow mode, the one claim that matters
@@ -126,7 +126,7 @@ Without this stage there is no product, only an engine. Nobody installs an engin
 
 | # | Feature | Why it helps her | Status |
 |---|---|---|---|
-| F31 | Low-end phone, min SDK 24, small deployed site | The women most exposed are not on flagship phones. | Real |
+| F31 | Low-end phone, 320 px viewport floor, small deployed site | The women most exposed are not on flagship phones. | Real |
 | F32 | Works on 3G and through drops | See F22. | Real |
 | F33 | Zero-tap primary path | The strongest accessibility property in the build. Low digital literacy stops being a barrier when correct usage is to do nothing. | Real |
 

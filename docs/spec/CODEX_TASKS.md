@@ -31,6 +31,7 @@ Hard rules:
 
 
 
+
 ## The tasks
 
 ### T1.1 — Scaffold: Next.js, TypeScript, theme tokens, Vercel
@@ -60,15 +61,17 @@ Hard rules:
 
 **COMPLETE.** Do not rebuild.
 
-### M4 — Home: map, zones, her dot, session states, arm banner, demo panel
+### M4 — Home: map, zones, zone detail, session states, arm banner, demo panel
 
-**Risk:** med · **Verify:** spec · **Hours:** 4.5
-**Reads:** `MAP_SPEC.md`, `SCREENS.md`, `RESPONSIVE_SPEC.md`, `STATES_CATALOGUE.md`, `ARCHITECTURE.md`, `COMPONENT_LIBRARY.md`, `DESIGN_SYSTEM.md`, `WEB_PLATFORM.md`, `COPY.md`, `MOTION_SPEC.md`, `STATE_MACHINE.md`
+**Risk:** med · **Verify:** spec · **Hours:** 6.5
+**Reads:** `MAP_SPEC.md`, `SCREENS.md`, `RESPONSIVE_SPEC.md`, `STATES_CATALOGUE.md`, `ARCHITECTURE.md`, `COMPONENT_LIBRARY.md`, `DESIGN_SYSTEM.md`, `WEB_PLATFORM.md`, `COPY.md`, `MOTION_SPEC.md`, `STATE_MACHINE.md`, `BUSINESS_RULES.md`
 
-**Merged node.** Replaces `T2.2`, `T4.3`. Both are the Home surface and share SCREENS, COMPONENT_LIBRARY, ARCHITECTURE and DESIGN_SYSTEM. Splitting them meant drawing the map, dropping context, then reloading it to put state on top of it. Load the reads ONCE and build every part before reporting.
+**Merged node.** Replaces `T2.2`, `T4.3`, `T3.1`. Both are the Home surface and share SCREENS, COMPONENT_LIBRARY, ARCHITECTURE and DESIGN_SYSTEM. Splitting them meant drawing the map, dropping context, then reloading it to put state on top of it. T3.1 rejoins here: the sheet opens from the map it is merged with, and both read SCREENS, COMPONENT_LIBRARY and COPY. Load the reads ONCE and build every part before reporting.
 
 - **T2.2 — Map screen: Leaflet, CARTO tiles, zones, her dot**
 - **T4.3 — Home session states, arm banner, demo panel**
+- **T3.1 — Zone detail sheet, nearest station**
+  *Reinstated 2026-08-24:* Dropped 2026-08-24 as off the judged path. That was wrong. SCOPE names zone detail and nearest station as why she installs it on a calm day and says without it we would be shipping an engine nobody has a reason to own. DEMO_SCRIPT spends 0:50 to 1:02 opening the sheet; SUBMISSION's video outline spends 0:25 to 0:40 on it. It is the payoff of the map: colour without explanation is decoration. Folded into M4, which owns the Home surface it opens from.
 
 > **CHECKPOINT.** HOME IS LIVE. Map, zones, her dot, session states and the demo panel on a real phone. First thing worth showing anyone.
 
@@ -102,7 +105,7 @@ Hard rules:
 - **T6.2 — Offline queue in IndexedDB with backoff**
 - **T7.2 — Anonymiser and the two Firestore writers**
 - **T7.3 — What the police see, in the citizen app**
-  *Reinstated:* Dropped 2026-08-24 as duplicating the console. That was wrong: the console is a control-room view of every incident, S10 is HER trust screen showing what the state can see about her right now, which in Shadow and both check-ins is nothing. F28 calls it the trust feature. DEMO_SCRIPT gives it 2:12 to 2:30 and calls it the screen we care about most; the console is a separate segment at 2:30. Folded into M2, which owns the anonymiser whose output this screen renders.
+  *Reinstated 2026-08-24:* Dropped 2026-08-24 as duplicating the console. That was wrong: the console is a control-room view of every incident, S10 is HER trust screen showing what the state can see about her right now, which in Shadow and both check-ins is nothing. F28 calls it the trust feature. DEMO_SCRIPT gives it 2:12 to 2:30 and calls it the screen we care about most; the console is a separate segment at 2:30. Folded into M2, which owns the anonymiser whose output this screen renders.
 
 ### M3 — Console: seed zones and the state view
 

@@ -30,8 +30,13 @@ Then per node: `always_read` plus that node's `reads`. Nothing else.
 
 ## What changed on 2026-08-24, so you do not look for it
 
-**Dropped.** `T3.1` zone detail sheet, `T7.3` police view in-app, `T8.3` console live
-trigger. Off the judged path or duplicative. Records stay in the graph; you do not build them.
+**Dropped.** `T8.3` console live trigger only. The live update arriving without a refresh is
+the point; a button that triggers it is not.
+
+**Two earlier drops were reversed.** `T3.1` zone detail and `T7.3` the in-app trust screen
+were cut on 2026-08-24 and reinstated the same day, because both were load-bearing:
+`SCOPE` calls zone detail the reason she installs it on a calm day, and `DEMO_SCRIPT` opens
+both on camera. `T3.1` is folded into `M4`, `T7.3` into `M2`. Build them.
 
 **Merged.** Seventeen ids became five nodes so their shared reads load once:
 

@@ -49,7 +49,7 @@ hide it behind a sheet and do not shorten it.
 |---|---|
 | Fill | the zone's own `color` at its own `opacity` (typically 0.35) |
 | Stroke | same `color` at full strength, **1.5 px** |
-| Stroke, selected | **3 px**, plus fill opacity raised by 0.1. Selection is visual only: there is no zone sheet in this build, so a tap highlights the zone and nothing opens. |
+| Stroke, selected | **3 px**, plus fill opacity raised by 0.1 |
 | Glow | a second stroke beneath at 6 px, same colour, 15% opacity, giving the soft bloom the deck screenshots have |
 | Label | `area_name`, `label` type, `textPrimary` at 80%, centred on the centroid, **hidden below zoom 12**. See below for where the field lives. |
 | Draw order | glow, fill, stroke, label. Higher `risk_score` draws on top so a high zone is never buried under a moderate one. |
@@ -93,9 +93,12 @@ Never auto-centre while she is panning. Offer a `MapControlButton` to recentre i
 
 ## Police stations
 
-**Not in this build.** Station markers belonged to the zone detail sheet, which was dropped
-from scope on 2026-08-24 along with `T3.1`. The `local_police` glyph is deliberately not in
-the icon subset. Do not add markers, and do not add the glyph.
+**Map station markers are not in this build**, though the zone sheet's nearest-station block
+is. The markers were a separate map layer needing a `local_police` glyph that is not in the
+frozen 17-icon subset, and nothing in `DEMO_SCRIPT.md` taps one. Do not add the glyph.
+
+The nearest-station block inside the zone sheet stays: it uses `call`, which is in the
+subset, and the same nearest-station computation the SOS payload already needs.
 
 ## Controls
 

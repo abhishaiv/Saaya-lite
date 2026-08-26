@@ -313,8 +313,8 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 361,
-  "edges": 664,
+  "entities": 362,
+  "edges": 665,
   "events": 64
  },
  "entities": [
@@ -923,8 +923,8 @@
    "risk": "low",
    "shape": "serial",
    "seq": 11,
-   "superseded_by": "dropped from scope 2026-08-24",
-   "dropped_reason": "Not on the judged demo path. The zone sheet is reachable but nothing in DEMO_SCRIPT.md opens it."
+   "superseded_by": "merged into M4 2026-08-24",
+   "merged_into": "M4"
   },
   {
    "id": "node.T3.2",
@@ -2958,6 +2958,12 @@
    "class": "Failure",
    "at": "2026-08-24",
    "label": "T7.3 was dropped on the rationale that the console already shows what the police see. They are different screens: the console is a control-room view of every incident, S10 is her trust screen showing what the state can see about HER right now, which through Shadow and both check-ins is nothing, shown as the headline. F28 calls it the trust feature, worth more than a privacy policy she will not read, and DEMO_SCRIPT gives it 2:12 to 2:30 and calls it the screen we care about most, with the console as a separate segment at 2:30. The scope cut deleted the feature that makes the privacy claim demonstrable instead of asserted. Reinstated into M2."
+  },
+  {
+   "id": "fail.cut_without_sweep",
+   "class": "Failure",
+   "at": "2026-08-24",
+   "label": "The scope cut dropped T3.1 and T7.3 and never swept the specs for what depended on them. Both were wrong cuts, and both were found by Codex hitting the dangling affordance rather than by the cut being reviewed. T3.1 was worse: SCOPE names zone detail and nearest station as why she installs it on a calm day, saying without it we would be shipping an engine nobody has a reason to own, and both the demo script and the submission video outline open the sheet on camera. A cut is not done when the node is marked dropped; it is done when every document that claimed the feature has been reconciled."
   }
  ],
  "edges": [
@@ -8267,6 +8273,14 @@
   },
   {
    "from": "fail.dropped_trust_screen",
+   "rel": "caused_by",
+   "to": "d.token_restructure",
+   "at": "2026-08-24",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.cut_without_sweep",
    "rel": "caused_by",
    "to": "d.token_restructure",
    "at": "2026-08-24",

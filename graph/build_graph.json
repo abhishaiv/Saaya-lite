@@ -11,7 +11,7 @@
   "copy:ios_verbatim",
   "invariant:trust_boundary_at_sos"
  ],
- "total_hours": 40.0,
+ "total_hours": 42.0,
  "order": [
   "T1.1",
   "T2.1",
@@ -713,7 +713,7 @@
    "extra_gates": [],
    "risk": "low",
    "cumulative_hours": 23.5,
-   "status": "dropped",
+   "status": "merged",
    "run_id": null,
    "gates_passed": [],
    "artifacts": [],
@@ -724,8 +724,9 @@
    "verify_command": "spawn spec as fresh-context subagents; merge verdicts in code",
    "shape": "serial",
    "fanout": null,
-   "dropped_reason": "Not on the judged demo path. The zone sheet is reachable but nothing in DEMO_SCRIPT.md opens it.",
-   "dropped_at": "2026-08-24"
+   "merged_into": "M4",
+   "merged_at": "2026-08-24",
+   "reinstated_reason": "Dropped 2026-08-24 as off the judged path. That was wrong. SCOPE names zone detail and nearest station as why she installs it on a calm day and says without it we would be shipping an engine nobody has a reason to own. DEMO_SCRIPT spends 0:50 to 1:02 opening the sheet; SUBMISSION's video outline spends 0:25 to 0:40 on it. It is the payoff of the map: colour without explanation is decoration. Folded into M4, which owns the Home surface it opens from."
   },
   "T3.2": {
    "id": "T3.2",
@@ -1275,7 +1276,7 @@
     "checkin2_over_lockscreen"
    ],
    "risk": "med",
-   "cumulative_hours": 27.5,
+   "cumulative_hours": 29.5,
    "status": "pending",
    "run_id": null,
    "gates_passed": [],
@@ -1345,7 +1346,7 @@
     "zero_writes_before_family"
    ],
    "risk": "high",
-   "cumulative_hours": 33.5,
+   "cumulative_hours": 35.5,
    "status": "pending",
    "run_id": null,
    "gates_passed": [],
@@ -1393,7 +1394,7 @@
     "console_loads_logged_out"
    ],
    "risk": "med",
-   "cumulative_hours": 37.0,
+   "cumulative_hours": 39.0,
    "status": "pending",
    "run_id": null,
    "gates_passed": [],
@@ -1414,8 +1415,8 @@
   "M4": {
    "id": "M4",
    "seq": 6,
-   "title": "Home: map, zones, her dot, session states, arm banner, demo panel",
-   "hours": 4.5,
+   "title": "Home: map, zones, zone detail, session states, arm banner, demo panel",
+   "hours": 6.5,
    "requires": [
     "T1.3",
     "T2.1",
@@ -1427,7 +1428,9 @@
     "attribution_visible",
     "home_states",
     "arm_banner",
-    "demo_panel"
+    "demo_panel",
+    "zone_sheet",
+    "nearest_station"
    ],
    "reads": [
     "MAP_SPEC.md",
@@ -1440,13 +1443,14 @@
     "WEB_PLATFORM.md",
     "COPY.md",
     "MOTION_SPEC.md",
-    "STATE_MACHINE.md"
+    "STATE_MACHINE.md",
+    "BUSINESS_RULES.md"
    ],
    "extra_gates": [
     "zones_render_offline"
    ],
    "risk": "med",
-   "cumulative_hours": 17.0,
+   "cumulative_hours": 19.0,
    "status": "pending",
    "run_id": null,
    "gates_passed": [],
@@ -1460,9 +1464,10 @@
    "fanout": null,
    "merged_from": [
     "T2.2",
-    "T4.3"
+    "T4.3",
+    "T3.1"
    ],
-   "merge_reason": "Both are the Home surface and share SCREENS, COMPONENT_LIBRARY, ARCHITECTURE and DESIGN_SYSTEM. Splitting them meant drawing the map, dropping context, then reloading it to put state on top of it."
+   "merge_reason": "Both are the Home surface and share SCREENS, COMPONENT_LIBRARY, ARCHITECTURE and DESIGN_SYSTEM. Splitting them meant drawing the map, dropping context, then reloading it to put state on top of it. T3.1 rejoins here: the sheet opens from the map it is merged with, and both read SCREENS, COMPONENT_LIBRARY and COPY."
   },
   "M5": {
    "id": "M5",
@@ -1498,7 +1503,7 @@
     "network_tab_evidence"
    ],
    "risk": "med",
-   "cumulative_hours": 40.0,
+   "cumulative_hours": 42.0,
    "status": "pending",
    "run_id": null,
    "gates_passed": [],
@@ -1615,7 +1620,6 @@
  },
  "retired": {
   "dropped": [
-   "T3.1",
    "T8.3"
   ],
   "merged": {
@@ -1637,7 +1641,8 @@
    ],
    "M4": [
     "T2.2",
-    "T4.3"
+    "T4.3",
+    "T3.1"
    ],
    "M5": [
     "T9.0",

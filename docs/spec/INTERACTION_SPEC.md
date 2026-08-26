@@ -49,12 +49,13 @@ are safety-critical.
 | Screen | Gesture | Result |
 |---|---|---|
 | Map | pan, pinch, rotate disabled | pan and zoom only. Rotation is disorienting and adds nothing. |
-| Map | tap a zone | **selects it: stroke 1.5 to 3 px, fill +0.1, over 150 ms.** Nothing opens. The zone detail sheet was dropped from scope on 2026-08-24. |
-| Map | tap empty space | clears the selection |
+| Map | tap a zone | opens the zone sheet; stroke 1.5 to 3 px and fill +0.1 over 150 ms |
+| Map | tap empty space | dismisses the zone sheet |
 | Map | long press | **nothing.** No hidden actions. |
 | Map | double tap | zoom in one step |
 | Bottom sheet | drag up or down | expand or collapse, follows the finger |
 | Bottom sheet | swipe down past 40% | collapse to peek. **Never fully dismissible**, it holds the primary action. |
+| Zone sheet | swipe down | dismiss |
 | `LadderCard` | tap scrim | **nothing.** Deliberately not dismissible. |
 | `LadderCard` | swipe | **nothing.** |
 | Check-in 1 notification | swipe away | dismisses the notification, **not the countdown**. `checkin_persist_note` says so on the card. |
