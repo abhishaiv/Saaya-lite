@@ -313,8 +313,8 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 364,
-  "edges": 666,
+  "entities": 367,
+  "edges": 667,
   "events": 65
  },
  "entities": [
@@ -2976,6 +2976,24 @@
    "class": "Decision",
    "at": "2026-08-26",
    "label": "demo.arm.hour is 04:00 IST. One frozen hour, one source, used by everything that shows or derives an hour for a demo-armed session: the arm banner, checkin1_reason, the armedHourBand that FREEZE_AT_ARM captures, and the SUS record's hourBand. 04:00 sits inside NIGHT_DEEP so a HIGH zone genuinely arms, and it is the 4 a.m. the whole narrative opens on. The clock itself is not frozen: ctx.nowEpochMs stays real so countdowns, deadlines and recovery behave exactly as in a live session. Only the hour-of-day used for band derivation and display is pinned."
+  },
+  {
+   "id": "fail.settings_unowned",
+   "class": "Failure",
+   "label": "S11 Settings existed in the screen spec with no owning node in the graph. Nothing built it, which also made the demo panel unreachable, since the panel is reached through Settings. A screen can be fully specified and still have no builder; the reads arrays are checked for closure but nothing checked that every specified screen has a producer.",
+   "at": "2026-08-26"
+  },
+  {
+   "id": "d.settings_split",
+   "class": "Decision",
+   "label": "Settings is a shell three nodes fill: M4 builds the shell, about and disclaimers, and the demo entry; M1 adds contacts, PIN change and language; M2 adds the police-view row with the screen behind it. A row appears only when its screen exists, so M4 ships no entry point that leads nowhere. M4 completes on its own rows rather than waiting for M1 or M2, because the M4 checkpoint is the first thing anyone is shown.",
+   "at": "2026-08-26"
+  },
+  {
+   "id": "d.safe_zone_via_picker",
+   "class": "Decision",
+   "label": "SAFE zones stay undrawn and are reachable only from the DemoPanel picker, which covers all 24. Selecting one opens the sheet with zone_safe_no_data and does not arm, since the matrix has no SAFE row. The path is kept rather than cut because the message is the point: fewer records is not the same as safe, it can also mean fewer reports. The map tap in TEST_PLAN M7 was untestable, since an undrawn zone cannot be tapped.",
+   "at": "2026-08-26"
   }
  ],
  "edges": [
@@ -8303,6 +8321,14 @@
    "from": "d.demo_hour_frozen",
    "rel": "motivated_by",
    "to": "fail.demo_hour_mismatch",
+   "at": "2026-08-26",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.settings_split",
+   "rel": "motivated_by",
+   "to": "fail.settings_unowned",
    "at": "2026-08-26",
    "by": "claude",
    "confidence": "high"

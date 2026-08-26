@@ -117,7 +117,7 @@ Run on a **real mobile browser** at the Vercel preview URL, not a desktop devtoo
 | M4 | the map | 19 zones drawn, 5 SAFE zones absent, attribution visible |
 | M5 | throttle to offline, reload | zones still render with the map-offline note |
 | M6 | tap a high zone | counts, top crimes, nearest station, `tel:` link opens the dialer |
-| M7 | tap a SAFE zone | `zone_safe_no_data`, not an empty card |
+| M7 | select a SAFE zone **from the DemoPanel picker** | `zone_safe_no_data`, not an empty card, and **no session arms**. SAFE zones are not drawn, so there is no map tap to test. |
 | M8 | demo panel, simulate entering a HIGH zone at NIGHT_DEEP | **arms with no tap**, banner names the zone and hour |
 | M9 | wait for check-in 1 | correct interval, states why it checked now |
 | M10 | tap I'm OK | returns to watching, reschedules |

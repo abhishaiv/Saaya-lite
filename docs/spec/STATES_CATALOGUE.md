@@ -111,4 +111,4 @@ common way a demo breaks in front of a judge.
 |---|---|
 | always | `demo_panel_header` visible at the top, never scrolled away |
 | demo speed on | Home banner appears immediately and stays |
-| simulate while a session is live | disabled, with the reason stated: "Finish or stop the current session first" |
+| simulate while a session is live | disabled, with `demo_session_live_reason` stated beside the control. A disabled control that does not say why is a dead end. |

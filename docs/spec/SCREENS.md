@@ -26,6 +26,9 @@ navigate away from `CHECKIN_2`, `FAMILY_ESCALATED` or `SOS_ACTIVE`. Back is cons
 ## S1. Gate
 No UI. Reads `onboarded`. Routes. Max 300 ms; show nothing rather than a flash.
 
+Built by `M1`, which owns the `onboarded` flag. Before `M1` lands the app opens Home
+directly; that is correct at the `M4` checkpoint, not a gap.
+
 ## S2. Onboarding (F1, 4 steps, target under 90 s total)
 
 Progress dots at top. No step is skippable except step 2's second contact.
@@ -117,7 +120,12 @@ there is no intermediate peek for this sheet. Bottom sheet, top radius per C8, d
   If nothing is within 20 km, show `err_no_station` and drop the block.
 - Footer: `zone_data_source` crediting NCRB 2023 calibration.
 
-**A `SAFE` zone has no card.** Tapping one shows `zone_safe_no_data`, and we say honestly
+**A `SAFE` zone has no card, and is not on the map to tap.** The 5 SAFE zones are not
+drawn (`zones.safe`), so there is no map gesture that reaches one. They are reachable from
+the DemoPanel zone picker, which covers all 24: selecting a SAFE zone there opens the sheet
+with `zone_safe_no_data` and **does not arm**, because the arming matrix has no SAFE row.
+
+That path exists rather than being cut because the message matters: choosing one shows
 that low recorded crime is not the same as safe.
 
 ## S5. CheckIn1 (F15, F16, F17, F18)
@@ -192,8 +200,25 @@ Footer: `police_no_govt_link` (F30), permanent.
 This is the trust screen. It is worth more than a privacy policy she will not read.
 
 ## S11. Settings
+
 Contacts (add, edit, delete, min 0 allowed), language, change PIN (requires current PIN),
 "What the police see", about + disclaimers, **Demo panel**.
+
+**Settings is a shell three nodes fill.** It had no owning node at all, which is why the
+demo panel was unreachable. Ownership:
+
+| Section | Built by |
+|---|---|
+| The shell itself, about + disclaimers, **Demo panel** entry | `M4` |
+| Contacts, change PIN, language | `M1` |
+| "What the police see" entry, and the screen behind it (S10) | `M2` |
+
+**A section appears when its screen exists.** `M4` does not render a "What the police see"
+row that leads nowhere: `M2` adds the row when it builds S10. A dead entry point at the
+`M4` checkpoint would be worse than an absent one, since that checkpoint is the first thing
+shown to anyone.
+
+`M4` is complete when it has built its own rows. It does not wait for `M1` or `M2`.
 
 ## S12. DemoPanel (D1)
 Reachable from Settings, and clearly labelled, in both build types.

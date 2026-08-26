@@ -1245,6 +1245,7 @@
     "T4.1"
    ],
    "produces": [
+    "gate_routing",
     "onboarding",
     "pin_stored_hashed",
     "favourites_local",
@@ -1256,7 +1257,10 @@
     "mock_disclosure_visible",
     "sos_screen",
     "pin_entry",
-    "sos_inescapable"
+    "sos_inescapable",
+    "settings_contacts",
+    "settings_pin_change",
+    "settings_language"
    ],
    "reads": [
     "SCREENS.md",
@@ -1302,7 +1306,8 @@
     "4. SOS screen and PIN entry.",
     "5. REDUCIBLE TAIL, only if budget allows: onboarding polish. Language selector, second and third contacts, progress-dot animation."
    ],
-   "cut_line": "Steps 1 to 4 are the product. Step 5 is polish and may be dropped without the demo suffering. Commit after each step."
+   "cut_line": "Steps 1 to 4 are the product. Step 5 is polish and may be dropped without the demo suffering. Commit after each step.",
+   "note": "Owns S1 Gate as well as onboarding: the Gate routes on the `onboarded` flag and is meaningless before onboarding exists. Until M1 lands, the app opens Home directly, which is correct for the M4 checkpoint."
   },
   "M2": {
    "id": "M2",
@@ -1323,7 +1328,8 @@
     "sus_writer",
     "sos_writer",
     "firestore_rules_deployed",
-    "police_view"
+    "police_view",
+    "settings_police_entry"
    ],
    "reads": [
     "SETUP.md",
@@ -1430,7 +1436,10 @@
     "arm_banner",
     "demo_panel",
     "zone_sheet",
-    "nearest_station"
+    "nearest_station",
+    "settings_shell",
+    "settings_about_disclaimers",
+    "settings_demo_entry"
    ],
    "reads": [
     "MAP_SPEC.md",
@@ -1467,7 +1476,8 @@
     "T4.3",
     "T3.1"
    ],
-   "merge_reason": "Both are the Home surface and share SCREENS, COMPONENT_LIBRARY, ARCHITECTURE and DESIGN_SYSTEM. Splitting them meant drawing the map, dropping context, then reloading it to put state on top of it. T3.1 rejoins here: the sheet opens from the map it is merged with, and both read SCREENS, COMPONENT_LIBRARY and COPY."
+   "merge_reason": "Both are the Home surface and share SCREENS, COMPONENT_LIBRARY, ARCHITECTURE and DESIGN_SYSTEM. Splitting them meant drawing the map, dropping context, then reloading it to put state on top of it. T3.1 rejoins here: the sheet opens from the map it is merged with, and both read SCREENS, COMPONENT_LIBRARY and COPY.",
+   "note": "Owns the Settings shell. It had no owning node, which is why the demo panel was unreachable. M4 builds the shell, about and disclaimers, and the demo entry. M1 adds contacts, PIN change and language; M2 adds the police-view row when it builds S10. A row appears when its screen exists: no dead entry points at the M4 checkpoint. M4 completes on its own rows and does not wait for M1 or M2."
   },
   "M5": {
    "id": "M5",

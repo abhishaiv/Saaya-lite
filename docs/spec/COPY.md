@@ -105,6 +105,7 @@ demo video.
 | `demo_trigger_sos` | Trigger SOS | SOS ప్రారంభించు |
 | `demo_reset` | Reset session | సెషన్‌ను రీసెట్ చేయి |
 | `demo_reset_done` | Session reset. Nothing was sent. | సెషన్ రీసెట్ అయింది. ఏదీ పంపబడలేదు. |
+| `demo_session_live_reason` | Finish or stop the current session first | ముందుగా ప్రస్తుత సెషన్‌ను పూర్తి చేయండి లేదా ఆపండి |
 | **Common** | | |
 | `cta_continue` | Continue | కొనసాగించు |
 | `cta_add_another` | Add another favourite | మరో ఆత్మీయుడిని జోడించు |
