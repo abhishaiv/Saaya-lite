@@ -3,7 +3,7 @@
  "kind": "knowledge_graph",
  "note": "Domain facts with provenance. Never merge with build_graph.json - different truth standards.",
  "rule": "Every numeric or colour literal in source must trace to a fact id here, or the grounded checker fails the node.",
- "count": 391,
+ "count": 392,
  "facts": [
   {
    "id": "ladder.cd1",
@@ -4350,6 +4350,17 @@
    "means": "India's national emergency number, named in the F30 no-government-link disclaimer alongside AP Police, Shakthi, T-Safe and ERSS. A value, not a placeholder.",
    "sourced_from": "COPY.md:95, police_no_govt_link",
    "governs": "COPY.md",
+   "frozen": true,
+   "platform": "any"
+  },
+  {
+   "id": "demo.arm.hour",
+   "kind": "number",
+   "value": 4,
+   "unit": "h",
+   "means": "hour of day, IST, that the demo arming control pretends it is. Inside NIGHT_DEEP (00:00 to 05:00) so a HIGH zone actually arms, and it is the 4 a.m. the whole narrative opens on.",
+   "sourced_from": "founder decision 2026-08-26, after browser QA showed the banner reading 5 pm while the session claimed NIGHT_DEEP",
+   "governs": "BUSINESS_RULES.md",
    "frozen": true,
    "platform": "any"
   }

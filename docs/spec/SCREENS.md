@@ -205,7 +205,7 @@ labels would break the demo for exactly the Telugu-speaking reviewer this is bui
 | Control | Key |
 |---|---|
 | Speed toggle, divisor `demo.divisor` | `demo_speed_toggle`, with `demo_speed_note` showing the resulting ladder timings live |
-| Zone picker over all 24 | `demo_pick_zone`, hint `demo_pick_zone_hint`, a11y `cd_demo_zone_picker` |
+| Zone picker over all 24 | `demo_pick_zone`, hint `demo_pick_zone_hint`, a11y `cd_demo_zone_picker`. Arming through this control pins the hour to `demo.arm.hour`, 04:00 IST, per `BUSINESS_RULES.md`. Picking a HIGH zone at the real 5 pm must not produce an armed session: `DAY` is not in the arming matrix. |
 | Simulate a missed check-in | `demo_miss_checkin` |
 | Jump to family escalation | `demo_jump_family` |
 | Trigger SOS | `demo_trigger_sos` |

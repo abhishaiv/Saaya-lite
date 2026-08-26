@@ -64,6 +64,29 @@ session reaches `RESOLVED`. Crossing into a current-band n/a cell never disarms 
 that session. After resolution, a new arming attempt evaluates the current hour band normally.
 `MANUAL` sessions never use `armedHourBand` and remain fixed at 10 minutes in every band.
 
+**Note there is no `DAY` column.** `DAY` runs 07:00 to 20:00 and never arms an `AUTO_ZONE`
+session in any tier. This is the rule the demo control has to respect.
+
+### The demo control freezes the hour, and freezes it everywhere
+
+`demo.arm.hour` is **04:00 IST**. When a session is armed through the demo control in
+`SCREENS.md` S12, that hour is the one the session believes it is: `NIGHT_DEEP`, inside
+which a HIGH zone genuinely arms.
+
+**One frozen hour, one source, used by everything that shows or derives an hour** for that
+session: the arm banner's `%2$s`, `checkin1_reason`'s `%3$s`, the hour band that
+`FREEZE_AT_ARM` captures into `armedHourBand`, and the `hourBand` on the SUS record. Browser
+QA found the banner reading "5 pm" while the session claimed `NIGHT_DEEP`, which is a state
+the matrix above forbids; that happened because the band was forced and the displayed hour
+was not. Deriving both from one value is what stops it recurring.
+
+**The clock itself is not frozen.** `ctx.nowEpochMs` stays real, so every countdown, deadline
+and recovery behaves exactly as in a live session. Only the hour-of-day used for band
+derivation and display is pinned.
+
+`demo_mode_active` stays on screen throughout, so nobody watching mistakes 4 a.m. for the
+real time.
+
 This is the concrete difference from T-Safe's fixed 15-minute timer, so it must be
 visible in the UI: the check-in screen states why it checked when it did.
 
