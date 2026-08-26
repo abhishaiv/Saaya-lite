@@ -313,7 +313,7 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 358,
+  "entities": 360,
   "edges": 663,
   "events": 64
  },
@@ -2940,6 +2940,18 @@
    "class": "Decision",
    "at": "2026-08-24",
    "label": "The demo panel ships bilingual like everything else. It is on the judged path, not beside it: a reviewer uses it to reproduce the journey without walking into a Vizag zone at 4 a.m., so English-only labels would fail precisely for the Telugu-speaking AP Police reviewer the product is aimed at. Eleven keys added. SCREENS S12 now references the keys rather than carrying English literals, which is the same defect that put seven untranslatable literals in the StatusPill."
+  },
+  {
+   "id": "anchor.area_name_join",
+   "class": "Anchor",
+   "at": "2026-08-24",
+   "label": "Measured across both frozen assets: vizag_heatmap.geojson carries station_name and areas_covered and no area_name on any of its 24 features. zone_info_cards.json carries area_name on all 19 entries. The join on station_id is exactly 1:1 with the drawn set, 19 to 19, no zone without a card and no card without a zone."
+  },
+  {
+   "id": "d.label_locality",
+   "class": "Decision",
+   "at": "2026-08-24",
+   "label": "Map labels use area_name from zone_info_cards joined on station_id, not station_name from the geojson. A station name is a jurisdiction, not a place: it would put 'II Town Police Station' over Soldierpet and 'IV Town Police Station' over Asilmetta. She is checking a stretch she recognises, and she recognises the locality. Labelling the map with police boundaries would be a different product, and it would also read as government branding the submission explicitly disclaims."
   }
  ],
  "edges": [

@@ -88,7 +88,7 @@ have no entry in `zone_info_cards.json`, which is why that file has 19 entries a
 ```typescript
 export interface ZoneCard {
   readonly stationId: string;
-  readonly areaName: string;
+  readonly areaName: string;        // the locality, e.g. "Soldierpet". THE MAP LABEL.
   readonly fullAreas: string;
   readonly riskLevel: string;      // "High Risk" - display string, use as-is
   readonly riskTier: string;

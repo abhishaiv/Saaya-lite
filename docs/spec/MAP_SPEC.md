@@ -51,10 +51,34 @@ hide it behind a sheet and do not shorten it.
 | Stroke | same `color` at full strength, **1.5 px** |
 | Stroke, selected | **3 px**, plus fill opacity raised by 0.1 |
 | Glow | a second stroke beneath at 6 px, same colour, 15% opacity, giving the soft bloom the deck screenshots have |
-| Label | zone `area_name`, `label` type, `textPrimary` at 80%, centred on the centroid, **hidden below zoom 12** |
+| Label | `area_name`, `label` type, `textPrimary` at 80%, centred on the centroid, **hidden below zoom 12**. See below for where the field lives. |
 | Draw order | glow, fill, stroke, label. Higher `risk_score` draws on top so a high zone is never buried under a moderate one. |
 
 Precompute the polygon paths once at load. **Never re-tessellate per frame.**
+
+### `area_name` lives in the cards asset, not the geojson
+
+`vizag_heatmap.geojson` carries `station_name` and `areas_covered` and **no `area_name`**.
+The field is in `zone_info_cards.json`, on all 19 entries. Join on `station_id`:
+
+```
+zoneCard(zone.stationId).areaName
+```
+
+The join is exactly 1:1 with the drawn set. 19 non-safe zones, 19 cards, no zone without a
+card and no card without a zone. It is already parsed: `ZoneCard.areaName` exists from T2.1.
+
+**Do not label with `station_name`.** It is a jurisdiction, not a place: it would put
+"II Town Police Station" over Soldierpet and "IV Town Police Station" over Asilmetta. She
+is checking a stretch she recognises, and she recognises the locality. Labelling the map
+with police boundaries would be a different product.
+
+**Do not label with `areas_covered` either.** It is a full list, far too long for a
+centroid-anchored single line that may never wrap.
+
+The 5 safe zones have no card and are not drawn, so they need no label. If a future zone
+were ever drawn without a card, that is a data defect: stop and report it rather than
+falling back to the station name.
 
 ## Her location
 
