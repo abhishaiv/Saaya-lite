@@ -201,8 +201,16 @@ This is the trust screen. It is worth more than a privacy policy she will not re
 
 ## S11. Settings
 
-Contacts (add, edit, delete, min 0 allowed), language, change PIN (requires current PIN),
-"What the police see", about + disclaimers, **Demo panel**.
+Title `set_title`. Rows, in this order, each a `COPY.md` key:
+
+| Row | Key | Sub-label |
+|---|---|---|
+| Favourites (add, edit, delete, min 0 allowed) | `set_favourites` | `set_favourites_sub` |
+| Language | `set_language` | |
+| Change PIN (requires current PIN) | `set_pin` | `set_pin_sub` |
+| What the police see | `set_police` | |
+| About | `set_about` | |
+| Demo panel | `set_demo` | `set_demo_sub` |
 
 **Settings is a shell three nodes fill.** It had no owning node at all, which is why the
 demo panel was unreachable. Ownership:
@@ -246,19 +254,30 @@ and in the video. We never demo something that looks like production behaviour.
 
 ## S13. About
 
-Reached from Settings. Static, scrollable, no interaction beyond links.
+Reached from Settings via `set_about`. Static, scrollable, no interaction beyond links.
+Title `about_title`. **Every line is a `COPY.md` key**; this screen is bilingual like the
+rest, and it is the screen most likely to be read closely by a judge.
 
-| Section | Content |
+| Section | Keys |
 |---|---|
-| Header | Saaya Lite wordmark, `versionName` and `versionCode` |
-| What this is | Two sentences: a prototype built for Build What Moves India, showing the missing tier below India's emergency apps. |
-| **What is real** | Bullet list, from `SCOPE.md`: map, zones, auto-arm, check-in ladder, escalation timing, PIN, both state writes, the console. |
-| **What is mocked** | Bullet list: SMS and WhatsApp delivery are composed and shown, not sent, because real delivery needs India DLT registration. |
-| **What this is not** | `police_no_govt_link`, in full. Not AP Police, Shakthi, T-Safe, 112 or ERSS. Not a government product. |
-| **No AI** | One line: every decision this app makes is a fixed rule, and there is no model in it. |
-| Data | Visakhapatnam records calibrated against NCRB 2023 city data. All demo records are synthetic. |
-| Attribution | `© OpenStreetMap contributors © CARTO`. Poppins and Noto Sans Telugu under the SIL Open Font License. Material Symbols under Apache 2.0. |
-| Contact | founder email |
+| Header | Saaya Lite wordmark, then `about_version` with `versionName` and `versionCode` |
+| What this is | `about_what_title`, `about_what_body` |
+| **What is real** | `about_real_title`, then the eight bullets `about_real_map`, `about_real_detail`, `about_real_arm`, `about_real_ladder`, `about_real_family`, `about_real_sos`, `about_real_writes`, `about_real_console` |
+| **What is mocked** | `about_mock_title`, `about_mock_delivery`, `about_mock_console` |
+| **What this is not** | `about_not_title`, then `police_no_govt_link` in full |
+| **No AI** | `about_noai_title`, `about_noai_body` |
+| Data | `about_data_title`, `about_data_body` |
+| Attribution | `about_attrib_title`, `about_attrib_map`, `about_attrib_fonts` |
+| Contact | `about_contact_title`, then the founder's address |
+
+**The contact address is a founder input.** It is deliberately not in `COPY.md`: it is a
+real personal address, it is not a translatable string, and nobody but the founder decides
+whether it is published. Read it from configuration. If it is absent, render the section
+without it rather than guessing or inserting a placeholder.
+
+**The bullet lists must match what is actually built.** If a node is cut or reinstated,
+these change with it. A judge who opens About and finds a claim the app does not honour
+learns more from that than from the feature itself.
 
 **This screen is a submission asset, not filler.** The brief scores Honesty explicitly, and
 a judge who opens About and finds the mock list already there will trust the rest.

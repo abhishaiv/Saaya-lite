@@ -93,6 +93,51 @@ demo video.
 | `police_sos_title` | If you raise an SOS | మీరు SOS ఇస్తే |
 | `police_sos_body` | Your exact location, the last few minutes, and the nearest station. This is the only moment identity crosses. | మీ ఖచ్చితమైన స్థానం, గత కొన్ని నిమిషాలు, సమీప స్టేషన్. గుర్తింపు దాటే ఏకైక క్షణం ఇదే. |
 | `police_no_govt_link` | Saaya Lite is a prototype. It is not connected to AP Police, Shakthi, T-Safe, 112 or ERSS, and it is not a government product. | సాయ లైట్ ఒక ప్రోటోటైప్. ఇది AP పోలీస్, శక్తి, T-Safe, 112 లేదా ERSS తో అనుసంధానించబడలేదు, ఇది ప్రభుత్వ ఉత్పత్తి కాదు. |
+
+### Settings (S11)
+
+| Key | English | తెలుగు |
+|---|---|---|
+| `set_title` | Settings | సెట్టింగ్‌లు |
+| `set_favourites` | Favourites | ఆత్మీయులు |
+| `set_favourites_sub` | Who we ask to check on you | మిమ్మల్ని చూడమని ఎవరిని అడగాలి |
+| `set_language` | Language | భాష |
+| `set_pin` | Change PIN | PIN మార్చు |
+| `set_pin_sub` | Needs your current PIN | మీ ప్రస్తుత PIN అవసరం |
+| `set_police` | What the police see | పోలీసులు ఏమి చూస్తారు |
+| `set_about` | About | గురించి |
+| `set_demo` | Demo panel | డెమో ప్యానెల్ |
+| `set_demo_sub` | Prototype controls, not product features | ప్రోటోటైప్ నియంత్రణలు, ఉత్పత్తి ఫీచర్లు కావు |
+
+### About (S13)
+
+| Key | English | తెలుగు |
+|---|---|---|
+| `about_title` | About | గురించి |
+| `about_version` | Version %1$s (%2$d) | వెర్షన్ %1$s (%2$d) |
+| `about_what_title` | What this is | ఇది ఏమిటి |
+| `about_what_body` | Saaya Lite is a prototype built for Build What Moves India. It shows the tier missing below India's emergency apps: the one that works before anything has happened. | సాయ లైట్ అనేది Build What Moves India కోసం తయారుచేసిన ప్రోటోటైప్. భారత అత్యవసర యాప్‌ల కింద లేని ఒక దశను ఇది చూపిస్తుంది: ఏదీ జరగకముందే పనిచేసేది. |
+| `about_real_title` | What is real | ఏది నిజం |
+| `about_real_map` | The Visakhapatnam map, 24 zones from real records | విశాఖపట్నం మ్యాప్, నిజమైన రికార్డుల నుండి 24 జోన్లు |
+| `about_real_detail` | Zone detail and the nearest station | జోన్ వివరాలు, సమీప స్టేషన్ |
+| `about_real_arm` | Automatic arming, with nothing pressed | ఏదీ నొక్కకుండా ఆటోమేటిక్ ఆర్మింగ్ |
+| `about_real_ladder` | The four-step check-in ladder, on real timings | నాలుగు దశల చెక్-ఇన్ నిచ్చెన, నిజమైన సమయాలతో |
+| `about_real_family` | Family escalation, composed with context | సందర్భంతో తయారైన ఆత్మీయుల హెచ్చరిక |
+| `about_real_sos` | PIN-protected SOS | PIN రక్షణ ఉన్న SOS |
+| `about_real_writes` | Both writes to the state view | రాష్ట్ర వ్యూకి రెండు రాతలు |
+| `about_real_console` | The live console | ప్రత్యక్ష కన్సోల్ |
+| `about_mock_title` | What is mocked | ఏది నమూనా మాత్రమే |
+| `about_mock_delivery` | SMS and WhatsApp messages are composed and shown on screen, never sent. Real delivery needs Indian DLT registration. | SMS, WhatsApp సందేశాలు తయారై స్క్రీన్‌పై కనిపిస్తాయి, ఎప్పుడూ పంపబడవు. నిజమైన డెలివరీకి భారత DLT నమోదు అవసరం. |
+| `about_mock_console` | The console demonstrates the receiving end. It is not a police system and no police force uses it. | కన్సోల్ స్వీకరించే వైపును చూపిస్తుంది. ఇది పోలీస్ వ్యవస్థ కాదు, ఏ పోలీసు శాఖా దీన్ని ఉపయోగించడం లేదు. |
+| `about_not_title` | What this is not | ఇది ఏమి కాదు |
+| `about_noai_title` | No AI | AI లేదు |
+| `about_noai_body` | Every decision this app makes is a fixed rule you could read. There is no model in it. | ఈ యాప్ తీసుకునే ప్రతి నిర్ణయం మీరు చదవగలిగే స్థిర నియమం. ఇందులో ఏ మోడల్ లేదు. |
+| `about_data_title` | Data | డేటా |
+| `about_data_body` | Visakhapatnam records, calibrated against NCRB 2023 city data. Every demo record is synthetic. | విశాఖపట్నం రికార్డులు, NCRB 2023 నగర డేటా ఆధారంగా. ప్రతి డెమో రికార్డు కృత్రిమమైనది. |
+| `about_attrib_title` | Attribution | ఆపాదింపు |
+| `about_attrib_map` | © OpenStreetMap contributors © CARTO | © OpenStreetMap contributors © CARTO |
+| `about_attrib_fonts` | Poppins and Noto Sans Telugu under the SIL Open Font License. Material Symbols under Apache 2.0. | Poppins, Noto Sans Telugu SIL ఓపెన్ ఫాంట్ లైసెన్స్ కింద. Material Symbols Apache 2.0 కింద. |
+| `about_contact_title` | Contact | సంప్రదించండి |
 | **Demo** | | |
 | `demo_mode_active` | Demo speed is on. Timers are 6x faster than the real product. | డెమో వేగం ఆన్‌లో ఉంది. టైమర్లు అసలు ఉత్పత్తి కంటే 6 రెట్లు వేగంగా ఉన్నాయి. |
 | `demo_panel_header` | These are prototype controls for demonstrating the journey. They are not product features. | ఇవి ప్రయాణాన్ని చూపించడానికి ప్రోటోటైప్ నియంత్రణలు. ఇవి ఉత్పత్తి ఫీచర్లు కావు. |

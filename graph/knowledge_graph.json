@@ -313,7 +313,7 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 367,
+  "entities": 369,
   "edges": 667,
   "events": 65
  },
@@ -2994,6 +2994,18 @@
    "class": "Decision",
    "label": "SAFE zones stay undrawn and are reachable only from the DemoPanel picker, which covers all 24. Selecting one opens the sheet with zone_safe_no_data and does not arm, since the matrix has no SAFE row. The path is kept rather than cut because the message is the point: fewer records is not the same as safe, it can also mean fewer reports. The map tap in TEST_PLAN M7 was untestable, since an undrawn zone cannot be tapped.",
    "at": "2026-08-26"
+  },
+  {
+   "id": "d.about_bilingual",
+   "class": "Decision",
+   "at": "2026-08-26",
+   "label": "S13 About ships fully bilingual, 25 keys, not a reduced English surface. SCREENS calls it a submission asset rather than filler because the brief scores Honesty explicitly, and it is the screen a judge is most likely to read closely. Shipping the honesty claims in English only would state them in the language half the intended audience does not read, on the one screen whose entire purpose is being believed."
+  },
+  {
+   "id": "d.contact_not_in_copy",
+   "class": "Decision",
+   "at": "2026-08-26",
+   "label": "The founder's contact address stays out of COPY.md and is read from configuration. It is a real personal address, it is not a translatable string, and whether it is published is the founder's call rather than a spec decision. If absent, the section renders without it rather than showing a placeholder."
   }
  ],
  "edges": [
