@@ -3,7 +3,7 @@
  "kind": "knowledge_graph",
  "note": "Domain facts with provenance. Never merge with build_graph.json - different truth standards.",
  "rule": "Every numeric or colour literal in source must trace to a fact id here, or the grounded checker fails the node.",
- "count": 390,
+ "count": 391,
  "facts": [
   {
    "id": "ladder.cd1",
@@ -4338,6 +4338,17 @@
    "unit": "year",
    "means": "NCRB city-data calibration year named in the zone source credit",
    "sourced_from": "COPY.md:48",
+   "governs": "COPY.md",
+   "frozen": true,
+   "platform": "any"
+  },
+  {
+   "id": "data.emergency.number.in",
+   "kind": "number",
+   "value": 112,
+   "unit": "number",
+   "means": "India's national emergency number, named in the F30 no-government-link disclaimer alongside AP Police, Shakthi, T-Safe and ERSS. A value, not a placeholder.",
+   "sourced_from": "COPY.md:95, police_no_govt_link",
    "governs": "COPY.md",
    "frozen": true,
    "platform": "any"
