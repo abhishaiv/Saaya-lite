@@ -11,6 +11,9 @@ describe("M4 bundled map", () => {
   it("joins exactly the drawn polygons to locality labels and keeps all demo zones", () => {
     expect(snapshot.mapZones).toHaveLength(19); // fact: zones.drawn
     expect(snapshot.demoZones).toHaveLength(24); // fact: zones.total
+    expect(snapshot.zoneDetails).toHaveLength(24); // fact: zones.total
+    expect(snapshot.policeStations).toHaveLength(37); // fact: stations.total
+    expect(snapshot.zoneDetails.filter(({ card }) => card === null)).toHaveLength(5); // fact: zones.safe
     expect(snapshot.mapZones.every(({ areaName }) => !areaName.includes("Police Station"))).toBe(true);
     expect(snapshot.mapZones.find(({ zone }) => zone.stationId === "ii_town_police_station")?.areaName).toBe("Soldierpet");
   });

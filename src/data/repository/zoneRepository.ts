@@ -1,4 +1,5 @@
 import { bundledZoneData, type ZoneData } from "../zone/zoneLoader";
+import type { PoliceStation } from "../../domain/model/policeStation";
 import { RiskTier, type Zone } from "../../domain/model/zone";
 import type { ZoneCard } from "../../domain/model/zoneCard";
 
@@ -13,9 +14,18 @@ export interface DemoZone {
   readonly label: string;
 }
 
+export interface ZoneDetail {
+  readonly card: ZoneCard | null;
+  readonly id: string;
+  readonly label: string;
+  readonly zone: Zone;
+}
+
 export interface ZoneRepositorySnapshot {
   readonly mapZones: readonly MapZone[];
   readonly demoZones: readonly DemoZone[];
+  readonly policeStations: readonly PoliceStation[];
+  readonly zoneDetails: readonly ZoneDetail[];
 }
 
 export interface ZoneRepository {
@@ -60,6 +70,18 @@ function demoZones(zones: readonly Zone[]): readonly DemoZone[] {
   return zones.map((zone) => ({ id: zone.stationId, label: zone.areasCovered }));
 }
 
+function zoneDetails(data: ZoneData): readonly ZoneDetail[] {
+  return data.zones.map((zone) => {
+    const card = data.cardsByStationId.get(zone.stationId) ?? null;
+    return {
+      card,
+      id: zone.stationId,
+      label: card?.areaName ?? zone.areasCovered,
+      zone,
+    };
+  });
+}
+
 export class BundledZoneRepository implements ZoneRepository {
   constructor(private readonly data: ZoneData = bundledZoneData) {}
 
@@ -67,6 +89,8 @@ export class BundledZoneRepository implements ZoneRepository {
     return {
       mapZones: joinMapZones(this.data),
       demoZones: demoZones(this.data.zones),
+      policeStations: this.data.policeStations,
+      zoneDetails: zoneDetails(this.data),
     };
   }
 }

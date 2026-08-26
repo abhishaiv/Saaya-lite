@@ -315,7 +315,7 @@
  "counts": {
   "entities": 362,
   "edges": 665,
-  "events": 64
+  "events": 65
  },
  "entities": [
   {
@@ -9029,6 +9029,18 @@
    "actor": "codex",
    "detail": "T1.3 completed C1 through C14, behavioural font and icon subsets, the 320 px gallery, and fresh spec verification after removing an invented card fade",
    "node": "T1.3"
+  },
+  {
+   "id": "ev.0065",
+   "type": "spec_amended",
+   "at": "2026-08-26",
+   "actor": "codex",
+   "detail": "Added the approved NCRB 2023 calibration-year fact from COPY.md:48; declared and actual fact counts both 390.",
+   "node": "M4",
+   "refs": [
+    "data.ncrb.calibration.year",
+    "COPY.md"
+   ]
   }
  ]
 }

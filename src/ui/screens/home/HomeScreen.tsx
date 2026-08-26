@@ -6,9 +6,11 @@ import { useRouter } from "next/navigation";
 import type {
   DemoZone,
   MapZone,
+  ZoneDetail,
 } from "../../../data/repository/zoneRepository";
 import { DEFAULT_RULES } from "../../../domain/engine/rules";
 import type { Command, SessionState } from "../../../domain/model/session";
+import type { PoliceStation } from "../../../domain/model/policeStation";
 import { browserClock } from "../../../platform/clock";
 import { readGeolocationPermissionState } from "../../../platform/geolocationPermission";
 import { hourBandAtEpochMs } from "../../../platform/hourBandClock";
@@ -19,14 +21,23 @@ import { MapControlButton, MapControlButtonStack } from "../../components/MapCon
 import { formatCopy, M4_COPY, type SaayaLocale } from "../../copy/strings";
 import { HomeEngineBridge, type HomeEngineView } from "./homeEngineBridge";
 import { HomeMap } from "./HomeMap";
+import { ZoneDetailSheet } from "./ZoneDetailSheet";
 
 export interface HomeScreenProps {
   readonly demoZones: readonly DemoZone[];
   readonly locale: SaayaLocale;
   readonly mapZones: readonly MapZone[];
+  readonly policeStations: readonly PoliceStation[];
+  readonly zoneDetails: readonly ZoneDetail[];
 }
 
-export function HomeScreen({ demoZones, locale, mapZones }: HomeScreenProps) {
+export function HomeScreen({
+  demoZones,
+  locale,
+  mapZones,
+  policeStations,
+  zoneDetails,
+}: HomeScreenProps) {
   const router = useRouter();
   const copy = M4_COPY[locale];
   const [location, setLocation] = useState<LiveLocationFix | null>(null);
@@ -61,6 +72,13 @@ export function HomeScreen({ demoZones, locale, mapZones }: HomeScreenProps) {
   }
 
   const zones = useMemo(() => mapZones.map(({ zone }) => zone), [mapZones]);
+  const selectedZone = useMemo(
+    () =>
+      selectedZoneId === null
+        ? null
+        : zoneDetails.find(({ id }) => id === selectedZoneId) ?? null,
+    [selectedZoneId, zoneDetails],
+  );
 
   useEffect(() => {
     const engine = engineRef.current;
@@ -154,6 +172,17 @@ export function HomeScreen({ demoZones, locale, mapZones }: HomeScreenProps) {
       <output className="home-screen__asset-count" hidden>
         {mapZones.length}:{demoZones.length}
       </output>
+
+      {selectedZone === null ? null : (
+        <ZoneDetailSheet
+          copy={copy}
+          currentPoint={location}
+          detail={selectedZone}
+          hourBand={hourBandAtEpochMs(browserClock.nowEpochMs())}
+          onDismiss={() => setSelectedZoneId(null)}
+          policeStations={policeStations}
+        />
+      )}
 
       <style jsx>{`
         .home-screen {

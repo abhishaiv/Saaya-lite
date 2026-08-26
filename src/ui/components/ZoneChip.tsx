@@ -5,6 +5,8 @@ import { RiskTier, type Zone } from "../../domain/model/zone";
 export type ZoneChipProps = Readonly<
   Pick<Zone, "riskTier" | "colorHex"> & {
     className?: string;
+    /** Frozen display label, when the asset supplies one. */
+    label?: string;
   }
 >;
 
@@ -12,6 +14,7 @@ export type ZoneChipProps = Readonly<
 export function ZoneChip({
   className,
   colorHex,
+  label,
   riskTier,
 }: ZoneChipProps) {
   const classes = ["zone-chip", className].filter(Boolean).join(" ");
@@ -25,7 +28,7 @@ export function ZoneChip({
   return (
     <>
       <span className={classes} data-tier={riskTier} style={style}>
-        {riskTier}
+        {label ?? riskTier}
       </span>
 
       <style jsx>{`
@@ -50,7 +53,6 @@ export function ZoneChip({
           font-weight: var(--weight-semibold);
           letter-spacing: var(--type-label-tracking);
           line-height: var(--type-label-line-height);
-          text-transform: uppercase;
           white-space: nowrap;
         }
       `}</style>

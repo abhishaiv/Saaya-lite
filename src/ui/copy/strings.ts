@@ -9,7 +9,9 @@ export type M4Copy = Readonly<{
   cdMap: string;
   cdRecentre: string;
   cdSettings: string;
+  cdStationCall: string;
   cdZone: string;
+  ctaCall: string;
   ctaArmManually: string;
   ctaImHome: string;
   demoJumpFamily: string;
@@ -29,6 +31,11 @@ export type M4Copy = Readonly<{
   locSearching: string;
   locSlow: string;
   mapOffline: string;
+  errNoStation: string;
+  riskBandElevated: string;
+  riskBandHigh: string;
+  riskBandLow: string;
+  riskBandModerate: string;
   stateWorking: string;
   statusCheckin1: string;
   statusCheckin2: string;
@@ -39,6 +46,15 @@ export type M4Copy = Readonly<{
   statusSos: string;
   warnKeepOpenBody: string;
   warnLocationDenied: string;
+  zoneDataSource: string;
+  zoneDistanceKm: string;
+  zoneDistanceM: string;
+  zoneSafeNoData: string;
+  zoneStatIncidents: string;
+  zoneStatWomen: string;
+  zoneStation: string;
+  zoneStationApprox: string;
+  zoneTopCrimes: string;
 }>;
 
 export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
@@ -51,7 +67,9 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     cdMap: "Map of Visakhapatnam risk areas",
     cdRecentre: "Centre the map on your location",
     cdSettings: "Open settings",
+    cdStationCall: "Call %1$s",
     cdZone: "%1$s, %2$s risk area. Open details.",
+    ctaCall: "Call",
     ctaArmManually: "Watch this journey",
     ctaImHome: "I am home",
     demoJumpFamily: "Jump to family escalation",
@@ -71,6 +89,11 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     locSearching: "Finding you",
     locSlow: "This is taking longer than usual. Check that location is on.",
     mapOffline: "Map offline, zones still work",
+    errNoStation: "No police station within 20 km.",
+    riskBandElevated: "Elevated",
+    riskBandHigh: "High",
+    riskBandLow: "Low",
+    riskBandModerate: "Moderate",
     stateWorking: "Working",
     statusCheckin1: "Checking in",
     statusCheckin2: "Still there?",
@@ -81,6 +104,15 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     statusSos: "SOS active",
     warnKeepOpenBody: "Keep this tab open while you are on the stretch. If you close it, Saaya stops watching.",
     warnLocationDenied: "Saaya cannot wake on its own without location.",
+    zoneDataSource: "Visakhapatnam records, calibrated against NCRB 2023 city data.",
+    zoneDistanceKm: "%1$s km away",
+    zoneDistanceM: "%1$d m away",
+    zoneSafeNoData: "This area has few records. Fewer records is not the same as safe, it can also mean fewer reports.",
+    zoneStatIncidents: "Total incidents",
+    zoneStatWomen: "Women-safety incidents",
+    zoneStation: "Nearest station",
+    zoneStationApprox: "This station location is approximate to the locality.",
+    zoneTopCrimes: "Most common",
   },
   te: {
     appName: "సాయ లైట్",
@@ -91,7 +123,9 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     cdMap: "విశాఖపట్నం ప్రమాద ప్రాంతాల మ్యాప్",
     cdRecentre: "మీ స్థానం మీద మ్యాప్ కేంద్రీకరించు",
     cdSettings: "సెట్టింగ్స్ తెరువు",
+    cdStationCall: "%1$s కి ఫోన్ చేయి",
     cdZone: "%1$s, %2$s ప్రమాద ప్రాంతం. వివరాలు తెరువు.",
+    ctaCall: "కాల్ చేయి",
     ctaArmManually: "ఈ ప్రయాణాన్ని గమనించు",
     ctaImHome: "నేను ఇంటికి చేరాను",
     demoJumpFamily: "ఆత్మీయుల దశకు వెళ్లు",
@@ -111,6 +145,11 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     locSearching: "మిమ్మల్ని కనుగొంటున్నాం",
     locSlow: "ఇది మామూలు కంటే ఎక్కువ సమయం తీసుకుంటోంది. లొకేషన్ ఆన్‌లో ఉందో చూడండి.",
     mapOffline: "మ్యాప్ ఆఫ్‌లైన్, జోన్‌లు ఇంకా పనిచేస్తాయి",
+    errNoStation: "20 కి.మీ. లోపు పోలీస్ స్టేషన్ లేదు.",
+    riskBandElevated: "ఎక్కువ",
+    riskBandHigh: "అత్యధికం",
+    riskBandLow: "తక్కువ",
+    riskBandModerate: "మధ్యస్థం",
     stateWorking: "పని జరుగుతోంది",
     statusCheckin1: "చెక్-ఇన్ చేస్తోంది",
     statusCheckin2: "ఇంకా అక్కడ ఉన్నారా?",
@@ -121,6 +160,15 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     statusSos: "SOS యాక్టివ్",
     warnKeepOpenBody: "మీరు ఆ మార్గంలో ఉన్నంత సేపు ఈ ట్యాబ్ తెరిచి ఉంచండి. మూసివేస్తే సాయ గమనించడం ఆగిపోతుంది.",
     warnLocationDenied: "లొకేషన్ లేకుండా సాయ దానంతట అదే మేల్కొనదు.",
+    zoneDataSource: "విశాఖపట్నం రికార్డులు, NCRB 2023 నగర డేటా ఆధారంగా.",
+    zoneDistanceKm: "%1$s కి.మీ. దూరంలో",
+    zoneDistanceM: "%1$d మీ. దూరంలో",
+    zoneSafeNoData: "ఈ ప్రాంతంలో తక్కువ రికార్డులు ఉన్నాయి. తక్కువ రికార్డులు అంటే సురక్షితం అని కాదు, తక్కువ ఫిర్యాదులు అని కూడా కావచ్చు.",
+    zoneStatIncidents: "మొత్తం ఘటనలు",
+    zoneStatWomen: "మహిళా భద్రత ఘటనలు",
+    zoneStation: "సమీప స్టేషన్",
+    zoneStationApprox: "ఈ స్టేషన్ స్థానం ఆ ప్రాంతానికి సుమారుగా ఉంది.",
+    zoneTopCrimes: "ఎక్కువగా జరిగేవి",
   },
 };
 

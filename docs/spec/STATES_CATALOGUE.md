@@ -52,7 +52,7 @@ common way a demo breaks in front of a judge.
 | loading | none, all local and instant |
 | `SAFE` zone, no card | `zone_safe_no_data`, and say low records is not the same as safe |
 | no station within 20 km | `err_no_station`, and the station block is not rendered. The Call button never appears without a number behind it. |
-| dialer unavailable | hide the call button, show the number as selectable text |
+| dialer availability | not detectable on the web; always show the selectable number and `tel:` Call action, then let the browser and user control the handoff |
 | `coordPrecision` approximate | `zone_station_approx` always shown, never suppressed |
 
 ## S5 / S6 Check-in cards

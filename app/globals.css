@@ -48,6 +48,12 @@ textarea {
   font-family: var(--font-family);
 }
 
+.zone-detail-sheet {
+  --sheet-expanded-height: 55dvh; /* sheet.expanded */
+
+  z-index: 6; /* GROUNDED-EXEMPT: local stacking order above map controls. */
+}
+
 .saaya-map-label-shell {
   inline-size: auto !important;
   block-size: auto !important;

@@ -8,12 +8,15 @@ type HomePageProps = Readonly<{
 
 export default function HomePage({ searchParams }: HomePageProps) {
   const locale: SaayaLocale = searchParams?.lang === "te" ? "te" : "en";
-  const { demoZones, mapZones } = bundledZoneRepository.snapshot();
+  const { demoZones, mapZones, policeStations, zoneDetails } =
+    bundledZoneRepository.snapshot();
   return (
     <HomeScreen
       demoZones={demoZones}
       locale={locale}
       mapZones={mapZones}
+      policeStations={policeStations}
+      zoneDetails={zoneDetails}
     />
   );
 }

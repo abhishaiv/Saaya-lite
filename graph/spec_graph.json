@@ -3,7 +3,7 @@
  "kind": "knowledge_graph",
  "note": "Domain facts with provenance. Never merge with build_graph.json - different truth standards.",
  "rule": "Every numeric or colour literal in source must trace to a fact id here, or the grounded checker fails the node.",
- "count": 389,
+ "count": 390,
  "facts": [
   {
    "id": "ladder.cd1",
@@ -4328,6 +4328,17 @@
    "means": "zoom at which every drawn tier shows its label",
    "sourced_from": "MAP_SPEC.md:154",
    "governs": "MAP_SPEC.md",
+   "frozen": true,
+   "platform": "any"
+  },
+  {
+   "id": "data.ncrb.calibration.year",
+   "kind": "number",
+   "value": 2023,
+   "unit": "year",
+   "means": "NCRB city-data calibration year named in the zone source credit",
+   "sourced_from": "COPY.md:48",
+   "governs": "COPY.md",
    "frozen": true,
    "platform": "any"
   }

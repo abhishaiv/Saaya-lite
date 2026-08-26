@@ -3,6 +3,8 @@ import type { HourBand, RiskTier, Rules } from "../model/session";
 export const CHECK_IN_1_SEC = 90;
 export const CHECK_IN_2_SEC = 60;
 export const CANCEL_WINDOW_SEC = 60;
+export const LADDER_TOTAL_SEC =
+  CHECK_IN_1_SEC + CHECK_IN_2_SEC + CANCEL_WINDOW_SEC; // fact: ladder.total
 export const ENTER_DWELL_SEC = 60;
 export const EXIT_DWELL_SEC = 180;
 export const MANUAL_DISARM_COOLDOWN_MIN = 45;
@@ -16,6 +18,13 @@ export const MAX_CONTAINMENT_ACCURACY_M = 100; // fact: loc.accuracy.reject
 export const MIN_ENTRY_FIXES = 5; // fact: candidate.dwell.min_fixes
 export const LAST_KNOWN_CENTERING_MAX_AGE_MIN = 5; // fact: loc.last_known.centering.max_age
 export const FIRST_FIX_SLOW_AFTER_SEC = 60; // fact: loc.first_fix.slow_after
+export const DEMO_DIVISOR = 6; // fact: demo.divisor
+export const DEMO_TOTAL_SEC = LADDER_TOTAL_SEC / DEMO_DIVISOR; // fact: demo.total
+export const EARTH_RADIUS_M = 6_371_008.8; // fact: const.earth
+export const MAX_STATION_DISTANCE_KM = 20; // fact: dist.station.max
+export const METRES_PER_KILOMETRE = 1_000; // GROUNDED-EXEMPT: SI unit conversion.
+export const MAX_STATION_DISTANCE_M =
+  MAX_STATION_DISTANCE_KM * METRES_PER_KILOMETRE;
 
 export const NIGHT_DEEP_START_HOUR = 0;
 export const DAWN_START_HOUR = 5;
@@ -91,7 +100,7 @@ export const DEFAULT_RULES: Rules = {
 
 export const DEMO_RULES: Rules = {
   ...DEFAULT_RULES,
-  demoDivisor: 6,
+  demoDivisor: DEMO_DIVISOR,
 };
 
 export type DisplayRiskLabel = "Low" | "Moderate" | "Elevated" | "High";
