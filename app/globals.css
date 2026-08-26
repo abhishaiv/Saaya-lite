@@ -1,5 +1,6 @@
 @import "../src/ui/theme/fonts.css";
 @import "../src/ui/theme/tokens.css";
+@import "leaflet/dist/leaflet.css";
 
 * {
   box-sizing: border-box;
@@ -40,6 +41,63 @@ textarea {
   font-size: var(--type-title-size);
   font-weight: var(--weight-bold);
   line-height: var(--type-title-line-height);
+}
+
+.leaflet-container {
+  background: var(--color-background);
+  font-family: var(--font-family);
+}
+
+.saaya-map-label-shell {
+  inline-size: auto !important;
+  block-size: auto !important;
+  border: 0;
+  background: transparent;
+}
+
+.saaya-map-label {
+  display: block;
+  color: rgb(from var(--color-text-primary) r g b / 0.8);
+  font-size: var(--type-label-size);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--type-label-tracking);
+  line-height: var(--type-label-line-height);
+  white-space: nowrap;
+  transform: translate(-50%, -50%); /* GROUNDED-EXEMPT: structural centring on the frozen centroid. */
+}
+
+.saaya-location-marker-shell {
+  border: 0;
+  background: transparent;
+}
+
+.saaya-location-marker {
+  position: relative;
+  display: block;
+  inline-size: 14px;
+  block-size: 14px;
+  border: 2px solid rgb(from var(--color-text-primary) r g b / 0.9);
+  border-radius: 50%; /* GROUNDED-EXEMPT: structural circle geometry. */
+  background: var(--color-brand);
+}
+
+.saaya-location-marker--shadow::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0 0 14px var(--color-brand);
+  content: "";
+  animation: location-shadow-breathe 2s var(--motion-standard) infinite alternate;
+}
+
+@keyframes location-shadow-breathe {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.08;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
