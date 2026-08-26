@@ -88,7 +88,7 @@ escalation, F23-F24 SOS with PIN, F29 the web console, F21 and F30 the disclosur
 - **DoD:** the trust boundary holds under test. Shadow and SUS produce nothing
   identifying; only SOS crosses.
 
-- Web console on Firebase Hosting. SUS and SOS, filterable last 24 hours / 7 days /
+- Web console as a route on Vercel. SUS and SOS, filterable last 24 hours / 7 days /
   30 days. Permanent "connected to no government system" disclaimer.
 - In-app "what the police see", showing all three honest states. First on the cut list.
 - **DoD:** the console URL loads in a logged-out private window, on a phone, and shows an

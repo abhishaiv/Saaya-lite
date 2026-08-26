@@ -7,8 +7,9 @@ the video's second minute, and it is what makes "the state finally receives a si
 had" demonstrable rather than asserted. But it is a supporting route, not the front door. It must load in a logged-out
 private window, on a phone, with no install and no access request.
 
-Static HTML, CSS and vanilla JS on Firebase Hosting reading Firestore directly with the
-web SDK in read-only mode. No build step, no framework, no bundler. It has to work on
+A route in the same Next.js app on Vercel, reading Firestore directly with the web SDK in
+read-only mode. Keep it plain: no extra dependency, no chart library, no framework beyond
+what the app already carries. It has to work on
 submission day and it has to be trivially reviewable.
 
 ## Route
