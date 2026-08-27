@@ -34,6 +34,7 @@ low contrast is exactly what we want: the basemap is context, the zones are the 
 | Min zoom | 10 |
 | Max zoom | 17 |
 | Default | zoom 12.5, centred on `17.7100, 83.3000` |
+| Fractional zoom | `zoomSnap: 0.5` (`map.zoom.snap`). **Leaflet defaults to 1 and silently rounds 12.5 to 12**, so the default-zoom fact is unreachable without this. Set it on the map, not per call. |
 
 ### Attribution, non-negotiable
 

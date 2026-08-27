@@ -21,6 +21,13 @@ Home
 **Session overlays are driven by `SessionState`, never by user navigation.** She can never
 navigate away from `CHECKIN_2`, `FAMILY_ESCALATED` or `SOS_ACTIVE`. Back is consumed.
 
+**The `StatusPill` belongs to the app shell, not to Home.** Whenever `SessionState` is
+anything but `IDLE`, it renders above every route: Home, Settings, About, the zone sheet,
+the location help sheet. The product's promise is that she always knows whether it is
+watching, and routing to Settings is not a reason to stop telling her. `CHECKIN_2`,
+`FAMILY_ESCALATED` and `SOS_ACTIVE` already force themselves over any route, so the gap
+this closes is `SHADOW` and `CHECKIN_1`.
+
 ---
 
 ## S1. Gate

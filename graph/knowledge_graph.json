@@ -313,7 +313,7 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 373,
+  "entities": 375,
   "edges": 669,
   "events": 65
  },
@@ -3031,6 +3031,18 @@
    "class": "Decision",
    "at": "2026-08-27",
    "label": "The separate submission page is dropped. S13 About already carries the version, what is real, what is mocked, the no-government-link statement, the no-AI line, data provenance and attributions, so the page duplicated it and sat between the judge and the product. The live link is the app; the video goes to the form directly. Founder decision under an 18-hour ceiling, with the offline queue and onboarding both deliberately kept."
+  },
+  {
+   "id": "d.statuspill_shell",
+   "class": "Decision",
+   "label": "The StatusPill renders from the app shell whenever SessionState is not IDLE, above every route including Settings, About and the sheets. The product's promise is that she always knows whether it is watching, and navigating to Settings is not a reason to stop telling her. CHECKIN_2, FAMILY_ESCALATED and SOS_ACTIVE already force themselves over any route, so this closes SHADOW and CHECKIN_1.",
+   "at": "2026-08-27"
+  },
+  {
+   "id": "fail.zoomsnap",
+   "class": "Failure",
+   "label": "map.zoom.default is 12.5 and Leaflet's zoomSnap defaults to 1, so it silently rounded to 12. A frozen fact was unreachable at runtime with no error anywhere: G6 confirmed the literal traced to a fact, and the map still did not honour it. Only browser QA on a device could see it.",
+   "at": "2026-08-27"
   }
  ],
  "edges": [

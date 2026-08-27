@@ -3,7 +3,7 @@
  "kind": "knowledge_graph",
  "note": "Domain facts with provenance. Never merge with build_graph.json - different truth standards.",
  "rule": "Every numeric or colour literal in source must trace to a fact id here, or the grounded checker fails the node.",
- "count": 393,
+ "count": 394,
  "facts": [
   {
    "id": "ladder.cd1",
@@ -4374,6 +4374,17 @@
    "governs": "COPY.md",
    "frozen": true,
    "platform": "any"
+  },
+  {
+   "id": "map.zoom.snap",
+   "kind": "number",
+   "value": 0.5,
+   "unit": "z",
+   "means": "Leaflet zoomSnap. Required for the 12.5 default zoom: Leaflet defaults to 1 and silently rounds fractional zoom, making map.zoom.default unreachable.",
+   "sourced_from": "browser QA 2026-08-27, G9 round on M4",
+   "governs": "MAP_SPEC.md",
+   "frozen": true,
+   "platform": "web"
   }
  ]
 }
