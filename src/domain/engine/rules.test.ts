@@ -5,6 +5,8 @@ import { checkInDelaySec } from "./intervalCalculator";
 import {
   DEFAULT_RULES,
   DAWN_START_HOUR,
+  DEMO_ARM_HOUR,
+  DEMO_ARM_TIME,
   HOURS_PER_DAY,
   MINUTES_PER_HOUR,
   NIGHT_DEEP_START_HOUR,
@@ -63,6 +65,18 @@ describe("frozen business rules", () => {
         );
       });
     });
+  });
+
+  it("keeps DAY non-arming and derives the demo band from its frozen hour", () => {
+    (Object.keys(EXPECTED_ARMING) as RiskTier[]).forEach((tier) => {
+      expect(shouldAutoArm(DEFAULT_RULES, tier, "DAY", undefined, 0)).toBe(
+        false,
+      );
+    });
+    expect(DEMO_ARM_TIME.hourBand).toBe(
+      hourBandForLocalTime(DEMO_ARM_HOUR, 0),
+    );
+    expect(DEMO_ARM_TIME.hourBand).toBe("NIGHT_DEEP");
   });
 
   it("never auto-arms a safe zone", () => {

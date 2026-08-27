@@ -51,7 +51,7 @@ export function onEvent(
   validateActiveContext(state, ctx);
 
   if (event.kind === "PermissionRevoked" && isActive(state)) {
-    return resolvePermissionLoss(state, event.permission);
+    return resolvePermissionLoss(state, event.permission, ctx);
   }
 
   switch (state) {
@@ -303,9 +303,17 @@ function enterSos(
 }
 
 function resolvePermissionLoss(
-  _state: SessionState,
+  state: SessionState,
   permission: string,
+  ctx: EngineContext,
 ): EngineResult {
+  if (ctx.armMode === "MANUAL") {
+    return {
+      state,
+      commands: [{ kind: "ShowPermissionWarning", permission }],
+    };
+  }
+
   const commands: Command[] = [
     { kind: "CancelTimer", id: "CHECKIN" },
     { kind: "CancelTimer", id: "CD1" },

@@ -313,9 +313,9 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 382,
-  "edges": 671,
-  "events": 65
+  "entities": 387,
+  "edges": 676,
+  "events": 68
  },
  "entities": [
   {
@@ -3085,6 +3085,36 @@
    "class": "Decision",
    "label": "Map offline is a re-enterable state, not a load-time verdict. Entered on tileerror, on the browser offline event, or on the 4 s timeout. Left only on a subsequent successful tileload, never on the online event: a network that reports itself back has not yet proved a tile will arrive. Listeners are removed on teardown. Only the note changes; zones, her dot and the ladder carry on untouched in either state, which is the claim.",
    "at": "2026-08-27"
+  },
+  {
+   "id": "art.m4.home_map",
+   "class": "Artifact",
+   "label": "Mobile Home map with Leaflet zones, offline disclosure, attribution, and selected zone state",
+   "node": "M4"
+  },
+  {
+   "id": "art.m4.zone_detail",
+   "class": "Artifact",
+   "label": "Zone detail sheet with locality label, hour-aware display band, and nearest-station call block",
+   "node": "M4"
+  },
+  {
+   "id": "art.m4.home_session_surface",
+   "class": "Artifact",
+   "label": "Home arm banner, session-state surfaces, recovery warning, and app-shell status visibility",
+   "node": "M4"
+  },
+  {
+   "id": "art.m4.demo_panel",
+   "class": "Artifact",
+   "label": "Bilingual demo controls with frozen session display provenance and scaled timing",
+   "node": "M4"
+  },
+  {
+   "id": "art.m4.settings_shell",
+   "class": "Artifact",
+   "label": "M4-owned Settings and About shell with truthful checkpoint claims",
+   "node": "M4"
   }
  ],
  "edges": [
@@ -8455,6 +8485,46 @@
    "at": "2026-08-27",
    "by": "claude",
    "confidence": "high"
+  },
+  {
+   "from": "art.m4.home_map",
+   "rel": "produced_by",
+   "to": "node.M4",
+   "at": "2026-08-27",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.m4.zone_detail",
+   "rel": "produced_by",
+   "to": "node.M4",
+   "at": "2026-08-27",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.m4.home_session_surface",
+   "rel": "produced_by",
+   "to": "node.M4",
+   "at": "2026-08-27",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.m4.demo_panel",
+   "rel": "produced_by",
+   "to": "node.M4",
+   "at": "2026-08-27",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.m4.settings_shell",
+   "rel": "produced_by",
+   "to": "node.M4",
+   "at": "2026-08-27",
+   "by": "codex",
+   "confidence": "high"
   }
  ],
  "events": [
@@ -9210,6 +9280,30 @@
     "data.ncrb.calibration.year",
     "COPY.md"
    ]
+  },
+  {
+   "id": "ev.0066",
+   "type": "spec_amended",
+   "at": "2026-08-27",
+   "actor": "codex",
+   "detail": "Reconciled STATES_CATALOGUE to the founder-approved S11b location recovery and loc_slow no-link policy",
+   "node": "M4"
+  },
+  {
+   "id": "ev.0067",
+   "type": "node_completed",
+   "at": "2026-08-27",
+   "actor": "codex",
+   "detail": "M4 completed: mobile map, zone detail, session surfaces, truthful Settings/About shell, and bilingual demo panel pass all gates; tile availability recovers only on successful tile evidence.",
+   "node": "M4"
+  },
+  {
+   "id": "ev.0068",
+   "type": "spec_amended",
+   "at": "2026-08-27",
+   "actor": "codex",
+   "detail": "Reconciled STATES_CATALOGUE to the founder-approved location-revocation arm-mode split: AUTO_ZONE disarms while MANUAL continues with an honest warning.",
+   "node": "M4"
   }
  ]
 }

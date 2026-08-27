@@ -65,13 +65,20 @@ export function HomeMap({
     if (host === null) return;
     let disposed = false;
 
-    void mountLeafletMap(host, mapZones, {
-      onReady() {
-        if (!disposed) setLeafletReady(true);
+    void mountLeafletMap(
+      host,
+      mapZones,
+      {
+        ariaZone: copy.ariaZone,
+        onReady() {
+          if (!disposed) setLeafletReady(true);
+        },
+        onTileAvailability,
+        onZoneSelected,
       },
-      onTileAvailability,
-      onZoneSelected,
-    }).then((controller) => {
+      () => disposed,
+    ).then((controller) => {
+      if (controller === null) return;
       if (disposed) {
         controller.destroy();
         return;
@@ -87,7 +94,7 @@ export function HomeMap({
       controllerRef.current = null;
       onController(null);
     };
-  }, [mapZones, onController, onTileAvailability, onZoneSelected]);
+  }, [copy.ariaZone, mapZones, onController, onTileAvailability, onZoneSelected]);
 
   useEffect(() => {
     controllerRef.current?.update({ location, selectedZoneId, sessionState });
@@ -110,66 +117,73 @@ export function HomeMap({
 
   return (
     <section aria-label={copy.ariaMap} className="home-map">
-      <div aria-label={copy.ariaMap} className="home-map__leaflet" ref={hostRef} role="application" />
+      <div className="home-map__canvas">
+        <div aria-label={copy.ariaMap} className="home-map__leaflet" ref={hostRef} role="application" />
 
-      <svg
-        aria-hidden={leafletReady}
-        aria-label={copy.ariaMap}
-        className="home-map__fallback"
-        data-map-layer="bundled-zones"
-        data-ready={leafletReady ? "false" : "true"}
-        onClick={() => onZoneSelected(null)}
-        preserveAspectRatio="xMidYMid meet"
-        role="img"
-        viewBox={STATIC_MAP_VIEW_BOX}
-      >
-        {projectedZones.map((zone) => {
-          const selected = zone.id === selectedZoneId;
-          return (
-            <g key={zone.id}>
-              <path
-                d={zone.path}
-                fill="none"
-                pointerEvents="none"
-                stroke={zone.colorHex}
-                strokeOpacity={ZONE_GLOW_OPACITY}
-                strokeWidth={ZONE_GLOW_STROKE_PX}
-              />
-              <path
-                aria-label={copy.ariaZone(zone.areaName, zone.riskLevel)}
-                d={zone.path}
-                data-zone-id={zone.id}
-                fill={zone.colorHex}
-                fillOpacity={Math.min(
-                  OPACITY_MAXIMUM,
-                  zone.fillOpacity + (selected ? ZONE_SELECTED_OPACITY_RAISE : 0),
-                )}
-                onClick={(event) => selectStaticZone(event, zone.id)}
-                onKeyDown={(event) => selectStaticZoneFromKeyboard(event, zone.id)}
-                role="button"
-                stroke={zone.colorHex}
-                strokeWidth={selected ? ZONE_SELECTED_STROKE_PX : ZONE_STROKE_PX}
-                tabIndex={leafletReady ? -1 : 0}
-              />
-              {zone.riskTier === "HIGH" ? (
-                <text
-                  className="home-map__fallback-label"
+        <svg
+          aria-hidden={leafletReady}
+          aria-label={copy.ariaMap}
+          className="home-map__fallback"
+          data-map-layer="bundled-zones"
+          data-ready={leafletReady ? "false" : "true"}
+          onClick={() => onZoneSelected(null)}
+          preserveAspectRatio="xMidYMid meet"
+          role="img"
+          viewBox={STATIC_MAP_VIEW_BOX}
+        >
+          {projectedZones.map((zone) => {
+            const selected = zone.id === selectedZoneId;
+            return (
+              <g key={zone.id}>
+                <path
+                  d={zone.path}
+                  fill="none"
                   pointerEvents="none"
-                  textAnchor="middle"
-                  x={zone.labelX}
-                  y={zone.labelY}
-                >
-                  {zone.areaName}
-                </text>
-              ) : null}
-            </g>
-          );
-        })}
-      </svg>
+                  stroke={zone.colorHex}
+                  strokeOpacity={ZONE_GLOW_OPACITY}
+                  strokeWidth={ZONE_GLOW_STROKE_PX}
+                />
+                <path
+                  aria-label={copy.ariaZone(zone.areaName, zone.riskLevel)}
+                  d={zone.path}
+                  data-zone-id={zone.id}
+                  fill={zone.colorHex}
+                  fillOpacity={Math.min(
+                    OPACITY_MAXIMUM,
+                    zone.fillOpacity +
+                      (selected ? ZONE_SELECTED_OPACITY_RAISE : 0),
+                  )}
+                  onClick={(event) => selectStaticZone(event, zone.id)}
+                  onKeyDown={(event) =>
+                    selectStaticZoneFromKeyboard(event, zone.id)
+                  }
+                  role="button"
+                  stroke={zone.colorHex}
+                  strokeWidth={
+                    selected ? ZONE_SELECTED_STROKE_PX : ZONE_STROKE_PX
+                  }
+                  tabIndex={leafletReady ? -1 : 0}
+                />
+                {zone.riskTier === "HIGH" ? (
+                  <text
+                    className="home-map__fallback-label"
+                    pointerEvents="none"
+                    textAnchor="middle"
+                    x={zone.labelX}
+                    y={zone.labelY}
+                  >
+                    {zone.areaName}
+                  </text>
+                ) : null}
+              </g>
+            );
+          })}
+        </svg>
 
-      {tileAvailability === "offline" ? (
-        <p className="home-map__offline" role="status">{copy.offline}</p>
-      ) : null}
+        {tileAvailability === "offline" ? (
+          <p className="home-map__offline" role="status">{copy.offline}</p>
+        ) : null}
+      </div>
 
       <small className="home-map__attribution">{copy.attribution}</small>
 
@@ -177,8 +191,15 @@ export function HomeMap({
         .home-map {
           position: absolute;
           inset: 0;
+        }
+
+        .home-map__canvas {
+          position: absolute;
+          z-index: 0; /* GROUNDED-EXEMPT: local base stacking context contains Leaflet's internal pane indices below Home UI. */
+          inset: 0;
           overflow: hidden;
           background: var(--color-background);
+          isolation: isolate;
         }
 
         .home-map__leaflet,
@@ -236,12 +257,12 @@ export function HomeMap({
         }
 
         .home-map__attribution {
-          position: absolute;
-          z-index: 3;
+          position: fixed;
+          z-index: 10; /* GROUNDED-EXEMPT: licence attribution remains above every Home sheet state. */
           inset-inline-start: var(--screen-padding);
-          inset-block-end: calc(var(--sheet-peek-height) + var(--space-8));
+          inset-block-end: calc(env(safe-area-inset-bottom) + var(--space-4));
           color: var(--color-text-tertiary);
-          font-size: 10px;
+          font-size: calc(10 / 16 * 1rem); /* type.map.attribution / type.rem.base */
           line-height: var(--type-label-line-height);
           white-space: nowrap;
         }

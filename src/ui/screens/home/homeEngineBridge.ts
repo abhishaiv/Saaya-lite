@@ -54,7 +54,7 @@ export class HomeEngineBridge implements RuntimeSessionBridge {
   };
 
   constructor(
-    private readonly rules: Rules,
+    private rules: Rules,
     private readonly hourBandAt: (epochMs: number) => HourBand,
     private readonly callbacks: HomeEngineCallbacks,
     private readonly createSessionId: () => string,
@@ -69,6 +69,38 @@ export class HomeEngineBridge implements RuntimeSessionBridge {
 
   view(): HomeEngineView {
     return this.currentView(null);
+  }
+
+  setRules(rules: Rules): void {
+    this.rules = rules;
+  }
+
+  resetForDemo(): void {
+    const cleanup: Command[] = [
+      { kind: "CancelTimer", id: "CHECKIN" },
+      { kind: "CancelTimer", id: "CD1" },
+      { kind: "CancelTimer", id: "CD2" },
+      { kind: "CancelTimer", id: "CANCEL" },
+      { kind: "HideCheckIn" },
+      { kind: "StopLocationWatch" },
+      { kind: "ReleaseWakeLock" },
+    ];
+    this.callbacks.onCommands(cleanup, {
+      ...this.currentView("CANCELLED"),
+      state: "RESOLVED",
+    });
+    this.memory = {
+      activeZoneId: null,
+      armedAtEpochMs: null,
+      armedHourBand: null,
+      armMode: "MANUAL",
+      cooldowns: {},
+      deadlineEpochMs: null,
+      sessionId: null,
+      state: "IDLE",
+      susEventWritten: false,
+    };
+    this.callbacks.onView(this.currentView("CANCELLED"));
   }
 
   persistedSession(): PersistedSession | null {
@@ -116,9 +148,13 @@ export class HomeEngineBridge implements RuntimeSessionBridge {
 
   dispatch(
     event: SessionEvent,
-    input: { readonly nowEpochMs: number; readonly zone: Zone | null },
+    input: {
+      readonly nowEpochMs: number;
+      readonly zone: Zone | null;
+      readonly hourBand?: HourBand;
+    },
   ): RuntimeSessionSnapshot {
-    const hourBand = this.hourBandAt(input.nowEpochMs);
+    const hourBand = input.hourBand ?? this.hourBandAt(input.nowEpochMs);
     const result = onEvent(this.memory.state, event, {
       armMode: this.memory.armMode,
       armedAtEpochMs: this.memory.armedAtEpochMs,

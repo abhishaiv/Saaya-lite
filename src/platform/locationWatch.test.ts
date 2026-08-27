@@ -147,6 +147,15 @@ function setup() {
 }
 
 describe("browser location watch", () => {
+  it("does not manufacture consent when visibility recovery runs before a grant", () => {
+    const harness = setup();
+
+    harness.watch.resumePreviouslyConsented();
+
+    expect(harness.geolocation.watchOptions).toEqual([]);
+    expect(harness.statuses).toEqual([]);
+  });
+
   it("starts only after consent and reports a slow first fix while continuing", () => {
     const harness = setup();
     expect(harness.geolocation.watchOptions).toEqual([]);
@@ -224,6 +233,34 @@ describe("browser location watch", () => {
 
     expect(harness.interruptions).toEqual(["PERMISSION_DENIED"]);
     expect(harness.statuses.at(-1)).toBe("PERMISSION_DENIED");
+  });
+
+  it("re-requests after a remembered denial and can recover after permission changes", () => {
+    const harness = setup();
+    const permissionDeniedCode = 1; // GROUNDED-EXEMPT: Web Geolocation API error enum.
+    const positionUnavailableCode = 2; // GROUNDED-EXEMPT: Web Geolocation API error enum.
+    const timeoutCode = 3; // GROUNDED-EXEMPT: Web Geolocation API error enum.
+    const denied = {
+      code: permissionDeniedCode,
+      message: "denied",
+      PERMISSION_DENIED: permissionDeniedCode,
+      POSITION_UNAVAILABLE: positionUnavailableCode,
+      TIMEOUT: timeoutCode,
+    } as GeolocationPositionError;
+
+    harness.watch.startAfterConsent();
+    harness.geolocation.fail(denied);
+    const watchCountAfterDenial = harness.geolocation.watchOptions.length;
+
+    harness.watch.startAfterConsent();
+    expect(harness.statuses.at(-1)).toBe("SEARCHING");
+    expect(harness.geolocation.watchOptions).toHaveLength(
+      watchCountAfterDenial + 1,
+    );
+
+    harness.geolocation.emit(position(harness.clock.now));
+    expect(harness.statuses.at(-1)).toBe("CURRENT");
+    expect(harness.fixes).toHaveLength(1);
   });
 
   it("returns a recent stored fix for centring only, never as a live fix", () => {

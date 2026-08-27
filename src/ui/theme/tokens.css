@@ -83,7 +83,21 @@
   --accent-family: #FF3B30;
   --accent-sos: #FF3B30;
   --border-checkin-1: 1px;
+  --border-hairline: 1px; /* dim.border.hairline */
   --border-checkin-2: 1.5px;
   --border-family: 2px;
   --border-accent-alpha: 0.5;
+}
+
+@media (max-width: 359px) {
+  :root {
+    --screen-padding: 16px;
+    --sheet-peek-height: 148px;
+  }
+}
+
+@media (min-width: 480px) {
+  :root {
+    --screen-padding: 24px;
+  }
 }

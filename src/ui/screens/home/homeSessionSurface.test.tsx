@@ -28,9 +28,11 @@ function render(
       armBannerVisible={false}
       contextLine={M4_COPY.en.homeHourContext}
       copy={M4_COPY.en}
+      demoModeActive={false}
       engineView={view(state, "MANUAL")}
       locationStatus="CURRENT"
       onArmBannerHidden={() => undefined}
+      onLocationHelpOpen={() => undefined}
       onManualArm={() => undefined}
       onManualDisarm={() => undefined}
       pageStoppedWarning={false}
@@ -40,10 +42,9 @@ function render(
 }
 
 describe("M4 Home session surface", () => {
-  it("shows the exact IDLE status and manual-arm action in the collapsed sheet", () => {
+  it("shows the manual-arm action in the collapsed sheet", () => {
     const html = render("IDLE");
 
-    expect(html).toContain(M4_COPY.en.statusIdle);
     expect(html).toContain(M4_COPY.en.ctaArmManually);
     expect(html).toContain('data-position="peek"');
     expect(html).not.toContain(M4_COPY.en.ctaImHome);
@@ -60,7 +61,6 @@ describe("M4 Home session surface", () => {
       engineView: view("SHADOW", "AUTO_ZONE"),
     });
 
-    expect(html).toContain(M4_COPY.en.statusShadowAuto);
     expect(html).toContain(M4_COPY.en.homeArmBannerTitle);
     expect(html.split(M4_COPY.en.homeArmBannerBody)).toHaveLength(3);
     expect(html).toContain(M4_COPY.en.ctaImHome);
@@ -80,14 +80,20 @@ describe("M4 Home session surface", () => {
 
     expect(html).not.toContain(M4_COPY.te.homeArmBannerTitle);
     expect(html).toContain(M4_COPY.te.homeArmBannerBody);
-    expect(html).toContain(M4_COPY.te.statusShadowAuto);
   });
 
   it("shows the honest permission warning without claiming the active watch is healthy", () => {
     const html = render("IDLE", { locationStatus: "PERMISSION_DENIED" });
 
     expect(html).toContain(M4_COPY.en.warnLocationDenied);
+    expect(html).toContain("data-location-help-trigger");
     expect(html).not.toContain(M4_COPY.en.warnKeepOpenBody);
+  });
+
+  it("keeps the labelled demo-speed disclosure visible outside the panel", () => {
+    const html = render("IDLE", { demoModeActive: true });
+
+    expect(html).toContain(M4_COPY.en.demoModeActive);
   });
 
   it("projects every escalated status without exposing a Home disarm shortcut", () => {

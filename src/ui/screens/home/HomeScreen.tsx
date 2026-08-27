@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 
 import type {
   DemoZone,
@@ -16,6 +15,8 @@ import {
 import { selectHighestRiskZone } from "../../../domain/engine/armingEvaluator";
 import {
   DEFAULT_RULES,
+  DEMO_ARM_TIME,
+  DEMO_RULES,
   displayRisk,
   displayRiskLabel,
 } from "../../../domain/engine/rules";
@@ -28,7 +29,14 @@ import {
   HomeSessionRuntime,
 } from "../../../platform/homeSessionRuntime";
 import { hourBandAtEpochMs } from "../../../platform/hourBandClock";
-import { formatIndiaHour } from "../../../platform/indiaTime";
+import { formatSessionArmTime } from "../../../platform/indiaTime";
+import {
+  clearDemoArmedSession,
+  isDemoArmedSession,
+  loadDemoSpeedEnabled,
+  markDemoArmedSession,
+  saveDemoSpeedEnabled,
+} from "../../../platform/demoModeStore";
 import type { LeafletMapController, TileAvailability } from "../../../platform/leafletMap";
 import type { LiveLocationFix, LocationStatus } from "../../../platform/locationWatch";
 import { PageLocationRuntime } from "../../../platform/pageLocationRuntime";
@@ -45,14 +53,32 @@ import { MapControlButton, MapControlButtonStack } from "../../components/MapCon
 import { formatCopy, M4_COPY, type SaayaLocale } from "../../copy/strings";
 import { HomeEngineBridge, type HomeEngineView } from "./homeEngineBridge";
 import { HomeMap } from "./HomeMap";
+import { DemoPanel } from "./DemoPanel";
+import {
+  eventsToFamilyEscalation,
+  eventsToSos,
+  nextMissedCheckInEvent,
+  simulatedZoneEntryEvent,
+} from "./demoControls";
+import { AppSessionStatus } from "./AppSessionStatus";
 import {
   HomeSessionSurface,
   type ArmAcknowledgement,
 } from "./HomeSessionSurface";
 import { ZoneDetailSheet } from "./ZoneDetailSheet";
+import { AboutScreen } from "../settings/AboutScreen";
+import { SettingsScreen } from "../settings/SettingsScreen";
+import { LocationHelpSheet } from "../location/LocationHelpSheet";
+
+export interface BuildVersion {
+  readonly code: number;
+  readonly name: string;
+}
 
 export interface HomeScreenProps {
+  readonly buildVersion: BuildVersion;
   readonly demoZones: readonly DemoZone[];
+  readonly founderContact: string | null;
   readonly locale: SaayaLocale;
   readonly mapZones: readonly MapZone[];
   readonly policeStations: readonly PoliceStation[];
@@ -60,13 +86,14 @@ export interface HomeScreenProps {
 }
 
 export function HomeScreen({
+  buildVersion,
   demoZones,
+  founderContact,
   locale,
   mapZones,
   policeStations,
   zoneDetails,
 }: HomeScreenProps) {
-  const router = useRouter();
   const copy = M4_COPY[locale];
   const [location, setLocation] = useState<LiveLocationFix | null>(null);
   const [locationStatus, setLocationStatus] = useState<LocationStatus>("SEARCHING");
@@ -80,6 +107,14 @@ export function HomeScreen({
     useState<ArmAcknowledgement | null>(null);
   const [armBannerVisible, setArmBannerVisible] = useState(false);
   const [pageStoppedWarning, setPageStoppedWarning] = useState(false);
+  const [demoPanelOpen, setDemoPanelOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);
+  const [locationHelpOpen, setLocationHelpOpen] = useState(false);
+  const [demoSpeedEnabled, setDemoSpeedEnabled] = useState(false);
+  const [demoSessionActive, setDemoSessionActive] = useState(false);
+  const demoSpeedEnabledRef = useRef(false);
+  const demoArmInFlightRef = useRef(false);
   const [engineView, setEngineView] = useState<HomeEngineView>({
     activeZoneId: null,
     armMode: "MANUAL",
@@ -148,11 +183,18 @@ export function HomeScreen({
   useEffect(() => {
     const engine = engineRef.current;
     if (engine === null) return;
+    const persistedDemoMode = loadDemoSpeedEnabled();
+    if (persistedDemoMode) {
+      engine.setRules(DEMO_RULES);
+      demoSpeedEnabledRef.current = true;
+      setDemoSpeedEnabled(true);
+    }
+    const activeRules = persistedDemoMode ? DEMO_RULES : DEFAULT_RULES;
     const sessions = new IndexedDbSessionRepository();
     const wakeLock = new WakeLockController(browserWakeLockApi());
     const runtime = new PageLocationRuntime(
       zones,
-      DEFAULT_RULES,
+      activeRules,
       engine,
       {
         onInterrupted(reason) {
@@ -162,6 +204,7 @@ export function HomeScreen({
         },
         onLiveFix(fix) {
           setLocation(fix);
+          setLocationHelpOpen(false);
           setNowEpochMs(fix.observedAtEpochMs);
         },
         onStatus(status) {
@@ -182,11 +225,19 @@ export function HomeScreen({
             if (detail === undefined) return;
             const armedAtEpochMs =
               engine.view().armedAtEpochMs ?? browserClock.nowEpochMs();
+            const sessionId = engine.persistedSession()?.sessionId ?? null;
+            const demoArmedSession =
+              demoArmInFlightRef.current ||
+              (sessionId !== null && isDemoArmedSession(sessionId));
             setArmAcknowledgement({
               body: formatCopy(
                 copy.homeArmBannerBody,
                 detail.label,
-                formatIndiaHour(armedAtEpochMs, locale),
+                formatSessionArmTime(
+                  armedAtEpochMs,
+                  locale,
+                  demoArmedSession,
+                ),
               ),
               title: copy.homeArmBannerTitle,
             });
@@ -202,6 +253,11 @@ export function HomeScreen({
       },
     );
     commandListenerRef.current = (commands, view) => {
+      if (view.state === "RESOLVED") {
+        const sessionId = engine.persistedSession()?.sessionId;
+        if (sessionId !== undefined) clearDemoArmedSession(sessionId);
+        setDemoSessionActive(false);
+      }
       sessionRuntime.handle(commands, view.state);
     };
     locationRuntimeRef.current = runtime;
@@ -211,6 +267,10 @@ export function HomeScreen({
       sessions,
       {
         async recover(persisted, recoveredAtEpochMs) {
+          const recoveredDemoSession = isDemoArmedSession(
+            persisted.sessionId,
+          );
+          setDemoSessionActive(recoveredDemoSession);
           const zone =
             zones.find((candidate) => candidate.stationId === persisted.zoneId) ??
             null;
@@ -221,7 +281,11 @@ export function HomeScreen({
                 body: formatCopy(
                   copy.homeArmBannerBody,
                   detail.label,
-                  formatIndiaHour(persisted.armedAtEpochMs, locale),
+                  formatSessionArmTime(
+                    persisted.armedAtEpochMs,
+                    locale,
+                    recoveredDemoSession,
+                  ),
                 ),
                 title: copy.homeArmBannerTitle,
               });
@@ -252,7 +316,7 @@ export function HomeScreen({
     });
     void readGeolocationPermissionState().then((permission) => {
       if (disposed) return;
-      if (permission === "granted") runtime.resumePreviouslyConsented();
+      if (permission === "granted") runtime.startAfterConsent();
       if (permission === "denied") setLocationStatus("PERMISSION_DENIED");
     });
 
@@ -300,6 +364,95 @@ export function HomeScreen({
       { nowEpochMs: browserClock.nowEpochMs(), zone: activeZone },
     );
   }, [currentZone, engineView.activeZoneId, zones]);
+  const handleLocationHelpOpen = useCallback(() => {
+    setSelectedZoneId(null);
+    setDemoPanelOpen(false);
+    setLocationHelpOpen(true);
+  }, []);
+  const handleLocationRetry = useCallback(() => {
+    locationRuntimeRef.current?.startAfterConsent();
+  }, []);
+  const dispatchDemoEvents = useCallback(
+    (events: readonly Parameters<HomeEngineBridge["dispatch"]>[0][]) => {
+      const engine = engineRef.current;
+      if (engine === null) return;
+      for (const event of events) {
+        const activeZone =
+          zones.find(
+            ({ stationId }) => stationId === engine.view().activeZoneId,
+          ) ?? currentZone;
+        engine.dispatch(event, {
+          nowEpochMs: browserClock.nowEpochMs(),
+          zone: activeZone,
+        });
+      }
+      const persisted = engine.persistedSession();
+      if (persisted !== null) {
+        markDemoArmedSession(persisted.sessionId);
+        setDemoSessionActive(true);
+      }
+    },
+    [currentZone, zones],
+  );
+  const handleDemoSpeedChanged = useCallback((enabled: boolean) => {
+    const rules = enabled ? DEMO_RULES : DEFAULT_RULES;
+    engineRef.current?.setRules(rules);
+    locationRuntimeRef.current?.setRules(rules);
+    demoSpeedEnabledRef.current = enabled;
+    saveDemoSpeedEnabled(enabled);
+    setDemoSpeedEnabled(enabled);
+  }, []);
+  const handleDemoZoneSelected = useCallback(
+    (zoneId: string) => {
+      const detail = zoneDetails.find(({ id }) => id === zoneId);
+      if (detail === undefined) return;
+      const event = simulatedZoneEntryEvent(detail.zone);
+      if (event === null) {
+        setDemoPanelOpen(false);
+        setSelectedZoneId(zoneId);
+        return;
+      }
+      const engine = engineRef.current;
+      if (engine === null) return;
+      demoArmInFlightRef.current = true;
+      try {
+        engine.dispatch(event, {
+          hourBand: DEMO_ARM_TIME.hourBand,
+          nowEpochMs: browserClock.nowEpochMs(),
+          zone: detail.zone,
+        });
+        const persisted = engine.persistedSession();
+        if (persisted !== null) {
+          markDemoArmedSession(persisted.sessionId);
+          setDemoSessionActive(true);
+        }
+      } finally {
+        demoArmInFlightRef.current = false;
+      }
+    },
+    [zoneDetails],
+  );
+  const handleDemoMissCheckIn = useCallback(() => {
+    const engine = engineRef.current;
+    if (engine === null) return;
+    const event = nextMissedCheckInEvent(engine.view().state);
+    if (event !== null) dispatchDemoEvents([event]);
+  }, [dispatchDemoEvents]);
+  const handleDemoJumpFamily = useCallback(() => {
+    const state = engineRef.current?.view().state ?? "IDLE";
+    dispatchDemoEvents(eventsToFamilyEscalation(state));
+  }, [dispatchDemoEvents]);
+  const handleDemoTriggerSos = useCallback(() => {
+    const state = engineRef.current?.view().state ?? "IDLE";
+    dispatchDemoEvents(eventsToSos(state));
+  }, [dispatchDemoEvents]);
+  const handleDemoReset = useCallback(() => {
+    engineRef.current?.resetForDemo();
+    setSelectedZoneId(null);
+    setArmAcknowledgement(null);
+    setArmBannerVisible(false);
+    setPageStoppedWarning(false);
+  }, []);
 
   const mapCopy = useMemo(
     () => ({
@@ -311,9 +464,55 @@ export function HomeScreen({
     }),
     [copy],
   );
+  const appSessionStatus = (
+    <AppSessionStatus
+      copy={copy}
+      showIdle={!aboutOpen && !settingsOpen}
+      view={engineView}
+    />
+  );
+
+  if (aboutOpen) {
+    return (
+      <>
+        {appSessionStatus}
+        <AboutScreen
+          copy={copy}
+          founderContact={founderContact}
+          mockedClaims={[]}
+          onBack={() => setAboutOpen(false)}
+          realClaims={[
+            copy.aboutRealMap,
+            copy.aboutRealDetail,
+          ]}
+          versionCode={buildVersion.code}
+          versionName={buildVersion.name}
+        />
+      </>
+    );
+  }
+
+  if (settingsOpen) {
+    return (
+      <>
+        {appSessionStatus}
+        <SettingsScreen
+          copy={copy}
+          onBack={() => setSettingsOpen(false)}
+          onOpenAbout={() => setAboutOpen(true)}
+          onOpenDemo={() => {
+            setSettingsOpen(false);
+            setDemoPanelOpen(true);
+          }}
+        />
+      </>
+    );
+  }
 
   return (
-    <main className="home-screen" data-location-status={locationStatus} data-session-state={engineView.state}>
+    <>
+      {appSessionStatus}
+      <main className="home-screen" data-location-status={locationStatus} data-session-state={engineView.state}>
       <HomeMap
         copy={mapCopy}
         location={location}
@@ -331,13 +530,27 @@ export function HomeScreen({
         armBannerVisible={armBannerVisible}
         contextLine={contextLine}
         copy={copy}
+        demoModeActive={demoSpeedEnabled || demoSessionActive}
         engineView={engineView}
         locationStatus={locationStatus}
         onArmBannerHidden={() => setArmBannerVisible(false)}
+        onLocationHelpOpen={handleLocationHelpOpen}
         onManualArm={handleManualArm}
         onManualDisarm={handleManualDisarm}
         pageStoppedWarning={pageStoppedWarning}
       />
+
+      <div className="home-screen__settings">
+        <MapControlButton
+          icon="settings"
+          label={copy.cdSettings}
+          onClick={() => {
+            setSelectedZoneId(null);
+            setDemoPanelOpen(false);
+            setSettingsOpen(true);
+          }}
+        />
+      </div>
 
       <div className="home-screen__controls">
         <MapControlButtonStack>
@@ -345,11 +558,6 @@ export function HomeScreen({
             icon="my_location"
             label={copy.cdRecentre}
             onClick={() => mapControllerRef.current?.recenter()}
-          />
-          <MapControlButton
-            icon="settings"
-            label={copy.cdSettings}
-            onClick={() => router.push(`/settings?lang=${locale}`)}
           />
         </MapControlButtonStack>
       </div>
@@ -369,12 +577,37 @@ export function HomeScreen({
         />
       )}
 
+      {demoPanelOpen ? (
+        <DemoPanel
+          copy={copy}
+          demoSpeedEnabled={demoSpeedEnabled}
+          demoZones={demoZones}
+          onClose={() => setDemoPanelOpen(false)}
+          onDemoSpeedChanged={handleDemoSpeedChanged}
+          onJumpFamily={handleDemoJumpFamily}
+          onMissCheckIn={handleDemoMissCheckIn}
+          onReset={handleDemoReset}
+          onTriggerSos={handleDemoTriggerSos}
+          onZoneSelected={handleDemoZoneSelected}
+          sessionState={engineView.state}
+        />
+      ) : null}
+
+      {locationHelpOpen ? (
+        <LocationHelpSheet
+          copy={copy}
+          onDismiss={() => setLocationHelpOpen(false)}
+          onRetry={handleLocationRetry}
+        />
+      ) : null}
+
       <style jsx>{`
         .home-screen {
           position: relative;
           min-block-size: 100dvh; /* GROUNDED-EXEMPT: structural viewport fill. */
           overflow: hidden;
           background: var(--color-background);
+          isolation: isolate;
         }
 
         .home-screen__controls {
@@ -383,8 +616,16 @@ export function HomeScreen({
           inset-inline-end: var(--screen-padding);
           inset-block-end: calc(var(--sheet-peek-height) + var(--space-20));
         }
+
+        .home-screen__settings {
+          position: fixed;
+          z-index: 4;
+          inset-block-start: calc(env(safe-area-inset-top) + var(--space-12));
+          inset-inline-end: var(--screen-padding);
+        }
       `}</style>
-    </main>
+      </main>
+    </>
   );
 }
 

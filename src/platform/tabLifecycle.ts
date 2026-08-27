@@ -102,6 +102,9 @@ export class TabLifecycleController {
       this.sessions.loadHeartbeat(),
     ]);
     if (persisted === null || !isActive(persisted.state)) {
+      if (!firstLoad && this.recovery.mayResumeLocation()) {
+        this.location.resumePreviouslyConsented();
+      }
       await this.sessions.saveHeartbeat({
         ownerId: this.pageOwnerId,
         lastSeenEpochMs: nowEpochMs,

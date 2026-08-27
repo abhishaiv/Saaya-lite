@@ -82,7 +82,9 @@ export function ZoneDetailSheet({
       className="zone-detail-sheet"
       dragRangePx={dragRangePx}
       onDismiss={onDismiss}
-      onPositionChange={onDismiss}
+      onPositionChange={(position) => {
+        if (position === "peek") onDismiss();
+      }}
       position="expanded"
     >
       <article aria-labelledby="zone-detail-title" className="zone-detail">

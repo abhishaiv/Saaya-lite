@@ -134,6 +134,42 @@ function autoSession(
 }
 
 describe("tab recovery", () => {
+  it("restarts the previously consented idle watch after visibility returns", async () => {
+    const clock = new FakeClock();
+    const visibility = new FakeVisibility();
+    const sessions = new FakeSessionRepository();
+    const recovery = new EngineRecoveryBridge();
+    const location = new FakeLocation();
+    const wakeLock = new FakeWakeLock();
+    const controller = new TabLifecycleController(
+      visibility,
+      sessions,
+      recovery,
+      location,
+      wakeLock,
+      "page",
+      {
+        onPageStopped: () => undefined,
+        onRecoveryError: (error) => {
+          throw error;
+        },
+      },
+      clock,
+    );
+
+    await controller.start();
+    expect(location.resumed).toBe(0);
+
+    visibility.changeTo("hidden");
+    await controller.waitForIdle();
+    visibility.changeTo("visible");
+    await controller.waitForIdle();
+
+    expect(location.paused).toBe(1);
+    expect(location.resumed).toBe(1);
+    expect(wakeLock.visible).toEqual([false, true]);
+  });
+
   it("recomputes a CHECKIN_2 countdown from its absolute deadline", async () => {
     const clock = new FakeClock();
     const visibility = new FakeVisibility();

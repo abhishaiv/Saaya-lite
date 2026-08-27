@@ -54,6 +54,10 @@ export class PageLocationRuntime {
     this.watch.startAfterConsent();
   }
 
+  setRules(rules: Rules): void {
+    this.arming.setRules(rules);
+  }
+
   resumePreviouslyConsented(): void {
     this.arming.synchronizeSessionState();
     this.watch.resumePreviouslyConsented();

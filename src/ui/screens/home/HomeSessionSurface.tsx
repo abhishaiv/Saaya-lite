@@ -9,7 +9,6 @@ import { ArmBanner } from "../../components/ArmBanner";
 import { DisclosureBanner } from "../../components/DisclosureBanner";
 import { SaayaBottomSheet } from "../../components/SaayaBottomSheet";
 import { SaayaButton } from "../../components/SaayaButton";
-import { StatusPill, type StatusPillLabels } from "../../components/StatusPill";
 import type { M4Copy } from "../../copy/strings";
 import type { HomeEngineView } from "./homeEngineBridge";
 
@@ -18,18 +17,16 @@ export interface ArmAcknowledgement {
   readonly title: string;
 }
 
-type VisibleHomeEngineView = Omit<HomeEngineView, "state"> & {
-  readonly state: Exclude<SessionState, "RESOLVED">;
-};
-
 export interface HomeSessionSurfaceProps {
   readonly armAcknowledgement: ArmAcknowledgement | null;
   readonly armBannerVisible: boolean;
   readonly contextLine: string | null;
   readonly copy: M4Copy;
+  readonly demoModeActive: boolean;
   readonly engineView: HomeEngineView;
   readonly locationStatus: LocationStatus;
   readonly onArmBannerHidden: () => void;
+  readonly onLocationHelpOpen: () => void;
   readonly onManualArm: () => void;
   readonly onManualDisarm: () => void;
   readonly pageStoppedWarning: boolean;
@@ -40,9 +37,11 @@ export function HomeSessionSurface({
   armBannerVisible,
   contextLine,
   copy,
+  demoModeActive,
   engineView,
   locationStatus,
   onArmBannerHidden,
+  onLocationHelpOpen,
   onManualArm,
   onManualDisarm,
   pageStoppedWarning,
@@ -65,10 +64,6 @@ export function HomeSessionSurface({
 
   return (
     <>
-      <div className="home-session-status">
-        <HomeStatusPill copy={copy} view={{ ...engineView, state }} />
-      </div>
-
       {armAcknowledgement !== null && armBannerVisible ? (
         <div className="home-session-arm-banner">
           <ArmBanner
@@ -79,26 +74,38 @@ export function HomeSessionSurface({
         </div>
       ) : null}
 
-      {locationStatus === "PERMISSION_DENIED" ? (
+      {demoModeActive ||
+      locationStatus === "PERMISSION_DENIED" ||
+      pageStoppedWarning ||
+      active ? (
         <div className="home-session-disclosure">
-          <DisclosureBanner
-            content={copy.warnLocationDenied}
-            kind="prototype-limitation"
-          />
-        </div>
-      ) : pageStoppedWarning ? (
-        <div className="home-session-disclosure">
-          <DisclosureBanner
-            content={copy.warnPageStopped}
-            kind="prototype-limitation"
-          />
-        </div>
-      ) : active ? (
-        <div className="home-session-disclosure">
-          <DisclosureBanner
-            content={copy.warnKeepOpenBody}
-            kind="prototype-limitation"
-          />
+          {demoModeActive ? (
+            <DisclosureBanner content={copy.demoModeActive} kind="mock" />
+          ) : null}
+          {locationStatus === "PERMISSION_DENIED" ? (
+            <button
+              aria-label={copy.warnLocationDenied}
+              className="home-session-location-help-trigger"
+              data-location-help-trigger
+              onClick={onLocationHelpOpen}
+              type="button"
+            >
+              <DisclosureBanner
+                content={copy.warnLocationDenied}
+                kind="prototype-limitation"
+              />
+            </button>
+          ) : pageStoppedWarning ? (
+            <DisclosureBanner
+              content={copy.warnPageStopped}
+              kind="prototype-limitation"
+            />
+          ) : active ? (
+            <DisclosureBanner
+              content={copy.warnKeepOpenBody}
+              kind="prototype-limitation"
+            />
+          ) : null}
         </div>
       ) : null}
 
@@ -141,17 +148,9 @@ export function HomeSessionSurface({
       </SaayaBottomSheet>
 
       <style jsx>{`
-        .home-session-status {
-          position: fixed;
-          z-index: 4; /* GROUNDED-EXEMPT: local stack above map and below transient arm acknowledgement. */
-          inset-block: 0;
-          inset-inline: var(--screen-padding);
-          pointer-events: none;
-        }
-
         .home-session-arm-banner {
           position: fixed;
-          z-index: 7; /* GROUNDED-EXEMPT: local stack above the status and sheets for a transient acknowledgement. */
+          z-index: 9; /* GROUNDED-EXEMPT: local stack above Home and the demo sheet for a transient acknowledgement. */
           inset-block-start: env(safe-area-inset-top);
           inset-inline: 0;
           pointer-events: none;
@@ -164,7 +163,24 @@ export function HomeSessionSurface({
           inset-block-end: calc(
             var(--sheet-peek-height) + var(--space-12)
           );
+          display: grid;
+          gap: var(--space-8);
           pointer-events: none;
+        }
+
+        .home-session-location-help-trigger {
+          inline-size: 100%; /* GROUNDED-EXEMPT: the recovery trigger preserves the banner's full-width layout. */
+          padding: 0;
+          border: 0;
+          background: transparent;
+          color: inherit;
+          text-align: start;
+          pointer-events: auto;
+        }
+
+        .home-session-location-help-trigger:focus-visible {
+          outline: 2px solid var(--color-brand-light);
+          outline-offset: 2px;
         }
 
         .home-session-sheet-content {
@@ -196,38 +212,6 @@ export function HomeSessionSurface({
       `}</style>
     </>
   );
-}
-
-function HomeStatusPill({
-  copy,
-  view,
-}: {
-  copy: M4Copy;
-  view: VisibleHomeEngineView;
-}) {
-  const labels: StatusPillLabels = {
-    checkIn1: copy.statusCheckin1,
-    checkIn2: copy.statusCheckin2,
-    family: copy.statusFamily,
-    idle: copy.statusIdle,
-    shadowAuto: copy.statusShadowAuto,
-    shadowManual: copy.statusShadowManual,
-    sos: copy.statusSos,
-  };
-
-  if (view.state === "IDLE") {
-    return <StatusPill icon="shield" labels={labels} state="IDLE" />;
-  }
-  if (view.state === "SHADOW") {
-    return (
-      <StatusPill
-        armMode={view.armMode}
-        labels={labels}
-        state="SHADOW"
-      />
-    );
-  }
-  return <StatusPill labels={labels} state={view.state} />;
 }
 
 function visibleSessionState(state: SessionState): Exclude<SessionState, "RESOLVED"> {

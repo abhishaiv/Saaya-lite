@@ -7,6 +7,7 @@ import type { LiveLocationFix } from "./locationWatch";
 export type TileAvailability = "loading" | "online" | "offline";
 
 export interface LeafletMapCallbacks {
+  ariaZone(areaName: string, riskLevel: string): string;
   onReady(): void;
   onTileAvailability(status: TileAvailability): void;
   onZoneSelected(zoneId: string | null): void;
@@ -24,9 +25,45 @@ export interface LeafletMapController {
   update(view: LeafletMapView): void;
 }
 
+/**
+ * Keeps the offline disclosure tied to tile evidence rather than the
+ * browser's optimistic connection hint. `online` can prompt a retry, but a
+ * tile is the only proof that the map is usable again.
+ */
+export interface TileAvailabilityReporter {
+  browserOffline(): void;
+  browserOnlineHint(): void;
+  noTileWithinTimeout(): void;
+  tileError(): void;
+  tileLoaded(): void;
+}
+
+export function createTileAvailabilityReporter(
+  onChange: (availability: TileAvailability) => void,
+): TileAvailabilityReporter {
+  let availability: TileAvailability = "loading";
+
+  const report = (next: TileAvailability): void => {
+    if (availability === next) return;
+    availability = next;
+    onChange(next);
+  };
+
+  return {
+    browserOffline: () => report("offline"),
+    // A browser's `online` signal only means it may be worth retrying. It
+    // deliberately does not clear the note; tileLoaded is the proof.
+    browserOnlineHint: () => undefined,
+    noTileWithinTimeout: () => report("offline"),
+    tileError: () => report("offline"),
+    tileLoaded: () => report("online"),
+  };
+}
+
 const MAP_CENTER_LATITUDE = 17.71; // fact: map.center.lat
 const MAP_CENTER_LONGITUDE = 83.3; // fact: map.center.lon
 const MAP_ZOOM_DEFAULT = 12.5; // fact: map.zoom.default
+const MAP_ZOOM_SNAP = 0.5; // fact: map.zoom.snap
 const MAP_ZOOM_MINIMUM = 10; // fact: map.zoom.min
 const MAP_ZOOM_MAXIMUM = 17; // fact: map.zoom.max
 const LABELS_HIDDEN_BELOW_ZOOM = 12; // fact: map.label.hide_below
@@ -61,12 +98,15 @@ export async function mountLeafletMap(
   host: HTMLElement,
   mapZones: readonly MapZone[],
   callbacks: LeafletMapCallbacks,
-): Promise<LeafletMapController> {
+  cancelled: () => boolean = () => false,
+): Promise<LeafletMapController | null> {
   const L = await import("leaflet");
+  if (cancelled()) return null;
   const map = L.map(host, {
     attributionControl: false,
     maxZoom: MAP_ZOOM_MAXIMUM,
     minZoom: MAP_ZOOM_MINIMUM,
+    zoomSnap: MAP_ZOOM_SNAP,
     zoomControl: false,
   }).setView(
     [MAP_CENTER_LATITUDE, MAP_CENTER_LONGITUDE],
@@ -80,16 +120,30 @@ export async function mountLeafletMap(
   );
   let firstTileArrived = false;
   let destroyed = false;
+  const tileAvailability = createTileAvailabilityReporter(
+    callbacks.onTileAvailability,
+  );
   const tileTimeout = globalThis.setTimeout(() => {
     if (!firstTileArrived && !destroyed) {
-      callbacks.onTileAvailability("offline");
+      tileAvailability.noTileWithinTimeout();
     }
   }, TILE_TIMEOUT_MS);
-  tiles.once("tileload", () => {
+  const onTileLoad = () => {
     firstTileArrived = true;
     globalThis.clearTimeout(tileTimeout);
-    callbacks.onTileAvailability("online");
-  });
+    tileAvailability.tileLoaded();
+  };
+  const onTileError = () => tileAvailability.tileError();
+  const onBrowserOffline = () => tileAvailability.browserOffline();
+  const onBrowserOnline = () => {
+    tileAvailability.browserOnlineHint();
+    tiles.redraw();
+  };
+  tiles.on("tileload", onTileLoad);
+  tiles.on("tileerror", onTileError);
+  globalThis.addEventListener("offline", onBrowserOffline);
+  globalThis.addEventListener("online", onBrowserOnline);
+  callbacks.onTileAvailability("loading");
   tiles.addTo(map);
 
   const zoneLayers = new Map<string, ZoneLayers>();
@@ -98,7 +152,7 @@ export async function mountLeafletMap(
     (left, right) => left.zone.riskScore - right.zone.riskScore,
   );
 
-  for (const { areaName, zone } of sortedZones) {
+  for (const { areaName, riskLevel, zone } of sortedZones) {
     const points = zone.polygon.map(
       ({ latitude, longitude }) => [latitude, longitude] as Leaflet.LatLngTuple,
     );
@@ -110,16 +164,39 @@ export async function mountLeafletMap(
       weight: ZONE_GLOW_STROKE_PX,
     }).addTo(map);
     const fill = L.polygon(points, {
+      bubblingMouseEvents: false,
       color: zone.colorHex,
       fillColor: zone.colorHex,
       fillOpacity: zone.opacity,
       opacity: 1, // GROUNDED-EXEMPT: full-strength stroke is the structural opacity ceiling.
       weight: ZONE_STROKE_PX,
     }).addTo(map);
-    fill.on("click", (event) => {
-      L.DomEvent.stopPropagation(event.originalEvent);
+    const selectZone = () => {
+      map.flyTo(
+        [zone.centroid.latitude, zone.centroid.longitude],
+        map.getZoom(),
+        {
+          duration: MAP_CAMERA_DURATION_MS / MILLISECONDS_PER_SECOND,
+        },
+      );
       callbacks.onZoneSelected(zone.stationId);
-    });
+    };
+    fill.on("click", selectZone);
+    const fillElement = fill.getElement();
+    if (fillElement !== undefined && fillElement !== null) {
+      fillElement.setAttribute(
+        "aria-label",
+        callbacks.ariaZone(areaName, riskLevel),
+      );
+      fillElement.setAttribute("role", "button");
+      fillElement.setAttribute("tabindex", "0");
+      fillElement.addEventListener("keydown", (event) => {
+        const keyboardEvent = event as KeyboardEvent;
+        if (keyboardEvent.key !== "Enter" && keyboardEvent.key !== " ") return;
+        keyboardEvent.preventDefault();
+        selectZone();
+      });
+    }
     zoneLayers.set(zone.stationId, { fill, glow });
 
     const label = L.marker(
@@ -238,13 +315,16 @@ export async function mountLeafletMap(
   map.on("click", () => callbacks.onZoneSelected(null));
   map.on("zoomend", layoutLabels);
   layoutLabels();
-  callbacks.onTileAvailability("loading");
   callbacks.onReady();
 
   return {
     destroy() {
       destroyed = true;
       globalThis.clearTimeout(tileTimeout);
+      tiles.off("tileload", onTileLoad);
+      tiles.off("tileerror", onTileError);
+      globalThis.removeEventListener("offline", onBrowserOffline);
+      globalThis.removeEventListener("online", onBrowserOnline);
       map.remove();
     },
     recenter() {

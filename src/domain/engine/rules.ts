@@ -19,7 +19,9 @@ export const MIN_ENTRY_FIXES = 5; // fact: candidate.dwell.min_fixes
 export const LAST_KNOWN_CENTERING_MAX_AGE_MIN = 5; // fact: loc.last_known.centering.max_age
 export const FIRST_FIX_SLOW_AFTER_SEC = 60; // fact: loc.first_fix.slow_after
 export const DEMO_DIVISOR = 6; // fact: demo.divisor
+export const NORMAL_DEMO_DIVISOR = 1; // fact: demo.normal.divisor
 export const DEMO_TOTAL_SEC = LADDER_TOTAL_SEC / DEMO_DIVISOR; // fact: demo.total
+export const DEMO_ARM_HOUR = 4; // fact: demo.arm.hour
 export const EARTH_RADIUS_M = 6_371_008.8; // fact: const.earth
 export const MAX_STATION_DISTANCE_KM = 20; // fact: dist.station.max
 export const METRES_PER_KILOMETRE = 1_000; // GROUNDED-EXEMPT: SI unit conversion.
@@ -91,7 +93,7 @@ export const DEFAULT_RULES: Rules = {
   manualDisarmCooldownMin: MANUAL_DISARM_COOLDOWN_MIN,
   okCooldownMin: OK_COOLDOWN_MIN,
   manualIntervalMin: MANUAL_INTERVAL_MIN,
-  demoDivisor: 1,
+  demoDivisor: NORMAL_DEMO_DIVISOR,
   intervals: INTERVALS,
   armingMatrix: ARMING_MATRIX,
   samplingShadowSec: SHADOW_SAMPLING_SEC,
@@ -127,6 +129,12 @@ export function hourBandForLocalTime(hour: number, minute: number): HourBand {
   if (hour >= DAWN_START_HOUR) return "DAWN";
   return "NIGHT_DEEP";
 }
+
+/** Every demo-session hour consumer reads this one derived clock value. */
+export const DEMO_ARM_TIME = Object.freeze({
+  hourBand: hourBandForLocalTime(DEMO_ARM_HOUR, 0),
+  hourOfDay: DEMO_ARM_HOUR,
+});
 
 export function scaledSeconds(seconds: number, rules: Rules): number {
   return seconds / rules.demoDivisor;

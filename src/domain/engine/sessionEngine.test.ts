@@ -282,6 +282,30 @@ describe("pure session engine", () => {
     });
   });
 
+  it("keeps every manual ladder state running when location is revoked", () => {
+    const states = [
+      "SHADOW",
+      "CHECKIN_1",
+      "CHECKIN_2",
+      "FAMILY_ESCALATED",
+    ] as const;
+
+    for (const state of states) {
+      const result = onEvent(
+        state,
+        { kind: "PermissionRevoked", permission: "geolocation" },
+        context({ armMode: "MANUAL", armedHourBand: null, zone: null }),
+      );
+
+      expect(result).toEqual({
+        state,
+        commands: [
+          { kind: "ShowPermissionWarning", permission: "geolocation" },
+        ],
+      });
+    }
+  });
+
   it("keeps SOS sticky for every event except a valid PIN", () => {
     const persisted: PersistedSession = {
       sessionId: "session",

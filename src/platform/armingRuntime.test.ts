@@ -4,12 +4,15 @@ import { bundledZoneData } from "../data/zone/zoneLoader";
 import { onEvent } from "../domain/engine/sessionEngine";
 import {
   DEFAULT_RULES,
+  DEMO_DIVISOR,
+  DEMO_RULES,
   ENTER_DWELL_SEC,
   MAX_CONTAINMENT_ACCURACY_M,
   MIN_ENTRY_FIXES,
   PENDING_DWELL_SAMPLING_SEC,
 } from "../domain/engine/rules";
 import type {
+  ArmMode,
   Command,
   EngineContext,
   HourBand,
@@ -28,6 +31,7 @@ import type { LiveLocationFix, LocationSampling } from "./locationWatch";
 class EngineBridge implements RuntimeSessionBridge {
   state: SessionState = "IDLE";
   activeZoneId: string | null = null;
+  armMode: ArmMode = "AUTO_ZONE";
   hourBand: HourBand = "NIGHT_DEEP";
   cooldowns: Record<string, number> = {};
   readonly events: SessionEvent[] = [];
@@ -45,9 +49,12 @@ class EngineBridge implements RuntimeSessionBridge {
       nowEpochMs: input.nowEpochMs,
       zone: input.zone,
       hourBand: this.hourBand,
-      armedHourBand: this.state === "IDLE" ? null : "NIGHT_DEEP",
+      armedHourBand:
+        this.state === "IDLE" || this.armMode === "MANUAL"
+          ? null
+          : "NIGHT_DEEP",
       rules: DEFAULT_RULES,
-      armMode: "AUTO_ZONE",
+      armMode: this.armMode,
       armedAtEpochMs: this.state === "IDLE" ? null : 0,
       deadlineEpochMs: null,
       cooldowns: this.cooldowns,
@@ -74,9 +81,13 @@ function highZone(): Zone {
   return zone;
 }
 
-function proofFix(zone: Zone, index: number): LiveLocationFix {
+function proofFix(
+  zone: Zone,
+  index: number,
+  totalSpanSec = ENTER_DWELL_SEC,
+): LiveLocationFix {
   const proofSegments = MIN_ENTRY_FIXES - 1;
-  const spanSec = (ENTER_DWELL_SEC * index) / proofSegments;
+  const spanSec = (totalSpanSec * index) / proofSegments;
   return {
     source: "LIVE_WATCH",
     ...zone.centroid,
@@ -146,6 +157,26 @@ describe("page-open automatic arming", () => {
     expect(runtime.pendingZoneId()).toBeNull();
   });
 
+  it("applies demo timing to dwell after the global rules switch", () => {
+    const session = new EngineBridge();
+    const runtime = new LocationArmingRuntime(
+      bundledZoneData.zones,
+      DEFAULT_RULES,
+      session,
+      { onSamplingChanged: () => undefined },
+    );
+    const zone = highZone();
+    runtime.setRules(DEMO_RULES);
+
+    for (let index = 0; index < MIN_ENTRY_FIXES; index += 1) {
+      runtime.acceptLiveFix(
+        proofFix(zone, index, ENTER_DWELL_SEC / DEMO_DIVISOR),
+      );
+    }
+
+    expect(session.state).toBe("SHADOW");
+  });
+
   it("discards pending proof when the watch is interrupted", () => {
     const session = new EngineBridge();
     const runtime = new LocationArmingRuntime(
@@ -167,7 +198,7 @@ describe("page-open automatic arming", () => {
     expect(session.events).toEqual([]);
   });
 
-  it("resolves an active session honestly when location permission is revoked", () => {
+  it("resolves an automatic session honestly when location permission is revoked", () => {
     const session = new EngineBridge();
     const zone = highZone();
     session.state = "SHADOW";
@@ -191,5 +222,27 @@ describe("page-open automatic arming", () => {
       kind: "ShowPermissionWarning",
       permission: "geolocation",
     });
+  });
+
+  it("keeps a manual session and its ladder alive when location is revoked", () => {
+    const session = new EngineBridge();
+    session.state = "SHADOW";
+    session.armMode = "MANUAL";
+    const runtime = new LocationArmingRuntime(
+      bundledZoneData.zones,
+      DEFAULT_RULES,
+      session,
+      { onSamplingChanged: () => undefined },
+    );
+
+    runtime.interruptWatch("PERMISSION_DENIED", 0);
+
+    expect(session.state).toBe("SHADOW");
+    expect(session.events).toEqual([
+      { kind: "PermissionRevoked", permission: "geolocation" },
+    ]);
+    expect(session.commands).toEqual([
+      { kind: "ShowPermissionWarning", permission: "geolocation" },
+    ]);
   });
 });

@@ -90,7 +90,7 @@ export class BrowserLocationWatch {
   ) {}
 
   startAfterConsent(): void {
-    if (this.consented && !this.paused) return;
+    if (this.consented && !this.paused && !this.permissionDenied) return;
     this.consented = true;
     this.paused = false;
     this.permissionDenied = false;
@@ -112,8 +112,7 @@ export class BrowserLocationWatch {
   }
 
   resumePreviouslyConsented(): void {
-    if (this.permissionDenied) return;
-    this.consented = true;
+    if (!this.consented || this.permissionDenied) return;
     this.paused = false;
     this.callbacks.onStatus(this.firstFixReceived ? "CURRENT" : "SEARCHING");
     if (!this.firstFixReceived) this.scheduleSlowStatus();

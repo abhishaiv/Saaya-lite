@@ -48,5 +48,6 @@ describe("M4 bundled map", () => {
     expect(html.match(/data-zone-id=/g)).toHaveLength(19); // fact: zones.drawn
     expect(html).toContain("© OpenStreetMap contributors © CARTO");
     expect(html).toContain("Map offline, zones still work");
+    expect(html).toMatch(/font-size:\s*calc\(10 \/ 16 \* 1rem\)/); // facts: type.map.attribution, type.rem.base
   });
 });

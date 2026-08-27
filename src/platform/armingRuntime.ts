@@ -54,7 +54,7 @@ export class LocationArmingRuntime {
 
   constructor(
     zones: readonly Zone[],
-    private readonly rules: Rules,
+    private rules: Rules,
     private readonly session: RuntimeSessionBridge,
     private readonly callbacks: ArmingRuntimeCallbacks,
   ) {
@@ -62,6 +62,12 @@ export class LocationArmingRuntime {
   }
 
   start(): void {
+    this.synchronizeSampling();
+  }
+
+  setRules(rules: Rules): void {
+    this.rules = rules;
+    this.dwellState = resetDwellEvidence();
     this.synchronizeSampling();
   }
 

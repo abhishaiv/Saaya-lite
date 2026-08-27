@@ -60,6 +60,18 @@ textarea {
   z-index: 5; /* GROUNDED-EXEMPT: local stacking order above the map. */
 }
 
+.demo-panel-sheet {
+  --sheet-expanded-height: 55dvh; /* sheet.expanded */
+
+  z-index: 8; /* GROUNDED-EXEMPT: local stacking order above Home and its detail sheet. */
+}
+
+.location-help-sheet {
+  --sheet-expanded-height: 55dvh; /* sheet.expanded */
+
+  z-index: 8; /* GROUNDED-EXEMPT: recovery sheet stacks above Home controls. */
+}
+
 .saaya-map-label-shell {
   inline-size: auto !important;
   block-size: auto !important;
