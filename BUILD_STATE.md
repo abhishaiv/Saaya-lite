@@ -10,7 +10,7 @@ Regenerate with `python3 scripts/render_build_state.py`.
 | Mode | **single continuous run**, order below |
 | Next node | **T4.2** - Geolocation watch, arming, wake lock, tab lifecycle |
 | Nodes complete | 4 of 10 |
-| Total work | 42.0 h |
+| Total work | 40.5 h |
 
 ## Node ledger
 
@@ -28,7 +28,7 @@ hour 14 rather than hour 24. Reasoning in `docs/spec/GRAPH_ENGINEERING.md`.
 | 7 | `M1` | Session UI: onboarding, check-ins, family escalation, SOS | med | serial | 29.5 | spec | pending |
 | 8 | `M2` | Data and trust boundary: Firebase, queue, anonymiser, writers, and the trust screen | high | serial | 35.5 | spec, boundary, invention | pending |
 | 9 | `M3` | Console: seed zones and the state view | med | serial | 39.0 | spec | pending |
-| 10 | `M5` | Ship: submission page, demo-path Telugu and a11y, spot checks | med | serial | 42.0 | spec | pending |
+| 10 | `M5` | Ship: verify Telugu and a11y on the demo path, spot checks | med | serial | 40.5 | spec | pending |
 
 ## Human gates
 

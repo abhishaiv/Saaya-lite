@@ -11,7 +11,7 @@
   "copy:ios_verbatim",
   "invariant:trust_boundary_at_sos"
  ],
- "total_hours": 42.0,
+ "total_hours": 40.5,
  "order": [
   "T1.1",
   "T2.1",
@@ -1077,7 +1077,7 @@
    "extra_gates": [],
    "risk": "low",
    "cumulative_hours": 36.5,
-   "status": "merged",
+   "status": "dropped",
    "run_id": null,
    "gates_passed": [],
    "artifacts": [],
@@ -1088,14 +1088,16 @@
    "verify_command": "spawn spec as ONE fresh-context subagent, one round. G6 and the browser gate already cover the rest.",
    "shape": "serial",
    "fanout": null,
-   "merged_into": "M5",
-   "merged_at": "2026-08-24"
+   "merged_into": null,
+   "merged_at": "2026-08-24",
+   "dropped_at": "2026-08-27",
+   "dropped_reason": "The separate submission page duplicated S13 About, which already carries the version, what is real, what is mocked, the no-government-link statement, the no-AI line, the data provenance and the attributions. The live link is the app itself and the video is submitted to the form directly, so the page sat between the judge and the product rather than adding anything. Founder decision 2026-08-27 under an 18-hour ceiling."
   },
   "T9.1": {
    "id": "T9.1",
    "seq": 12,
-   "title": "Localisation and a11y on the demo path only",
-   "hours": 1.0,
+   "title": "Verify Telugu and a11y already present on the demo path",
+   "hours": 0.5,
    "requires": [
     "M1",
     "T4.3"
@@ -1154,7 +1156,7 @@
     ],
     "merge": "code: (1) FAIL LOUDLY on any key claimed by two screens with different text - a shared-file write would have silently clobbered one; (2) FAIL on any key present in en but missing in te; (3) assert every key marked iOS-verbatim in COPY.md matches character for character; (4) emit both strings.xml files sorted by key"
    },
-   "scope_note": "Reduced 2026-08-24: Telugu and accessibility verified on the DEMO_SCRIPT path only, not every screen.",
+   "scope_note": "Reduced 2026-08-27: the bilingual strings and a11y labels already exist in COPY, 167 keys with both columns and a full cd_ block. This is a verification pass over the demo path, not a translation or labelling pass. If a string on the demo path has no Telugu, that is a blocker to report, not work to do here.",
    "merged_into": "M5",
    "merged_at": "2026-08-24"
   },
@@ -1482,15 +1484,14 @@
   "M5": {
    "id": "M5",
    "seq": 10,
-   "title": "Ship: submission page, demo-path Telugu and a11y, spot checks",
-   "hours": 3.0,
+   "title": "Ship: verify Telugu and a11y on the demo path, spot checks",
+   "hours": 1.5,
    "requires": [
     "M1",
     "M3",
     "M4"
    ],
    "produces": [
-    "submission_page",
     "strings_en",
     "strings_te",
     "a11y_pass",
@@ -1499,13 +1500,11 @@
    "reads": [
     "SUBMISSION.md",
     "COMPLIANCE.md",
-    "EVIDENCE.md",
     "DEMO_SCRIPT.md",
     "COPY.md",
     "RESPONSIVE_SPEC.md",
     "ACCESSIBILITY_SPEC.md",
-    "TEST_PLAN.md",
-    "BUILD_PLAN.md"
+    "TEST_PLAN.md"
    ],
    "extra_gates": [
     "all_anchors_green",
@@ -1513,7 +1512,7 @@
     "network_tab_evidence"
    ],
    "risk": "med",
-   "cumulative_hours": 42.0,
+   "cumulative_hours": 40.5,
    "status": "pending",
    "run_id": null,
    "gates_passed": [],
@@ -1526,11 +1525,10 @@
    "shape": "serial",
    "fanout": null,
    "merged_from": [
-    "T9.0",
     "T9.1",
     "T9.2"
    ],
-   "merge_reason": "Three small nodes over the same submission and compliance set. Merged they load it once."
+   "merge_reason": "Two small verification nodes over the same submission and compliance set. Merged they load it once. The submission page they used to sit beside was dropped 2026-08-27: About already carries every disclosure it would have shown."
   }
  },
  "verification": {
@@ -1630,7 +1628,8 @@
  },
  "retired": {
   "dropped": [
-   "T8.3"
+   "T8.3",
+   "T9.0"
   ],
   "merged": {
    "M1": [
@@ -1655,7 +1654,6 @@
     "T3.1"
    ],
    "M5": [
-    "T9.0",
     "T9.1",
     "T9.2"
    ]
@@ -1681,7 +1679,7 @@
   },
   {
    "after": "M5",
-   "state": "SUBMITTABLE."
+   "state": "SUBMITTABLE. About carries the disclosures; the video and the live link go to the form."
   }
  ]
 }

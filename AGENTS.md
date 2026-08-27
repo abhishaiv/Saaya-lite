@@ -150,7 +150,7 @@ Risk-first, not phase-first. Do not reorder it.
 |  7 | `M1` | Session UI: onboarding, check-ins, family escalation, SOS | med | spec | 29.5 |
 |  8 | `M2` | Data and trust boundary: Firebase, queue, anonymiser, writers, and the trust screen | high | spec, boundary, invention | 35.5 |
 |  9 | `M3` | Console: seed zones and the state view | med | spec | 39.0 |
-| 10 | `M5` | Ship: submission page, demo-path Telugu and a11y, spot checks | med | spec | 42.0 |
+| 10 | `M5` | Ship: verify Telugu and a11y on the demo path, spot checks | med | spec | 40.5 |
 
 **10 nodes, down from 22.** Restructured 2026-08-24 for a fixed weekly credit budget.
 Dropped `T3.1`, `T7.3`, `T8.3`. Merged seventeen ids into `M1` to `M5` so shared reads load

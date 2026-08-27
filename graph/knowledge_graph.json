@@ -313,7 +313,7 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 372,
+  "entities": 373,
   "edges": 669,
   "events": 65
  },
@@ -1013,8 +1013,9 @@
    "risk": "low",
    "shape": "serial",
    "seq": 11,
-   "superseded_by": "merged into M5 2026-08-24",
-   "merged_into": "M5"
+   "superseded_by": "dropped 2026-08-27",
+   "merged_into": "M5",
+   "dropped_reason": "The separate submission page duplicated S13 About, which already carries the version, what is real, what is mocked, the no-government-link statement, the no-AI line, the data provenance and the attributions. The live link is the app itself and the video is submitted to the form directly, so the page sat between the judge and the product rather than adding anything. Founder decision 2026-08-27 under an 18-hour ceiling."
   },
   {
    "id": "node.T9.1",
@@ -3024,6 +3025,12 @@
    "class": "Decision",
    "label": "Authorised a further G9 round on M4 after three failures. The stop-after-three rule exists to stop an agent grinding at the same wall. Here the three failures were correct findings against a contract that specified something unbuildable, and the contract has now changed, so the next round is a first round against a corrected spec rather than a fourth attempt at the same one. The counter resets when the input changes, never when patience runs out.",
    "at": "2026-08-26"
+  },
+  {
+   "id": "d.drop_submission_page",
+   "class": "Decision",
+   "at": "2026-08-27",
+   "label": "The separate submission page is dropped. S13 About already carries the version, what is real, what is mocked, the no-government-link statement, the no-AI line, data provenance and attributions, so the page duplicated it and sat between the judge and the product. The live link is the app; the video goes to the form directly. Founder decision under an 18-hour ceiling, with the offline queue and onboarding both deliberately kept."
   }
  ],
  "edges": [

@@ -32,6 +32,7 @@ Hard rules:
 
 
 
+
 ## The tasks
 
 ### T1.1 — Scaffold: Next.js, TypeScript, theme tokens, Vercel
@@ -71,7 +72,7 @@ Hard rules:
 - **T2.2 — Map screen: Leaflet, CARTO tiles, zones, her dot**
 - **T4.3 — Home session states, arm banner, demo panel**
 - **T3.1 — Zone detail sheet, nearest station**
-  *Reinstated 2026-08-24:* Dropped 2026-08-24 as off the judged path. That was wrong. SCOPE names zone detail and nearest station as why she installs it on a calm day and says without it we would be shipping an engine nobody has a reason to own. DEMO_SCRIPT spends 0:50 to 1:02 opening the sheet; SUBMISSION's video outline spends 0:25 to 0:40 on it. It is the payoff of the map: colour without explanation is decoration. Folded into M4, which owns the Home surface it opens from.
+  *Reinstated:* Dropped 2026-08-24 as off the judged path. That was wrong. SCOPE names zone detail and nearest station as why she installs it on a calm day and says without it we would be shipping an engine nobody has a reason to own. DEMO_SCRIPT spends 0:50 to 1:02 opening the sheet; SUBMISSION's video outline spends 0:25 to 0:40 on it. It is the payoff of the map: colour without explanation is decoration. Folded into M4, which owns the Home surface it opens from.
 
 > **CHECKPOINT.** HOME IS LIVE. Map, zones, her dot, session states and the demo panel on a real phone. First thing worth showing anyone.
 
@@ -105,7 +106,7 @@ Hard rules:
 - **T6.2 — Offline queue in IndexedDB with backoff**
 - **T7.2 — Anonymiser and the two Firestore writers**
 - **T7.3 — What the police see, in the citizen app**
-  *Reinstated 2026-08-24:* Dropped 2026-08-24 as duplicating the console. That was wrong: the console is a control-room view of every incident, S10 is HER trust screen showing what the state can see about her right now, which in Shadow and both check-ins is nothing. F28 calls it the trust feature. DEMO_SCRIPT gives it 2:12 to 2:30 and calls it the screen we care about most; the console is a separate segment at 2:30. Folded into M2, which owns the anonymiser whose output this screen renders.
+  *Reinstated:* Dropped 2026-08-24 as duplicating the console. That was wrong: the console is a control-room view of every incident, S10 is HER trust screen showing what the state can see about her right now, which in Shadow and both check-ins is nothing. F28 calls it the trust feature. DEMO_SCRIPT gives it 2:12 to 2:30 and calls it the screen we care about most; the console is a separate segment at 2:30. Folded into M2, which owns the anonymiser whose output this screen renders.
 
 ### M3 — Console: seed zones and the state view
 
@@ -119,15 +120,16 @@ Hard rules:
 
 > **CHECKPOINT.** THE ARGUMENT IS COMPLETE. The console receives the anonymous SUS event and the SOS incident live. This is what the submission is actually about.
 
-### M5 — Ship: submission page, demo-path Telugu and a11y, spot checks
+### M5 — Ship: verify Telugu and a11y on the demo path, spot checks
 
-**Risk:** med · **Verify:** spec · **Hours:** 3.0
-**Reads:** `SUBMISSION.md`, `COMPLIANCE.md`, `EVIDENCE.md`, `DEMO_SCRIPT.md`, `COPY.md`, `RESPONSIVE_SPEC.md`, `ACCESSIBILITY_SPEC.md`, `TEST_PLAN.md`, `BUILD_PLAN.md`
+**Risk:** med · **Verify:** spec · **Hours:** 1.5
+**Reads:** `SUBMISSION.md`, `COMPLIANCE.md`, `DEMO_SCRIPT.md`, `COPY.md`, `RESPONSIVE_SPEC.md`, `ACCESSIBILITY_SPEC.md`, `TEST_PLAN.md`
 
-**Merged node.** Replaces `T9.0`, `T9.1`, `T9.2`. Three small nodes over the same submission and compliance set. Merged they load it once. Load the reads ONCE and build every part before reporting.
+**Merged node.** Replaces `T9.1`, `T9.2`. Two small verification nodes over the same submission and compliance set. Merged they load it once. The submission page they used to sit beside was dropped 2026-08-27: About already carries every disclosure it would have shown. Load the reads ONCE and build every part before reporting.
 
-- **T9.0 — Submission page: video, summary, disclosures**
-- **T9.1 — Localisation and a11y on the demo path only**
+- **T9.1 — Verify Telugu and a11y already present on the demo path**
+  *Scope:* Reduced 2026-08-27: the bilingual strings and a11y labels already exist in COPY, 167 keys with both columns and a full cd_ block. This is a verification pass over the demo path, not a translation or labelling pass. If a string on the demo path has no Telugu, that is a blocker to report, not work to do here.
 - **T9.2 — Verification spot checks V1 to V9**
+  *Scope:* Reduced 2026-08-24: V1 to V9 run as spot checks, not an exhaustive sweep.
 
-> **CHECKPOINT.** SUBMITTABLE.
+> **CHECKPOINT.** SUBMITTABLE. About carries the disclosures; the video and the live link go to the form.
