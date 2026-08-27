@@ -304,9 +304,23 @@ real personal address, it is not a translatable string, and nobody but the found
 whether it is published. Read it from configuration. If it is absent, render the section
 without it rather than guessing or inserting a placeholder.
 
-**The bullet lists must match what is actually built.** If a node is cut or reinstated,
-these change with it. A judge who opens About and finds a claim the app does not honour
-learns more from that than from the feature itself.
+**The bullet lists must match what is actually built, at every checkpoint, not only at the
+end.** Each node renders the bullets it owns and no others:
+
+| Bullet | Owned by |
+|---|---|
+| `about_real_map`, `about_real_detail` | `M4` |
+| `about_real_arm` | `T4.2` |
+| `about_real_ladder`, `about_real_family`, `about_real_sos` | `M1` |
+| `about_real_writes` | `M2` |
+| `about_real_console` | `M3` |
+
+`M4` builds the About screen and ships **two** bullets. It does not print the other six
+against work that does not exist yet. Each later node adds its own line as it lands, so
+About is honest at every checkpoint rather than only after the last one.
+
+If a node is cut or reinstated, its bullets go with it. A judge who opens About and finds a
+claim the app does not honour learns more from that than from the feature itself.
 
 **This screen is a submission asset, not filler.** The brief scores Honesty explicitly, and
 a judge who opens About and finds the mock list already there will trust the rest.

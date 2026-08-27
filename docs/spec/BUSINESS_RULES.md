@@ -87,6 +87,21 @@ derivation and display is pinned.
 `demo_mode_active` stays on screen throughout, so nobody watching mistakes 4 a.m. for the
 real time.
 
+**The frozen hour has to survive a reload, and it does not belong in `PersistedSession`.**
+Toggling demo speed and reloading otherwise drops the session back to the real clock, which
+reintroduces exactly the mismatch this rule exists to prevent.
+
+Persist a private marker **keyed by `sessionId` in the demo metadata store**, alongside the
+demo-speed flag. On recovery, a session whose id carries that marker restores
+`demo.arm.hour` as its displayed hour.
+
+**Do not add a demo field to `PersistedSession`.** That interface is the engine's contract
+and the trust-boundary type; a demo-only field there would leak the harness into the
+product's persisted shape and duplicate a value that is already frozen as a fact.
+`armedHourBand` is already persisted and already carries `NIGHT_DEEP` through recovery, so
+the band survives on its own. What the marker restores is the **displayed** hour, which is
+presentation, which is where it belongs.
+
 This is the concrete difference from T-Safe's fixed 15-minute timer, so it must be
 visible in the UI: the check-in screen states why it checked when it did.
 

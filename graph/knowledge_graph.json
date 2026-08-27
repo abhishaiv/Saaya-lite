@@ -313,7 +313,7 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 375,
+  "entities": 378,
   "edges": 669,
   "events": 65
  },
@@ -3042,6 +3042,24 @@
    "id": "fail.zoomsnap",
    "class": "Failure",
    "label": "map.zoom.default is 12.5 and Leaflet's zoomSnap defaults to 1, so it silently rounded to 12. A frozen fact was unreachable at runtime with no error anywhere: G6 confirmed the literal traced to a fact, and the map still did not honour it. Only browser QA on a device could see it.",
+   "at": "2026-08-27"
+  },
+  {
+   "id": "d.demo_marker_not_in_contract",
+   "class": "Decision",
+   "label": "The frozen demo hour survives recovery through a private marker keyed by sessionId in the demo metadata store, not through a field on PersistedSession. PersistedSession is the engine's contract and the trust-boundary type; a demo-only field there would leak the harness into the product's persisted shape and duplicate a value already frozen as demo.arm.hour. armedHourBand already carries NIGHT_DEEP through recovery on its own, so what the marker restores is the displayed hour, which is presentation.",
+   "at": "2026-08-27"
+  },
+  {
+   "id": "d.about_incremental",
+   "class": "Decision",
+   "label": "About's what-is-real bullets are owned node by node: M4 ships two, T4.2 one, M1 three, M2 one, M3 one. M4 builds the screen and prints only its own, so About is honest at every checkpoint rather than only after the last node. The rule that the list must track what is built was written when T3.1 and T7.3 were cut and reinstated; this is the same rule applied forward in time instead of backward.",
+   "at": "2026-08-27"
+  },
+  {
+   "id": "fail.about_premature_claims",
+   "class": "Failure",
+   "label": "M4 built the About screen and rendered all eight what-is-real bullets, claiming the ladder, the writes and the console before M1, M2 and M3 exist. The screen whose entire purpose is being believed was the first to overstate. Caught by G9, which is the reason the bullets were made eight separate keys rather than one paragraph.",
    "at": "2026-08-27"
   }
  ],

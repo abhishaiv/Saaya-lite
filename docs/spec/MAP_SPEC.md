@@ -38,9 +38,14 @@ low contrast is exactly what we want: the basemap is context, the zones are the 
 
 ### Attribution, non-negotiable
 
-`© OpenStreetMap contributors © CARTO`, 10 px, `textTertiary`, bottom-left, above the
+`© OpenStreetMap contributors © CARTO`, `type.map.attribution`, `textTertiary`, bottom-left, above the
 navigation inset, always visible. This is a licence condition, not a design choice. Do not
 hide it behind a sheet and do not shorten it.
+
+**It is type, so it is emitted in `rem`** like every other string: `calc(10 / 16 * 1rem)`
+per `DESIGN_SYSTEM.md`, not a flat `10px`. It is small text that a reader who has enlarged
+their browser font most needs to be able to read, and a licence condition is the last thing
+to pin at a fixed size.
 
 ## Zone rendering
 
