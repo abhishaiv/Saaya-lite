@@ -313,8 +313,8 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 369,
-  "edges": 667,
+  "entities": 372,
+  "edges": 669,
   "events": 65
  },
  "entities": [
@@ -3006,6 +3006,24 @@
    "class": "Decision",
    "at": "2026-08-26",
    "label": "The founder's contact address stays out of COPY.md and is read from configuration. It is a real personal address, it is not a translatable string, and whether it is published is the founder's call rather than a spec decision. If absent, the section renders without it rather than showing a placeholder."
+  },
+  {
+   "id": "fail.settings_deeplink",
+   "class": "Failure",
+   "label": "Three rows promised a link into browser settings, which no web page can open: Home's location-denied banner, the notifications-denied banner, and STATE_MACHINE's slow-fix caption. Android residue that survived every platform sweep because the phrase settings link contains no Android API name and reads as ordinary product language. G9 killed M4 three rounds running on it, correctly: the verifier was failing a contract that could not be built.",
+   "at": "2026-08-26"
+  },
+  {
+   "id": "d.location_help_sheet",
+   "class": "Decision",
+   "label": "One recovery path for a denied permission: a location help sheet opened from the Home banner and from onboarding denied_permanently, carrying instructions plus cta_retry which re-requests. It never claims to open browser settings. The note says the exact path depends on her browser, because it does and guessing wrongly is worse than saying so. The retry alone recovers her if she allowed it elsewhere since the denial, with no instructions needed.",
+   "at": "2026-08-26"
+  },
+  {
+   "id": "d.g9_round_four",
+   "class": "Decision",
+   "label": "Authorised a further G9 round on M4 after three failures. The stop-after-three rule exists to stop an agent grinding at the same wall. Here the three failures were correct findings against a contract that specified something unbuildable, and the contract has now changed, so the next round is a first round against a corrected spec rather than a fourth attempt at the same one. The counter resets when the input changes, never when patience runs out.",
+   "at": "2026-08-26"
   }
  ],
  "edges": [
@@ -8341,6 +8359,22 @@
    "from": "d.settings_split",
    "rel": "motivated_by",
    "to": "fail.settings_unowned",
+   "at": "2026-08-26",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.location_help_sheet",
+   "rel": "motivated_by",
+   "to": "fail.settings_deeplink",
+   "at": "2026-08-26",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.g9_round_four",
+   "rel": "motivated_by",
+   "to": "fail.settings_deeplink",
    "at": "2026-08-26",
    "by": "claude",
    "confidence": "high"

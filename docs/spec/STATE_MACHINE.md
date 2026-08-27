@@ -298,7 +298,7 @@ outdoors and longer indoors. Decided behaviour:
 | Last known fix exists and is under 5 minutes old | Use it for map centring only. **Never for an arming decision.** |
 | First fix arrives, she is inside a HIGH zone at NIGHT_DEEP | Start the 60 s enter dwell now. She arms 60 s later, not instantly, exactly as if she had walked in. |
 | First fix has accuracy worse than 100 m | Ignore for containment, keep sampling. Show the dot with its accuracy circle. |
-| No fix within 60 s | `caption` in the sheet: location is taking longer than usual, with a link to location settings. Keep trying. Do not give up and do not claim to be watching. |
+| No fix within 60 s | `loc_slow` in the sheet. Keep trying: this is a slow fix, not a denied permission, so there is nothing to re-enable and no link to offer. Do not give up and do not claim to be watching. |
 | Manual arm with no fix | **Allowed.** Arms in `MANUAL` mode with a 10 min interval. The ladder does not need a coordinate to run: only the SOS payload does, and by then there will be one, or the last known fix is sent with its age stated. |
 
 There is no background arming. A browser cannot watch position with the page hidden, so

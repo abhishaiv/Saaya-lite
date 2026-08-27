@@ -41,6 +41,10 @@ demo video.
 | `cta_arm_manually` | Watch this journey | ఈ ప్రయాణాన్ని గమనించు |
 | `cta_im_home` | I am home | నేను ఇంటికి చేరాను |
 | `warn_location_denied` | Saaya cannot wake on its own without location. | లొకేషన్ లేకుండా సాయ దానంతట అదే మేల్కొనదు. |
+| `loc_help_title` | Turn location back on | లొకేషన్ మళ్లీ ఆన్ చేయండి |
+| `loc_help_body` | In your browser, open the site settings for this page and allow Location. Then come back and tap Try again. | మీ బ్రౌజర్‌లో ఈ పేజీ సైట్ సెట్టింగ్‌లు తెరిచి, లొకేషన్‌ను అనుమతించండి. తర్వాత తిరిగి వచ్చి "మళ్లీ ప్రయత్నించు" నొక్కండి. |
+| `loc_help_note` | Where this setting lives depends on your browser. | ఈ సెట్టింగ్ ఎక్కడ ఉంటుందో మీ బ్రౌజర్‌ను బట్టి మారుతుంది. |
+| `cta_retry` | Try again | మళ్లీ ప్రయత్నించు |
 | `warn_queue_failed` | An alert could not be sent. Tap to retry. | ఒక హెచ్చరిక పంపబడలేదు. మళ్లీ ప్రయత్నించడానికి నొక్కండి. |
 | **Zone detail** | | |
 | `zone_station_approx` | This station location is approximate to the locality. | ఈ స్టేషన్ స్థానం ఆ ప్రాంతానికి సుమారుగా ఉంది. |

@@ -27,7 +27,7 @@ common way a demo breaks in front of a judge.
 | step loading | none, all local |
 | contact name empty | inline "Add a name" under the field on blur |
 | phone wrong length | inline "10 digits, without the country code" |
-| notifications denied | continue. Banner on Home explaining check-ins may be missed, with a settings link. |
+| notifications denied | continue. Banner on Home with `warn_notif_denied`, offering `cta_retry`, which re-requests. **No settings link:** a page cannot open browser settings. If the re-request returns `denied` without prompting, the browser has remembered it; say so rather than looping. |
 | location denied once | rationale again, softer. Continue button stays enabled. |
 | location denied permanently | `onb_location_partial`, plus a line on re-enabling it in the browser's site settings, plus a working Continue. **Never dead-end.** |
 | PIN weak | `err_pin_weak` inline, boxes clear |

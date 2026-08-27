@@ -3,7 +3,7 @@
  "kind": "knowledge_graph",
  "note": "Domain facts with provenance. Never merge with build_graph.json - different truth standards.",
  "rule": "Every numeric or colour literal in source must trace to a fact id here, or the grounded checker fails the node.",
- "count": 392,
+ "count": 393,
  "facts": [
   {
    "id": "ladder.cd1",
@@ -4361,6 +4361,17 @@
    "means": "hour of day, IST, that the demo arming control pretends it is. Inside NIGHT_DEEP (00:00 to 05:00) so a HIGH zone actually arms, and it is the 4 a.m. the whole narrative opens on.",
    "sourced_from": "founder decision 2026-08-26, after browser QA showed the banner reading 5 pm while the session claimed NIGHT_DEEP",
    "governs": "BUSINESS_RULES.md",
+   "frozen": true,
+   "platform": "any"
+  },
+  {
+   "id": "license.material_symbols.version",
+   "kind": "number",
+   "value": 2.0,
+   "unit": "version",
+   "means": "Apache License version for the shipped Material Symbols font, named in about_attrib_fonts",
+   "sourced_from": "public/fonts/LICENSE-material-symbols.txt:3, cited at COPY.md:139",
+   "governs": "COPY.md",
    "frozen": true,
    "platform": "any"
   }

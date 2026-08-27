@@ -57,8 +57,8 @@ Progress dots at top. No step is skippable except step 2's second contact.
 - On grant, show `onb_location_partial`: Saaya watches while this page is open. This is not
   a degraded fallback, it is the only mode, so state it plainly rather than as a limitation
   she failed to avoid.
-- States: `default`, `requesting`, `denied_once`, `denied_permanently` (explain the
-  browser's site-settings route; a web page cannot deep link into it).
+- States: `default`, `requesting`, `denied_once`, `denied_permanently`. On permanent denial
+  offer the same location help sheet Home uses, so there is one recovery path, not two.
 
 ### S2.4 PIN (F5)
 - `onb_pin_title`, `onb_pin_body` explaining it stops a live SOS.
@@ -84,7 +84,7 @@ Full-bleed dark map, controls floating over it.
 | `IDLE` | `StatusPill` = `status_idle`. Button = `cta_arm_manually`. |
 | `SHADOW`, auto | `StatusPill` = `status_shadow_auto`. **Arm banner (F11)**: which zone, what hour, and that she did not start it. Button = `cta_im_home`. |
 | `SHADOW`, manual | `StatusPill` = `status_shadow_manual`. Button = `cta_im_home`. |
-| location denied | Persistent `DisclosureBanner`, `warn_location_denied`, deep link to settings. |
+| location denied | Persistent `DisclosureBanner`, `warn_location_denied`, opening the location help sheet below. **No deep link:** a page cannot open browser site settings, and a button that claims to is a dead end. |
 | queue has `FAILED_PERMANENT` | Persistent banner, `warn_queue_failed`. |
 | demo mode on | Persistent labelled banner, `demo_mode_active`. Never hidden. |
 
@@ -227,6 +227,28 @@ row that leads nowhere: `M2` adds the row when it builds S10. A dead entry point
 shown to anyone.
 
 `M4` is complete when it has built its own rows. It does not wait for `M1` or `M2`.
+
+## S11b. Location help sheet
+
+The single recovery path for a denied location permission, opened from the Home banner and
+from onboarding's `denied_permanently`. A `SaayaBottomSheet`, not a route: she is recovering
+from a dead end, not navigating somewhere.
+
+| Element | Key |
+|---|---|
+| Title | `loc_help_title` |
+| Body | `loc_help_body` |
+| Note | `loc_help_note` |
+| Primary | `cta_retry`, which re-requests the permission |
+
+**It never claims to open browser settings.** No web page can. The body tells her what to
+change and the note says the exact path depends on her browser, because it does and guessing
+wrongly is worse than saying so. `cta_retry` re-requests: if she has already allowed it in
+another tab or since the denial, that alone recovers her without any instructions at all.
+
+If the re-request is refused without a prompt, the browser has remembered the denial. Leave
+the sheet open with the instructions still visible rather than closing it on a silent
+failure.
 
 ## S12. DemoPanel (D1)
 Reachable from Settings, and clearly labelled, in both build types.
