@@ -130,6 +130,17 @@ is a genuine resilience story worth mentioning in the write-up rather than hidin
 **not** claim the app opens with no network: there is no cached shell and no offline first
 launch. See `WEB_PLATFORM.md`.
 
+**Offline is a state, not a load-time verdict.** The 4 s rule above is only how it is first
+entered. Tiles that loaded once are no guarantee the next ones will, and venue wifi is
+exactly where this breaks.
+
+| Enter offline | on `tileerror`, on the browser's `offline` event, or when no tile arrives within `map.tile.timeout` |
+| Leave offline | **only on a subsequent successful `tileload`.** Not on the `online` event: a network that says it is back has not yet proved a tile will arrive. |
+| Teardown | remove both the Leaflet and window listeners when the map unmounts |
+
+The note is the only thing that changes. Zones, her dot and the whole ladder carry on
+untouched in either state, which is the point being claimed.
+
 ## Performance
 
 | Budget | Value |

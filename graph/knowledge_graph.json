@@ -313,8 +313,8 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 380,
-  "edges": 670,
+  "entities": 382,
+  "edges": 671,
   "events": 65
  },
  "entities": [
@@ -3072,6 +3072,18 @@
    "id": "d.revoke_by_arm_mode",
    "class": "Decision",
    "label": "A mid-session location revocation resolves an AUTO_ZONE session, which armed on containment and can no longer tell whether she is contained, and does not resolve a MANUAL session, which she started deliberately and which runs on timers. Both show the persistent warning, because either way the SOS payload carries a last-known fix with its age stated, or none.",
+   "at": "2026-08-27"
+  },
+  {
+   "id": "fail.offline_one_shot",
+   "class": "Failure",
+   "label": "MAP_SPEC described the offline note only as a load-time condition, four seconds with no tile, and said nothing about re-entering it. Once a tile had loaded the map could never return to the offline state, so the resilience claim held only on first load. MAP_SPEC itself calls tile failure the single most likely thing to go wrong in a live demo on venue wifi, which is precisely when this would have shown.",
+   "at": "2026-08-27"
+  },
+  {
+   "id": "d.offline_is_a_state",
+   "class": "Decision",
+   "label": "Map offline is a re-enterable state, not a load-time verdict. Entered on tileerror, on the browser offline event, or on the 4 s timeout. Left only on a subsequent successful tileload, never on the online event: a network that reports itself back has not yet proved a tile will arrive. Listeners are removed on teardown. Only the note changes; zones, her dot and the ladder carry on untouched in either state, which is the claim.",
    "at": "2026-08-27"
   }
  ],
@@ -8432,6 +8444,14 @@
    "from": "d.revoke_by_arm_mode",
    "rel": "motivated_by",
    "to": "fail.revoke_kills_manual",
+   "at": "2026-08-27",
+   "by": "claude",
+   "confidence": "high"
+  },
+  {
+   "from": "d.offline_is_a_state",
+   "rel": "motivated_by",
+   "to": "fail.offline_one_shot",
    "at": "2026-08-27",
    "by": "claude",
    "confidence": "high"
