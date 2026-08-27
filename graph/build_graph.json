@@ -1283,33 +1283,11 @@
    ],
    "risk": "med",
    "cumulative_hours": 29.5,
-  "status": "complete",
-  "run_id": "run.M4.2026-08-27.web.006",
-  "gates_passed": [
-   "G1_npm_run_build",
-   "G2_tsc_no_emit_and_next_lint",
-   "G3_vitest_147_tests",
-   "G4_m4_contract_tests_added_and_passing",
-   "G5_320px_mobile_browser_map_sheet_and_settings_acceptance",
-   "G6_grounded_105_source_files",
-   "G7_twelve_non_negotiables",
-   "G8_320px_browser_runtime_acceptance",
-   "G9_fresh_spec_verifier_pass",
-   "G10_reads_check_17_types_closed",
-   "zones_render_offline_tile_availability_cycles"
-  ],
-  "artifacts": [
-   "art.m4.home_map",
-   "art.m4.zone_detail",
-   "art.m4.home_session_surface",
-   "art.m4.demo_panel",
-   "art.m4.settings_shell"
-  ],
-  "corrections": [
-   "closed the verifier findings for fractional map zoom, attribution visibility and rem scaling, app-shell session status, idle-watch recovery, 24-hour arm time and live demo timing",
-   "kept demo provenance outside PersistedSession, made manual arming survive location denial, reconciled the stale location-revocation catalogue row, and added the fatal zone-data recovery state",
-   "made tile offline recovery evidence-based: enter on timeout, tileerror or browser offline; recover only after a successful tileload"
-  ],
+   "status": "pending",
+   "run_id": null,
+   "gates_passed": [],
+   "artifacts": [],
+   "corrections": [],
    "verify_lenses": [
     "spec"
    ],
@@ -1484,11 +1462,33 @@
    ],
    "risk": "med",
    "cumulative_hours": 19.0,
-   "status": "pending",
-   "run_id": null,
-   "gates_passed": [],
-   "artifacts": [],
-   "corrections": [],
+   "status": "complete",
+   "run_id": "run.M4.2026-08-27.web.006",
+   "gates_passed": [
+    "G1_npm_run_build",
+    "G2_tsc_no_emit_and_next_lint",
+    "G3_vitest_147_tests",
+    "G4_m4_contract_tests_added_and_passing",
+    "G5_320px_mobile_browser_map_sheet_and_settings_acceptance",
+    "G6_grounded_105_source_files",
+    "G7_twelve_non_negotiables",
+    "G8_320px_browser_runtime_acceptance",
+    "G9_fresh_spec_verifier_pass",
+    "G10_reads_check_17_types_closed",
+    "zones_render_offline_tile_availability_cycles"
+   ],
+   "artifacts": [
+    "art.m4.home_map",
+    "art.m4.zone_detail",
+    "art.m4.home_session_surface",
+    "art.m4.demo_panel",
+    "art.m4.settings_shell"
+   ],
+   "corrections": [
+    "closed the verifier findings for fractional map zoom, attribution visibility and rem scaling, app-shell session status, idle-watch recovery, 24-hour arm time and live demo timing",
+    "kept demo provenance outside PersistedSession, made manual arming survive location denial, reconciled the stale location-revocation catalogue row, and added the fatal zone-data recovery state",
+    "made tile offline recovery evidence-based: enter on timeout, tileerror or browser offline; recover only after a successful tileload"
+   ],
    "verify_lenses": [
     "spec"
    ],

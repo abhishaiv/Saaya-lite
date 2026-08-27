@@ -1,5 +1,5 @@
 import { bundledZoneRepository } from "@/src/data/repository/zoneRepository";
-import { HomeScreen } from "@/src/ui/screens/home/HomeScreen";
+import { AppGate } from "@/src/ui/screens/onboarding/AppGate";
 import type { SaayaLocale } from "@/src/ui/copy/strings";
 
 type HomePageProps = Readonly<{
@@ -20,7 +20,7 @@ export default function HomePage({ searchParams }: HomePageProps) {
   const { demoZones, mapZones, policeStations, zoneDetails } =
     bundledZoneRepository.snapshot();
   return (
-    <HomeScreen
+    <AppGate
       buildVersion={{ name: versionName, code: Number(versionCodeText) }}
       demoZones={demoZones}
       founderContact={process.env.SAAYA_FOUNDER_CONTACT?.trim() || null}

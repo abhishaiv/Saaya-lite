@@ -38,6 +38,8 @@ export type M4Copy = Readonly<{
   cdStationCall: string;
   cdZone: string;
   ctaCall: string;
+  ctaContinue: string;
+  ctaFinish: string;
   ctaArmManually: string;
   ctaImHome: string;
   demoJumpFamily: string;
@@ -52,6 +54,8 @@ export type M4Copy = Readonly<{
   demoSpeedNote: string;
   demoSpeedToggle: string;
   demoTriggerSos: string;
+  errPinMismatch: string;
+  errPinWeak: string;
   errZoneData: string;
   homeArmBannerBody: string;
   homeArmBannerTitle: string;
@@ -63,6 +67,14 @@ export type M4Copy = Readonly<{
   locSearching: string;
   locSlow: string;
   mapOffline: string;
+  onbContactBody: string;
+  onbContactPrivacy: string;
+  onbContactTitle: string;
+  onbLocationBody: string;
+  onbLocationPartial: string;
+  onbLocationTitle: string;
+  onbPinBody: string;
+  onbPinTitle: string;
   policeNoGovtLink: string;
   errNoStation: string;
   riskBandElevated: string;
@@ -140,6 +152,8 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     cdStationCall: "Call %1$s",
     cdZone: "%1$s, %2$s risk area. Open details.",
     ctaCall: "Call",
+    ctaContinue: "Continue",
+    ctaFinish: "Finish",
     ctaArmManually: "Watch this journey",
     ctaImHome: "I am home",
     demoJumpFamily: "Jump to family escalation",
@@ -154,6 +168,8 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     demoSpeedNote: "Timers run %1$dx faster. The full ladder takes %2$d seconds instead of %3$d.",
     demoSpeedToggle: "Demo speed",
     demoTriggerSos: "Trigger SOS",
+    errPinMismatch: "Those did not match. Try again.",
+    errPinWeak: "Pick something less obvious.",
     errZoneData: "Saaya Lite could not load Visakhapatnam data. Reloading the page should fix this.",
     homeArmBannerBody: "You are in %1$s and it is %2$s. You did not have to do anything.",
     homeArmBannerTitle: "Saaya woke by itself",
@@ -165,6 +181,14 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     locSearching: "Finding you",
     locSlow: "This is taking longer than usual. Check that location is on.",
     mapOffline: "Map offline, zones still work",
+    onbContactBody: "One person is enough. We only ask your favourites to check on you if you miss two check-ins.",
+    onbContactPrivacy: "This stays on your phone. Saaya never uploads your favourites.",
+    onbContactTitle: "Your favourites",
+    onbLocationBody: "Location is how Saaya wakes without you pressing anything. It is not shared with anyone until you raise an SOS.",
+    onbLocationPartial: "Saaya watches only while this page is open. Keep it open for the stretch you are on.",
+    onbLocationTitle: "Saaya needs to know where the stretch is",
+    onbPinBody: "Four digits. You will need it to stop a live SOS. Set it now, calmly, because you may need it when you are not calm.",
+    onbPinTitle: "Set a PIN",
     policeNoGovtLink: "Saaya Lite is a prototype. It is not connected to AP Police, Shakthi, T-Safe, 112 or ERSS, and it is not a government product.",
     errNoStation: "No police station within 20 km.",
     riskBandElevated: "Elevated",
@@ -240,6 +264,8 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     cdStationCall: "%1$s కి ఫోన్ చేయి",
     cdZone: "%1$s, %2$s ప్రమాద ప్రాంతం. వివరాలు తెరువు.",
     ctaCall: "కాల్ చేయి",
+    ctaContinue: "కొనసాగించు",
+    ctaFinish: "పూర్తి చేయి",
     ctaArmManually: "ఈ ప్రయాణాన్ని గమనించు",
     ctaImHome: "నేను ఇంటికి చేరాను",
     demoJumpFamily: "ఆత్మీయుల దశకు వెళ్లు",
@@ -254,6 +280,8 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     demoSpeedNote: "టైమర్లు %1$d రెట్లు వేగంగా నడుస్తాయి. పూర్తి నిచ్చెన %3$d సెకన్లకు బదులు %2$d సెకన్లు పడుతుంది.",
     demoSpeedToggle: "డెమో వేగం",
     demoTriggerSos: "SOS ప్రారంభించు",
+    errPinMismatch: "అవి సరిపోలలేదు. మళ్లీ ప్రయత్నించండి.",
+    errPinWeak: "కొంచెం ఊహించలేని దాన్ని ఎంచుకోండి.",
     errZoneData: "సాయ లైట్ విశాఖపట్నం డేటాను లోడ్ చేయలేకపోయింది. పేజీని మళ్లీ లోడ్ చేస్తే సరిపోతుంది.",
     homeArmBannerBody: "మీరు %1$s లో ఉన్నారు, ఇప్పుడు %2$s. మీరు ఏమీ చేయాల్సిన అవసరం లేదు.",
     homeArmBannerTitle: "సాయ దానంతట అదే మేల్కొంది",
@@ -265,6 +293,14 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     locSearching: "మిమ్మల్ని కనుగొంటున్నాం",
     locSlow: "ఇది మామూలు కంటే ఎక్కువ సమయం తీసుకుంటోంది. లొకేషన్ ఆన్‌లో ఉందో చూడండి.",
     mapOffline: "మ్యాప్ ఆఫ్‌లైన్, జోన్‌లు ఇంకా పనిచేస్తాయి",
+    onbContactBody: "ఒక్కరు చాలు. మీరు రెండు చెక్-ఇన్‌లు మిస్ అయితేనే మీ ఆత్మీయులను చూడమని అడుగుతాం.",
+    onbContactPrivacy: "ఇది మీ ఫోన్‌లోనే ఉంటుంది. సాయ మీ ఆత్మీయులను ఎప్పుడూ అప్‌లోడ్ చేయదు.",
+    onbContactTitle: "మీ ఆత్మీయులు",
+    onbLocationBody: "మీరు ఏదీ నొక్కకుండా సాయ మేల్కొనేది లొకేషన్ ద్వారానే. మీరు SOS ఇచ్చే వరకు ఇది ఎవరితోనూ పంచుకోబడదు.",
+    onbLocationPartial: "ఈ పేజీ తెరిచి ఉన్నప్పుడు మాత్రమే సాయ గమనిస్తుంది. మీరు వెళ్తున్న మార్గం వరకు దీన్ని తెరిచి ఉంచండి.",
+    onbLocationTitle: "మార్గం ఎక్కడ ఉందో సాయకు తెలియాలి",
+    onbPinBody: "నాలుగు అంకెలు. ప్రత్యక్ష SOS ఆపడానికి ఇది అవసరం. ప్రశాంతంగా ఉన్నప్పుడే దీన్ని సెట్ చేయండి.",
+    onbPinTitle: "ఒక PIN సెట్ చేయండి",
     policeNoGovtLink: "సాయ లైట్ ఒక ప్రోటోటైప్. ఇది AP పోలీస్, శక్తి, T-Safe, 112 లేదా ERSS తో అనుసంధానించబడలేదు, ఇది ప్రభుత్వ ఉత్పత్తి కాదు.",
     errNoStation: "20 కి.మీ. లోపు పోలీస్ స్టేషన్ లేదు.",
     riskBandElevated: "ఎక్కువ",
