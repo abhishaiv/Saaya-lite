@@ -21,6 +21,26 @@ export function formatIndiaUiTime(
   }).format(epochMs);
 }
 
+/** The frozen English format used inside the composed family message. */
+export function formatIndiaFamilyTime(epochMs: number): string {
+  return new Intl.DateTimeFormat("en-IN", {
+    hour: "numeric",
+    hourCycle: "h12",
+    minute: "2-digit",
+    timeZone: SAAYA_TIME_ZONE,
+  })
+    .format(epochMs)
+    .toUpperCase();
+}
+
+/** The family message is readable prose, so its day is a full English weekday. */
+export function formatIndiaFamilyDay(epochMs: number): string {
+  return new Intl.DateTimeFormat("en-IN", {
+    timeZone: SAAYA_TIME_ZONE,
+    weekday: "long",
+  }).format(epochMs);
+}
+
 /** Formats an already-IST wall-clock hour without changing the real session clock. */
 export function formatIndiaUiTimeOfDay(
   hourOfDay: number,

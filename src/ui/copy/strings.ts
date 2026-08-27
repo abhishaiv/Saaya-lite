@@ -28,6 +28,7 @@ export type M4Copy = Readonly<{
   aboutWhatTitle: string;
   appName: string;
   cdBack: string;
+  cdCancelEscalation: string;
   cdCloseSheet: string;
   cdCountdown: string;
   cdDemoPanel: string;
@@ -40,6 +41,7 @@ export type M4Copy = Readonly<{
   cdStationCall: string;
   cdZone: string;
   ctaCall: string;
+  ctaCancelImFine: string;
   ctaContinue: string;
   ctaFinish: string;
   ctaImOk: string;
@@ -60,6 +62,12 @@ export type M4Copy = Readonly<{
   errPinMismatch: string;
   errPinWeak: string;
   errZoneData: string;
+  familyBody: string;
+  familyCancelNote: string;
+  familyMockDisclosure: string;
+  familyNoContact: string;
+  familySubjectFallback: string;
+  familyTitle: string;
   homeArmBannerBody: string;
   homeArmBannerTitle: string;
   homeHourContext: string;
@@ -82,6 +90,8 @@ export type M4Copy = Readonly<{
   onbLocationBody: string;
   onbLocationPartial: string;
   onbLocationTitle: string;
+  onbNameHint: string;
+  onbNameLabel: string;
   onbPinBody: string;
   onbPinTitle: string;
   policeNoGovtLink: string;
@@ -151,6 +161,7 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     aboutWhatTitle: "What this is",
     appName: "Saaya Lite",
     cdBack: "Go back",
+    cdCancelEscalation: "Cancel. Your favourites will not be told.",
     cdCloseSheet: "Close",
     cdCountdown: "%1$d seconds left to answer",
     cdDemoPanel: "Open prototype demo controls",
@@ -163,6 +174,7 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     cdStationCall: "Call %1$s",
     cdZone: "%1$s, %2$s risk area. Open details.",
     ctaCall: "Call",
+    ctaCancelImFine: "Cancel, I am fine",
     ctaContinue: "Continue",
     ctaFinish: "Finish",
     ctaImOk: "I am OK",
@@ -183,6 +195,12 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     errPinMismatch: "Those did not match. Try again.",
     errPinWeak: "Pick something less obvious.",
     errZoneData: "Saaya Lite could not load Visakhapatnam data. Reloading the page should fix this.",
+    familyBody: "We've asked them to check on you. This is the message. You can still stop it.",
+    familyCancelNote: "If you do not cancel in %1$d seconds, Saaya raises a full SOS and shares your exact location.",
+    familyMockDisclosure: "Prototype: this message is composed but not actually sent. Real delivery needs Indian DLT registration.",
+    familyNoContact: "You haven't added a favourite yet. Saaya will still raise an SOS.",
+    familySubjectFallback: "Someone using Saaya Lite",
+    familyTitle: "Your favourites are being notified",
     homeArmBannerBody: "You are in %1$s and it is %2$s. You did not have to do anything.",
     homeArmBannerTitle: "Saaya woke by itself",
     homeHourContext: "Right now, %1$s reads %2$s",
@@ -205,6 +223,8 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     onbLocationBody: "Location is how Saaya wakes without you pressing anything. It is not shared with anyone until you raise an SOS.",
     onbLocationPartial: "Saaya watches only while this page is open. Keep it open for the stretch you are on.",
     onbLocationTitle: "Saaya needs to know where the stretch is",
+    onbNameHint: "So your favourites know who the alert is about",
+    onbNameLabel: "Your name",
     onbPinBody: "Four digits. You will need it to stop a live SOS. Set it now, calmly, because you may need it when you are not calm.",
     onbPinTitle: "Set a PIN",
     policeNoGovtLink: "Saaya Lite is a prototype. It is not connected to AP Police, Shakthi, T-Safe, 112 or ERSS, and it is not a government product.",
@@ -272,6 +292,7 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     aboutWhatTitle: "ఇది ఏమిటి",
     appName: "సాయ లైట్",
     cdBack: "వెనక్కి వెళ్ళు",
+    cdCancelEscalation: "రద్దు చేయి. మీ ఆత్మీయులకు తెలియజేయబడదు.",
     cdCloseSheet: "మూసివేయి",
     cdCountdown: "సమాధానం ఇవ్వడానికి %1$d సెకన్లు మిగిలాయి",
     cdDemoPanel: "ప్రోటోటైప్ డెమో నియంత్రణలు తెరువు",
@@ -284,6 +305,7 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     cdStationCall: "%1$s కి ఫోన్ చేయి",
     cdZone: "%1$s, %2$s ప్రమాద ప్రాంతం. వివరాలు తెరువు.",
     ctaCall: "కాల్ చేయి",
+    ctaCancelImFine: "రద్దు చేయి, నేను బాగున్నాను",
     ctaContinue: "కొనసాగించు",
     ctaFinish: "పూర్తి చేయి",
     ctaImOk: "నేను బాగున్నాను",
@@ -304,6 +326,12 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     errPinMismatch: "అవి సరిపోలలేదు. మళ్లీ ప్రయత్నించండి.",
     errPinWeak: "కొంచెం ఊహించలేని దాన్ని ఎంచుకోండి.",
     errZoneData: "సాయ లైట్ విశాఖపట్నం డేటాను లోడ్ చేయలేకపోయింది. పేజీని మళ్లీ లోడ్ చేస్తే సరిపోతుంది.",
+    familyBody: "మిమ్మల్ని చూడమని వారిని అడిగాం. ఇదే సందేశం. మీరు ఇప్పటికీ ఆపవచ్చు.",
+    familyCancelNote: "%1$d సెకన్లలో మీరు రద్దు చేయకపోతే, సాయ పూర్తి SOS ఇచ్చి మీ ఖచ్చితమైన స్థానాన్ని పంచుతుంది.",
+    familyMockDisclosure: "ప్రోటోటైప్: ఈ సందేశం తయారైంది కానీ నిజంగా పంపబడలేదు. నిజమైన డెలివరీకి భారత DLT నమోదు అవసరం.",
+    familyNoContact: "మీరు ఇంకా ఆత్మీయులను జోడించలేదు. అయినా సాయ SOS ఇస్తుంది.",
+    familySubjectFallback: "సాయ లైట్ ఉపయోగిస్తున్న వ్యక్తి",
+    familyTitle: "మీ ఆత్మీయులకు తెలియజేస్తున్నాం",
     homeArmBannerBody: "మీరు %1$s లో ఉన్నారు, ఇప్పుడు %2$s. మీరు ఏమీ చేయాల్సిన అవసరం లేదు.",
     homeArmBannerTitle: "సాయ దానంతట అదే మేల్కొంది",
     homeHourContext: "ప్రస్తుతం, %1$s %2$s గా ఉంది",
@@ -326,6 +354,8 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     onbLocationBody: "మీరు ఏదీ నొక్కకుండా సాయ మేల్కొనేది లొకేషన్ ద్వారానే. మీరు SOS ఇచ్చే వరకు ఇది ఎవరితోనూ పంచుకోబడదు.",
     onbLocationPartial: "ఈ పేజీ తెరిచి ఉన్నప్పుడు మాత్రమే సాయ గమనిస్తుంది. మీరు వెళ్తున్న మార్గం వరకు దీన్ని తెరిచి ఉంచండి.",
     onbLocationTitle: "మార్గం ఎక్కడ ఉందో సాయకు తెలియాలి",
+    onbNameHint: "హెచ్చరిక ఎవరి గురించో మీ ఆత్మీయులకు తెలియడానికి",
+    onbNameLabel: "మీ పేరు",
     onbPinBody: "నాలుగు అంకెలు. ప్రత్యక్ష SOS ఆపడానికి ఇది అవసరం. ప్రశాంతంగా ఉన్నప్పుడే దీన్ని సెట్ చేయండి.",
     onbPinTitle: "ఒక PIN సెట్ చేయండి",
     policeNoGovtLink: "సాయ లైట్ ఒక ప్రోటోటైప్. ఇది AP పోలీస్, శక్తి, T-Safe, 112 లేదా ERSS తో అనుసంధానించబడలేదు, ఇది ప్రభుత్వ ఉత్పత్తి కాదు.",

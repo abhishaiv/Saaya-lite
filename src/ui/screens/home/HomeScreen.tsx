@@ -171,6 +171,13 @@ export function HomeScreen({
         : zoneDetails.find(({ id }) => id === currentZone.stationId) ?? null,
     [currentZone, zoneDetails],
   );
+  const activeZoneDetail = useMemo(
+    () =>
+      engineView.activeZoneId === null
+        ? null
+        : zoneDetails.find(({ id }) => id === engineView.activeZoneId) ?? null,
+    [engineView.activeZoneId, zoneDetails],
+  );
   const contextLine = useMemo(() => {
     if (currentZoneDetail === null) return null;
     const band = hourBandAtEpochMs(nowEpochMs);
@@ -399,6 +406,17 @@ export function HomeScreen({
       { nowEpochMs, zone: activeZone },
     );
   }, [currentZone, engineView.activeZoneId, zones]);
+  const handleFamilyCancel = useCallback(() => {
+    const nowEpochMs = browserClock.nowEpochMs();
+    const activeZone =
+      zones.find(({ stationId }) => stationId === engineView.activeZoneId) ??
+      currentZone;
+    setNowEpochMs(nowEpochMs);
+    engineRef.current?.dispatch(
+      { kind: "CancelTapped" },
+      { nowEpochMs, zone: activeZone },
+    );
+  }, [currentZone, engineView.activeZoneId, zones]);
   const handleLocationHelpOpen = useCallback(() => {
     setSelectedZoneId(null);
     setDemoPanelOpen(false);
@@ -561,6 +579,7 @@ export function HomeScreen({
       />
 
       <HomeSessionSurface
+        activeZoneDetail={activeZoneDetail}
         armAcknowledgement={armAcknowledgement}
         armBannerVisible={armBannerVisible}
         checkInReason={checkInReason}
@@ -568,14 +587,17 @@ export function HomeScreen({
         copy={copy}
         demoModeActive={demoSpeedEnabled || demoSessionActive}
         demoSpeedEnabled={demoSpeedEnabled}
+        currentPoint={location}
         engineView={engineView}
         locationStatus={locationStatus}
         onArmBannerHidden={() => setArmBannerVisible(false)}
         onCheckInOk={handleCheckInOk}
+        onFamilyCancel={handleFamilyCancel}
         onLocationHelpOpen={handleLocationHelpOpen}
         onManualArm={handleManualArm}
         onManualDisarm={handleManualDisarm}
         pageStoppedWarning={pageStoppedWarning}
+        policeStations={policeStations}
       />
 
       <div className="home-screen__settings">

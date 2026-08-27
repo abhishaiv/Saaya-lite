@@ -3,6 +3,9 @@
 import { useEffect, useState } from "react";
 
 import type { SessionState } from "../../../domain/model/session";
+import type { ZoneDetail } from "../../../data/repository/zoneRepository";
+import type { PoliceStation } from "../../../domain/model/policeStation";
+import type { LatLng } from "../../../domain/model/zone";
 import type { LocationStatus } from "../../../platform/locationWatch";
 import { subscribeBottomSheetDragRange } from "../../../platform/viewportMetrics";
 import { ArmBanner } from "../../components/ArmBanner";
@@ -12,6 +15,7 @@ import { SaayaButton } from "../../components/SaayaButton";
 import type { M4Copy } from "../../copy/strings";
 import type { HomeEngineView } from "./homeEngineBridge";
 import { CheckInOverlay } from "./CheckInOverlay";
+import { FamilyEscalationOverlay } from "./FamilyEscalationOverlay";
 
 export interface ArmAcknowledgement {
   readonly body: string;
@@ -19,27 +23,33 @@ export interface ArmAcknowledgement {
 }
 
 export interface HomeSessionSurfaceProps {
+  readonly activeZoneDetail: ZoneDetail | null;
   readonly armAcknowledgement: ArmAcknowledgement | null;
   readonly armBannerVisible: boolean;
   readonly contextLine: string | null;
   readonly demoSpeedEnabled: boolean;
   readonly checkInReason: string | null;
+  readonly currentPoint: LatLng | null;
   readonly copy: M4Copy;
   readonly demoModeActive: boolean;
   readonly engineView: HomeEngineView;
   readonly locationStatus: LocationStatus;
   readonly onArmBannerHidden: () => void;
   readonly onCheckInOk: () => void;
+  readonly onFamilyCancel: () => void;
   readonly onLocationHelpOpen: () => void;
   readonly onManualArm: () => void;
   readonly onManualDisarm: () => void;
   readonly pageStoppedWarning: boolean;
+  readonly policeStations: readonly PoliceStation[];
 }
 
 export function HomeSessionSurface({
+  activeZoneDetail,
   armAcknowledgement,
   armBannerVisible,
   checkInReason,
+  currentPoint,
   contextLine,
   demoSpeedEnabled,
   copy,
@@ -48,10 +58,12 @@ export function HomeSessionSurface({
   locationStatus,
   onArmBannerHidden,
   onCheckInOk,
+  onFamilyCancel,
   onLocationHelpOpen,
   onManualArm,
   onManualDisarm,
   pageStoppedWarning,
+  policeStations,
 }: HomeSessionSurfaceProps) {
   const [dragRangePx, setDragRangePx] = useState<number | null>(null);
   const [sheetPosition, setSheetPosition] = useState<"peek" | "expanded">(
@@ -162,6 +174,18 @@ export function HomeSessionSurface({
           onOk={onCheckInOk}
           reason={state === "CHECKIN_1" ? checkInReason : null}
           state={state}
+        />
+      ) : null}
+
+      {state === "FAMILY_ESCALATED" ? (
+        <FamilyEscalationOverlay
+          copy={copy}
+          currentPoint={currentPoint}
+          deadlineEpochMs={engineView.deadlineEpochMs}
+          demoSpeedEnabled={demoSpeedEnabled}
+          detail={activeZoneDetail}
+          onCancel={onFamilyCancel}
+          policeStations={policeStations}
         />
       ) : null}
 

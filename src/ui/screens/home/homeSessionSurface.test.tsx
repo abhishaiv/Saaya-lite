@@ -24,21 +24,25 @@ function render(
 ) {
   return renderToStaticMarkup(
     <HomeSessionSurface
+      activeZoneDetail={null}
       armAcknowledgement={null}
       armBannerVisible={false}
       checkInReason={null}
       contextLine={M4_COPY.en.homeHourContext}
       copy={M4_COPY.en}
+      currentPoint={null}
       demoModeActive={false}
       demoSpeedEnabled={false}
       engineView={view(state, "MANUAL")}
       locationStatus="CURRENT"
       onArmBannerHidden={() => undefined}
       onCheckInOk={() => undefined}
+      onFamilyCancel={() => undefined}
       onLocationHelpOpen={() => undefined}
       onManualArm={() => undefined}
       onManualDisarm={() => undefined}
       pageStoppedWarning={false}
+      policeStations={[]}
       {...options}
     />,
   );

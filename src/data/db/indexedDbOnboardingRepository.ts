@@ -14,8 +14,8 @@ interface OnboardingDatabase extends DBSchema {
     value: Favourite;
   };
   settings: {
-    key: "current";
-    value: OnboardingSettings;
+    key: string;
+    value: OnboardingSettings | string;
   };
 }
 
@@ -23,6 +23,7 @@ const DATABASE_NAME = "saaya-lite-onboarding";
 const DATABASE_VERSION = 1; // GROUNDED-EXEMPT: initial isolated IndexedDB schema version.
 const SETTINGS_KEY = "current";
 const PRIMARY_FAVOURITE_KEY = "primary";
+const USER_NAME_KEY = "user_name";
 
 /** IndexedDB-backed local-only onboarding data. It never has a remote dependency. */
 export class IndexedDbOnboardingRepository implements OnboardingRepository {
@@ -40,6 +41,11 @@ export class IndexedDbOnboardingRepository implements OnboardingRepository {
       (await (await this.database()).get("favourite", PRIMARY_FAVOURITE_KEY)) ??
       null
     );
+  }
+
+  async loadUserName(): Promise<string | null> {
+    const value = await (await this.database()).get("settings", USER_NAME_KEY);
+    return typeof value === "string" && value.length > 0 ? value : null;
   }
 
   async saveOnboarded(): Promise<void> {
@@ -66,18 +72,25 @@ export class IndexedDbOnboardingRepository implements OnboardingRepository {
     );
   }
 
+  async saveUserName(userName: string | null): Promise<void> {
+    const database = await this.database();
+    if (userName === null) {
+      await database.delete("settings", USER_NAME_KEY);
+      return;
+    }
+    await database.put("settings", userName, USER_NAME_KEY);
+  }
+
   async verifyPin(pin: string): Promise<boolean> {
     const stored = (await this.settings()).pin;
     return stored === null ? false : this.pinHasher.verify(pin, stored);
   }
 
   private async settings(): Promise<OnboardingSettings> {
-    return (
-      (await (await this.database()).get("settings", SETTINGS_KEY)) ?? {
-        onboarded: false,
-        pin: null,
-      }
-    );
+    const value = await (await this.database()).get("settings", SETTINGS_KEY);
+    return isOnboardingSettings(value)
+      ? value
+      : { onboarded: false, pin: null };
   }
 
   private database(): Promise<IDBPDatabase<OnboardingDatabase>> {
@@ -97,4 +110,10 @@ export class IndexedDbOnboardingRepository implements OnboardingRepository {
     );
     return this.databasePromise;
   }
+}
+
+function isOnboardingSettings(
+  value: OnboardingSettings | string | undefined,
+): value is OnboardingSettings {
+  return typeof value === "object" && value !== null && "onboarded" in value;
 }

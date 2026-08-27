@@ -32,6 +32,7 @@ export function OnboardingScreen({
   const [step, setStep] = useState<OnboardingStep>("FAVOURITE");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [userName, setUserName] = useState("");
   const [locationResult, setLocationResult] =
     useState<LocationResult>("RATIONALE");
   const [pin, setPin] = useState("");
@@ -44,6 +45,7 @@ export function OnboardingScreen({
     if (!hasFavouriteInput(name, phone)) return;
     setSaving(true);
     try {
+      await repository.saveUserName(userName.trim() || null);
       await repository.savePrimaryFavourite({
         name: name.trim(),
         phone: phone.trim(),
@@ -90,6 +92,21 @@ export function OnboardingScreen({
       <section aria-live="polite" className="onboarding-screen__card">
         {step === "FAVOURITE" ? (
           <form onSubmit={(event) => void saveFavourite(event)}>
+            <div className="onboarding-screen__user-name">
+              <label htmlFor="user-name">{copy.onbNameLabel}</label>
+              <input
+                aria-describedby="user-name-hint"
+                aria-label={copy.onbNameLabel}
+                autoCapitalize="words"
+                autoComplete="name"
+                id="user-name"
+                name="user-name"
+                onChange={(event) => setUserName(event.currentTarget.value)}
+                type="text"
+                value={userName}
+              />
+              <p id="user-name-hint">{copy.onbNameHint}</p>
+            </div>
             <OnboardingHeading
               body={copy.onbContactBody}
               title={copy.onbContactTitle}
@@ -246,11 +263,31 @@ export function OnboardingScreen({
 
         .onboarding-screen__inputs,
         .onboarding-screen__pin-inputs,
-        .onboarding-screen__actions {
+        .onboarding-screen__actions,
+        .onboarding-screen__user-name {
           display: grid;
           gap: var(--space-12);
         }
 
+        .onboarding-screen__user-name label,
+        .onboarding-screen__user-name p {
+          margin: 0;
+        }
+
+        .onboarding-screen__user-name label {
+          font-size: var(--type-label-size);
+          font-weight: var(--weight-semibold);
+          letter-spacing: var(--type-label-tracking);
+          line-height: var(--type-label-line-height);
+        }
+
+        .onboarding-screen__user-name p {
+          color: var(--color-text-secondary);
+          font-size: var(--type-caption-size);
+          line-height: var(--type-caption-line-height);
+        }
+
+        .onboarding-screen__user-name input,
         .onboarding-screen__inputs input {
           min-block-size: var(--minimum-touch-target);
           padding: 0 var(--space-14);
