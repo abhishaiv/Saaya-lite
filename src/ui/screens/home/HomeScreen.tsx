@@ -21,6 +21,7 @@ import {
   displayRiskLabel,
 } from "../../../domain/engine/rules";
 import type { Command, SessionState } from "../../../domain/model/session";
+import { RiskTier } from "../../../domain/model/zone";
 import type { PoliceStation } from "../../../domain/model/policeStation";
 import { browserClock } from "../../../platform/clock";
 import { readGeolocationPermissionState } from "../../../platform/geolocationPermission";
@@ -179,6 +180,29 @@ export function HomeScreen({
     );
     return formatCopy(copy.homeHourContext, currentZoneDetail.label, riskBand);
   }, [copy, currentZoneDetail, nowEpochMs]);
+  const checkInReason = useMemo(() => {
+    if (
+      engineView.state !== "CHECKIN_1" ||
+      engineView.activeZoneId === null ||
+      engineView.armedAtEpochMs === null
+    ) {
+      return null;
+    }
+    const detail = zoneDetails.find(
+      ({ id }) => id === engineView.activeZoneId,
+    );
+    if (detail === undefined) return null;
+    return formatCopy(
+      copy.checkin1Reason,
+      detail.label,
+      localizedRiskTier(copy, detail.zone.riskTier),
+      formatSessionArmTime(
+        engineView.armedAtEpochMs,
+        locale,
+        demoSessionActive,
+      ),
+    );
+  }, [copy, demoSessionActive, engineView, locale, zoneDetails]);
 
   useEffect(() => {
     const engine = engineRef.current;
@@ -364,6 +388,17 @@ export function HomeScreen({
       { nowEpochMs: browserClock.nowEpochMs(), zone: activeZone },
     );
   }, [currentZone, engineView.activeZoneId, zones]);
+  const handleCheckInOk = useCallback(() => {
+    const nowEpochMs = browserClock.nowEpochMs();
+    const activeZone =
+      zones.find(({ stationId }) => stationId === engineView.activeZoneId) ??
+      currentZone;
+    setNowEpochMs(nowEpochMs);
+    engineRef.current?.dispatch(
+      { kind: "OkTapped" },
+      { nowEpochMs, zone: activeZone },
+    );
+  }, [currentZone, engineView.activeZoneId, zones]);
   const handleLocationHelpOpen = useCallback(() => {
     setSelectedZoneId(null);
     setDemoPanelOpen(false);
@@ -528,12 +563,15 @@ export function HomeScreen({
       <HomeSessionSurface
         armAcknowledgement={armAcknowledgement}
         armBannerVisible={armBannerVisible}
+        checkInReason={checkInReason}
         contextLine={contextLine}
         copy={copy}
         demoModeActive={demoSpeedEnabled || demoSessionActive}
+        demoSpeedEnabled={demoSpeedEnabled}
         engineView={engineView}
         locationStatus={locationStatus}
         onArmBannerHidden={() => setArmBannerVisible(false)}
+        onCheckInOk={handleCheckInOk}
         onLocationHelpOpen={handleLocationHelpOpen}
         onManualArm={handleManualArm}
         onManualDisarm={handleManualDisarm}
@@ -642,5 +680,21 @@ function localizedRiskBand(
       return copy.riskBandElevated;
     case "High":
       return copy.riskBandHigh;
+  }
+}
+
+function localizedRiskTier(
+  copy: (typeof M4_COPY)[SaayaLocale],
+  tier: RiskTier,
+): string {
+  switch (tier) {
+    case RiskTier.HIGH:
+      return copy.riskBandHigh;
+    case RiskTier.ELEVATED:
+      return copy.riskBandElevated;
+    case RiskTier.MODERATE:
+      return copy.riskBandModerate;
+    case RiskTier.SAFE:
+      return copy.riskBandLow;
   }
 }

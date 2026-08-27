@@ -26,12 +26,15 @@ function render(
     <HomeSessionSurface
       armAcknowledgement={null}
       armBannerVisible={false}
+      checkInReason={null}
       contextLine={M4_COPY.en.homeHourContext}
       copy={M4_COPY.en}
       demoModeActive={false}
+      demoSpeedEnabled={false}
       engineView={view(state, "MANUAL")}
       locationStatus="CURRENT"
       onArmBannerHidden={() => undefined}
+      onCheckInOk={() => undefined}
       onLocationHelpOpen={() => undefined}
       onManualArm={() => undefined}
       onManualDisarm={() => undefined}
@@ -109,5 +112,8 @@ describe("M4 Home session surface", () => {
       expect(html).not.toContain(M4_COPY.en.ctaArmManually);
       expect(html).not.toContain(M4_COPY.en.ctaImHome);
     }
+
+    expect(render("CHECKIN_1")).toContain(M4_COPY.en.checkin1Title);
+    expect(render("CHECKIN_2")).toContain(M4_COPY.en.checkin2Title);
   });
 });

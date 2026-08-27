@@ -126,6 +126,7 @@ export class HomeEngineBridge implements RuntimeSessionBridge {
   setDeadlineEpochMs(deadlineEpochMs: number | null): void {
     if (this.memory.state === "IDLE") return;
     this.memory.deadlineEpochMs = deadlineEpochMs;
+    this.callbacks.onView(this.currentView(null));
   }
 
   recover(

@@ -11,6 +11,7 @@ import { SaayaBottomSheet } from "../../components/SaayaBottomSheet";
 import { SaayaButton } from "../../components/SaayaButton";
 import type { M4Copy } from "../../copy/strings";
 import type { HomeEngineView } from "./homeEngineBridge";
+import { CheckInOverlay } from "./CheckInOverlay";
 
 export interface ArmAcknowledgement {
   readonly body: string;
@@ -21,11 +22,14 @@ export interface HomeSessionSurfaceProps {
   readonly armAcknowledgement: ArmAcknowledgement | null;
   readonly armBannerVisible: boolean;
   readonly contextLine: string | null;
+  readonly demoSpeedEnabled: boolean;
+  readonly checkInReason: string | null;
   readonly copy: M4Copy;
   readonly demoModeActive: boolean;
   readonly engineView: HomeEngineView;
   readonly locationStatus: LocationStatus;
   readonly onArmBannerHidden: () => void;
+  readonly onCheckInOk: () => void;
   readonly onLocationHelpOpen: () => void;
   readonly onManualArm: () => void;
   readonly onManualDisarm: () => void;
@@ -35,12 +39,15 @@ export interface HomeSessionSurfaceProps {
 export function HomeSessionSurface({
   armAcknowledgement,
   armBannerVisible,
+  checkInReason,
   contextLine,
+  demoSpeedEnabled,
   copy,
   demoModeActive,
   engineView,
   locationStatus,
   onArmBannerHidden,
+  onCheckInOk,
   onLocationHelpOpen,
   onManualArm,
   onManualDisarm,
@@ -146,6 +153,17 @@ export function HomeSessionSurface({
           ) : null}
         </section>
       </SaayaBottomSheet>
+
+      {state === "CHECKIN_1" || state === "CHECKIN_2" ? (
+        <CheckInOverlay
+          copy={copy}
+          deadlineEpochMs={engineView.deadlineEpochMs}
+          demoSpeedEnabled={demoSpeedEnabled}
+          onOk={onCheckInOk}
+          reason={state === "CHECKIN_1" ? checkInReason : null}
+          state={state}
+        />
+      ) : null}
 
       <style jsx>{`
         .home-session-arm-banner {

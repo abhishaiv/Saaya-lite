@@ -29,7 +29,9 @@ export type M4Copy = Readonly<{
   appName: string;
   cdBack: string;
   cdCloseSheet: string;
+  cdCountdown: string;
   cdDemoPanel: string;
+  cdImOk: string;
   cdDemoReset: string;
   cdDemoZonePicker: string;
   cdMap: string;
@@ -40,6 +42,7 @@ export type M4Copy = Readonly<{
   ctaCall: string;
   ctaContinue: string;
   ctaFinish: string;
+  ctaImOk: string;
   ctaArmManually: string;
   ctaImHome: string;
   demoJumpFamily: string;
@@ -61,6 +64,12 @@ export type M4Copy = Readonly<{
   homeArmBannerTitle: string;
   homeHourContext: string;
   ctaRetry: string;
+  checkin1Body: string;
+  checkin1Reason: string;
+  checkin1Title: string;
+  checkin2Body: string;
+  checkin2Title: string;
+  checkinPersistNote: string;
   locHelpBody: string;
   locHelpNote: string;
   locHelpTitle: string;
@@ -143,7 +152,9 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     appName: "Saaya Lite",
     cdBack: "Go back",
     cdCloseSheet: "Close",
+    cdCountdown: "%1$d seconds left to answer",
     cdDemoPanel: "Open prototype demo controls",
+    cdImOk: "Confirm you are safe",
     cdDemoReset: "Reset the demo session. Nothing is sent.",
     cdDemoZonePicker: "Choose a zone to simulate entering",
     cdMap: "Map of Visakhapatnam risk areas",
@@ -154,6 +165,7 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     ctaCall: "Call",
     ctaContinue: "Continue",
     ctaFinish: "Finish",
+    ctaImOk: "I am OK",
     ctaArmManually: "Watch this journey",
     ctaImHome: "I am home",
     demoJumpFamily: "Jump to family escalation",
@@ -175,6 +187,12 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     homeArmBannerTitle: "Saaya woke by itself",
     homeHourContext: "Right now, %1$s reads %2$s",
     ctaRetry: "Try again",
+    checkin1Body: "All good? Tap I'm OK and we'll keep quietly watching over you.",
+    checkin1Reason: "You are in %1$s, a %2$s area, at %3$s.",
+    checkin1Title: "Just checking in",
+    checkin2Body: "We still haven't heard from you. Tap I'm OK when you can, or we'll ask your favourites to check on you in a few minutes.",
+    checkin2Title: "Quick reminder",
+    checkinPersistNote: "Swiping this away does not stop the timer.",
     locHelpBody: "In your browser, open the site settings for this page and allow Location. Then come back and tap Try again.",
     locHelpNote: "Where this setting lives depends on your browser.",
     locHelpTitle: "Turn location back on",
@@ -255,7 +273,9 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     appName: "సాయ లైట్",
     cdBack: "వెనక్కి వెళ్ళు",
     cdCloseSheet: "మూసివేయి",
+    cdCountdown: "సమాధానం ఇవ్వడానికి %1$d సెకన్లు మిగిలాయి",
     cdDemoPanel: "ప్రోటోటైప్ డెమో నియంత్రణలు తెరువు",
+    cdImOk: "మీరు క్షేమంగా ఉన్నారని నిర్ధారించండి",
     cdDemoReset: "డెమో సెషన్‌ను రీసెట్ చేయి. ఏదీ పంపబడదు.",
     cdDemoZonePicker: "ప్రవేశించినట్టు చూపించడానికి ఒక జోన్ ఎంచుకోండి",
     cdMap: "విశాఖపట్నం ప్రమాద ప్రాంతాల మ్యాప్",
@@ -266,6 +286,7 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     ctaCall: "కాల్ చేయి",
     ctaContinue: "కొనసాగించు",
     ctaFinish: "పూర్తి చేయి",
+    ctaImOk: "నేను బాగున్నాను",
     ctaArmManually: "ఈ ప్రయాణాన్ని గమనించు",
     ctaImHome: "నేను ఇంటికి చేరాను",
     demoJumpFamily: "ఆత్మీయుల దశకు వెళ్లు",
@@ -287,6 +308,12 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     homeArmBannerTitle: "సాయ దానంతట అదే మేల్కొంది",
     homeHourContext: "ప్రస్తుతం, %1$s %2$s గా ఉంది",
     ctaRetry: "మళ్లీ ప్రయత్నించు",
+    checkin1Body: "అంతా బాగుందా? \"నేను బాగున్నాను\" నొక్కండి, మేము నిశ్శబ్దంగా మిమ్మల్ని గమనిస్తూ ఉంటాం.",
+    checkin1Reason: "మీరు %3$s కి %2$s ప్రాంతమైన %1$s లో ఉన్నారు.",
+    checkin1Title: "ఒకసారి చూస్తున్నాం",
+    checkin2Body: "మీ నుండి ఇంకా సమాధానం రాలేదు. వీలైనప్పుడు \"నేను బాగున్నాను\" నొక్కండి, లేదంటే కొన్ని నిమిషాల్లో మీ ఆత్మీయులను చూడమని అడుగుతాం.",
+    checkin2Title: "ఒక చిన్న గుర్తు",
+    checkinPersistNote: "దీన్ని తీసివేయడం వల్ల టైమర్ ఆగదు.",
     locHelpBody: "మీ బ్రౌజర్‌లో ఈ పేజీ సైట్ సెట్టింగ్‌లు తెరిచి, లొకేషన్‌ను అనుమతించండి. తర్వాత తిరిగి వచ్చి \"మళ్లీ ప్రయత్నించు\" నొక్కండి.",
     locHelpNote: "ఈ సెట్టింగ్ ఎక్కడ ఉంటుందో మీ బ్రౌజర్‌ను బట్టి మారుతుంది.",
     locHelpTitle: "లొకేషన్ మళ్లీ ఆన్ చేయండి",
