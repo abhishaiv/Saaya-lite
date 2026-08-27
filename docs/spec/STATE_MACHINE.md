@@ -137,7 +137,8 @@ the common case rather than the rare one, which makes the rule more important, n
 | Two overlapping zones | Use the **highest** `risk_tier`. On a tie, the higher `risk_score`. |
 | Airplane mode at escalation | Everything queues. UI shows "queued, will send when connected". Ladder timing is unaffected. |
 | No contact configured | Ladder still runs. Family step shows "no contact set, add one" and proceeds to SOS on lapse. Never block the ladder on missing config. |
-| Location permission revoked mid-session | Move to `RESOLVED(DISARMED)`, show a persistent warning. Never pretend to watch when blind. |
+| Location revoked mid-session, `AUTO_ZONE` | Move to `RESOLVED(DISARMED)`, persistent warning. It armed on containment and can no longer tell whether she is contained. Never pretend to watch when blind. |
+| Location revoked mid-session, `MANUAL` | **The session continues.** She asked to be watched, and the ladder is timers rather than coordinates, so it needs no fix to run. Show the same persistent warning, because the SOS payload will carry a last-known fix with its age stated, or none. Disarming here would take the fallback from exactly the user who would not grant location in the first place. |
 | The browser froze or closed the tab | Detect on load by comparing `deadlineEpochMs` with now. Show an honest "Saaya was stopped by your browser" notice, then apply the recovery table above. Never silently restart the countdown. |
 | She uninstalls mid-SOS | Out of scope. Do not attempt to prevent. |
 | Clock change or DST | Countdowns are absolute `deadlineEpochMs`, so a wall-clock change moves them with it. That is accepted: epoch millis are UTC and IST has no DST. Hour bands are derived from wall clock in Asia/Kolkata. Never use `performance.now()` for a deadline: it does not survive a frozen tab. |
