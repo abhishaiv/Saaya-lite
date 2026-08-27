@@ -175,6 +175,14 @@ Sent by Saaya Lite. This is a prototype and this message was not actually delive
 
 The last line is F21's disclosure and is **not removable**.
 
+`{name}` is **her** name, from `user_name` in the settings store, not the contact's. If it
+is unset, substitute `family_subject_fallback` rather than leaving a gap or omitting the
+line: the recipient still needs to know the alert is about a person and not a test.
+
+**Her name never leaves the device.** It appears only in this message, which is composed
+and displayed and never sent. It is not in the SUS event, which is anonymous, and not in
+the SOS incident, which carries a pseudonymous id. Do not add it to either.
+
 ## 9. Nearest station (F8)
 
 Haversine from her current point to each of the 37 entries in `vizag_police_points.json`.

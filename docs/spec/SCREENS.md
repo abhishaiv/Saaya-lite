@@ -46,6 +46,12 @@ Progress dots at top. No step is skippable except step 2's second contact.
 - Primary: `cta_continue`.
 
 ### S2.2 Trusted contact (F2)
+- **Her own name first**, one field: `onb_name_label`, helper `onb_name_hint`. The frozen
+  family message in `BUSINESS_RULES.md` §8 opens "Saaya alert - {name} may need help", and
+  that `{name}` is **hers**, not the contact's. Without it the message cannot say who it is
+  about, which is the one thing its recipient needs.
+- **Optional.** If she skips it the ladder still runs and the message substitutes
+  `family_subject_fallback`. Never block onboarding on it.
 - `onb_contact_title`, `onb_contact_body`.
 - Name field, phone field (prefix `+91` fixed, 10 digits).
 - **Manual entry only. There is no contact picker.** `SECRETS_AND_ACCESS.md` states that

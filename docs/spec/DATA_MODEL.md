@@ -183,6 +183,7 @@ It is still never stored in plaintext.
 |---|---|
 | `pin_hash` | SHA-256 of (salt + pin) |
 | `pin_salt` | 16 random bytes, base64 |
+| `user_name` | her own name, for the family message subject. **Device only, never uploaded.** Absent is valid. |
 | `language` | `en` \| `te` |
 | `onboarded` | Boolean |
 

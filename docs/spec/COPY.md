@@ -18,6 +18,9 @@ demo video.
 | **Onboarding** | | |
 | `onb_welcome_title` | You do not have to press anything | మీరు ఏదీ నొక్కాల్సిన అవసరం లేదు |
 | `onb_welcome_body` | Saaya watches the stretch, not you. It wakes on its own when you enter an area that has a record, at an hour that matters. | సాయ మిమ్మల్ని కాదు, మార్గాన్ని గమనిస్తుంది. రికార్డు ఉన్న ప్రాంతంలోకి, ముఖ్యమైన సమయంలో మీరు ప్రవేశించినప్పుడు అది దానంతట అదే మేల్కొంటుంది. |
+| `onb_name_label` | Your name | మీ పేరు |
+| `onb_name_hint` | So your favourites know who the alert is about | హెచ్చరిక ఎవరి గురించో మీ ఆత్మీయులకు తెలియడానికి |
+| `family_subject_fallback` | Someone using Saaya Lite | సాయ లైట్ ఉపయోగిస్తున్న వ్యక్తి |
 | `onb_contact_title` | Your favourites | మీ ఆత్మీయులు |
 | `onb_contact_body` | One person is enough. We only ask your favourites to check on you if you miss two check-ins. | ఒక్కరు చాలు. మీరు రెండు చెక్-ఇన్‌లు మిస్ అయితేనే మీ ఆత్మీయులను చూడమని అడుగుతాం. |
 | `onb_contact_privacy` | This stays on your phone. Saaya never uploads your favourites. | ఇది మీ ఫోన్‌లోనే ఉంటుంది. సాయ మీ ఆత్మీయులను ఎప్పుడూ అప్‌లోడ్ చేయదు. |
