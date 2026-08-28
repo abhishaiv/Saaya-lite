@@ -1,0 +1,73 @@
+{
+  "schema": "saaya-lite/round2_graph/1",
+  "kind": "isolated_build_graph",
+  "note": "Scaffolding for a second agent (Gemini) covering ground on M2 and M3 while the main submission ships on the round-one scope. This graph is deliberately separate from graph/build_graph.json, which belongs to the agent working on branch main. Never merge the two files; never write to graph/build_graph.json or graph/knowledge_graph.json from this worktree.",
+  "isolation": {
+    "worktree": "/tmp/saaya-round2",
+    "branch": "round2/backend",
+    "base_commit": "8ec7155",
+    "rule": "This branch is never pushed to a state that main depends on, and is never merged into main by an agent. Integration is a human decision, made after both nodes below pass every gate listed and are reviewed on their own branch diff. Until then this work does not exist as far as the submission is concerned."
+  },
+  "why_this_is_safe_to_build_now": "The live submission at https://saaya-lite.vercel.app has no Firebase code in it at all: M2 and M3 were cut from round one under time pressure, and every document that claimed them was corrected to say so. Building them here, isolated, does not put the submission at risk, because nothing here reaches main or Vercel until a human says so.",
+  "always_read": {
+    "files": ["AGENTS.md", "docs/spec/SPEC_README.md", "docs/FEATURES.md", "docs/SCOPE.md"],
+    "note": "Re-read at the start of every node. FEATURES.md and SCOPE.md currently say F22/F27/F28/F29 and the state view are 'Cut, round two' — that is accurate from main's point of view and is exactly the gap this graph exists to fill. Building them here does not contradict those documents; it is what makes them true again later, on purpose, after review."
+  },
+  "order": ["M2", "M3"],
+  "total_hours": 9.5,
+  "nodes": {
+    "M2": {
+      "id": "M2",
+      "seq": 1,
+      "title": "Data and trust boundary: Firebase, offline queue, anonymiser, writers, trust screen",
+      "hours": 6.0,
+      "requires": [],
+      "produces": ["firebase_project", "anon_auth", "firestore_client", "queue_repository", "backoff_policy", "anonymiser", "sus_writer", "sos_writer", "firestore_rules_written", "police_view", "settings_police_entry"],
+      "reads": ["SETUP.md", "SECRETS_AND_ACCESS.md", "DATA_MODEL.md", "ARCHITECTURE.md", "BUSINESS_RULES.md", "TEST_PLAN.md", "WEB_PLATFORM.md", "PROBLEM.md", "SCREENS.md", "COPY.md", "COMPONENT_LIBRARY.md", "OPERATING_MODEL.md"],
+      "risk": "HIGHEST",
+      "verify_lenses": ["spec", "boundary", "invention"],
+      "verify_command": "This is the ONE node in the whole project that gets full adversarial verification, and it is the reason: it is the trust boundary. Spawn spec, boundary and invention as fresh-context passes (sub-agents if available, otherwise re-read the node fresh in a new context before each pass) and repeat until all three pass. Concentrate every pass on the anonymiser and the two Firestore writers.",
+      "the_one_rule_that_cannot_bend": "Nothing identifying leaves the device before SOS. The anonymiser test asserts these keys are ABSENT from a SUS event: latitude, longitude, sessionId, uid, deviceId, name, phone. If any of them can reach a SUS event under any code path, that is not a bug to note and move past, it is a stop. Do not ship a version of this node where that test is weakened, skipped, or marked known-limitation to make progress.",
+      "config": {
+        "source": ".env.local in this worktree, already populated with the real saaya-lite Firebase Web app config",
+        "vars": ["NEXT_PUBLIC_FIREBASE_API_KEY", "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN", "NEXT_PUBLIC_FIREBASE_PROJECT_ID", "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET", "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID", "NEXT_PUBLIC_FIREBASE_APP_ID"],
+        "rule": "These are not secrets (Firebase web config is public by design; Firestore rules are the real boundary), but .env.local still must never be committed. It already matches the .gitignore pattern .env.* — do not change that pattern and do not commit the file.",
+        "note": "No measurementId is configured and none should be added. SETUP.md says Analytics is disabled for this project deliberately: 'we collect nothing.' Do not add the Analytics SDK to reach it."
+      },
+      "build_order": [
+        "1. firebase_project + anon_auth: initialise the Firebase app from the env vars above, anonymous sign-in only. No other sign-in method.",
+        "2. anonymiser: pure function first, fully unit tested BEFORE it touches Firestore. This is the highest-value hour in the node.",
+        "3. firestore_client + queue_repository + backoff_policy: the offline queue from BUSINESS_RULES section 11. Enqueue locally first, flush with backoff, never lose a write.",
+        "4. sus_writer, sos_writer: thin wrappers that hand the queue exactly what the anonymiser produced. No new fields invented at this layer.",
+        "5. firestore_rules_written: write firestore.rules per DATA_MODEL / SECRETS_AND_ACCESS. Do NOT run `firebase deploy`. Rules are written and tested locally against the emulator or reviewed by hand; deploying them to the live project is a founder action outside this node's scope, same standing rule as everywhere else in this project.",
+        "6. police_view + settings_police_entry: S10, the trust screen. Build this LAST, after the anonymiser is real, so it renders what the anonymiser actually produces rather than a hand-written sample."
+      ],
+      "done_when": [
+        "npx vitest run passes, including a new anonymiser test file that asserts the absent-keys list above on both a SUS event and an SOS incident",
+        "npx tsc --noEmit and npm run lint are clean",
+        "python3 scripts/grounded_check.py over every new/changed file reports 0 ungrounded literals",
+        "python3 scripts/reads_check.py still reports 0 unresolved (this node must not break the type contract closure the rest of the app depends on)",
+        "S10 (police view) renders live from a real anonymiser call against a fixture session, not a hard-coded sample string",
+        "firestore.rules exists and is reasoned about in the PR/branch notes, but is NOT deployed anywhere"
+      ]
+    },
+    "M3": {
+      "id": "M3",
+      "seq": 2,
+      "title": "Console: seed zones and the state view",
+      "hours": 3.5,
+      "requires": ["M2"],
+      "produces": ["firestore_zones_seeded", "console_live_url", "console_snapshot_listener", "firestore_indexes"],
+      "reads": ["DATA_MODEL.md", "SETUP.md", "CONSOLE_SPEC.md", "DESIGN_SYSTEM.md", "OPERATING_MODEL.md"],
+      "risk": "med",
+      "verify_lenses": ["spec"],
+      "verify_command": "One spec verifier, one round. This is a read-only display surface over M2's writes; the risk lives in M2, not here.",
+      "note": "CONSOLE_SPEC.md says the console is a route in the same Next.js app on Vercel, not Firebase Hosting, and reads Firestore directly with the web SDK in read-only mode. Keep it plain: the live record list and the expandable timeline are what the video would use if this is ever integrated. The stat strip and the 24h/7d/30d filters are lower priority; build them only after the list and timeline work and are tested.",
+      "done_when": [
+        "a seed script populates sus_events / sos_incidents in the real saaya-lite project from local fixtures, never from the frozen Vizag assets themselves",
+        "the console route renders a live snapshot listener: writing a new fixture record while the page is open updates the list with no refresh",
+        "npx vitest run, tsc, lint, grounded_check all clean, same bar as M2"
+      ]
+    }
+  }
+}
