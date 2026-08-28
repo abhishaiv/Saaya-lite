@@ -16,3 +16,15 @@ This log records decisions, progress, and verification results for Node M2 and N
 - **Firestore Security Rules & Indexes**: `firestore.rules` and `firestore.indexes.json` written per DATA_MODEL.md. Enforces `!request.resource.data.keys().hasAny(['latitude','longitude','sessionId','uid'])` at the database level. (Rules are NOT deployed).
 - **S10 Trust Screen**: `src/ui/screens/police/PoliceViewScreen.tsx` renders all 3 honest sections (Right now: nothing, If you miss two check-ins, If SOS triggers) generated dynamically from the real anonymiser with sample sessions, plus permanent prototype disclaimer footer. Integrated into `SettingsScreen` and `HomeScreen`.
 - **Verification & Gates**: 168 tests passed, build and lint clean, 0 ungrounded literals, 0 unresolved type reads.
+
+### Node M3 Completed: Console (Seed Fixtures and State View)
+- **Synthetic Seed Script**: `scripts/seed-fixtures.mjs` populates synthetic `sus_events` and `sos_incidents` (marked with `source: "CONSOLE_DEMO"`), never modifying or pulling from frozen Vizag assets directly.
+- **Console Route & Architecture**: `app/console/page.tsx` serves the state view console at `/console`.
+- **Live Snapshot Listener**: `src/ui/screens/console/consoleStore.ts` subscribes via `onSnapshot` to `sus_events` and `sos_incidents` in real time.
+- **Console UI Components**:
+  - `ConsoleHeader`: PROTOTYPE badge, no-government disclaimer, `▶ Watch a journey happen` live demo button with 90s countdown cooldown, and real-time narration strip.
+  - `ConsoleStatStrip`: Displays SUS events count, SOS incidents count, zones flagged count, repeat zones count, and prominent False-Positive Rate (`CANCELLED_BY_USER / total SUS`).
+  - `ConsoleFilters`: 24h / 7d / 30d time windows, All / SUS / SOS type filter, Hide Cancelled toggle (with count of hidden records).
+  - `ConsoleRecordList`: Newest-first record stream. SUS rows display zone, tier, hour, date, outcome, and unlinkability annotation. SOS rows display precise coordinates, station, status, contacts count, and expandable event sequence timeline.
+- **Scripted Journey Trigger**: Replays a 30s synthetic journey writing live Firestore documents with `source: "CONSOLE_DEMO"`, advances the narration strip, and auto-expands the SOS timeline upon arrival.
+- **Verification & Gates**: 171 tests passed (3 new console tests), build and lint clean, 0 ungrounded literals across 26 files, 0 unresolved type reads.

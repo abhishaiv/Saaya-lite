@@ -65,6 +65,7 @@ export interface AnonymiserSosInput {
   readonly nearestStation: SosNearestStation | null;
   readonly timeline: readonly SosTimelineEntry[];
   readonly contactsNotified: number;
+  readonly source?: SusSource;
   readonly triggeredAt?: unknown;
 }
 
@@ -82,6 +83,7 @@ export interface SosIncidentPayload {
   readonly contactsNotified: number;
   readonly status: SosStatus;
   readonly stoppedAt: unknown | null;
+  readonly source: SusSource;
   readonly appVersion: string;
 }
 
@@ -189,6 +191,7 @@ export function createSosIncidentPayload(
     contactsNotified: contactsCount,
     status: "ACTIVE",
     stoppedAt: null,
+    source: input.source ?? "APP",
     appVersion: SAAYA_APP_VERSION,
   };
 
