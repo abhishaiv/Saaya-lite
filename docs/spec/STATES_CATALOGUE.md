@@ -29,7 +29,7 @@ common way a demo breaks in front of a judge.
 | phone wrong length | inline "10 digits, without the country code" |
 | notifications denied | continue. Banner on Home with `warn_notif_denied`, offering `cta_retry`, which re-requests. **No settings link:** a page cannot open browser settings. If the re-request returns `denied` without prompting, the browser has remembered it; say so rather than looping. |
 | location denied once | rationale again, softer. Continue button stays enabled. |
-| location denied permanently | the shared S11b location help sheet, plus a working Continue. A retry that is silently denied leaves S11b open with its instructions visible. **Never dead-end.** |
+| location denied permanently | `onb_location_partial`, plus a line on re-enabling it in the browser's site settings, plus a working Continue. **Never dead-end.** |
 | PIN weak | `err_pin_weak` inline, boxes clear |
 | PIN mismatch | `err_pin_mismatch`, both entries clear, focus returns to the first box |
 
@@ -39,8 +39,8 @@ common way a demo breaks in front of a judge.
 | map tiles loading | zones and location render immediately over `background`. **Never a blocking spinner.** |
 | tiles failed | dark background, zones drawn, small "Map offline, zones still work" note |
 | location unavailable | no dot, `StatusPill` unchanged, `caption` in the sheet: "Finding you" |
-| location permission revoked while running | persistent `DisclosureBanner`, `warn_location_denied`. An `AUTO_ZONE` session moves to `RESOLVED(DISARMED)` because containment can no longer be known; a `MANUAL` session continues on its timer ladder with the same honest warning. |
-| position unavailable | `loc_slow`; keep trying. This is a slow fix, not a denial, so there is nothing to re-enable and no settings path to offer. |
+| location permission revoked while running | persistent `DisclosureBanner`, `warn_location_denied`, session moves to `RESOLVED(DISARMED)` |
+| position unavailable | banner explaining location is on but no fix is arriving, with the browser's site-settings route. No dead end. |
 | zone data failed to parse | **fatal, and say so.** "Saaya Lite could not load Visakhapatnam data." No silent empty map, because an empty map looks like a safe city. |
 | queue has `FAILED_PERMANENT` | persistent banner, `warn_queue_failed`, tap to retry |
 | tab was closed or frozen mid-session | on next load, `warn_page_stopped`, then the recovery table in `STATE_MACHINE.md` runs. Never silently restart a countdown. |

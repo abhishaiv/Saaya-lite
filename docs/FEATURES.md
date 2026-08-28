@@ -102,7 +102,7 @@ Without this stage there is no product, only an engine. Nobody installs an engin
 | F19 | Context-rich escalation | Her contact receives: which zone, what hour, that zone's reported history, her last known area, and that she did not answer a check | Compare with Shakthi, where 11,60,146 presses produced 3,193 FIRs because a press carries none of this. Context is not decoration, it is what makes someone act. | Real |
 | F20 | Cancel window | A grace period with a visible timer | She fell asleep. Her phone was in her bag. False positives are what get a safety app deleted, and this is also the last gate before an institutional record. | Real |
 | F21 | Mocked delivery, disclosed on screen | The message is composed and shown, marked as not dispatched | Real SMS needs India DLT registration, months of regulatory lead. The disclosure lives in the product, not only the write-up. | **MOCKED** |
-| F22 | Offline queue | Nothing visible, it just survives | A dropped network on an unlit road is normal, not exceptional. Losing signal must never lose the escalation. | Real |
+| F22 | Offline queue | Nothing visible, it just survives | A dropped network on an unlit road is normal, not exceptional. Losing signal must never lose the escalation. | **Cut, round two** |
 
 ## Stage 6: SOS
 
@@ -117,9 +117,9 @@ Without this stage there is no product, only an engine. Nobody installs an engin
 
 | # | Feature | What she experiences | Why it helps her | Status |
 |---|---|---|---|---|
-| F27 | Anonymised SUS records reach the state | Nothing, by design | Her experience counts toward where patrols stand without her name, her route, or a complaint she was never going to file. This is the answer to NFHS-5's 14.2%. | Real |
-| F28 | "What the police see", in-app | Three honest states: what they see right now (nothing), what a SUS record looks like, what SOS would send | The trust feature. She sees exactly what left her phone, rather than a privacy policy she will not read. | Real |
-| F29 | Web console, time-filtered | Last 24 hours, 7 days, 30 days | A stretch that keeps waking the app at 4 a.m. becomes visible as a pattern without any density machinery. Also our live demo link: a URL, no install, no login. | Real |
+| F27 | Anonymised SUS records reach the state | Nothing, by design | Her experience counts toward where patrols stand without her name, her route, or a complaint she was never going to file. This is the answer to NFHS-5's 14.2%. | **Cut, round two** |
+| F28 | "What the police see", in-app | Three honest states: what they see right now (nothing), what a SUS record looks like, what SOS would send | The trust feature. She sees exactly what left her phone, rather than a privacy policy she will not read. | **Cut, round two** |
+| F29 | Web console, time-filtered | Last 24 hours, 7 days, 30 days | A stretch that keeps waking the app at 4 a.m. becomes visible as a pattern without any density machinery. Also our live demo link: a URL, no install, no login. | **Cut, round two** |
 | F30 | "Connected to no government system" | A permanent disclaimer, app and console | We are not AP Police, Shakthi, T-Safe, 112 or ERSS, and we never imply otherwise. | Real |
 
 ## Stage 8: The conditions she actually lives in

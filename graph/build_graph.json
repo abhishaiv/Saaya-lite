@@ -11,7 +11,7 @@
   "copy:ios_verbatim",
   "invariant:trust_boundary_at_sos"
  ],
- "total_hours": 40.5,
+ "total_hours": 29.5,
  "order": [
   "T1.1",
   "T2.1",
@@ -19,10 +19,7 @@
   "T4.2",
   "T1.3",
   "M4",
-  "M1",
-  "M2",
-  "M3",
-  "M5"
+  "M1"
  ],
  "nodes": {
   "T1.1": {
@@ -1355,7 +1352,7 @@
    ],
    "risk": "high",
    "cumulative_hours": 35.5,
-   "status": "pending",
+   "status": "dropped",
    "run_id": null,
    "gates_passed": [],
    "artifacts": [],
@@ -1374,7 +1371,9 @@
     "T7.2",
     "T7.3"
    ],
-   "merge_reason": "One data layer, one trust boundary. Splitting it made the anonymiser load DATA_MODEL separately from the queue that carries its output. T7.3 rejoins here: the trust screen renders exactly what the anonymiser produces, so building it beside the anonymiser is the one place it can be verified truthful rather than illustrative."
+   "merge_reason": "One data layer, one trust boundary. Splitting it made the anonymiser load DATA_MODEL separately from the queue that carries its output. T7.3 rejoins here: the trust screen renders exactly what the anonymiser produces, so building it beside the anonymiser is the one place it can be verified truthful rather than illustrative.",
+   "dropped_at": "2026-08-28",
+   "dropped_reason": "Cut 2026-08-28 with two hours to submission. The citizen app end to end is the submission; the backend and console are round two. Nothing may claim them in the meantime."
   },
   "M3": {
    "id": "M3",
@@ -1403,7 +1402,7 @@
    ],
    "risk": "med",
    "cumulative_hours": 39.0,
-   "status": "pending",
+   "status": "dropped",
    "run_id": null,
    "gates_passed": [],
    "artifacts": [],
@@ -1418,7 +1417,9 @@
     "T8.1",
     "T8.2"
    ],
-   "merge_reason": "Seeding exists only to give the console something to read. Same Firestore shape, same load."
+   "merge_reason": "Seeding exists only to give the console something to read. Same Firestore shape, same load.",
+   "dropped_at": "2026-08-28",
+   "dropped_reason": "Cut 2026-08-28 with two hours to submission. The citizen app end to end is the submission; the backend and console are round two. Nothing may claim them in the meantime."
   },
   "M4": {
    "id": "M4",
@@ -1535,7 +1536,7 @@
    ],
    "risk": "med",
    "cumulative_hours": 40.5,
-   "status": "pending",
+   "status": "dropped",
    "run_id": null,
    "gates_passed": [],
    "artifacts": [],
@@ -1550,7 +1551,9 @@
     "T9.1",
     "T9.2"
    ],
-   "merge_reason": "Two small verification nodes over the same submission and compliance set. Merged they load it once. The submission page they used to sit beside was dropped 2026-08-27: About already carries every disclosure it would have shown."
+   "merge_reason": "Two small verification nodes over the same submission and compliance set. Merged they load it once. The submission page they used to sit beside was dropped 2026-08-27: About already carries every disclosure it would have shown.",
+   "dropped_at": "2026-08-28",
+   "dropped_reason": "Cut 2026-08-28 with two hours to submission. The citizen app end to end is the submission; the backend and console are round two. Nothing may claim them in the meantime."
   }
  },
  "verification": {
@@ -1570,28 +1573,6 @@
    "before": "T1.1",
    "gate": "connect the GitHub repo to Vercel so previews build",
    "why": "T1.1 produces vercel_deploy and its extra gate is preview_url_loads_on_mobile. This is an account action, not a public act: a preview URL is not the submission link. Distinct from the T2.2 gate."
-  },
-  {
-   "before": "M2",
-   "gate": "register the Firebase Web app and supply its config",
-   "why": "T1.2 performs anonymous auth with the Firebase web SDK, which needs a Web app registration. The two mobile app ids on the project do not work for it. SETUP.md deferred this to T8.2, which is four nodes too late.",
-   "moved_2026_08_24": true
-  },
-  {
-   "before": "M3",
-   "gate": "Firestore rules and public read go live",
-   "why": "public read is hard to un-publish; confirm every record is synthetic first",
-   "moved_2026_08_24": true
-  },
-  {
-   "before": "M5",
-   "gate": "the production Vercel URL is shared as the submission's live link",
-   "why": "This is the judged link; once shared it is judged. Moved off the map node 2026-08-24: publishing the URL never blocked BUILDING the map, and gating it there stalled work for no reason. It belongs where the link is actually published."
-  },
-  {
-   "after": "M5",
-   "gate": "submission form",
-   "why": "no grace period after 2026-08-28 20:00 IST (T9.0 merged into M5 2026-08-24)"
   }
  ],
  "architecture": {
@@ -1650,6 +1631,9 @@
  },
  "retired": {
   "dropped": [
+   "M2",
+   "M3",
+   "M5",
    "T8.3",
    "T9.0"
   ],
@@ -1694,14 +1678,6 @@
   {
    "after": "M1",
    "state": "THE LADDER RUNS. Shadow, check-in 1, check-in 2, family escalation, SOS, end to end on a phone. This is the MVP: if everything stops here, there is still a working product to demo."
-  },
-  {
-   "after": "M3",
-   "state": "THE ARGUMENT IS COMPLETE. The console receives the anonymous SUS event and the SOS incident live. This is what the submission is actually about."
-  },
-  {
-   "after": "M5",
-   "state": "SUBMITTABLE. About carries the disclosures; the video and the live link go to the form."
   }
  ]
 }

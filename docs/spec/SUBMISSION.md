@@ -7,7 +7,7 @@ Built on E9. Every claim traces to `../EVIDENCE.md` or to a verification output.
 |---|---|
 | **A live public link that opens in a browser without requesting access** | the Vercel URL. The app IS the link. |
 | *"Reviewers will not download a mobile app"* | we pivoted off the previous platform for Android for exactly this |
-| *"Reviewers will test the citizen experience, not an admin panel"* | the citizen journey is the deliverable; the console is evidence shown in the video |
+| *"Reviewers will test the citizen experience, not an admin panel"* | the citizen journey IS the deliverable. The console is cut to round two and is claimed nowhere. |
 | Mock consumer login credentials **if required** | **not required.** No account, no OTP, no password. Say so; do not leave them hunting for a login box. |
 | **One video, max 2:00** | 1:00 citizen demo, 1:00 how and why. Both teammates may present. |
 | **Summary under 250 words** | template below. Under, not near. |
@@ -41,7 +41,7 @@ only then does anything identifying leave her phone. She is told the moment that
 crossed.
 
 Real: the map, zone detection, arming, the ladder, escalation, the PIN-protected SOS, both
-writes to the state view. Mocked and labelled in the product: SMS delivery, which needs
+the four-step ladder. Mocked and labelled in the product: SMS delivery, which needs
 Indian DLT registration. Connected to no government system. No AI: every decision is a
 stated rule.
 
@@ -61,7 +61,7 @@ That is 249 words. Count before submitting.
 | 0:40-0:52 | **it arms with no press.** Hands visibly off. |
 | 0:52-1:00 | check-in, missed, family told with context, SOS |
 | 1:00-1:20 | architecture: the trust boundary, what crosses and when |
-| 1:20-1:40 | the state view: not a dot, a sequence. The 0.28% answered. |
+| 1:20-1:40 | About: what is real, what is mocked, what this is not. The honesty is the claim. |
 | 1:40-1:55 | how it was built: spec frozen first, Codex against 300+ facts, adversarial verifiers |
 | 1:55-2:00 | disclosures: no government link, synthetic data, no AI, browser limits |
 
@@ -86,7 +86,7 @@ Saaya is an existing iOS product, and I am not going to let you discover that on
 What is reused: the problem statement, the 12 interviews, the audited Visakhapatnam dataset,
 the colour tokens and some check-in strings. What is new and does not exist in the iOS app:
 auto-arming from zone crossed with hour, the four-step ladder with the trust boundary as a
-visible step, the anonymised zone-level civic signal, the state view console, and the
+visible step, and the
 entire public-service framing. The repository contains no Swift and every commit falls
 inside the hackathon window. [full table in `../COMPLIANCE.md`]
 
@@ -127,8 +127,9 @@ facing violence sought any help, and about **7%** went to police.
 [the MOCKED list from `SCOPE.md`, verbatim]
 - SMS and WhatsApp delivery: composed and shown, not sent. Real delivery needs India DLT
   registration, a months-long regulatory process.
-- The state view is our own backend. **It is connected to no government system.**
-- Firestore read is public for the demo. In production this becomes role-based access with
+- There is no backend in this build. Nothing leaves the device at all, which is stronger
+  than the privacy claim we set out to make. **Connected to no government system.**
+- There is no Firestore in this build. In round two the state view returns with role-based access and
   an audit trail.
 - IndexedDB uses destructive migration, correct for a prototype and wrong for a real product.
 
@@ -171,7 +172,7 @@ We would rather be checked than believed.
 | No AI anywhere | `grep -ri "openai\|gpt\|ml\|model" app/src` → [paste V7 output] |
 | Cannot listen, watch or send | manifest has no `RECORD_AUDIO`, `CAMERA`, `SEND_SMS` → [paste V8 output] |
 | Favourites never leave the device | `allowBackup="false"`, no upload path, `FavouriteRepository` has no remote |
-| No coordinate in a SUS record | `AnonymiserTest`, plus the Firestore rule rejecting `latitude`/`longitude`/`sessionId`/`uid` |
+| Nothing leaves the device at all | there is no network call in the build. Open devtools, run the whole ladder, watch the network tab stay empty. Stronger than the claim we set out to make. |
 | Nothing sent before SOS | `SessionEngineTest`: zero write commands across IDLE → SHADOW → CHECKIN_1 → CHECKIN_2 |
 
 ### Known limitations

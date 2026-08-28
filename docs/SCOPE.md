@@ -21,9 +21,10 @@ not read as a stripped demo. Fewer things, finished.
 2. **Shadow.** Zone and hour arm it. No press. Nothing leaves the phone.
 3. **SUS.** Adaptive check-in ladder. Still nothing leaves the phone.
 4. **Family escalation.** Context-rich, with a cancel window. Contacts only.
-5. **SOS.** PIN-protected. The state view receives the incident, and she is told.
+5. **SOS.** PIN-protected, full-bleed, and she is told exactly what would be shared.
 
-Plus the state view itself: anonymised SUS records, full SOS incidents, and a web console
+**Cut to round two 2026-08-28:** the state view itself, anonymised SUS records, full SOS
+incidents, and a web console
 filtered by last 24 hours, 7 days or 30 days.
 
 **Saaya Lite contains no AI model, in the product or behind it.** Entirely deterministic,
@@ -54,9 +55,9 @@ implying intelligence we did not build.
 | SUS: adaptive check-in ladder | **REAL** |
 | Family escalation, context, cancel window, offline queue | **REAL** |
 | SOS, PIN-protected stop | **REAL** |
-| Anonymised SUS records to the state view | **REAL** |
-| Full SOS incident to the state view | **REAL** |
-| Web console with 24h / 7d / 30d filters | **REAL**, and this is the live demo link |
+| Anonymised SUS records to the state view | **Cut, round two** |
+| Full SOS incident to the state view | **Cut, round two** |
+| Web console with 24h / 7d / 30d filters | **Cut, round two.** The live demo link is the citizen app. |
 | Demo trigger to simulate zone entry | **REAL, a dev affordance**, labelled on screen |
 | SMS and WhatsApp delivery to contacts | **MOCKED**, disclosed in the UI |
 | Connection to AP Police, Shakthi, T-Safe, 112, ERSS | **NONE**, stated in-product |
@@ -87,7 +88,7 @@ install it before she ever needed it.** Both survive the AI cut intact.
 |---|---|---|
 | App | **Next.js + TypeScript, mobile-first web** | Pivoted 2026-08-19: the brief states reviewers will not download a mobile app. ~94% of this spec transferred unchanged. |
 | Backend | Firebase, **a NEW project**, never Saaya production | Protects the live iOS product. |
-| State view console | A route in the same Next.js app on Vercel, reading Firestore | The live demo link. No install, no login, no access request. |
+| State view console | **Cut 2026-08-28, round two.** Not built and claimed nowhere. | The live link is the citizen app. |
 | Zone data | Existing audited Vizag dataset, verified present 2026-08-18 | 24 classified zones, station points, info cards. A port, not a build. |
 | AI | **None** | Founder decision. No OpenAI API key required. |
 | Build assistant | Codex CLI | Load-bearing. See below. |

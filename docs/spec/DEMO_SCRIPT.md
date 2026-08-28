@@ -13,7 +13,7 @@ Recorded on E9. Do not improvise on the day.
 | Simulated hour | 04:05, `NIGHT_DEEP` |
 | Favourite | one synthetic contact, "Amma", synthetic number |
 | Console | open on a second screen, live, filter Last 24 hours |
-| Capture | screen recording at device resolution, plus a browser capture of the console |
+| Capture | screen recording at device resolution |
 
 ## Shot list
 
@@ -27,9 +27,8 @@ Recorded on E9. Do not improvise on the day.
 | 1:20 - 1:38 | Check-in 1, lavender, then check-in 2, amber | "A check-in, and it tells her why it checked now. Not a fixed timer. If she answers, it goes quiet. She does not answer." |
 | 1:38 - 1:58 | Family escalation, red, the exact message, the disclosure banner in frame | "Her favourite gets the area, the hour, that area's record, and that she missed two checks. Not a blank alarm. The prototype label is on screen: we compose this message, we do not send it, because real delivery needs Indian DLT registration." |
 | 1:58 - 2:12 | Cancel window lapses. SOS, instant, red. | "She still does not answer. Now, and only now, SOS. And she is told, on screen, that the state view has it." |
-| 2:12 - 2:30 | **"What the police see"**, scrolling the three sections | "This is the screen we care about most. Until this moment the state saw nothing. A missed check-in gives them an area, an hour and a date, with no coordinate and nothing linking it to any other trip she has taken. Only SOS gives them her." |
-| 2:30 - 2:48 | Cut to the live console. The incident appears without refresh. Expand the timeline. | "And here is what a control room gets. Not a dot. A sequence. That is the answer to nought point two eight percent." |
-| 2:48 - 3:00 | Console header disclaimer, then the closing card | "Saaya Lite is a prototype. It is connected to no government system, every record is synthetic, and there is no AI in it: every decision is a rule you can read. Built with Codex in nine evenings." |
+| 2:12 - 2:30 | Hold on the SOS screen, then the About screen's What is mocked list | "Saaya Lite is a prototype. The message to her favourites is composed and shown on screen, never sent, because real delivery needs Indian DLT registration. Every limit is written into the product, not just the write-up." |
+| 2:30 - 2:45 | Closing card | "This is the tier missing below India's emergency apps: the one that works before anything has happened. She pressed nothing." |
 
 ## Rules for the recording
 
@@ -46,6 +45,6 @@ Recorded on E9. Do not improvise on the day.
 
 | If | Then |
 |---|---|
-| Live console update fails on camera | pre-record the console segment separately and cut to it. Never fake it with a mockup. |
+| The live link is slow on venue wifi | the map draws zones before tiles by design, so record with tiles failing if need be. Never fake it with a mockup. |
 | Screen recorder drops frames on the map | record the map segment at 30 fps and the rest at 60 |
 | Telugu unverified by the founder | record in English only and say the app ships English and Telugu, rather than showing unverified strings |
