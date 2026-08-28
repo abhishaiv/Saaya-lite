@@ -83,6 +83,9 @@ const MILLISECONDS_PER_SECOND = 1_000; // GROUNDED-EXEMPT: SI unit conversion.
 const TILE_TIMEOUT_MS = TILE_TIMEOUT_SEC * MILLISECONDS_PER_SECOND;
 const HALF = 2; // GROUNDED-EXEMPT: radius and anchor are half the specified diameter.
 
+export const OPEN_STREET_MAP_TILE_URL =
+  "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+
 type ZoneLayers = Readonly<{
   fill: Leaflet.Polygon;
   glow: Leaflet.Polygon;
@@ -113,9 +116,8 @@ export async function mountLeafletMap(
     MAP_ZOOM_DEFAULT,
   );
 
-  const retinaSuffix = globalThis.devicePixelRatio > 1 ? "@2x" : "";
   const tiles = L.tileLayer(
-    `https://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}${retinaSuffix}.png`,
+    OPEN_STREET_MAP_TILE_URL,
     { maxZoom: MAP_ZOOM_MAXIMUM, minZoom: MAP_ZOOM_MINIMUM },
   );
   let firstTileArrived = false;
@@ -160,14 +162,14 @@ export async function mountLeafletMap(
       color: zone.colorHex,
       fill: false,
       interactive: false,
-      opacity: ZONE_GLOW_OPACITY,
+      opacity: 0, // No glow until this zone is selected.
       weight: ZONE_GLOW_STROKE_PX,
     }).addTo(map);
     const fill = L.polygon(points, {
       bubblingMouseEvents: false,
       color: zone.colorHex,
       fillColor: zone.colorHex,
-      fillOpacity: zone.opacity,
+      fillOpacity: 0, // Outline-first until the user selects this zone.
       opacity: 1, // GROUNDED-EXEMPT: full-strength stroke is the structural opacity ceiling.
       weight: ZONE_STROKE_PX,
     }).addTo(map);
@@ -230,12 +232,15 @@ export async function mountLeafletMap(
       const mapZone = mapZones.find(({ zone }) => zone.stationId === zoneId);
       if (mapZone === undefined) continue;
       layers.fill.setStyle({
-        fillOpacity: Math.min(
-          1, // GROUNDED-EXEMPT: CSS/Leaflet opacity ceiling.
-          mapZone.zone.opacity + (selected ? ZONE_SELECTED_OPACITY_RAISE : 0),
-        ),
+        fillOpacity: selected
+          ? Math.min(
+              1, // GROUNDED-EXEMPT: CSS/Leaflet opacity ceiling.
+              mapZone.zone.opacity + ZONE_SELECTED_OPACITY_RAISE,
+            )
+          : 0,
         weight: selected ? ZONE_SELECTED_STROKE_PX : ZONE_STROKE_PX,
       });
+      layers.glow.setStyle({ opacity: selected ? ZONE_GLOW_OPACITY : 0 });
     }
   }
 

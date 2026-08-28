@@ -11,10 +11,14 @@ import type { M4Copy } from "../../copy/strings";
 import {
   hasFavouriteInput,
   isCompletePin,
+  isValidIndianMobileNumber,
   isWeakPin,
+  ONBOARDING_PHONE_COUNTRY_CODE,
+  ONBOARDING_PHONE_DIGITS,
+  toIndianE164,
 } from "./onboardingRules";
 
-type OnboardingStep = "FAVOURITE" | "LOCATION" | "PIN";
+type OnboardingStep = "WELCOME" | "FAVOURITE" | "LOCATION" | "PIN";
 type LocationResult = "RATIONALE" | "GRANTED" | "DENIED";
 
 export interface OnboardingScreenProps {
@@ -29,7 +33,7 @@ export function OnboardingScreen({
   onCompleted,
   repository,
 }: OnboardingScreenProps) {
-  const [step, setStep] = useState<OnboardingStep>("FAVOURITE");
+  const [step, setStep] = useState<OnboardingStep>("WELCOME");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [userName, setUserName] = useState("");
@@ -48,7 +52,7 @@ export function OnboardingScreen({
       await repository.saveUserName(userName.trim() || null);
       await repository.savePrimaryFavourite({
         name: name.trim(),
-        phone: phone.trim(),
+        phone: toIndianE164(phone),
       });
       setStep("LOCATION");
     } finally {
@@ -90,6 +94,20 @@ export function OnboardingScreen({
   return (
     <main className="onboarding-screen">
       <section aria-live="polite" className="onboarding-screen__card">
+        {step === "WELCOME" ? (
+          <section className="onboarding-screen__welcome">
+            <p className="onboarding-screen__app-name">{copy.appName}</p>
+            <OnboardingHeading
+              body={copy.onbWelcomeBody}
+              title={copy.onbWelcomeTitle}
+            />
+            <ContinueToFavourite
+              copy={copy}
+              onClick={() => setStep("FAVOURITE")}
+            />
+          </section>
+        ) : null}
+
         {step === "FAVOURITE" ? (
           <form onSubmit={(event) => void saveFavourite(event)}>
             <div className="onboarding-screen__user-name">
@@ -112,24 +130,40 @@ export function OnboardingScreen({
               title={copy.onbContactTitle}
             />
             <div className="onboarding-screen__inputs">
+              <label htmlFor="favourite-name">
+                {copy.onbFavouriteNameLabel}
+              </label>
               <input
-                aria-label={copy.onbContactTitle}
                 autoCapitalize="words"
                 autoComplete="name"
+                id="favourite-name"
                 name="favourite-name"
                 onChange={(event) => setName(event.currentTarget.value)}
+                required
                 type="text"
                 value={name}
               />
-              <input
-                aria-label={copy.onbContactBody}
-                autoComplete="tel"
-                inputMode="numeric"
-                name="favourite-phone"
-                onChange={(event) => setPhone(event.currentTarget.value)}
-                type="tel"
-                value={phone}
-              />
+              <label htmlFor="favourite-phone">
+                {copy.onbFavouritePhoneLabel}
+              </label>
+              <div className="onboarding-screen__phone-input">
+                <span id="favourite-phone-prefix">
+                  {ONBOARDING_PHONE_COUNTRY_CODE}
+                </span>
+                <input
+                  aria-describedby="favourite-phone-prefix"
+                  aria-invalid={phone !== "" && !isValidIndianMobileNumber(phone)}
+                  autoComplete="tel-national"
+                  id="favourite-phone"
+                  inputMode="numeric"
+                  maxLength={ONBOARDING_PHONE_DIGITS}
+                  name="favourite-phone"
+                  onChange={(event) => setPhone(event.currentTarget.value)}
+                  required
+                  type="tel"
+                  value={phone}
+                />
+              </div>
             </div>
             <DisclosureBanner
               content={copy.onbContactPrivacy}
@@ -269,6 +303,15 @@ export function OnboardingScreen({
           gap: var(--space-12);
         }
 
+        .onboarding-screen__app-name,
+        .onboarding-screen__inputs label {
+          margin: 0;
+          font-size: var(--type-label-size);
+          font-weight: var(--weight-semibold);
+          letter-spacing: var(--type-label-tracking);
+          line-height: var(--type-label-line-height);
+        }
+
         .onboarding-screen__user-name label,
         .onboarding-screen__user-name p {
           margin: 0;
@@ -288,12 +331,28 @@ export function OnboardingScreen({
         }
 
         .onboarding-screen__user-name input,
-        .onboarding-screen__inputs input {
+        .onboarding-screen__inputs > input,
+        .onboarding-screen__phone-input {
           min-block-size: var(--minimum-touch-target);
           padding: 0 var(--space-14);
           border: var(--border-hairline) solid var(--color-surface-elevated);
           border-radius: var(--radius-control);
           background: var(--color-surface);
+          color: var(--color-text-primary);
+          font: inherit;
+        }
+
+        .onboarding-screen__phone-input {
+          display: grid;
+          grid-template-columns: max-content 1fr;
+          align-items: center;
+          gap: var(--space-12);
+        }
+
+        .onboarding-screen__phone-input input {
+          border: none;
+          outline: none;
+          background: transparent;
           color: var(--color-text-primary);
           font: inherit;
         }
@@ -349,6 +408,17 @@ function OnboardingHeading({ body, title }: Readonly<{ body: string; title: stri
 }
 
 function ContinueToPin({ copy, onClick }: Readonly<{ copy: M4Copy; onClick: () => void }>) {
+  return (
+    <SaayaButton onClick={onClick} variant="primary" workingLabel={copy.stateWorking}>
+      {copy.ctaContinue}
+    </SaayaButton>
+  );
+}
+
+function ContinueToFavourite({
+  copy,
+  onClick,
+}: Readonly<{ copy: M4Copy; onClick: () => void }>) {
   return (
     <SaayaButton onClick={onClick} variant="primary" workingLabel={copy.stateWorking}>
       {copy.ctaContinue}

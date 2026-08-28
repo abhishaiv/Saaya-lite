@@ -135,24 +135,30 @@ export function HomeMap({
             const selected = zone.id === selectedZoneId;
             return (
               <g key={zone.id}>
-                <path
-                  d={zone.path}
-                  fill="none"
-                  pointerEvents="none"
-                  stroke={zone.colorHex}
-                  strokeOpacity={ZONE_GLOW_OPACITY}
-                  strokeWidth={ZONE_GLOW_STROKE_PX}
-                />
+                {selected ? (
+                  <path
+                    d={zone.path}
+                    fill="none"
+                    pointerEvents="none"
+                    stroke={zone.colorHex}
+                    strokeOpacity={ZONE_GLOW_OPACITY}
+                    strokeWidth={ZONE_GLOW_STROKE_PX}
+                  />
+                ) : null}
                 <path
                   aria-label={copy.ariaZone(zone.areaName, zone.riskLevel)}
                   d={zone.path}
                   data-zone-id={zone.id}
+                  data-zone-treatment={selected ? "selected" : "outline"}
                   fill={zone.colorHex}
-                  fillOpacity={Math.min(
-                    OPACITY_MAXIMUM,
-                    zone.fillOpacity +
-                      (selected ? ZONE_SELECTED_OPACITY_RAISE : 0),
-                  )}
+                  fillOpacity={
+                    selected
+                      ? Math.min(
+                          OPACITY_MAXIMUM,
+                          zone.fillOpacity + ZONE_SELECTED_OPACITY_RAISE,
+                        )
+                      : 0
+                  }
                   onClick={(event) => selectStaticZone(event, zone.id)}
                   onKeyDown={(event) =>
                     selectStaticZoneFromKeyboard(event, zone.id)

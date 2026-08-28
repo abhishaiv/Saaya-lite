@@ -2,7 +2,7 @@
 The hero surface. She opens the app to look at this, and the whole "a map she actually
 opens" argument depends on it looking deliberate rather than default.
 
-## Engine: Leaflet. No key, no billing, no quota.
+## Engine: Leaflet. No key, no billing.
 
 Founder decision 2026-08-18, replacing an earlier Google Maps choice, so that **nothing in
 the build depends on a credential that could fail on submission day.**
@@ -12,25 +12,26 @@ the build depends on a credential that could fail on submission day.**
 | Library | `leaflet` 1.9.4 from npm, pinned in `BUILD_CONFIG.md` |
 | API key | **none required** |
 | Billing | **none** |
-| Quota risk | **none** |
+| Tile failure | an honest offline state; bundled zones and detail continue to work |
 | Offline behaviour | zone polygons render from the bundled asset with no tiles, see below |
 
-## Tiles: CARTO Dark Matter
+## Tiles: OpenStreetMap Standard
 
 ```
-https://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{scale}.png
+https://tile.openstreetmap.org/{z}/{x}/{y}.png
 ```
 
-Near-black land `#0E0E10`, muted grey roads, deep navy water, dimmed labels. It is the
-closest free match to the Apple Maps dark basemap in the Saaya deck screenshots, and its
-low contrast is exactly what we want: the basemap is context, the zones are the content.
+OpenStreetMap provides the street context needed to orient a route without a credential or
+billing account. On 2026-08-28, the former CARTO endpoint began returning a 200-image
+watermark reading “API KEY REQUIRED”; it is rejected because that failure is invisible to a
+normal tile-error handler and would ship into the demo.
 
 | Setting | Value |
 |---|---|
-| Tile source | CARTO Dark Matter, `dark_all` (labels retained, she needs to orient) |
-| Retina | append `@2x` when `devicePixelRatio > 1` |
-| User agent | not applicable. The browser sends its own, and CARTO's tile CDN serves it. Nothing to configure. |
-| Cache | the browser HTTP cache only, governed by CARTO's headers. Nothing to configure, no cap to set, and no Service Worker tile cache in the prototype. |
+| Tile source | OpenStreetMap Standard (labels retained, she needs to orient) |
+| Credential | none |
+| User agent | not applicable. The browser sends its own; nothing to configure. |
+| Cache | the browser HTTP cache only, governed by OpenStreetMap's headers. Nothing to configure, no cap to set, and no Service Worker tile cache in the prototype. |
 | Min zoom | 10 |
 | Max zoom | 17 |
 | Default | zoom 12.5, centred on `17.7100, 83.3000` |
@@ -38,7 +39,7 @@ low contrast is exactly what we want: the basemap is context, the zones are the 
 
 ### Attribution, non-negotiable
 
-`© OpenStreetMap contributors © CARTO`, `type.map.attribution`, `textTertiary`, bottom-left, above the
+`© OpenStreetMap contributors`, `type.map.attribution`, `textTertiary`, bottom-left, above the
 navigation inset, always visible. This is a licence condition, not a design choice. Do not
 hide it behind a sheet and do not shorten it.
 
@@ -53,12 +54,12 @@ to pin at a fixed size.
 
 | Layer | Treatment |
 |---|---|
-| Fill | the zone's own `color` at its own `opacity` (typically 0.35) |
+| Base | **outline only.** No fill and no glow until she selects a zone; the map stays useful on a calm day instead of reading as a warning wall. |
 | Stroke | same `color` at full strength, **1.5 px** |
-| Stroke, selected | **3 px**, plus fill opacity raised by 0.1 |
-| Glow | a second stroke beneath at 6 px, same colour, 15% opacity, giving the soft bloom the deck screenshots have |
+| Stroke, selected | **3 px**, with the zone's own fill opacity raised by 0.1 |
+| Glow, selected | a second stroke beneath at 6 px, same colour, 15% opacity; it marks the one stretch she is inspecting |
 | Label | `area_name`, `label` type, `textPrimary` at 80%, centred on the centroid, **hidden below zoom 12**. See below for where the field lives. |
-| Draw order | glow, fill, stroke, label. Higher `risk_score` draws on top so a high zone is never buried under a moderate one. |
+| Draw order | selected glow and fill (when present), stroke, label. Higher `risk_score` draws on top so a high zone is never buried under a moderate one. |
 
 Precompute the polygon paths once at load. **Never re-tessellate per frame.**
 
@@ -160,6 +161,7 @@ Recorded so this is not relitigated mid-build.
 | Option | Why not |
 |---|---|
 | Google Maps SDK | Needs an API key and a billing account. A key or quota problem on submission day kills the live demo, and the brief requires everything to work without requesting access. |
+| CARTO Dark Matter | Its formerly public endpoint now serves an API-key watermark as a successful image response, so browser error handling cannot protect the demo. |
 | MapLibre GL + OpenFreeMap | Genuinely good, vector, free, no key. Rejected on weight: the GL bundle is several times Leaflet's, and `perf.bundle` is 200 KB gzipped for the whole app. |
 | No basemap, bundled vectors only | Cleanest and fully offline, but she cannot orient against real streets, which undercuts "check a stretch before you commit to it". |
 

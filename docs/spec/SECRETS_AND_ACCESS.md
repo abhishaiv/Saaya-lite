@@ -17,8 +17,8 @@ spec, so **STOP and report it**.
 
 | Not needed | Why | Decided in |
 |---|---|---|
-| Google Maps API key + billing | Leaflet with CARTO Dark Matter tiles. No key, no quota. | `MAP_SPEC.md` |
-| Any map tile key | CARTO's public basemap endpoint is keyless. Requires attribution, which we show. | `MAP_SPEC.md` |
+| Google Maps API key + billing | Leaflet with OpenStreetMap Standard tiles. No key or billing account. | `MAP_SPEC.md` |
+| Any map tile key | OpenStreetMap Standard tiles are keyless. Requires attribution, which we show. | `MAP_SPEC.md` |
 | OpenAI API key | There is no model in the product. Every decision is a stated rule. | founder, 2026-08-18 |
 | SMS gateway, MSG91, Twilio, DLT registration | Delivery is composed and displayed, never dispatched, and labelled in the UI. | `SCOPE.md` |
 | WhatsApp Business API | Same. | `SCOPE.md` |

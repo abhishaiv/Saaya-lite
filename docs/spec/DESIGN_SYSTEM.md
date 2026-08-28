@@ -31,10 +31,10 @@ Poppins Regular, Medium, SemiBold and Bold.
 
 ### Where the font files come from
 
-**Self-hosted and committed. The build never fetches a font.** This is the same reasoning
-that chose Leaflet and CARTO over Google Maps: nothing in the build may depend on a third
-party being reachable on submission day. It also rules out `next/font/google`, which
-downloads at build time and cannot subset Material Symbols by icon name.
+**Self-hosted and committed. The build never fetches a font.** Remote map tiles may be
+unavailable and have an explicit honest fallback; typography must be available before first
+paint. This rules out `next/font/google`, which downloads at build time and cannot subset
+Material Symbols by icon name.
 
 All three paths below were checked against the live repositories on 2026-08-24, because a
 plausible-looking path is not a verified one: an earlier draft of this table sent Material

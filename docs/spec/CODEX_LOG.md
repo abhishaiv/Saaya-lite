@@ -285,3 +285,9 @@ claim. Completion depends on measurement from a real phone against the real depl
 then a fresh adversarial verifier diamond.
 
 T1.3 (2026-08-26): C1-C14, the 320 px development gallery, self-hosted fonts and 17-glyph icon subset passed 93 tests, G1-G8/G10 and fresh spec round 3 after removing an invented card fade. Font evidence: 105 COPY rows; 680 Poppins + 618 Noto runs matched exact GIDs/advances at 400/600/700; 17/17 symbols; 130272 bytes. Upstream SHA-256 pins: Poppins 400 `7e65201e9b79159e2300267cc885e16c8dcef2424cdfa09a29bfb0980a94a7ba`, 600 `d3bf1bdaf0550e83da9ac0b1d1d9fe6db086835a83aa28578e609a394b9a0286`, 700 `983676516167748b74de6f4771fb384c664fd913acb8b471122ecacf5da5ea6c`; Noto Telugu `e618af7bf999df192ed4f388eba2e563f2b5015034e9cbb317b5bd793bd7334d`; Material font `c2c185c2f31193348f34ae454215d990bb49f494c45e79348d9f2b3d653607d7`, codepoints `cb8e63e819c1172b9653b7f15fecd024ac329f7854f65e9c7dc7cc9b78d993eb`.
+
+### Chrome correction - onboarding clarity and map availability          2026-08-28
+
+**Needed correcting:** Chrome rendered the former CARTO tile URL as a successful image visibly marked “API KEY REQUIRED,” so normal tile-error handling could never recover. The onboarding also opened directly on unlabeled contact inputs, hiding the intended Welcome and leaving the name/number relationship unclear.
+
+**Shipped:** The map now uses keyless OpenStreetMap Standard tiles with its required attribution and outline-first zones. Onboarding starts with Welcome, then presents visible favourite name and `+91` phone labels, validates ten national digits, and stores the local number as E.164. Local build, strict checks, all 154 tests, G6, G10 and graph validation passed before deployment.

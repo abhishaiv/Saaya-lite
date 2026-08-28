@@ -105,7 +105,7 @@ Runtime, pinned in `BUILD_CONFIG.md`:
 |---|---|
 | `next`, `react`, `react-dom` | framework and UI |
 | `typescript` | language |
-| `leaflet` | map rendering with CARTO Dark Matter tiles. **Decided, see `MAP_SPEC.md`.** |
+| `leaflet` | map rendering with OpenStreetMap Standard tiles. **Decided, see `MAP_SPEC.md`.** |
 | `firebase` | Firestore and anonymous Auth, for the state view writes |
 | `idb` | IndexedDB wrapper: local persistence and the offline queue |
 
@@ -113,9 +113,10 @@ Dev only: `@types/node`, `@types/react`, `@types/react-dom`, `@types/leaflet`, `
 `eslint`, `eslint-config-next`. These are required by gates G2 and G3 and by
 `strict: true`; they ship nothing to the browser.
 
-**Map choice is decided: Leaflet with CARTO Dark Matter tiles.** Founder decision
-2026-08-18. No API key, no billing account, no quota, so nothing in the build depends on a
-credential that could fail on submission day. Full specification in `MAP_SPEC.md`.
+**Map choice is decided: Leaflet with OpenStreetMap Standard tiles.** The CARTO endpoint
+was retired on 2026-08-28 after it served a visible API-key watermark as a successful tile.
+The replacement needs no API key or billing account; tile unavailability remains an honest
+offline state with bundled zones still usable. Full specification in `MAP_SPEC.md`.
 Do not substitute Google Maps.
 
 **Do not add:** any CSS or UI framework, any state library, any component library, any

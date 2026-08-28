@@ -69,7 +69,7 @@ Hard rules:
 
 **Merged node.** Replaces `T2.2`, `T4.3`, `T3.1`. Both are the Home surface and share SCREENS, COMPONENT_LIBRARY, ARCHITECTURE and DESIGN_SYSTEM. Splitting them meant drawing the map, dropping context, then reloading it to put state on top of it. T3.1 rejoins here: the sheet opens from the map it is merged with, and both read SCREENS, COMPONENT_LIBRARY and COPY. Load the reads ONCE and build every part before reporting.
 
-- **T2.2 — Map screen: Leaflet, CARTO tiles, zones, her dot**
+- **T2.2 — Map screen: Leaflet, keyless OpenStreetMap tiles, zones, her dot**
 - **T4.3 — Home session states, arm banner, demo panel**
 - **T3.1 — Zone detail sheet, nearest station**
   *Reinstated:* Dropped 2026-08-24 as off the judged path. That was wrong. SCOPE names zone detail and nearest station as why she installs it on a calm day and says without it we would be shipping an engine nobody has a reason to own. DEMO_SCRIPT spends 0:50 to 1:02 opening the sheet; SUBMISSION's video outline spends 0:25 to 0:40 on it. It is the payoff of the map: colour without explanation is decoration. Folded into M4, which owns the Home surface it opens from.

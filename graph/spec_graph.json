@@ -3,7 +3,7 @@
  "kind": "knowledge_graph",
  "note": "Domain facts with provenance. Never merge with build_graph.json - different truth standards.",
  "rule": "Every numeric or colour literal in source must trace to a fact id here, or the grounded checker fails the node.",
- "count": 394,
+ "count": 396,
  "facts": [
   {
    "id": "ladder.cd1",
@@ -4374,6 +4374,28 @@
    "governs": "COPY.md",
    "frozen": true,
    "platform": "any"
+  },
+  {
+   "id": "onboarding.phone.country_code",
+   "kind": "number",
+   "value": 91,
+   "unit": "dial-code",
+   "means": "fixed India prefix shown beside the manually entered favourite phone number during onboarding",
+   "sourced_from": "SCREENS.md:56",
+   "governs": "SCREENS.md",
+   "frozen": true,
+   "platform": "web"
+  },
+  {
+   "id": "onboarding.phone.digits",
+   "kind": "number",
+   "value": 10,
+   "unit": "digits",
+   "means": "exact number of digits required after the fixed India prefix during onboarding",
+   "sourced_from": "SCREENS.md:56,61",
+   "governs": "SCREENS.md",
+   "frozen": true,
+   "platform": "web"
   },
   {
    "id": "map.zoom.snap",

@@ -543,7 +543,7 @@ export function HomeScreen({
       ariaMap: copy.cdMap,
       ariaZone: (areaName: string, riskLevel: string) =>
         formatCopy(copy.cdZone, areaName, riskLevel),
-      attribution: "© OpenStreetMap contributors © CARTO",
+      attribution: copy.aboutAttribMap,
       offline: copy.mapOffline,
     }),
     [copy],

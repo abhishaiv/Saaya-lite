@@ -605,7 +605,7 @@
   "T2.2": {
    "id": "T2.2",
    "seq": 8,
-   "title": "Map screen: Leaflet, CARTO tiles, zones, her dot",
+   "title": "Map screen: Leaflet, keyless OpenStreetMap tiles, zones, her dot",
    "hours": 2.5,
    "requires": [
     "T1.3",

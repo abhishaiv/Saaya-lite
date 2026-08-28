@@ -94,6 +94,8 @@ export type M4Copy = Readonly<{
   onbContactBody: string;
   onbContactPrivacy: string;
   onbContactTitle: string;
+  onbFavouriteNameLabel: string;
+  onbFavouritePhoneLabel: string;
   onbLocationBody: string;
   onbLocationPartial: string;
   onbLocationTitle: string;
@@ -101,6 +103,8 @@ export type M4Copy = Readonly<{
   onbNameLabel: string;
   onbPinBody: string;
   onbPinTitle: string;
+  onbWelcomeBody: string;
+  onbWelcomeTitle: string;
   pinNoRecovery: string;
   pinTitle: string;
   policeNoGovtLink: string;
@@ -145,7 +149,7 @@ export type M4Copy = Readonly<{
 export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
   en: {
     aboutAttribFonts: "Poppins and Noto Sans Telugu under the SIL Open Font License. Material Symbols under Apache 2.0.",
-    aboutAttribMap: "© OpenStreetMap contributors © CARTO",
+    aboutAttribMap: "© OpenStreetMap contributors",
     aboutAttribTitle: "Attribution",
     aboutContactTitle: "Contact",
     aboutDataBody: "Visakhapatnam records, calibrated against NCRB 2023 city data. Every demo record is synthetic.",
@@ -237,6 +241,8 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     onbContactBody: "One person is enough. We only ask your favourites to check on you if you miss two check-ins.",
     onbContactPrivacy: "This stays on your phone. Saaya never uploads your favourites.",
     onbContactTitle: "Your favourites",
+    onbFavouriteNameLabel: "Their name",
+    onbFavouritePhoneLabel: "Their phone number",
     onbLocationBody: "Location is how Saaya wakes without you pressing anything. It is not shared with anyone until you raise an SOS.",
     onbLocationPartial: "Saaya watches only while this page is open. Keep it open for the stretch you are on.",
     onbLocationTitle: "Saaya needs to know where the stretch is",
@@ -244,6 +250,8 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     onbNameLabel: "Your name",
     onbPinBody: "Four digits. You will need it to stop a live SOS. Set it now, calmly, because you may need it when you are not calm.",
     onbPinTitle: "Set a PIN",
+    onbWelcomeBody: "Saaya watches the stretch, not you. It wakes on its own when you enter an area that has a record, at an hour that matters.",
+    onbWelcomeTitle: "You do not have to press anything",
     pinNoRecovery: "There is no way around this PIN. If there were, anyone holding your phone could use it.",
     pinTitle: "Enter your PIN to stop",
     policeNoGovtLink: "Saaya Lite is a prototype. It is not connected to AP Police, Shakthi, T-Safe, 112 or ERSS, and it is not a government product.",
@@ -286,7 +294,7 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
   },
   te: {
     aboutAttribFonts: "Poppins, Noto Sans Telugu SIL ఓపెన్ ఫాంట్ లైసెన్స్ కింద. Material Symbols Apache 2.0 కింద.",
-    aboutAttribMap: "© OpenStreetMap contributors © CARTO",
+    aboutAttribMap: "© OpenStreetMap contributors",
     aboutAttribTitle: "ఆపాదింపు",
     aboutContactTitle: "సంప్రదించండి",
     aboutDataBody: "విశాఖపట్నం రికార్డులు, NCRB 2023 నగర డేటా ఆధారంగా. ప్రతి డెమో రికార్డు కృత్రిమమైనది.",
@@ -378,6 +386,8 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     onbContactBody: "ఒక్కరు చాలు. మీరు రెండు చెక్-ఇన్‌లు మిస్ అయితేనే మీ ఆత్మీయులను చూడమని అడుగుతాం.",
     onbContactPrivacy: "ఇది మీ ఫోన్‌లోనే ఉంటుంది. సాయ మీ ఆత్మీయులను ఎప్పుడూ అప్‌లోడ్ చేయదు.",
     onbContactTitle: "మీ ఆత్మీయులు",
+    onbFavouriteNameLabel: "వారి పేరు",
+    onbFavouritePhoneLabel: "వారి ఫోన్ నంబర్",
     onbLocationBody: "మీరు ఏదీ నొక్కకుండా సాయ మేల్కొనేది లొకేషన్ ద్వారానే. మీరు SOS ఇచ్చే వరకు ఇది ఎవరితోనూ పంచుకోబడదు.",
     onbLocationPartial: "ఈ పేజీ తెరిచి ఉన్నప్పుడు మాత్రమే సాయ గమనిస్తుంది. మీరు వెళ్తున్న మార్గం వరకు దీన్ని తెరిచి ఉంచండి.",
     onbLocationTitle: "మార్గం ఎక్కడ ఉందో సాయకు తెలియాలి",
@@ -385,6 +395,8 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     onbNameLabel: "మీ పేరు",
     onbPinBody: "నాలుగు అంకెలు. ప్రత్యక్ష SOS ఆపడానికి ఇది అవసరం. ప్రశాంతంగా ఉన్నప్పుడే దీన్ని సెట్ చేయండి.",
     onbPinTitle: "ఒక PIN సెట్ చేయండి",
+    onbWelcomeBody: "సాయ మిమ్మల్ని కాదు, మార్గాన్ని గమనిస్తుంది. రికార్డు ఉన్న ప్రాంతంలోకి, ముఖ్యమైన సమయంలో మీరు ప్రవేశించినప్పుడు అది దానంతట అదే మేల్కొంటుంది.",
+    onbWelcomeTitle: "మీరు ఏదీ నొక్కాల్సిన అవసరం లేదు",
     pinNoRecovery: "ఈ PIN ని దాటవేసే మార్గం లేదు. ఉంటే, మీ ఫోన్ పట్టుకున్న ఎవరైనా దాన్ని వాడగలరు.",
     pinTitle: "ఆపడానికి మీ PIN నమోదు చేయండి",
     policeNoGovtLink: "సాయ లైట్ ఒక ప్రోటోటైప్. ఇది AP పోలీస్, శక్తి, T-Safe, 112 లేదా ERSS తో అనుసంధానించబడలేదు, ఇది ప్రభుత్వ ఉత్పత్తి కాదు.",

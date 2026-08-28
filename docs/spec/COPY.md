@@ -23,6 +23,8 @@ demo video.
 | `family_subject_fallback` | Someone using Saaya Lite | సాయ లైట్ ఉపయోగిస్తున్న వ్యక్తి |
 | `onb_contact_title` | Your favourites | మీ ఆత్మీయులు |
 | `onb_contact_body` | One person is enough. We only ask your favourites to check on you if you miss two check-ins. | ఒక్కరు చాలు. మీరు రెండు చెక్-ఇన్‌లు మిస్ అయితేనే మీ ఆత్మీయులను చూడమని అడుగుతాం. |
+| `onb_favourite_name_label` | Their name | వారి పేరు |
+| `onb_favourite_phone_label` | Their phone number | వారి ఫోన్ నంబర్ |
 | `onb_contact_privacy` | This stays on your phone. Saaya never uploads your favourites. | ఇది మీ ఫోన్‌లోనే ఉంటుంది. సాయ మీ ఆత్మీయులను ఎప్పుడూ అప్‌లోడ్ చేయదు. |
 | `onb_location_title` | Saaya needs to know where the stretch is | మార్గం ఎక్కడ ఉందో సాయకు తెలియాలి |
 | `onb_location_body` | Location is how Saaya wakes without you pressing anything. It is not shared with anyone until you raise an SOS. | మీరు ఏదీ నొక్కకుండా సాయ మేల్కొనేది లొకేషన్ ద్వారానే. మీరు SOS ఇచ్చే వరకు ఇది ఎవరితోనూ పంచుకోబడదు. |
@@ -142,7 +144,7 @@ demo video.
 | `about_data_title` | Data | డేటా |
 | `about_data_body` | Visakhapatnam records, calibrated against NCRB 2023 city data. Every demo record is synthetic. | విశాఖపట్నం రికార్డులు, NCRB 2023 నగర డేటా ఆధారంగా. ప్రతి డెమో రికార్డు కృత్రిమమైనది. |
 | `about_attrib_title` | Attribution | ఆపాదింపు |
-| `about_attrib_map` | © OpenStreetMap contributors © CARTO | © OpenStreetMap contributors © CARTO |
+| `about_attrib_map` | © OpenStreetMap contributors | © OpenStreetMap contributors |
 | `about_attrib_fonts` | Poppins and Noto Sans Telugu under the SIL Open Font License. Material Symbols under Apache 2.0. | Poppins, Noto Sans Telugu SIL ఓపెన్ ఫాంట్ లైసెన్స్ కింద. Material Symbols Apache 2.0 కింద. |
 | `about_contact_title` | Contact | సంప్రదించండి |
 | **Demo** | | |

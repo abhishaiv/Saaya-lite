@@ -313,9 +313,9 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 389,
-  "edges": 677,
-  "events": 70
+  "entities": 393,
+  "edges": 680,
+  "events": 71
  },
  "entities": [
   {
@@ -3126,6 +3126,30 @@
    "id": "d.m1.sos_delivery_staging",
    "class": "Decision",
    "label": "M1 keeps the SOS screen limited to the local sticky state and PIN stop flow until M2's real writer and queue can truthfully show what crossed the boundary.",
+   "node": "M1"
+  },
+  {
+   "id": "anchor.carto_key_watermark",
+   "class": "Anchor",
+   "label": "Chrome measured the former CARTO tile endpoint returning a 200 image whose visible content reads API KEY REQUIRED; an ordinary tile-error handler cannot detect it.",
+   "node": "M4"
+  },
+  {
+   "id": "fail.carto_key_watermark",
+   "class": "Failure",
+   "label": "The CARTO tile endpoint showed an API-key watermark instead of a usable map while reporting success.",
+   "node": "M4"
+  },
+  {
+   "id": "d.keyless_osm_tiles",
+   "class": "Decision",
+   "label": "Use keyless OpenStreetMap Standard tiles with their required visible attribution; reject CARTO because its successful watermark response cannot be handled honestly.",
+   "node": "M4"
+  },
+  {
+   "id": "d.onboarding_field_clarity",
+   "class": "Decision",
+   "label": "Restore the Welcome step and make favourite name and phone visible labeled controls with a fixed India prefix and exact national-digit validation.",
    "node": "M1"
   }
  ],
@@ -8545,6 +8569,30 @@
    "at": "2026-08-28",
    "by": "codex",
    "confidence": "high"
+  },
+  {
+   "from": "fail.carto_key_watermark",
+   "rel": "caused_by",
+   "to": "anchor.carto_key_watermark",
+   "at": "2026-08-28",
+   "by": "codex",
+   "confidence": "1.0"
+  },
+  {
+   "from": "d.keyless_osm_tiles",
+   "rel": "motivated_by",
+   "to": "fail.carto_key_watermark",
+   "at": "2026-08-28",
+   "by": "founder",
+   "confidence": "1.0"
+  },
+  {
+   "from": "d.keyless_osm_tiles",
+   "rel": "supersedes",
+   "to": "d.osmdroid",
+   "at": "2026-08-28",
+   "by": "codex",
+   "confidence": "high"
   }
  ],
  "events": [
@@ -9342,6 +9390,18 @@
    "at": "2026-08-28",
    "actor": "codex",
    "detail": "M1 spec verifier found SOS delivery presentation pending M2, plus back and focus issues; the latter were corrected before the step checkpoint.",
+   "node": "M1"
+  },
+  {
+   "id": "ev.0071",
+   "type": "spec_amended",
+   "at": "2026-08-28",
+   "actor": "codex",
+   "detail": "Founder feedback replaced the watermarked tile source and clarified visible onboarding controls; onboarding phone provenance facts were added.",
+   "refs": [
+    "d.keyless_osm_tiles",
+    "d.onboarding_field_clarity"
+   ],
    "node": "M1"
   }
  ]

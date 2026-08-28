@@ -2,10 +2,18 @@ import { describe, expect, it } from "vitest";
 
 import {
   createTileAvailabilityReporter,
+  OPEN_STREET_MAP_TILE_URL,
   type TileAvailability,
 } from "./leafletMap";
 
 describe("map tile availability", () => {
+  it("uses the keyless OpenStreetMap raster endpoint", () => {
+    expect(OPEN_STREET_MAP_TILE_URL).toBe(
+      "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    );
+    expect(OPEN_STREET_MAP_TILE_URL).not.toMatch(/carto|key/i);
+  });
+
   it("enters offline on every failed-evidence path", () => {
     const changes: TileAvailability[] = [];
     const reporter = createTileAvailabilityReporter((status) => {

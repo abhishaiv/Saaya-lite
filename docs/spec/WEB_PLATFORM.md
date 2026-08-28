@@ -29,7 +29,7 @@ Saying exactly where the browser stops is a better architecture answer than pret
 |---|---|---|
 | Framework | **Next.js (App Router), TypeScript** | the brief names Vercel; API routes give us server-side Firestore writes |
 | Hosting | **Vercel**, deployed from the GitHub repo | named in the brief; push-to-deploy |
-| Map | **Leaflet** + the same CARTO Dark Matter tiles | no key, no billing, and the tile source is unchanged from `MAP_SPEC.md` |
+| Map | **Leaflet** + OpenStreetMap Standard tiles | no key, no billing, and an offline tile state that leaves bundled zones usable |
 | State | React state + a reducer wrapping the pure engine | the engine is unchanged: pure TypeScript, no DOM |
 | Local storage | **IndexedDB** (favourites, session, queue), `localStorage` for flags | replaces Room |
 | PIN | **Web Crypto** `SHA-256` over salt+pin | replaces EncryptedSharedPreferences |
@@ -105,7 +105,7 @@ Three consequences, stated so nobody implements around them:
 1. **There is no offline first launch.** With no network and no cached shell, the page does
    not load. Do not claim installable-and-works-offline anywhere.
 2. **There is no tile cache to configure and no cap to set.** Tiles are subject to the
-   browser HTTP cache and CARTO's own headers, and nothing else.
+   browser HTTP cache and OpenStreetMap's headers, and nothing else.
 3. **"Offline" in this product means one specific thing:** the page is already open and
    connectivity drops. Zones stay drawn because they were already parsed, tiles stop
    arriving and we say so, and every write queues in IndexedDB and flushes on reconnect.

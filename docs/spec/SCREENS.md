@@ -53,7 +53,7 @@ Progress dots at top. No step is skippable except step 2's second contact.
 - **Optional.** If she skips it the ladder still runs and the message substitutes
   `family_subject_fallback`. Never block onboarding on it.
 - `onb_contact_title`, `onb_contact_body`.
-- Name field, phone field (prefix `+91` fixed, 10 digits).
+- `onb_favourite_name_label` name field, `onb_favourite_phone_label` phone field (prefix `+91` fixed, 10 digits).
 - **Manual entry only. There is no contact picker.** `SECRETS_AND_ACCESS.md` states that
   contacts access is never requested, and its absence is verifiable in devtools, which is
   part of the argument. The Contact Picker API is also Chrome-Android-only, so a picker

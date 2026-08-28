@@ -60,7 +60,7 @@ window, and `CODEX_LOG.md` records every task.
 |---|---|---|
 | Visakhapatnam zone dataset, 24 zones | Built by the founder for Saaya. Aggregate counts calibrated against **NCRB Crime in India 2023** city tables (5,746 total, 997 crimes against women), with zone boundaries drawn to Visakhapatnam police station jurisdictions and risk notes derived from **publicly published news reports**. | Founder's own work. NCRB tables are published government statistics. |
 | Police station points, 37 | Publicly listed station names, addresses and published landline numbers. | Public information. |
-| Map tiles | CARTO Dark Matter over OpenStreetMap data. | Attribution shown permanently in-app. |
+| Map tiles | OpenStreetMap Standard. | Attribution shown permanently in-app. |
 | Poppins | Google Fonts. | SIL Open Font License 1.1 |
 | Noto Sans Telugu | Google Fonts. | SIL Open Font License 1.1 |
 | Material Symbols Rounded | Google. | Apache License 2.0 |

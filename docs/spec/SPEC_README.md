@@ -19,7 +19,7 @@ Stop and ask rather than guessing, then the answer gets written into the spec.
 4. **`BUSINESS_RULES.md`** - every number in the product. Arming matrix, timers, formulas.
 5. **`STATE_MACHINE.md`** - the session engine. States, events, guards, edge cases.
 6. **`SCREENS.md`** - every screen and its layout, the navigation graph.
-6b. **`MAP_SPEC.md`** - the hero surface: Leaflet, CARTO tiles, zone rendering, offline.
+6b. **`MAP_SPEC.md`** - the hero surface: Leaflet, keyless OpenStreetMap tiles, zone rendering, offline.
 
 **Look and feel, all founder-decided on 2026-08-18. Read all seven before writing any UI:**
 
