@@ -1568,13 +1568,7 @@
   },
   "total_verifier_runs": 44
  },
- "human_gates": [
-  {
-   "before": "T1.1",
-   "gate": "connect the GitHub repo to Vercel so previews build",
-   "why": "T1.1 produces vercel_deploy and its extra gate is preview_url_loads_on_mobile. This is an account action, not a public act: a preview URL is not the submission link. Distinct from the T2.2 gate."
-  }
- ],
+ "human_gates": [],
  "architecture": {
   "principle": "Fan out only genuinely decomposable work. Sequential reasoning stays single-agent.",
   "evidence": [
@@ -1679,5 +1673,13 @@
    "after": "M1",
    "state": "THE LADDER RUNS. Shadow, check-in 1, check-in 2, family escalation, SOS, end to end on a phone. This is the MVP: if everything stops here, there is still a working product to demo."
   }
- ]
+ ],
+ "live_url": "https://saaya-lite.vercel.app",
+ "vercel": {
+  "project": "saaya-lite",
+  "team": "abhishai-vardhans-projects",
+  "connected_at": "2026-08-28",
+  "connected_by": "claude via Vercel MCP, founder request in chat",
+  "production_deployment": "dpl_CcYfb8WZFuLnAaruoQa2R9GWCEfc"
+ }
 }

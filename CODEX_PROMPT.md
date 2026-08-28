@@ -12,7 +12,7 @@ token budget.** Do not re-derive where the build is: it is written below and in 
 | | |
 |---|---|
 | Complete | `T1.1`, `T2.1`, `T4.1` |
-| Committed, not closed | `T4.2` at `da15bf9`. Code done. Waits on G8, the real-phone anchor and G9, all of which need the Vercel preview URL. |
+| Live | **https://saaya-lite.vercel.app** — connected and deployed 2026-08-28, on commit `ed1ed4f`. Run G8/G9 anchors against this URL now. |
 | In progress | `T1.3`. Components C1 to C6 done and more uncommitted in the worktree. Fonts done, subset shaping gate passed (`anchor.font_gate_passed`). |
 | Remaining | **7 nodes, 32.0h** |
 | Deadline | **2026-08-28 20:00 IST. No grace period.** |
@@ -130,11 +130,7 @@ right one here. That has blocked this build twice. Check the fact id, not the nu
 
 | Gate point | What the founder must do |
 |---|---|
-| `T1.1` | connect the GitHub repo to Vercel so previews build |
-| `M2` | register the Firebase Web app and supply its config |
-| `M3` | Firestore rules and public read go live |
-| `M5` | the production Vercel URL is shared as the submission's live link |
-| `after M5` | submission form |
+| — | **None open.** Vercel is connected: https://saaya-lite.vercel.app. M2, M3 and M5 are cut to round two, so their gates no longer apply. |
 
 If you reach a gated node and its gate is still open, **say so in one line and move to the
 next node that is not gated.** Do not stall, do not invent a workaround, do not weaken a
