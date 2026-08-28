@@ -103,6 +103,14 @@ export type M4Copy = Readonly<{
   onbPinTitle: string;
   pinNoRecovery: string;
   pinTitle: string;
+  cdPoliceView: string;
+  policeTitle: string;
+  policeNowNothing: string;
+  policeNowBody: string;
+  policeSusTitle: string;
+  policeSusBody: string;
+  policeSosTitle: string;
+  policeSosBody: string;
   policeNoGovtLink: string;
   errNoStation: string;
   riskBandElevated: string;
@@ -246,6 +254,14 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     onbPinTitle: "Set a PIN",
     pinNoRecovery: "There is no way around this PIN. If there were, anyone holding your phone could use it.",
     pinTitle: "Enter your PIN to stop",
+    cdPoliceView: "See exactly what the police can see",
+    policeTitle: "What the police see",
+    policeNowNothing: "Right now: nothing.",
+    policeNowBody: "While Saaya is watching, nothing about you leaves this phone.",
+    policeSusTitle: "If you miss two check-ins",
+    policeSusBody: "Only this: the area, the hour, the date. No location point, no name, nothing linking it to any other trip you have taken.",
+    policeSosTitle: "If you raise an SOS",
+    policeSosBody: "Your exact location, the last few minutes, and the nearest station. This is the only moment identity crosses.",
     policeNoGovtLink: "Saaya Lite is a prototype. It is not connected to AP Police, Shakthi, T-Safe, 112 or ERSS, and it is not a government product.",
     errNoStation: "No police station within 20 km.",
     riskBandElevated: "Elevated",
@@ -387,6 +403,14 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     onbPinTitle: "ఒక PIN సెట్ చేయండి",
     pinNoRecovery: "ఈ PIN ని దాటవేసే మార్గం లేదు. ఉంటే, మీ ఫోన్ పట్టుకున్న ఎవరైనా దాన్ని వాడగలరు.",
     pinTitle: "ఆపడానికి మీ PIN నమోదు చేయండి",
+    cdPoliceView: "పోలీసులు ఏమి చూడగలరో చూడండి",
+    policeTitle: "పోలీసులు ఏమి చూస్తారు",
+    policeNowNothing: "ప్రస్తుతం: ఏమీ లేదు.",
+    policeNowBody: "సాయ గమనిస్తున్నంత సేపు, మీ గురించి ఏదీ ఈ ఫోన్ నుండి బయటకు వెళ్లదు.",
+    policeSusTitle: "మీరు రెండు చెక్-ఇన్‌లు మిస్ అయితే",
+    policeSusBody: "ఇది మాత్రమే: ప్రాంతం, గంట, తేదీ. లొకేషన్ పాయింట్ లేదు, పేరు లేదు, మీ ఇతర ప్రయాణాలతో లింక్ ఏదీ లేదు.",
+    policeSosTitle: "మీరు SOS ఇస్తే",
+    policeSosBody: "మీ ఖచ్చితమైన స్థానం, గత కొన్ని నిమిషాలు, సమీప స్టేషన్. గుర్తింపు దాటే ఏకైక క్షణం ఇదే.",
     policeNoGovtLink: "సాయ లైట్ ఒక ప్రోటోటైప్. ఇది AP పోలీస్, శక్తి, T-Safe, 112 లేదా ERSS తో అనుసంధానించబడలేదు, ఇది ప్రభుత్వ ఉత్పత్తి కాదు.",
     errNoStation: "20 కి.మీ. లోపు పోలీస్ స్టేషన్ లేదు.",
     riskBandElevated: "ఎక్కువ",

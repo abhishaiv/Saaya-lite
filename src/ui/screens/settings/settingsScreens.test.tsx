@@ -5,8 +5,8 @@ import { M4_COPY } from "../../copy/strings";
 import { AboutScreen } from "./AboutScreen";
 import { SettingsScreen } from "./SettingsScreen";
 
-describe("M4 Settings ownership", () => {
-  it("renders only M4-owned Settings rows in both languages", () => {
+describe("M4 and M2 Settings ownership", () => {
+  it("renders only M4-owned Settings rows when police view is not mounted", () => {
     for (const locale of ["en", "te"] as const) {
       const copy = M4_COPY[locale];
       const html = renderToStaticMarkup(
@@ -26,6 +26,24 @@ describe("M4 Settings ownership", () => {
       expect(html).not.toContain(copy.setLanguage);
       expect(html).not.toContain(copy.setPin);
       expect(html).not.toContain(copy.setPolice);
+    }
+  });
+
+  it("renders M2 What the police see row when onOpenPolice is provided", () => {
+    for (const locale of ["en", "te"] as const) {
+      const copy = M4_COPY[locale];
+      const html = renderToStaticMarkup(
+        <SettingsScreen
+          copy={copy}
+          onBack={() => undefined}
+          onOpenAbout={() => undefined}
+          onOpenDemo={() => undefined}
+          onOpenPolice={() => undefined}
+        />,
+      );
+      expect(html).toContain(copy.setPolice);
+      expect(html).toContain(copy.setAbout);
+      expect(html).toContain(copy.setDemo);
     }
   });
 });

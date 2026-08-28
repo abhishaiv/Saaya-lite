@@ -69,6 +69,7 @@ import {
 import { ZoneDetailSheet } from "./ZoneDetailSheet";
 import { AboutScreen } from "../settings/AboutScreen";
 import { SettingsScreen } from "../settings/SettingsScreen";
+import { PoliceViewScreen } from "../police/PoliceViewScreen";
 import { LocationHelpSheet } from "../location/LocationHelpSheet";
 
 export interface BuildVersion {
@@ -111,6 +112,7 @@ export function HomeScreen({
   const [demoPanelOpen, setDemoPanelOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
+  const [policeOpen, setPoliceOpen] = useState(false);
   const [locationHelpOpen, setLocationHelpOpen] = useState(false);
   const [demoSpeedEnabled, setDemoSpeedEnabled] = useState(false);
   const [demoSessionActive, setDemoSessionActive] = useState(false);
@@ -551,7 +553,7 @@ export function HomeScreen({
   const appSessionStatus = (
     <AppSessionStatus
       copy={copy}
-      showIdle={!aboutOpen && !settingsOpen}
+      showIdle={!aboutOpen && !settingsOpen && !policeOpen}
       view={engineView}
     />
   );
@@ -579,6 +581,18 @@ export function HomeScreen({
     );
   }
 
+  if (policeOpen && engineView.state !== "SOS_ACTIVE") {
+    return (
+      <>
+        {appSessionStatus}
+        <PoliceViewScreen
+          copy={copy}
+          onBack={() => setPoliceOpen(false)}
+        />
+      </>
+    );
+  }
+
   if (settingsOpen && engineView.state !== "SOS_ACTIVE") {
     return (
       <>
@@ -590,6 +604,10 @@ export function HomeScreen({
           onOpenDemo={() => {
             setSettingsOpen(false);
             setDemoPanelOpen(true);
+          }}
+          onOpenPolice={() => {
+            setSettingsOpen(false);
+            setPoliceOpen(true);
           }}
         />
       </>

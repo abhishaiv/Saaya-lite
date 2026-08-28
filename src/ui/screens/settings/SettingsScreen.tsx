@@ -8,6 +8,7 @@ export interface SettingsScreenProps {
   readonly onBack: () => void;
   readonly onOpenAbout: () => void;
   readonly onOpenDemo: () => void;
+  readonly onOpenPolice?: () => void;
 }
 
 export function SettingsScreen({
@@ -15,6 +16,7 @@ export function SettingsScreen({
   onBack,
   onOpenAbout,
   onOpenDemo,
+  onOpenPolice,
 }: SettingsScreenProps) {
   return (
     <main className="settings-screen">
@@ -26,6 +28,9 @@ export function SettingsScreen({
       </header>
 
       <nav aria-label={copy.setTitle} className="settings-screen__rows">
+        {onOpenPolice === undefined ? null : (
+          <SettingsRow label={copy.setPolice} onClick={onOpenPolice} />
+        )}
         <SettingsRow label={copy.setAbout} onClick={onOpenAbout} />
         <SettingsRow
           label={copy.setDemo}
