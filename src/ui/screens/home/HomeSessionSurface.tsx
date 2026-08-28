@@ -16,6 +16,7 @@ import type { M4Copy } from "../../copy/strings";
 import type { HomeEngineView } from "./homeEngineBridge";
 import { CheckInOverlay } from "./CheckInOverlay";
 import { FamilyEscalationOverlay } from "./FamilyEscalationOverlay";
+import { SosOverlay } from "./SosOverlay";
 
 export interface ArmAcknowledgement {
   readonly body: string;
@@ -37,9 +38,11 @@ export interface HomeSessionSurfaceProps {
   readonly onArmBannerHidden: () => void;
   readonly onCheckInOk: () => void;
   readonly onFamilyCancel: () => void;
+  readonly onHelpNow: () => void;
   readonly onLocationHelpOpen: () => void;
   readonly onManualArm: () => void;
   readonly onManualDisarm: () => void;
+  readonly onPinAccepted: () => void;
   readonly pageStoppedWarning: boolean;
   readonly policeStations: readonly PoliceStation[];
 }
@@ -59,9 +62,11 @@ export function HomeSessionSurface({
   onArmBannerHidden,
   onCheckInOk,
   onFamilyCancel,
+  onHelpNow,
   onLocationHelpOpen,
   onManualArm,
   onManualDisarm,
+  onPinAccepted,
   pageStoppedWarning,
   policeStations,
 }: HomeSessionSurfaceProps) {
@@ -155,13 +160,23 @@ export function HomeSessionSurface({
               {copy.ctaArmManually}
             </SaayaButton>
           ) : state === "SHADOW" ? (
-            <SaayaButton
-              onClick={onManualDisarm}
-              variant="primary"
-              workingLabel={copy.stateWorking}
-            >
-              {copy.ctaImHome}
-            </SaayaButton>
+            <div className="home-session-sheet-actions">
+              <SaayaButton
+                onClick={onManualDisarm}
+                variant="primary"
+                workingLabel={copy.stateWorking}
+              >
+                {copy.ctaImHome}
+              </SaayaButton>
+              <SaayaButton
+                aria-label={copy.cdHelpNow}
+                onClick={onHelpNow}
+                variant="textOnly"
+                workingLabel={copy.stateWorking}
+              >
+                {copy.ctaHelpNow}
+              </SaayaButton>
+            </div>
           ) : null}
         </section>
       </SaayaBottomSheet>
@@ -171,6 +186,7 @@ export function HomeSessionSurface({
           copy={copy}
           deadlineEpochMs={engineView.deadlineEpochMs}
           demoSpeedEnabled={demoSpeedEnabled}
+          onHelpNow={onHelpNow}
           onOk={onCheckInOk}
           reason={state === "CHECKIN_1" ? checkInReason : null}
           state={state}
@@ -185,8 +201,13 @@ export function HomeSessionSurface({
           demoSpeedEnabled={demoSpeedEnabled}
           detail={activeZoneDetail}
           onCancel={onFamilyCancel}
+          onHelpNow={onHelpNow}
           policeStations={policeStations}
         />
+      ) : null}
+
+      {state === "SOS_ACTIVE" ? (
+        <SosOverlay copy={copy} onPinAccepted={onPinAccepted} />
       ) : null}
 
       <style jsx>{`
@@ -235,6 +256,11 @@ export function HomeSessionSurface({
         }
 
         .home-session-sheet-copy {
+          display: grid;
+          gap: var(--space-8);
+        }
+
+        .home-session-sheet-actions {
           display: grid;
           gap: var(--space-8);
         }

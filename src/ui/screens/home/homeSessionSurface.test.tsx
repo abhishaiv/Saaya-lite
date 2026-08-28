@@ -38,9 +38,11 @@ function render(
       onArmBannerHidden={() => undefined}
       onCheckInOk={() => undefined}
       onFamilyCancel={() => undefined}
+      onHelpNow={() => undefined}
       onLocationHelpOpen={() => undefined}
       onManualArm={() => undefined}
       onManualDisarm={() => undefined}
+      onPinAccepted={() => undefined}
       pageStoppedWarning={false}
       policeStations={[]}
       {...options}
@@ -119,5 +121,6 @@ describe("M4 Home session surface", () => {
 
     expect(render("CHECKIN_1")).toContain(M4_COPY.en.checkin1Title);
     expect(render("CHECKIN_2")).toContain(M4_COPY.en.checkin2Title);
+    expect(render("SOS_ACTIVE")).toContain(M4_COPY.en.sosTitle);
   });
 });

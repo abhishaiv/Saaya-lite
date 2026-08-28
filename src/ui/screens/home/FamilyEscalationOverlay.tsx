@@ -18,6 +18,7 @@ import { BigActionButton } from "../../components/BigActionButton";
 import { CountdownRing } from "../../components/CountdownRing";
 import { DisclosureBanner } from "../../components/DisclosureBanner";
 import { LadderCard } from "../../components/LadderCard";
+import { SaayaButton } from "../../components/SaayaButton";
 import type { M4Copy } from "../../copy/strings";
 
 const COUNTDOWN_TICK_MS = 1000; // fact: motion.1000ms
@@ -34,6 +35,7 @@ export interface FamilyEscalationOverlayProps {
   readonly demoSpeedEnabled: boolean;
   readonly detail: ZoneDetail | null;
   readonly onCancel: () => void;
+  readonly onHelpNow: () => void;
   readonly policeStations: readonly PoliceStation[];
 }
 
@@ -45,6 +47,7 @@ export function FamilyEscalationOverlay({
   demoSpeedEnabled,
   detail,
   onCancel,
+  onHelpNow,
   policeStations,
 }: FamilyEscalationOverlayProps) {
   const repositoryRef = useRef<IndexedDbOnboardingRepository | null>(null);
@@ -160,7 +163,16 @@ export function FamilyEscalationOverlay({
         />
       }
       rung="FAMILY_ESCALATED"
-      secondary={null}
+      secondary={
+        <SaayaButton
+          aria-label={copy.cdHelpNow}
+          onClick={onHelpNow}
+          variant="textOnly"
+          workingLabel={copy.stateWorking}
+        >
+          {copy.ctaHelpNow}
+        </SaayaButton>
+      }
       title={title}
     />
   );

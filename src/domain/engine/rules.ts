@@ -36,6 +36,9 @@ export const NIGHT_LATE_START_HOUR = 22;
 export const HOURS_PER_DAY = 24; // GROUNDED-EXEMPT: structural clock-domain size
 export const MINUTES_PER_HOUR = 60; // GROUNDED-EXEMPT: structural clock-domain size
 export const PIN_LENGTH = 4;
+export const PIN_MAX_ATTEMPTS = 5; // fact: pin.attempts
+export const PIN_INITIAL_LOCKOUT_SEC = 60; // fact: pin.lockout
+export const PIN_MAX_LOCKOUT_MIN = 15; // fact: pin.lockout.max
 export const WESTERN_DIGIT_MIN = "0";
 
 const DISPLAY_MULTIPLIERS: Readonly<Record<HourBand, number>> = {

@@ -1,9 +1,10 @@
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 
 import {
   MaterialSymbol,
   type MaterialSymbolName,
 } from "../icons/MaterialSymbol";
+import { installConsumeBackGuard } from "../../platform/sosBackGuard";
 
 export type LadderCardRung =
   | "CHECKIN_1"
@@ -76,6 +77,16 @@ const phaseClassNames: Readonly<
  * platform adapter; this component exposes the required policy as data and a typed prop.
  */
 export function LadderCard(props: LadderCardProps) {
+  const backPolicy = props.backPolicy ?? LADDER_CARD_BACK_POLICY[props.rung];
+
+  useEffect(
+    () =>
+      props.phase !== "deadline-passed" && backPolicy === "consume"
+        ? installConsumeBackGuard()
+        : undefined,
+    [backPolicy, props.phase],
+  );
+
   if (props.phase === "deadline-passed") {
     return null;
   }
@@ -92,7 +103,6 @@ export function LadderCard(props: LadderCardProps) {
     title,
   } = props;
   const presentation = rungPresentation[rung];
-  const backPolicy = props.backPolicy ?? LADDER_CARD_BACK_POLICY[rung];
   const titleId = `${id}-title`;
   const messageId = `${id}-message`;
   const classes = [

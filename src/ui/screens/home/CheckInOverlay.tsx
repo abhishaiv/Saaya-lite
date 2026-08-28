@@ -6,6 +6,7 @@ import { CHECK_IN_1_SEC, CHECK_IN_2_SEC, DEMO_DIVISOR } from "../../../domain/en
 import { CountdownRing } from "../../components/CountdownRing";
 import { BigActionButton } from "../../components/BigActionButton";
 import { LadderCard } from "../../components/LadderCard";
+import { SaayaButton } from "../../components/SaayaButton";
 import type { M4Copy } from "../../copy/strings";
 
 const COUNTDOWN_TICK_MS = 1000; // fact: motion.1000ms
@@ -14,6 +15,7 @@ export interface CheckInOverlayProps {
   readonly copy: M4Copy;
   readonly deadlineEpochMs: number | null;
   readonly demoSpeedEnabled: boolean;
+  readonly onHelpNow: () => void;
   readonly onOk: () => void;
   readonly reason: string | null;
   readonly state: "CHECKIN_1" | "CHECKIN_2";
@@ -24,6 +26,7 @@ export function CheckInOverlay({
   copy,
   deadlineEpochMs,
   demoSpeedEnabled,
+  onHelpNow,
   onOk,
   reason,
   state,
@@ -89,7 +92,16 @@ export function CheckInOverlay({
         />
       }
       rung={state}
-      secondary={null}
+      secondary={
+        <SaayaButton
+          aria-label={copy.cdHelpNow}
+          onClick={onHelpNow}
+          variant="textOnly"
+          workingLabel={copy.stateWorking}
+        >
+          {copy.ctaHelpNow}
+        </SaayaButton>
+      }
       title={title}
     />
   );

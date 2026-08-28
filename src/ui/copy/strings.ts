@@ -32,18 +32,22 @@ export type M4Copy = Readonly<{
   cdCloseSheet: string;
   cdCountdown: string;
   cdDemoPanel: string;
+  cdHelpNow: string;
   cdImOk: string;
+  cdPinBox: string;
   cdDemoReset: string;
   cdDemoZonePicker: string;
   cdMap: string;
   cdRecentre: string;
   cdSettings: string;
   cdStationCall: string;
+  cdStopSos: string;
   cdZone: string;
   ctaCall: string;
   ctaCancelImFine: string;
   ctaContinue: string;
   ctaFinish: string;
+  ctaHelpNow: string;
   ctaImOk: string;
   ctaArmManually: string;
   ctaImHome: string;
@@ -59,7 +63,9 @@ export type M4Copy = Readonly<{
   demoSpeedNote: string;
   demoSpeedToggle: string;
   demoTriggerSos: string;
+  errPinLocked: string;
   errPinMismatch: string;
+  errPinWrong: string;
   errPinWeak: string;
   errZoneData: string;
   familyBody: string;
@@ -72,6 +78,7 @@ export type M4Copy = Readonly<{
   homeArmBannerTitle: string;
   homeHourContext: string;
   ctaRetry: string;
+  ctaStopSos: string;
   checkin1Body: string;
   checkin1Reason: string;
   checkin1Title: string;
@@ -94,6 +101,8 @@ export type M4Copy = Readonly<{
   onbNameLabel: string;
   onbPinBody: string;
   onbPinTitle: string;
+  pinNoRecovery: string;
+  pinTitle: string;
   policeNoGovtLink: string;
   errNoStation: string;
   riskBandElevated: string;
@@ -118,6 +127,7 @@ export type M4Copy = Readonly<{
   statusShadowAuto: string;
   statusShadowManual: string;
   statusSos: string;
+  sosTitle: string;
   warnKeepOpenBody: string;
   warnLocationDenied: string;
   warnPageStopped: string;
@@ -165,18 +175,22 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     cdCloseSheet: "Close",
     cdCountdown: "%1$d seconds left to answer",
     cdDemoPanel: "Open prototype demo controls",
+    cdHelpNow: "Start an emergency SOS immediately",
     cdImOk: "Confirm you are safe",
+    cdPinBox: "PIN digit %1$d of 4",
     cdDemoReset: "Reset the demo session. Nothing is sent.",
     cdDemoZonePicker: "Choose a zone to simulate entering",
     cdMap: "Map of Visakhapatnam risk areas",
     cdRecentre: "Centre the map on your location",
     cdSettings: "Open settings",
     cdStationCall: "Call %1$s",
+    cdStopSos: "Stop the SOS. Needs your PIN.",
     cdZone: "%1$s, %2$s risk area. Open details.",
     ctaCall: "Call",
     ctaCancelImFine: "Cancel, I am fine",
     ctaContinue: "Continue",
     ctaFinish: "Finish",
+    ctaHelpNow: "I need help now",
     ctaImOk: "I am OK",
     ctaArmManually: "Watch this journey",
     ctaImHome: "I am home",
@@ -192,7 +206,9 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     demoSpeedNote: "Timers run %1$dx faster. The full ladder takes %2$d seconds instead of %3$d.",
     demoSpeedToggle: "Demo speed",
     demoTriggerSos: "Trigger SOS",
+    errPinLocked: "Too many attempts. Try again in %1$s.",
     errPinMismatch: "Those did not match. Try again.",
+    errPinWrong: "Wrong PIN. %1$d attempts left.",
     errPinWeak: "Pick something less obvious.",
     errZoneData: "Saaya Lite could not load Visakhapatnam data. Reloading the page should fix this.",
     familyBody: "We've asked them to check on you. This is the message. You can still stop it.",
@@ -205,6 +221,7 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     homeArmBannerTitle: "Saaya woke by itself",
     homeHourContext: "Right now, %1$s reads %2$s",
     ctaRetry: "Try again",
+    ctaStopSos: "Stop SOS",
     checkin1Body: "All good? Tap I'm OK and we'll keep quietly watching over you.",
     checkin1Reason: "You are in %1$s, a %2$s area, at %3$s.",
     checkin1Title: "Just checking in",
@@ -227,6 +244,8 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     onbNameLabel: "Your name",
     onbPinBody: "Four digits. You will need it to stop a live SOS. Set it now, calmly, because you may need it when you are not calm.",
     onbPinTitle: "Set a PIN",
+    pinNoRecovery: "There is no way around this PIN. If there were, anyone holding your phone could use it.",
+    pinTitle: "Enter your PIN to stop",
     policeNoGovtLink: "Saaya Lite is a prototype. It is not connected to AP Police, Shakthi, T-Safe, 112 or ERSS, and it is not a government product.",
     errNoStation: "No police station within 20 km.",
     riskBandElevated: "Elevated",
@@ -251,6 +270,7 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     statusShadowAuto: "Watching this stretch",
     statusShadowManual: "Watching, you turned this on",
     statusSos: "SOS active",
+    sosTitle: "SOS active",
     warnKeepOpenBody: "Keep this tab open while you are on the stretch. If you close it, Saaya stops watching.",
     warnLocationDenied: "Saaya cannot wake on its own without location.",
     warnPageStopped: "Your browser stopped Saaya while you were travelling. Nothing was sent.",
@@ -296,18 +316,22 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     cdCloseSheet: "మూసివేయి",
     cdCountdown: "సమాధానం ఇవ్వడానికి %1$d సెకన్లు మిగిలాయి",
     cdDemoPanel: "ప్రోటోటైప్ డెమో నియంత్రణలు తెరువు",
+    cdHelpNow: "వెంటనే అత్యవసర SOS ప్రారంభించు",
     cdImOk: "మీరు క్షేమంగా ఉన్నారని నిర్ధారించండి",
+    cdPinBox: "4 లో %1$d వ PIN అంకె",
     cdDemoReset: "డెమో సెషన్‌ను రీసెట్ చేయి. ఏదీ పంపబడదు.",
     cdDemoZonePicker: "ప్రవేశించినట్టు చూపించడానికి ఒక జోన్ ఎంచుకోండి",
     cdMap: "విశాఖపట్నం ప్రమాద ప్రాంతాల మ్యాప్",
     cdRecentre: "మీ స్థానం మీద మ్యాప్ కేంద్రీకరించు",
     cdSettings: "సెట్టింగ్స్ తెరువు",
     cdStationCall: "%1$s కి ఫోన్ చేయి",
+    cdStopSos: "SOS ఆపు. మీ PIN అవసరం.",
     cdZone: "%1$s, %2$s ప్రమాద ప్రాంతం. వివరాలు తెరువు.",
     ctaCall: "కాల్ చేయి",
     ctaCancelImFine: "రద్దు చేయి, నేను బాగున్నాను",
     ctaContinue: "కొనసాగించు",
     ctaFinish: "పూర్తి చేయి",
+    ctaHelpNow: "నాకు ఇప్పుడే సహాయం కావాలి",
     ctaImOk: "నేను బాగున్నాను",
     ctaArmManually: "ఈ ప్రయాణాన్ని గమనించు",
     ctaImHome: "నేను ఇంటికి చేరాను",
@@ -323,7 +347,9 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     demoSpeedNote: "టైమర్లు %1$d రెట్లు వేగంగా నడుస్తాయి. పూర్తి నిచ్చెన %3$d సెకన్లకు బదులు %2$d సెకన్లు పడుతుంది.",
     demoSpeedToggle: "డెమో వేగం",
     demoTriggerSos: "SOS ప్రారంభించు",
+    errPinLocked: "చాలా ప్రయత్నాలు. %1$s తర్వాత మళ్లీ ప్రయత్నించండి.",
     errPinMismatch: "అవి సరిపోలలేదు. మళ్లీ ప్రయత్నించండి.",
+    errPinWrong: "తప్పు PIN. %1$d ప్రయత్నాలు మిగిలాయి.",
     errPinWeak: "కొంచెం ఊహించలేని దాన్ని ఎంచుకోండి.",
     errZoneData: "సాయ లైట్ విశాఖపట్నం డేటాను లోడ్ చేయలేకపోయింది. పేజీని మళ్లీ లోడ్ చేస్తే సరిపోతుంది.",
     familyBody: "మిమ్మల్ని చూడమని వారిని అడిగాం. ఇదే సందేశం. మీరు ఇప్పటికీ ఆపవచ్చు.",
@@ -336,6 +362,7 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     homeArmBannerTitle: "సాయ దానంతట అదే మేల్కొంది",
     homeHourContext: "ప్రస్తుతం, %1$s %2$s గా ఉంది",
     ctaRetry: "మళ్లీ ప్రయత్నించు",
+    ctaStopSos: "SOS ఆపు",
     checkin1Body: "అంతా బాగుందా? \"నేను బాగున్నాను\" నొక్కండి, మేము నిశ్శబ్దంగా మిమ్మల్ని గమనిస్తూ ఉంటాం.",
     checkin1Reason: "మీరు %3$s కి %2$s ప్రాంతమైన %1$s లో ఉన్నారు.",
     checkin1Title: "ఒకసారి చూస్తున్నాం",
@@ -358,6 +385,8 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     onbNameLabel: "మీ పేరు",
     onbPinBody: "నాలుగు అంకెలు. ప్రత్యక్ష SOS ఆపడానికి ఇది అవసరం. ప్రశాంతంగా ఉన్నప్పుడే దీన్ని సెట్ చేయండి.",
     onbPinTitle: "ఒక PIN సెట్ చేయండి",
+    pinNoRecovery: "ఈ PIN ని దాటవేసే మార్గం లేదు. ఉంటే, మీ ఫోన్ పట్టుకున్న ఎవరైనా దాన్ని వాడగలరు.",
+    pinTitle: "ఆపడానికి మీ PIN నమోదు చేయండి",
     policeNoGovtLink: "సాయ లైట్ ఒక ప్రోటోటైప్. ఇది AP పోలీస్, శక్తి, T-Safe, 112 లేదా ERSS తో అనుసంధానించబడలేదు, ఇది ప్రభుత్వ ఉత్పత్తి కాదు.",
     errNoStation: "20 కి.మీ. లోపు పోలీస్ స్టేషన్ లేదు.",
     riskBandElevated: "ఎక్కువ",
@@ -382,6 +411,7 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     statusShadowAuto: "ఈ మార్గాన్ని గమనిస్తోంది",
     statusShadowManual: "గమనిస్తోంది, మీరు దీన్ని ఆన్ చేశారు",
     statusSos: "SOS యాక్టివ్",
+    sosTitle: "SOS యాక్టివ్",
     warnKeepOpenBody: "మీరు ఆ మార్గంలో ఉన్నంత సేపు ఈ ట్యాబ్ తెరిచి ఉంచండి. మూసివేస్తే సాయ గమనించడం ఆగిపోతుంది.",
     warnLocationDenied: "లొకేషన్ లేకుండా సాయ దానంతట అదే మేల్కొనదు.",
     warnPageStopped: "మీరు ప్రయాణిస్తున్నప్పుడు మీ బ్రౌజర్ సాయను ఆపింది. ఏదీ పంపబడలేదు.",

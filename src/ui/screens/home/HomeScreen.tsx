@@ -366,6 +366,15 @@ export function HomeScreen({
     setArmBannerVisible(false);
   }, [engineView.state]);
 
+  useEffect(() => {
+    if (engineView.state !== "SOS_ACTIVE") return;
+    setAboutOpen(false);
+    setDemoPanelOpen(false);
+    setLocationHelpOpen(false);
+    setSelectedZoneId(null);
+    setSettingsOpen(false);
+  }, [engineView.state]);
+
   const handleMapController = useCallback(
     (controller: LeafletMapController | null) => {
       mapControllerRef.current = controller;
@@ -414,6 +423,28 @@ export function HomeScreen({
     setNowEpochMs(nowEpochMs);
     engineRef.current?.dispatch(
       { kind: "CancelTapped" },
+      { nowEpochMs, zone: activeZone },
+    );
+  }, [currentZone, engineView.activeZoneId, zones]);
+  const handleHelpNow = useCallback(() => {
+    const nowEpochMs = browserClock.nowEpochMs();
+    const activeZone =
+      zones.find(({ stationId }) => stationId === engineView.activeZoneId) ??
+      currentZone;
+    setNowEpochMs(nowEpochMs);
+    engineRef.current?.dispatch(
+      { kind: "HelpNowTapped" },
+      { nowEpochMs, zone: activeZone },
+    );
+  }, [currentZone, engineView.activeZoneId, zones]);
+  const handlePinAccepted = useCallback(() => {
+    const nowEpochMs = browserClock.nowEpochMs();
+    const activeZone =
+      zones.find(({ stationId }) => stationId === engineView.activeZoneId) ??
+      currentZone;
+    setNowEpochMs(nowEpochMs);
+    engineRef.current?.dispatch(
+      { kind: "PinAccepted" },
       { nowEpochMs, zone: activeZone },
     );
   }, [currentZone, engineView.activeZoneId, zones]);
@@ -525,7 +556,7 @@ export function HomeScreen({
     />
   );
 
-  if (aboutOpen) {
+  if (aboutOpen && engineView.state !== "SOS_ACTIVE") {
     return (
       <>
         {appSessionStatus}
@@ -537,6 +568,9 @@ export function HomeScreen({
           realClaims={[
             copy.aboutRealMap,
             copy.aboutRealDetail,
+            copy.aboutRealLadder,
+            copy.aboutRealFamily,
+            copy.aboutRealSos,
           ]}
           versionCode={buildVersion.code}
           versionName={buildVersion.name}
@@ -545,7 +579,7 @@ export function HomeScreen({
     );
   }
 
-  if (settingsOpen) {
+  if (settingsOpen && engineView.state !== "SOS_ACTIVE") {
     return (
       <>
         {appSessionStatus}
@@ -593,9 +627,11 @@ export function HomeScreen({
         onArmBannerHidden={() => setArmBannerVisible(false)}
         onCheckInOk={handleCheckInOk}
         onFamilyCancel={handleFamilyCancel}
+        onHelpNow={handleHelpNow}
         onLocationHelpOpen={handleLocationHelpOpen}
         onManualArm={handleManualArm}
         onManualDisarm={handleManualDisarm}
+        onPinAccepted={handlePinAccepted}
         pageStoppedWarning={pageStoppedWarning}
         policeStations={policeStations}
       />

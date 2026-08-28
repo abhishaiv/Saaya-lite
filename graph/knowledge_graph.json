@@ -313,9 +313,9 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 388,
-  "edges": 676,
-  "events": 68
+  "entities": 389,
+  "edges": 677,
+  "events": 70
  },
  "entities": [
   {
@@ -3121,6 +3121,12 @@
    "class": "Decision",
    "at": "2026-08-27",
    "label": "Onboarding captures her own name into user_name in the settings store, device only, never uploaded. The frozen family message opens 'Saaya alert - {name} may need help' and that name is hers: without it the message cannot say who it is about, which is the one thing its recipient needs, and it is the artefact on camera at 1:38 in the video. Optional, with family_subject_fallback when unset, because the ladder is never blocked on missing config. Not added to the SUS event, which is anonymous, nor to the SOS incident, which carries a pseudonymous id."
+  },
+  {
+   "id": "d.m1.sos_delivery_staging",
+   "class": "Decision",
+   "label": "M1 keeps the SOS screen limited to the local sticky state and PIN stop flow until M2's real writer and queue can truthfully show what crossed the boundary.",
+   "node": "M1"
   }
  ],
  "edges": [
@@ -8531,6 +8537,14 @@
    "at": "2026-08-27",
    "by": "codex",
    "confidence": "high"
+  },
+  {
+   "from": "d.m1.sos_delivery_staging",
+   "rel": "respects",
+   "to": "con.boundary",
+   "at": "2026-08-28",
+   "by": "codex",
+   "confidence": "high"
   }
  ],
  "events": [
@@ -9310,6 +9324,25 @@
    "actor": "codex",
    "detail": "Reconciled STATES_CATALOGUE to the founder-approved location-revocation arm-mode split: AUTO_ZONE disarms while MANUAL continues with an honest warning.",
    "node": "M4"
+  },
+  {
+   "id": "ev.0069",
+   "type": "decision_made",
+   "at": "2026-08-28",
+   "actor": "codex",
+   "detail": "M1 SOS delivery presentation remains deferred to M2's real writer to avoid a false delivery claim.",
+   "refs": [
+    "d.m1.sos_delivery_staging"
+   ],
+   "node": "M1"
+  },
+  {
+   "id": "ev.0070",
+   "type": "verifier_killed",
+   "at": "2026-08-28",
+   "actor": "codex",
+   "detail": "M1 spec verifier found SOS delivery presentation pending M2, plus back and focus issues; the latter were corrected before the step checkpoint.",
+   "node": "M1"
   }
  ]
 }
