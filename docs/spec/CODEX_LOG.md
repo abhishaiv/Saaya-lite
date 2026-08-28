@@ -291,3 +291,5 @@ T1.3 (2026-08-26): C1-C14, the 320 px development gallery, self-hosted fonts and
 **Needed correcting:** Chrome rendered the former CARTO tile URL as a successful image visibly marked “API KEY REQUIRED,” so normal tile-error handling could never recover. The onboarding also opened directly on unlabeled contact inputs, hiding the intended Welcome and leaving the name/number relationship unclear.
 
 **Shipped:** The map now uses keyless OpenStreetMap Standard tiles with its required attribution and outline-first zones. Onboarding starts with Welcome, then presents visible favourite name and `+91` phone labels, validates ten national digits, and stores the local number as E.164. Local build, strict checks, all 154 tests, G6, G10 and graph validation passed before deployment.
+
+**Chrome evidence:** At `https://saaya-lite.vercel.app/` in Chrome at 390 × 844, the deployed Home surface loaded 15 OpenStreetMap tiles, zero CARTO tiles and no API-key text; its 19 unselected zones were outlines. A fresh local Chrome origin displayed the Welcome screen, then the three visibly labeled name/phone controls and fixed `+91` prefix.
