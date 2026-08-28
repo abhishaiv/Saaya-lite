@@ -1,4 +1,5 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
+import { getAuth, signInAnonymously } from "firebase/auth";
 import { getFirestore, collection, addDoc, serverTimestamp, setDoc, doc } from "firebase/firestore";
 import fs from "node:fs";
 import path from "node:path";
@@ -28,7 +29,13 @@ const firebaseConfig = {
 };
 
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
-const db = getFirestore(app);
+// See src/data/firebase/firebaseApp.ts: the project's database is literally named
+// "default", not the SDK's implicit "(default)". Must be explicit or every write fails.
+const db = getFirestore(app, "default");
+const auth = getAuth(app);
+// Rules require request.auth != null on every create. Sign in the same way the real
+// app does before writing anything.
+await signInAnonymously(auth);
 
 const SYNTHETIC_SUS_FIXTURES = [
   {
@@ -103,6 +110,9 @@ export async function seedFixtures() {
   for (const sos of SYNTHETIC_SOS_FIXTURES) {
     const docRef = await addDoc(collection(db, "sos_incidents"), {
       ...sos,
+      // Rules require this to equal request.auth.uid exactly. A fixture-fixed
+      // placeholder cannot pass that check against a real signed-in session.
+      uid: auth.currentUser.uid,
       triggeredAt: serverTimestamp(),
     });
     console.log("Seeded sos_incident:", docRef.id);

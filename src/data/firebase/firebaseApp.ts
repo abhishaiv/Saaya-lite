@@ -61,7 +61,14 @@ export function getSaayaFirestore(customConfig?: SaayaFirebaseConfig): Firestore
     return cachedFirestore;
   }
   const app = getSaayaFirebaseApp(customConfig);
-  cachedFirestore = getFirestore(app);
+  // The saaya-lite project's Firestore database is literally named "default" (no
+  // parentheses), not the SDK's implicit "(default)" sentinel — Firebase's own console
+  // creation flow does not accept "(default)" as typed input, since parentheses are not
+  // valid GCP resource-id characters. Omitting the second argument here silently targets
+  // a database that does not exist and fails with a generic transport-level NOT_FOUND
+  // that gives no indication this is the cause. Verified live against production
+  // 2026-08-28: anonymous auth succeeds, but every write fails until this is explicit.
+  cachedFirestore = getFirestore(app, "default");
   return cachedFirestore;
 }
 
