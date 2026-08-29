@@ -291,7 +291,18 @@ export function HomeScreen({
         if (sessionId !== undefined) clearDemoArmedSession(sessionId);
         setDemoSessionActive(false);
       }
-      sessionRuntime.handle(commands, view.state);
+      // The labelled demo picker simulates the already-proven zone entry. Starting
+      // a real watch here would immediately revoke that simulated AUTO_ZONE session
+      // on a browser where location was deliberately denied during onboarding.
+      // Timers and every subsequent engine transition still run through the same
+      // runtime; only this physical watch start is omitted for the mock entry.
+      const runtimeCommands =
+        demoArmInFlightRef.current &&
+        view.state === "SHADOW" &&
+        view.armMode === "AUTO_ZONE"
+          ? commands.filter((command) => command.kind !== "StartLocationWatch")
+          : commands;
+      sessionRuntime.handle(runtimeCommands, view.state);
     };
     locationRuntimeRef.current = runtime;
     let disposed = false;
