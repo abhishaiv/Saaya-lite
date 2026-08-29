@@ -3,8 +3,9 @@
 ## Principle
 
 **Anything that could identify her stays on the device.** Contacts, PIN, session history
-and precise location live in IndexedDB and are never uploaded. Firestore receives exactly two
-things: an anonymised SUS event, and a full SOS incident.
+and precise location live in IndexedDB and are never uploaded. Lite constructs no Firestore
+client, payload, delivery queue or console. The former state-view schemas below are retained
+only as a clearly labelled round-two design, never as a current-product claim.
 
 ---
 
@@ -149,29 +150,20 @@ interface wins.
 | `armedAtEpochMs` | number | |
 | `armedHourBand` | HourBand \| null | frozen at arm, `FREEZE_AT_ARM`. null for `MANUAL`. **Required for recovery.** |
 | `deadlineEpochMs` | number \| null | absolute. Countdowns are recomputed from this, never resumed. |
-| `susEventWritten` | boolean | |
+| `susEventWritten` | boolean | reserved for the round-two writer; always `false` in Lite |
 | `outcome` | Outcome \| undefined | `RESOLVED_OK` \| `CANCELLED` \| `ESCALATED_SOS` \| `DISARMED` |
 | `endedAtEpochMs` | number \| null | local history only, not part of `PersistedSession` |
 
-### `session_event` (the local timeline, feeds the SOS payload)
-| Column | Type | Note |
-|---|---|---|
-| `id` | Int PK autoincrement | |
-| `sessionId` | String FK | |
-| `at` | Long | |
-| `type` | String | `ARMED`,`CHECKIN_1_SHOWN`,`CHECKIN_1_MISSED`,`CHECKIN_2_SHOWN`,`CHECKIN_2_MISSED`,`OK_TAPPED`,`FAMILY_NOTIFIED`,`CANCELLED`,`SOS_TRIGGERED`,`SOS_STOPPED`,`ZONE_EXIT`,`DISARMED` |
-| `detail` | String? | JSON blob |
+### No `session_event` store in Lite
 
-### `queued_event` (the offline queue, F22)
-| Column | Type | Note |
-|---|---|---|
-| `id` | Int PK autoincrement | |
-| `kind` | String | `SUS_EVENT` \| `SOS_INCIDENT` \| `SOS_UPDATE` |
-| `payloadJson` | String | exactly what will be written to Firestore |
-| `status` | String | `PENDING` \| `SENT` \| `FAILED_PERMANENT` |
-| `attempts` | Int | |
-| `createdAt` / `lastAttemptAt` | Long | |
-| `remoteId` | String? | Firestore doc id once sent |
+Lite persists only the active session required for timer recovery. It has no local timeline
+or audit trail in this round; the former `session_event` shape is deferred with the future
+writer design so the UI never claims one exists.
+
+### No `queued_event` store in Lite
+
+F22 is cut to round two. Lite never serialises a payload for delivery, so it has no remote
+queue, retry status or remote identifier.
 
 ### Settings store (IndexedDB object store `settings`)
 
@@ -191,7 +183,11 @@ It is still never stored in plaintext.
 
 ---
 
-## Firestore (the state view)
+## Round-two Firestore design — not present in Lite
+
+No Firebase project is configured or contacted by this build. There is no anonymous auth,
+writer, queue, public read or console route. The following is a retained design reference
+for a separately approved round-two build; it must never be cited as live Lite behaviour.
 
 Project: a **NEW** Firebase project. Never Saaya production.
 Auth: **anonymous only**. The UID is the pseudonymous identifier used in SOS incidents.
@@ -333,8 +329,6 @@ export async function openSaayaDb() {
         for (const name of Array.from(db.objectStoreNames)) db.deleteObjectStore(name);
       }
       db.createObjectStore("session", { keyPath: "sessionId" });
-      db.createObjectStore("session_event", { keyPath: "id", autoIncrement: true });
-      db.createObjectStore("queued_event", { keyPath: "id", autoIncrement: true });
       db.createObjectStore("contact", { keyPath: "id", autoIncrement: true });
       db.createObjectStore("settings");
     },
@@ -350,7 +344,7 @@ Say so in the write-up rather than letting a reviewer assume we did not know.
 If the schema changes mid-build, bump the version and let it wipe. Do not hand-write a
 migration.
 
-## Firestore composite indexes
+## Round-two Firestore composite indexes
 
 Create these on **E8, not E9**. A missing index throws at runtime with a console link, and
 finding that out an hour before submission is avoidable.
@@ -391,7 +385,7 @@ finding that out an hour before submission is avoidable.
 Deploy with `firebase deploy --only firestore:indexes`. Verify each one resolves by running
 the console's three filters before leaving E8.
 
-## `session_event.detail` shapes
+## Round-two `session_event.detail` shapes
 
 The column is nullable JSON. These are the only shapes it ever holds.
 
@@ -404,12 +398,12 @@ The column is nullable JSON. These are the only shapes it ever holds.
 | `CHECKIN_2_SHOWN` | `{"deadlineEpochMs":1755835872000}` |
 | `CHECKIN_2_MISSED` | `null` |
 | `OK_TAPPED` | `{"step":1}` or `{"step":2}` |
-| `FAMILY_NOTIFIED` | `{"contactCount":1,"queued":true}` |
+| `FAMILY_PREVIEW_SHOWN` | `null` |
 | `CANCELLED` | `{"secondsRemaining":18}` |
 | `SOS_TRIGGERED` | `{"trigger":"LADDER_LAPSE"}` or `{"trigger":"MANUAL_HELP_BUTTON"}` |
 | `SOS_STOPPED` | `{"pinAttempts":1}` |
 | `ZONE_EXIT` | `{"zoneId":"dwaraka_police_station"}` |
 | `DISARMED` | `{"reason":"USER"}` or `{"reason":"PERMISSION_REVOKED"}` |
 
-**`detail` never contains a coordinate, a name or a phone number**, because the SOS
-timeline is built from these rows and uploaded.
+**`detail` never contains a coordinate, a name or a phone number.** This is a round-two
+design constraint; Lite does not construct the timeline.

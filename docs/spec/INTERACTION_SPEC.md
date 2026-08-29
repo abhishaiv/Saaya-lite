@@ -1,6 +1,10 @@
 # Saaya Lite - Interaction, Haptics and Sound
 
-## Sound policy
+**Lite current behaviour:** check-ins are in-page only. It has no sound or haptic performer
+and does not post system notifications. The detailed haptic and sound material below is a
+round-two design reference, not a shipped claim.
+
+## Round-two sound policy - not implemented in Lite
 
 Founder decision: **escalating haptics, sound only from check-in 2.**
 
@@ -40,9 +44,9 @@ escalation, and the visible card is the fallback under that.
 2. **Never disturb a live SOS with another sound.** Suppress all other audio and haptics
    while `SOS_ACTIVE`.
 
-There is no system haptics setting to read on the web. If `navigator.vibrate` is absent or
-returns false, carry on silently; **do** still play the escalation sounds, because those
-are safety-critical.
+There is no system haptics setting to read on the web. Lite carries on silently: it has no
+sound or haptic performer. A future round-two implementation must feature-detect before using
+either capability.
 
 ## Gestures
 
@@ -58,8 +62,8 @@ are safety-critical.
 | Zone sheet | swipe down | dismiss |
 | `LadderCard` | tap scrim | **nothing.** Deliberately not dismissible. |
 | `LadderCard` | swipe | **nothing.** |
-| Check-in 1 notification | swipe away | dismisses the notification, **not the countdown**. `checkin_persist_note` says so on the card. |
-| Any list | pull to refresh | **not used anywhere.** Data is local or live. |
+| Check-in 1 card | swipe away | **nothing.** The in-page card is deliberately not dismissible; its countdown continues. |
+| Any list | pull to refresh | **not used anywhere.** Lite uses frozen local data. |
 
 ## Back button, per screen
 
@@ -70,8 +74,8 @@ are safety-critical.
 | Home | exits the app (single press, standard) |
 | Zone sheet | dismisses the sheet |
 | Settings and children | pops normally |
-| Police view | pops to Home |
-| `CHECKIN_1` | dismisses the card, countdown continues, returns to Home |
+| State view | not present in Lite |
+| `CHECKIN_1` | stays on Home; the in-page card remains visible and the countdown continues |
 | **`CHECKIN_2`** | **consumed. Nothing happens.** |
 | **`FAMILY_ESCALATED`** | **consumed.** |
 | **`SOS_ACTIVE`** | **consumed. Only the PIN exits.** |
@@ -112,8 +116,8 @@ never as a toast, never as a dialog.
 | Case | Behaviour |
 |---|---|
 | Incoming call during check-in | check-in continues underneath, countdown unaffected, re-presents when the call ends |
-| Incoming call during SOS | SOS continues, notification stays |
+| Incoming call during SOS | SOS remains active; the in-page overlay re-presents when the page returns to the foreground |
 | Tab hidden during ladder | the absolute deadline in IndexedDB owns the timing. Timers do not run reliably while hidden, so the ladder is reconciled on `visibilitychange` and on load, never resumed. |
-| Screen off during check-in 2 | a browser cannot turn the screen on. The notification is posted with `requireInteraction: true` and the ladder continues against its absolute deadline. Disclosed as a platform limit. |
-| Battery saver enabled | detect and warn per `WEB_PLATFORM.md`. Never fail silently. |
-| Airplane mode | ladder unaffected, writes queue, UI states it is queued |
+| Screen off during check-in 2 | a browser cannot turn the screen on or guarantee an alert. The ladder reconciles against its absolute deadline when the page becomes visible. Disclosed as a platform limit. |
+| Battery saver enabled | browsers expose no reliable battery-saver signal. Lite makes no detection or warning claim. |
+| Airplane mode | ladder unaffected; no report is queued or claimed because this round-one build has no writer |

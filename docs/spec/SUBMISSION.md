@@ -35,10 +35,10 @@ name.
 
 She opens a map of Visakhapatnam's 24 police-jurisdiction risk zones to check a route. Enter
 a flagged zone at a flagged hour and it arms itself. An adaptive check-in follows, not a
-fixed timer. Miss two and her chosen favourites are told, with context: the area, the hour,
-that zone's record, the missed checks. Only if she still does not answer does SOS fire, and
-only then does anything identifying leave her phone. She is told the moment that line is
-crossed.
+fixed timer. Miss two and she sees the contextual local message a favourite would receive:
+the area, the hour, that zone's record, the missed checks. If she still does not answer,
+SOS opens with user-controlled dial actions. This Lite round sends no report and no safety
+data leaves her phone.
 
 Real: the map, zone detection, arming, the ladder, escalation, the PIN-protected SOS, both
 the four-step ladder. Mocked and labelled in the product: SMS delivery, which needs
@@ -114,8 +114,8 @@ facing violence sought any help, and about **7%** went to police.
 2. **The check-in adapts** to area and hour instead of a fixed timer.
 3. **The signal carries context by construction.** It is produced by circumstance, so it
    arrives already carrying the area, the hour, that area's record, and the missed check.
-4. **The trust boundary is a step she can see.** Nothing identifying leaves the phone
-   before SOS, and she is told the moment it does.
+4. **The trust boundary is a step she can see.** Nothing leaves the device in Lite. At
+   SOS, the screen says that plainly and offers only user-controlled dialler handoffs.
 
 ### Why it is better
 [the comparison table from `SCOPE.md`]
@@ -127,8 +127,8 @@ facing violence sought any help, and about **7%** went to police.
 [the MOCKED list from `SCOPE.md`, verbatim]
 - SMS and WhatsApp delivery: composed and shown, not sent. Real delivery needs India DLT
   registration, a months-long regulatory process.
-- There is no backend in this build. Nothing leaves the device at all, which is stronger
-  than the privacy claim we set out to make. **Connected to no government system.**
+- There is no backend in this build. No personal, session or precise-location safety data
+  leaves the device; ordinary public map-tile reads still occur. **Connected to no government system.**
 - There is no Firestore in this build. In round two the state view returns with role-based access and
   an audit trail.
 - IndexedDB uses destructive migration, correct for a prototype and wrong for a real product.
@@ -170,10 +170,10 @@ We would rather be checked than believed.
 | Claim | How to verify |
 |---|---|
 | No AI anywhere | `grep -ri "openai\|gpt\|ml\|model" app/src` → [paste V7 output] |
-| Cannot listen, watch or send | manifest has no `RECORD_AUDIO`, `CAMERA`, `SEND_SMS` → [paste V8 output] |
-| Favourites never leave the device | `allowBackup="false"`, no upload path, `FavouriteRepository` has no remote |
-| Nothing leaves the device at all | there is no network call in the build. Open devtools, run the whole ladder, watch the network tab stay empty. Stronger than the claim we set out to make. |
-| Nothing sent before SOS | `SessionEngineTest`: zero write commands across IDLE → SHADOW → CHECKIN_1 → CHECKIN_2 |
+| Cannot listen, watch or send automatically | V8 finds no microphone, camera or contacts API call; SOS uses user-controlled `tel:` links only. |
+| Favourites never leave the device | local IndexedDB repository, no application upload path |
+| No safety data leaves the device | run the ladder in devtools: ordinary public map-tile reads may occur, but no application request carries personal, session or precise-location safety data. |
+| Local-only ladder | `HomeSessionRuntimeTest`: future write/notify intents have no Lite performer, and the screens disclose the local preview and local SOS. |
 
 ### Known limitations
 - One city. Visakhapatnam only, because that is where the audited data is.
@@ -190,7 +190,7 @@ We would rather be checked than believed.
 
 | # | Check | Done |
 |---|---|---|
-| 1 | Console loads, logged out, private window, phone, different network | |
+| 1 | **Cut, round two.** No console is published or claimed. | |
 | 2 | the deployed site loads on a clean phone from the submission link, private window, no sign-in | |
 | 3 | Video plays with no sign-in, under 3:00 | |
 | 4 | Repo opens with no access request | |

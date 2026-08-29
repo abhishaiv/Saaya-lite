@@ -21,14 +21,14 @@ protect the submission's claims**, so they are not optional.
 | Test | Assertion |
 |---|---|
 | Happy path | `IDLE` + `ZoneEntered(high, 04:00)` -> `SHADOW`, one `ScheduleTimer` |
-| No arm in a safe zone | stays `IDLE`, **emits zero commands and zero notifications** |
+| No arm in a safe zone | stays `IDLE`, **emits zero commands and no visible alert** |
 | Full ladder | `SHADOW` -> `CHECKIN_1` -> `CHECKIN_2` -> `FAMILY_ESCALATED` -> `SOS_ACTIVE` at exactly 90 / 60 / 60 s |
 | `OK` at step 1 | returns to `SHADOW`, cancels CD1, reschedules, applies the 20 min cooldown |
 | `OK` at step 2 | same |
 | Manual disarm at step 1 | `RESOLVED(DISARMED)`; exact commands are `CancelTimer(CD1)`, `HideCheckIn`, `StopLocationWatch`, `ReleaseWakeLock`, `StartCooldown(45)`; no write, notification or PIN command |
 | Manual disarm at step 2 | `RESOLVED(DISARMED)`; exact commands are `CancelTimer(CD2)`, `HideCheckIn`, `StopLocationWatch`, `ReleaseWakeLock`, `StartCooldown(45)`; no write, notification or PIN command |
-| Cancel in the family window | `RESOLVED(CANCELLED)`, emits the SUS outcome patch to `CANCELLED_BY_USER` |
-| Help Now from `SHADOW` | straight to `SOS_ACTIVE`, **and also emits a SUS event** so the civic layer is not blind |
+| Cancel in the family window | `RESOLVED(CANCELLED)`, local cleanup. The frozen future SUS-outcome intent has no Lite performer. |
+| Help Now from `SHADOW` | straight to `SOS_ACTIVE`, with no application safety-data delivery |
 | SOS is sticky | every event except `PinAccepted` leaves it in `SOS_ACTIVE` |
 | Zone exit during `CHECKIN_2` | ladder continues, does not resolve |
 | Zone exit while manually armed | stays `SHADOW` |
@@ -36,14 +36,14 @@ protect the submission's claims**, so they are not optional.
 | Enter dwell | arming does not fire before 60 s continuous containment |
 | Exit dwell | disarming does not fire before 180 s continuous non-containment |
 | Cooldown after manual disarm | re-entry within 45 min does not re-arm |
-| Demo divisor | with `DEMO`, ladder totals 35 s and the written payloads are byte-identical to `NORMAL` |
+| Demo divisor | with `DEMO`, ladder totals 35 s without changing the local-only delivery boundary |
 | Frozen band reschedule | MODERATE armed in `NIGHT_DEEP`, then `OkTapped` during `DAWN`, remains `SHADOW` and reschedules for 12 min |
 | Active crossing | entering a current-band n/a cell does not disarm or interrupt an active session |
 | Frozen-band recovery | process recovery retains persisted `armedHourBand` and uses the absolute `deadlineEpochMs` |
 | Overdue SHADOW recovery | a passed persisted deadline immediately advances as `CheckInTimerFired` |
 | Fresh n/a attempt | after resolution, a new MODERATE + `DAWN` arming attempt stays `IDLE` |
 | Manual across bands | every band reschedules a MANUAL session at 10 min with `armedHourBand=null` |
-| Hour change silence | changing the current band alone emits no backend command, notification or user interruption |
+| Hour change silence | changing the current band alone emits no delivery, system alert or user interruption |
 
 ### `dwellEvaluator.test.ts` (pure, fake clock, no browser)
 
@@ -74,27 +74,17 @@ hand off and no background-permission branch. Do not test for those.
 | Polygon is authoritative | a point inside the bounding box but outside the polygon is **not** contained |
 | Radius is unread | `geofenceRadiusM` appears in no containment code path |
 
-### `anonymiser.test.ts` - **the trust boundary, and the most important test in the build**
-| Test | Assertion |
-|---|---|
-| SUS payload keys | exactly the allowed set. Assert `latitude`, `longitude`, `sessionId`, `uid`, `deviceId` are **absent** |
-| SUS carries no fine time | `dateLocal` is a date and `hourLocal` is an integer hour. No minutes, no seconds. |
-| Two SUS events from one session | contain nothing that links them |
-| Nothing writes before family escalation | drive `IDLE`->`SHADOW`->`CHECKIN_1`->`CHECKIN_2` and assert **zero** backend-write commands |
-| Family boundary | entering `FAMILY_ESCALATED` emits exactly one anonymous `WriteSusEvent` intent and no `WriteSosIncident` |
-| SOS boundary | entering `SOS_ACTIVE` emits `WriteSosIncident`; this is the first detailed state-visible incident |
-| SOS payload | contains precise location and uid, and `contactsNotified` is an Int, never names |
-
-### `queue.test.ts`
-Backoff sequence is 5/15/60/300/900 s; `SOS_INCIDENT` is drained before any `SUS_EVENT`;
-after 20 attempts the status is `FAILED_PERMANENT` and it surfaces in UI state.
+### `anonymiser.test.ts` and `queue.test.ts` — **Cut, round two**
+Lite ships no Firestore writer, delivery queue or payload builder. The pure engine retains
+future delivery intents, but the round-one runtime ignores them. M2 returns only when those
+writers and their adversarial payload tests can ship together.
 
 ### `zoneParsing.test.ts`
 24 features parse; tier counts are HIGH 6, MODERATE 9, ELEVATED 4, SAFE 5; every centroid **and every polygon vertex**
 falls inside the district envelope `lat 17.4..18.1, lon 82.9..83.7` (**catches the GeoJSON lon/lat swap**); all
 19 non-safe zones join to a `zone_info_cards.json` entry; all 37 stations parse with a phone.
 
-## Layer 2: browser integration tests - **three only**
+## Layer 2: browser integration tests - **two only**
 
 Prototype posture: these are slower to write than unit tests. Write only the three that
 protect a claim the submission makes.
@@ -103,7 +93,6 @@ protect a claim the submission makes.
 |---|---|---|
 | `pinStorage.test.ts` | the plaintext PIN appears nowhere in IndexedDB, `localStorage`, `sessionStorage` or the console | we claim the PIN is never stored in the clear |
 | `tabRecovery.test.ts` | hide the page mid-`CHECKIN_2`, restore, the remaining countdown is correct; hide during `FAMILY_ESCALATED` past the window, restore, it lands in `SOS_ACTIVE` | **a frozen tab must never rescue her from the ladder.** This is the web equivalent of process death and it cannot be unit-tested. |
-| `queueOffline.test.ts` | with the network offline the ladder completes and every write flushes on reconnect | "works on a slow Indian network" is a claim we make |
 
 ## Layer 3: manual browser script (run before submitting, record the result)
 
@@ -112,24 +101,25 @@ Run on a **real mobile browser** at the Vercel preview URL, not a desktop devtoo
 | # | Step | Pass condition |
 |---|---|---|
 | M1 | open the URL cold on a phone | loads under 2.5 s on 3G, no console errors |
-| M2 | complete onboarding | under 90 s, ends on the map |
+| M2 | complete onboarding | setup completes under 90 s, then the Saaya v2 lockup, Vizag-only beta note and safety-flow tour appear before the map's labelled DemoPanel opens |
 | M3 | deny geolocation | continues, explains, never dead-ends |
 | M4 | the map | 19 zones drawn, 5 SAFE zones absent, attribution visible |
 | M5 | throttle to offline, reload | zones still render with the map-offline note |
 | M6 | tap a high zone | counts, top crimes, nearest station, `tel:` link opens the dialer |
 | M7 | select a SAFE zone **from the DemoPanel picker** | `zone_safe_no_data`, not an empty card, and **no session arms**. SAFE zones are not drawn, so there is no map tap to test. |
 | M8 | demo panel, simulate entering a HIGH zone at NIGHT_DEEP | **arms with no tap**, banner names the zone and hour |
+| M8a | from idle, tap the floating SOS control | SOS opens immediately, offers user-controlled `tel:112`, `tel:181`, and nearest-station dial actions when a location is known; the local-only and no-government-link disclosures stay visible, and no application request carries personal, session or precise-location data |
 | M9 | wait for check-in 1 | correct interval, states why it checked now |
 | M10 | tap I'm OK | returns to watching, reschedules |
-| M11 | let both check-ins lapse | family screen shows the exact message and the mock disclosure |
-| M12 | cancel | resolves, console shows the SUS event as cancelled |
-| M13 | repeat and let it lapse | SOS appears instantly, states the state view has it |
+| M11 | let both check-ins lapse | family screen shows the exact local message preview and the mock disclosure |
+| M12 | cancel | resolves locally; ordinary map-tile reads aside, no application request carries personal, session or precise-location data |
+| M13 | repeat and let it lapse | SOS appears instantly, states that this beta sent no report, and offers the user-controlled dial actions |
 | M14 | try to leave SOS | back, refresh and navigation do not exit; only the PIN stops it |
 | M15 | **switch tabs mid-countdown for 30 s, return** | the countdown shows the CORRECT remaining time, not a reset one |
 | M16 | **switch away past a deadline, return** | the ladder has advanced, not paused |
-| M17 | airplane mode through the ladder | queued, UI says so, flushes on reconnect, nothing lost |
-| M18 | police view in each state | IDLE, SHADOW and both check-ins all headline "nothing" |
-| M19 | console in a signed-out private window on another network | loads, no prompt, shows the incident from M13 live |
+| M17 | airplane mode through the ladder | local ladder remains visible; it does not queue or claim a future send |
+| M18 | police view in each state | **Cut, round two.** No state-view route ships in this build. |
+| M19 | console in a signed-out private window on another network | **Cut, round two.** No console or live incident ships in Lite. |
 | M20 | browser text zoom 200% | no clipping on any screen |
 | M21 | Telugu | every screen translated, no untranslated key, no overflow |
 | M22 | Lighthouse mobile | performance 85 or better |
@@ -149,8 +139,8 @@ open**, and the manual script tests exactly that.
 |---|---|---|
 | arms with no tap | M8, on a real phone, page open | needs the page open |
 | the ladder survives interruption | M15, M16 | a closed tab stops it; on reopen we detect and disclose |
-| escalation survives a bad network | M17 | none |
-| nothing crosses before SOS | `anonymiser.test.ts` + the network tab during M13 | none |
+| local ladder survives a bad network | M17 | no delivery or queue is claimed |
+| no safety data crosses | M8a + the network tab through M13 | ordinary map-tile reads can occur, but no application request carries personal, session or precise-location safety data |
 
 **Do not claim background arming.** It is disclosed in the product, in `WEB_PLATFORM.md`, and
 in the 250 words. Saying exactly where the browser stops is the architecture answer.
@@ -159,14 +149,14 @@ in the 250 words. Saying exactly where the browser stops is the architecture ans
 
 | # | Check |
 |---|---|
-| V1 | Console URL loads in a private window with no login |
+| V1 | **Cut, round two.** No console URL ships in Lite. |
 | V2 | the deployed site loads on a real phone from the submission link, in a private window, with no sign-in |
 | V3 | Video plays without sign-in |
 | V4 | Repo link, if provided, opens without an access request |
 | V5 | No screen anywhere shows a government logo or implies endorsement |
 | V6 | Every mock is labelled in the product, not only in the write-up |
 | V7 | `grep -ri "openai\|gpt\|claude\|ml\|model"` over the source returns nothing that contradicts the no-AI claim |
-| V8 | `grep -rn "getUserMedia\|MediaRecorder\|navigator.contacts\|ContactsManager" src app` returns nothing, and a full run of the ladder in devtools prompts for **geolocation and notifications only** |
+| V8 | `grep -rn "getUserMedia\|MediaRecorder\|navigator.contacts\|ContactsManager" src app` returns nothing, and a full run of the ladder in devtools prompts for **geolocation only** |
 | V9 | Every font in `public/fonts` shapes identically to its upstream source: glyph ids and advances match per shaping run over every keyed bilingual row of `COPY.md`, segmented by the declared font stack. Licence files present beside them. Total under `font.budget`. |
 
 V7, V8 and V9 are how we prove the honesty claims rather than assert them. V8 replaces an

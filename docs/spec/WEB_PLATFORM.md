@@ -13,8 +13,9 @@ We do not paper over this. We handle it three ways:
 
 1. **The journey that actually works, live.** She opens the map to check a stretch, which is
    the reason she opens it at all. From that moment the page holds a wake lock, watches
-   position, arms on zone entry, runs the ladder, escalates, and writes to the state view.
-   Reviewers complete that end to end.
+   position, arms on zone entry, runs the ladder and escalates locally. The round-one
+   runtime has no writer, so reviewers see the local-only SOS disclosure and use the
+   user-controlled dial handoff rather than a false state-view claim.
 2. **The disclosure**, in the product and in the 250 words: pocket-in-the-background arming
    needs a native runtime. This is the honest half of the architecture answer, and the brief
    scores Honesty explicitly.
@@ -27,13 +28,13 @@ Saying exactly where the browser stops is a better architecture answer than pret
 
 | Layer | Choice | Why |
 |---|---|---|
-| Framework | **Next.js (App Router), TypeScript** | the brief names Vercel; API routes give us server-side Firestore writes |
+| Framework | **Next.js (App Router), TypeScript** | the brief names Vercel; Lite ships no API routes or remote writers |
 | Hosting | **Vercel**, deployed from the GitHub repo | named in the brief; push-to-deploy |
 | Map | **Leaflet** + OpenStreetMap Standard tiles | no key, no billing, and an offline tile state that leaves bundled zones usable |
 | State | React state + a reducer wrapping the pure engine | the engine is unchanged: pure TypeScript, no DOM |
-| Local storage | **IndexedDB** (favourites, session, queue), `localStorage` for flags | replaces Room |
+| Local storage | **IndexedDB** (favourites, session), `localStorage` for flags | replaces Room |
 | PIN | **Web Crypto** `SHA-256` over salt+pin | replaces EncryptedSharedPreferences |
-| Backend | **Firestore**, same project `saaya-lite` | unchanged |
+| Backend | **None in Lite** | Firestore is reserved for the cut round-two state view |
 | Fonts | Poppins + Noto Sans Telugu, self-hosted, `font-display: swap` | unchanged values |
 
 ## Browser APIs, and what each replaces
@@ -44,7 +45,7 @@ Saying exactly where the browser stops is a better architecture answer than pret
 | Geofencing API | **point-in-polygon in JS, on every fix**, with each polygon's **bounding box** as the pre-filter | the polygon is authoritative. `geofence_radius_m` is **not** used: see the prefilter rule below. |
 | Wake lock plus a visible page | **Wake Lock API** + Page Visibility | `navigator.wakeLock.request('screen')` while armed, so the ladder keeps running |
 | `an absolute deadline in IndexedDB` | `setTimeout` + an **absolute deadline in IndexedDB** | on visibility change, recompute from the deadline. Never trust the timer to have run. |
-| Notification channels | **Notification API** via `ServiceWorkerRegistration.showNotification` | `requireInteraction: true` for check-in 2. See the Service Worker rule below: Chrome on Android has no `Notification` constructor, so the worker is not optional. |
+| System notifications | **Not used in Lite** | Check-ins are in-page while the page is open. Lite neither asks for notification permission nor calls `showNotification`. |
 | Full-screen intent | an in-page full-screen overlay | a browser cannot wake a locked phone. Disclosed. |
 | `allowBackup=false` | nothing leaves the device by default | favourites and the PIN hash live in IndexedDB and are never uploaded |
 | Battery optimisation | Page Visibility + a stale-heartbeat check | if the tab was frozen, say so honestly on return |
@@ -56,9 +57,7 @@ dead-end on a denial.
 
 1. **Geolocation** — a rationale screen in her words, then `getCurrentPosition`. Denied:
    continue with the map and manual arming, say so plainly.
-2. **Notifications** — requested only when she first arms, never on load. Denied: the
-   in-page ladder still runs while the tab is open.
-3. **Wake Lock** — no prompt. Request on arm, re-request on visibility change, ignore failure.
+2. **Wake Lock** — no prompt. Request on arm, re-request on visibility change, ignore failure.
 
 **Never request anything on page load.** A permission prompt before the first screen is the
 web equivalent of an install wall.
@@ -71,7 +70,7 @@ web equivalent of an install wall.
 | Tab visible again | **recompute the ladder from the deadline, never resume the countdown.** If the deadline passed while hidden, advance the ladder immediately, exactly as the Android recovery table said. |
 | Tab closed mid-session | on next open, detect the live session, show what happened, offer resume or resolve |
 | Page refreshed | session survives in IndexedDB; state rehydrates |
-| Offline | the ladder is local and unaffected. Writes queue in IndexedDB and flush on reconnect. |
+| Offline | the ladder is local and unaffected. Lite has no writer, queue or reconnect flush. |
 
 The principle from `STATE_MACHINE.md` is unchanged: **a frozen tab must never rescue her
 from the ladder.**
@@ -89,16 +88,17 @@ from the ladder.**
 No web fonts blocking first paint. No map library on the critical path: zones can draw
 before Leaflet loads.
 
-## The Service Worker, and exactly what it is for
+## The Service Worker — registered but not used for Lite alerts
 
 There is **one** Service Worker and it exists for **one** reason: Chrome on Android does not
 implement the `Notification` constructor. `new Notification(...)` throws there, and
 `ServiceWorkerRegistration.showNotification()` is the only way to post a notification on our
-primary target platform. Without the worker, check-ins are silent on most Indian phones.
+primary target platform. The worker remains a narrow round-two capability; Lite does not
+request notification permission or post notifications, so it never claims a system alert.
 
 **It has no `fetch` handler and it caches nothing.** Not assets, not tiles, not data. It
-registers, it shows notifications, and it handles `notificationclick` to focus the tab.
-That is the whole file.
+registers, has no `fetch` handler, and has no current Lite delivery work. That is the
+whole file.
 
 Three consequences, stated so nobody implements around them:
 
@@ -108,12 +108,12 @@ Three consequences, stated so nobody implements around them:
    browser HTTP cache and OpenStreetMap's headers, and nothing else.
 3. **"Offline" in this product means one specific thing:** the page is already open and
    connectivity drops. Zones stay drawn because they were already parsed, tiles stop
-   arriving and we say so, and every write queues in IndexedDB and flushes on reconnect.
-   That is a real and demonstrable resilience story. The other kind is not, so do not
-   promise it.
+   arriving and we say so. The local ladder continues, but Lite has no writer, queue or
+   reconnect flush to promise.
 
 ## What is deliberately absent
 
 No analytics, no third-party scripts, no cookies beyond a session flag, and a Service Worker
-that caches nothing at all. A reviewer can open devtools and see that nothing leaves the
-device before SOS.
+that caches nothing at all. A reviewer can open devtools and see no application request
+carrying personal, session or precise-location safety data at any ladder stage; ordinary
+public map-tile reads are not safety-data delivery.

@@ -26,7 +26,7 @@ const STATUS_LABELS: StatusPillLabels = {
   shadowManual: "Watching, you turned this on",
   checkIn1: "Checking in",
   checkIn2: "Still there?",
-  family: "Telling your favourites",
+  family: "Preparing a message",
   sos: "SOS active",
 };
 

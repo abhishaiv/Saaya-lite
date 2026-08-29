@@ -74,9 +74,9 @@ session in any tier. This is the rule the demo control has to respect.
 which a HIGH zone genuinely arms.
 
 **One frozen hour, one source, used by everything that shows or derives an hour** for that
-session: the arm banner's `%2$s`, `checkin1_reason`'s `%3$s`, the hour band that
-`FREEZE_AT_ARM` captures into `armedHourBand`, and the `hourBand` on the SUS record. Browser
-QA found the banner reading "5 pm" while the session claimed `NIGHT_DEEP`, which is a state
+session: the arm banner's `%2$s`, `checkin1_reason`'s `%3$s`, and the hour band that
+`FREEZE_AT_ARM` captures into `armedHourBand`. A future round-two SUS record would derive
+from that same source; Lite writes no record. Browser QA found the banner reading "5 pm" while the session claimed `NIGHT_DEEP`, which is a state
 the matrix above forbids; that happened because the band was forced and the displayed hour
 was not. Deriving both from one value is what stops it recurring.
 
@@ -116,11 +116,9 @@ visible in the UI: the check-in screen states why it checked when it did.
 
 Total from check-in 1 appearing to SOS: **210 s (3 min 30 s)**.
 
-Check-in 2 differs from check-in 1: a full-screen in-page overlay, the urgent sound, and
-the long vibration pattern where `navigator.vibrate` exists. Check-in 1 is gentle: a plain
-notification and a short vibration. **Nothing here bypasses Do Not Disturb or the silent
-switch.** A web page cannot, and `INTERACTION_SPEC.md` states the limit rather than
-claiming otherwise.
+Check-in 2 differs from check-in 1 through the stronger in-page overlay. Lite has no sound,
+haptic or system-notification performer. The historical sound and vibration design is a
+round-two reference in `INTERACTION_SPEC.md`; it is not a current user-visible claim.
 
 ## 6. Demo speed (D1)
 
@@ -133,8 +131,8 @@ the four timers above and the two dwell values.
 | `DEMO` | **6** | 35 s (15 / 10 / 10) |
 
 `DEMO` is toggled from the demo panel, is **visibly labelled on screen while active**, and
-the label appears in every screenshot. It never changes any rule other than these timers,
-and it never changes what is written to Firestore.
+the label appears in every screenshot. It never changes any rule other than these timers.
+Lite has no Firestore writer.
 
 ## 7. PIN (F5, F24)
 
@@ -167,10 +165,10 @@ Last seen: near {areasCoveredFirstItem}
 
 Nearest police station: {stationName}, {phone} ({distanceM} m away)
 
-She has {cancelWindowSec} seconds to cancel this. If she does not, Saaya raises a full
-SOS and her precise location is shared.
+She has {cancelWindowSec} seconds to cancel this. If she does not, Saaya opens a local SOS
+screen. No message is sent and no location is shared.
 
-Sent by Saaya Lite. This is a prototype and this message was not actually delivered.
+Prepared locally by Saaya Lite. This preview has not been sent.
 ```
 
 The last line is F21's disclosure and is **not removable**.
@@ -179,9 +177,8 @@ The last line is F21's disclosure and is **not removable**.
 is unset, substitute `family_subject_fallback` rather than leaving a gap or omitting the
 line: the recipient still needs to know the alert is about a person and not a test.
 
-**Her name never leaves the device.** It appears only in this message, which is composed
-and displayed and never sent. It is not in the SUS event, which is anonymous, and not in
-the SOS incident, which carries a pseudonymous id. Do not add it to either.
+**Her name never leaves the device.** It appears only in this locally composed preview,
+which is displayed and never sent. Lite has neither a SUS event nor an SOS incident writer.
 
 ## 9. Nearest station (F8)
 
@@ -206,13 +203,11 @@ for **display and copy**. It never changes the arming matrix, which is authorita
 `displayRisk = clamp(risk_score * multiplier, 0.0, 1.0)`. Display band labels:
 `< 0.25` Low, `< 0.50` Moderate, `< 0.75` Elevated, `>= 0.75` High.
 
-## 11. Offline queue backoff (F22)
+## 11. Remote delivery queue — cut in Lite (F22)
 
-Attempts at **5 s, 15 s, 60 s, 5 min, 15 min**, then only on a connectivity-regained
-broadcast. After **20** total attempts mark `FAILED_PERMANENT` and surface it in the UI,
-because silently dropping an escalation is the worst failure this app can have.
-
-`SOS_INCIDENT` always jumps the queue ahead of any `SUS_EVENT`.
+Lite has no writer, queue or retry behaviour. The local safety flow remains usable without
+connectivity and does not claim a message or incident will be sent later. A queue belongs to
+the future round-two state-view delivery path, not to this submission.
 
 ## 12. Location sampling
 
@@ -242,8 +237,9 @@ centroid against a declared 2,000 m. Since a boundary point counts as inside, us
 radii would have refused to arm across most of Vizag. The field stays in the asset because
 the asset is frozen and audited; nothing reads it.
 
-Discard any fix with `accuracy > 100 m` for zone-containment decisions. Never discard for
-SOS, where a poor fix beats no fix, but do send `accuracyM` so the console can show it.
+Discard any fix with `accuracy > 100 m` for zone-containment decisions. SOS may still use a
+current or last-known fix to choose a nearest **local dial action**, but Lite never sends a
+payload or location to a console.
 
 A pending dwell is private to the dwell evaluator and leaves `SessionEngine` in `IDLE`.
 The containment proof requires at least **five** qualifying in-polygon fixes spanning at

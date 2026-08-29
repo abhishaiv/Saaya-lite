@@ -106,6 +106,7 @@ Same master, simpler job than the platform we came from. No foreground/backgroun
 | Output | From | Notes |
 |---|---|---|
 | `favicon.svg` | the whole master | browsers scale it; no raster favicon needed |
+| `saaya-icon-v2-small.svg` | the simplified v2 master | compact in-product Saaya Lite lockups at or below the small-icon threshold; pair it with live app-name text, not the unconverted wordmark artwork |
 | `icon-192.png`, `icon-512.png` | rendered from the master | PWA manifest icons |
 | `apple-touch-icon.png` 180 | rendered from the master | iOS home screen |
 | `icon-maskable-512.png` | the master with the pin inside the **80% safe circle** | `purpose: "maskable"`. Android launchers crop aggressively; the aura may extend into the outer 20% but the pin must not. |

@@ -21,35 +21,36 @@ removed roughly **4.5 hours** of work that no judge would ever see:
 | Foldable support | ~0.5 |
 | deployed site size tuning | ~0.5 |
 
-Then **+1.5 hours** for the console's live journey trigger (T8.3), so a judge can complete
-the journey from the live link with no install.
+The earlier console estimate is superseded: Lite's live journey stays entirely in the
+citizen app and has no console trigger.
 
 Revised estimate: **~34 hours against 27.** Still a gap, still closed by Codex, but the
 riskiest evening (E4, Shadow) now has more room and R8 can no longer eat an evening in E9.
 
-**Nothing cut was visible to a judge.** The full posture table, including the things that
-look like hardening but are actually submission evidence and must stay, is in
-`spec/SPEC_README.md`.
+The current Lite cut is visible only through honest absence and disclosure. The full posture
+table, including the things that look like hardening but are actually submission evidence and
+must stay, is in `spec/SPEC_README.md`.
 
 The cut order below stays in force as insurance. It is not an expectation and it is not
 a plan, it is what happens automatically if an evening misses its definition of done, so
 that the decision is never taken at midnight by a tired person.
 
-**Cut order, first to go:** Hindi strings, then F28 (in-app "what the police see", since
-the console carries it), then F13 (manual arm), then map visual polish, then F22 (offline
-queue).
+**Current cut, 2026-08-28:** the state view, Firestore writers, web console and offline
+queue are deferred to round two. The live Lite build retains the map and the entirely
+local safety flow.
 
-**Never cut:** F10 auto-arm with no press, F15-F17 the check-in ladder, F19 context-rich
-escalation, F23-F24 SOS with PIN, F29 the web console, F21 and F30 the disclosures.
+**Never cut:** F10 auto-arm with no press, F15-F17 the check-in ladder, F19's local
+context-rich preview, F23-F24 SOS with PIN, and F21/F30's honest disclosures. The web
+console is a round-two feature and must not be claimed by Lite.
 
 ## Evenings
 
 - Planning docs. **Done.**
 - Next.js project: App Router, TypeScript strict, theme tokens, fonts, Vercel preview URL.
-- New Firebase project, Firestore. Saaya production is never touched.
+- Firebase is deferred to round two. Saaya production is never touched.
 - Git repo init. **CODEX_LOG.md started tonight, not later.**
-- **DoD:** the Vercel preview URL loads on a real mobile browser and writes one test doc
-  to the new Firestore.
+- **DoD:** the Vercel preview URL loads on a real mobile browser without creating a
+  remote safety record.
 
 - Port the audited Vizag data to `zones.json`: geometry, risk score, active hours,
   incident breakdown, women-safety count, nearest station and distance.
@@ -59,8 +60,8 @@ escalation, F23-F24 SOS with PIN, F29 the web console, F21 and F30 the disclosur
 
 - Tap a zone: risk level, incident breakdown, women-safety count, nearest station with
   distance and a call button.
-- Onboarding: trusted contact, location permission with a plain reason first, language,
-  **PIN setup**.
+- Onboarding: name, one favourite, location permission with a plain reason first, **PIN setup**
+  and the required safety-flow tour.
 - **DoD:** a stranger completes onboarding in under 90 seconds and can read the map.
 
 - Wake lock plus a visible page, location updates, zone entry and exit detection.
@@ -77,34 +78,31 @@ escalation, F23-F24 SOS with PIN, F29 the web console, F21 and F30 the disclosur
 
 - Escalation composes the family message with its context: zone, hour, that zone's
   reported history, last known area, and the non-response.
-- Cancel window with a visible timer. Mocked-delivery disclosure in the UI. Offline queue.
-- **DoD:** escalation fires end to end, the contact view is correct, cancel works, the
-  mock disclosure is on screen, and killing the network does not lose the escalation.
+- Cancel window with a visible timer. Mocked-delivery disclosure in the UI. No offline
+  queue in Lite.
+- **DoD:** escalation reaches the local message preview, cancel works, the mock disclosure
+  is on screen, and a dropped network never changes the local flow or implies delivery.
 
 - SOS trigger from both routes: *I need help now*, and cancel-window lapse.
-- PIN-protected stop. On-screen statement that the state now has it.
-- Two writes: **anonymised SUS records** (zone-snapped, no session id, no name) and
-  **full SOS incidents** (precise location, identity, session history).
-- **DoD:** the trust boundary holds under test. Shadow and SUS produce nothing
-  identifying; only SOS crosses.
+- PIN-protected stop. On-screen local-only disclosure and user-controlled dial actions.
+- State writers are cut to round two; this build makes no SUS or SOS write.
+- **DoD:** the trust boundary holds under test. Nothing leaves the device and no screen
+  claims otherwise.
 
-- Web console as a route on Vercel. SUS and SOS, filterable last 24 hours / 7 days /
-  30 days. Permanent "connected to no government system" disclaimer.
-- In-app "what the police see", showing all three honest states. First on the cut list.
-- **DoD:** the console URL loads in a logged-out private window, on a phone, and shows an
-  incident the app created minutes earlier.
+- State-view/console route, writers and live incident data are deferred to round two. Lite
+  has no console URL, state-facing screen or incident delivery path.
 
 - Telugu strings. Low-end device pass. Throttled-network pass. Empty and error states.
 - 3-minute video: the 4 a.m. ride and the four shut doors, Shakthi's 0.28%, T-Safe's
-  1,300 downloads, the map, auto-arm with no press, escalation with its context, the
-  trust boundary at SOS, the console, the disclosures.
+  1,300 downloads, the map, auto-arm with no press, the local escalation preview, the
+  trust boundary at SOS, and the disclosures.
 - Write-up against the brief's six questions, drawn from PROBLEM.md. Codex contribution
   section drawn from CODEX_LOG.md.
-- Signed deployed site. Landing page carrying the deployed site, the console link and the video.
+- Signed deployed site. Landing page carrying the deployed site and the video.
 - **DoD:** every link works from a logged-out private window with no access request.
 
 **E9 is overloaded and I am saying so in advance.** Polish, translation, video, write-up
-and the deployed site do not fit in three hours. If E1 through E8 hold, move the video and write-up
+and the deployed site do not fit in three hours. If E1 through E6 hold, move the video and write-up
 onto Sat Aug 22 or Sun Aug 23 alongside E5 and E6. If they do not hold, Telugu is cut
 first and E9 becomes submission-only.
 
@@ -119,7 +117,7 @@ first and E9 becomes submission-only.
 | Codex log is thin by E9 | **High** | It is the only evidence for the tooling requirement. Log the same evening, every evening. |
 | Judges read this as another consumer safety app | Medium | Name Shakthi and T-Safe in the first ten seconds of the video, with their own numbers. |
 | Scope creep back toward full Saaya | Medium | FEATURES.md is the contract. Nothing outside it gets built. |
-| Console leaks or breaks on submission day | Medium | Synthetic data only, read-only, checked from a logged-out private window on E8 and again on E9. |
+| A screen implies delivery when Lite is local-only | Medium | Keep the local-only disclosure beside the family preview and SOS actions; do not expose a console or state view. |
 | An evening lost to life | Certain at least once | The buffer day and the cut order absorb one lost evening, not two. |
 
 ## What Codex does
@@ -127,15 +125,14 @@ first and E9 becomes submission-only.
 A real allocation, and now the only basis for the brief's tooling requirement as well as
 the answer to the schedule:
 
-- **E1** scaffold, npm, React navigation, Firebase wiring.
+- **E1** scaffold, npm, React navigation and local runtime wiring.
 - **E2** the crime-data to `zones.json` conversion script.
 - **E3** onboarding screens and the PIN flow.
 - **E4** geofence plumbing and the wake lock plus a visible page. The fiddliest boilerplate in the
   build and the evening most likely to overrun, so this is where Codex earns the most.
 - **E5** the session state machine.
-- **E6** the escalation builder and the offline queue.
-- **E7** the two Firestore write paths and the anonymisation rules.
-- **E8** the console.
+- **E6** the local escalation-preview builder.
+- **E7 / E8** are deferred to round two: writers, anonymisation transport and console.
 
 Log each one in CODEX_LOG.md the evening it happens: **what was asked, what came back,
 what shipped, and what needed correcting.** The last column is the honest one, and a

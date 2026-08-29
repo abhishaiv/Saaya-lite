@@ -7,7 +7,7 @@ feature list. Changes need a line in progress.md.
 
 **Saaya Lite is not a smaller Saaya. It is the one claim, proven.**
 
-The claim: *she never presses anything, and what reaches the state is legible anyway.*
+The claim: *she never presses anything, and the safety flow is legible before she has to act.*
 If a feature does not serve that sentence, it is out, however good it is.
 
 This build is also indirect marketing for full Saaya, so it must feel like Saaya and must
@@ -20,8 +20,8 @@ not read as a stripped demo. Fewer things, finished.
    it we would be shipping an engine that nobody has a reason to own.
 2. **Shadow.** Zone and hour arm it. No press. Nothing leaves the phone.
 3. **SUS.** Adaptive check-in ladder. Still nothing leaves the phone.
-4. **Family escalation.** Context-rich, with a cancel window. Contacts only.
-5. **SOS.** PIN-protected, full-bleed, and she is told exactly what would be shared.
+4. **Family escalation preview.** Context-rich and local, with a cancel window. Nothing is delivered.
+5. **SOS.** PIN-protected, full-bleed, with an honest local-only disclosure and user-controlled dial actions.
 
 **Cut to round two 2026-08-28:** the state view itself, anonymised SUS records, full SOS
 incidents, and a web console
@@ -41,7 +41,7 @@ implying intelligence we did not build.
 | H3 cells, k-anonymity gating, HyperLogLog density | Founder decision: unnecessary complication at this size. Replaced by zone-snapping plus time-window filters, which produce the same "this stretch keeps flagging" reading. The full machinery is documented in PROBLEM.md as the scale path. |
 | Evidence capture and upload | Belongs to the SOS layer of full Saaya, not to the before layer. |
 | Watch app, fake call | Not part of the claim. |
-| Live location sharing to contacts | Deliberately out. Safetipin built it and removed it because it becomes control in the Indian family context. Contacts get an escalation, never a dot she cannot switch off. |
+| Live location sharing to contacts | Deliberately out. Safetipin built it and removed it because it becomes control in the Indian family context. Lite shows a local escalation preview, never a dot she cannot switch off. |
 | Real SMS or WhatsApp delivery | Needs India DLT registration. Months of regulatory lead time. |
 | Any live government integration | Forbidden by the brief and by our own honest-disclaimer rule. |
 
@@ -53,7 +53,7 @@ implying intelligence we did not build.
 | GPS, zone entry detection, hour-aware risk | **REAL** |
 | Shadow: automatic arming, no press | **REAL** |
 | SUS: adaptive check-in ladder | **REAL** |
-| Family escalation, context, cancel window, offline queue | **REAL** |
+| Family escalation preview, context, cancel window | **REAL** |
 | SOS, PIN-protected stop | **REAL** |
 | Anonymised SUS records to the state view | **Cut, round two** |
 | Full SOS incident to the state view | **Cut, round two** |
@@ -73,9 +73,9 @@ breath:
 |---|---|---|
 | How it starts | she starts the trip, app or IVR | the zone arms it, no press |
 | When it checks | fixed 15 minute timer | adapts to zone and hour |
-| What arrives | an alert | an incident carrying zone, hour, reported history, non-response |
-| Who is told | police | family first, the state only at SOS |
-| What the state learns | one alert per trip | which stretches keep waking the app, from women who never file |
+| What arrives | an alert | a local preview carrying zone, hour, reported history, non-response |
+| Who is told | police | nobody automatically; the user controls every dial action |
+| What the state learns | one alert per trip | nothing in Lite; the state view is cut to round two |
 | On an ordinary day | nothing to open | a map she opens anyway |
 | Coverage | cabs, Telangana | any journey |
 
@@ -87,7 +87,7 @@ install it before she ever needed it.** Both survive the AI cut intact.
 | Layer | Choice | Reason |
 |---|---|---|
 | App | **Next.js + TypeScript, mobile-first web** | Pivoted 2026-08-19: the brief states reviewers will not download a mobile app. ~94% of this spec transferred unchanged. |
-| Backend | Firebase, **a NEW project**, never Saaya production | Protects the live iOS product. |
+| Backend | None in Lite; Firebase is a round-two design, never Saaya production | Protects the live iOS product. |
 | State view console | **Cut 2026-08-28, round two.** Not built and claimed nowhere. | The live link is the citizen app. |
 | Zone data | Existing audited Vizag dataset, verified present 2026-08-18 | 24 classified zones, station points, info cards. A port, not a build. |
 | AI | **None** | Founder decision. No OpenAI API key required. |
@@ -112,8 +112,8 @@ remains in force as insurance, not as an expectation.
 Scored directly by the brief, so these are build requirements.
 
 - Low-end phone. Min SDK 24, no heavy 3D map, small deployed site.
-- Slow or dropped connection. Escalation queues locally and syncs when the network
-  returns. Losing signal must never lose the escalation.
+- Slow or dropped connection. The local ladder remains visible; this round-one build
+  never queues or claims a later delivery.
 - Low digital literacy. The primary path requires **zero taps**, which is the strongest
   accessibility property this product has.
 - Language. English plus Telugu, given Visakhapatnam. Hindi only if time allows.

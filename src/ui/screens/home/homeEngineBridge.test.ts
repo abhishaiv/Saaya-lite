@@ -68,6 +68,27 @@ describe("M4 Home engine bridge", () => {
     );
   });
 
+  it("persists a direct SOS raised from idle so PIN recovery remains possible", () => {
+    const { bridge, commandBatches } = harness();
+
+    bridge.dispatch(
+      { kind: "HelpNowTapped" },
+      { nowEpochMs: 0, zone: null },
+    );
+
+    expect(bridge.view()).toMatchObject({
+      armMode: "MANUAL",
+      armedHourBand: null,
+      state: "SOS_ACTIVE",
+    });
+    expect(bridge.persistedSession()).toMatchObject({
+      sessionId: "local-session",
+      state: "SOS_ACTIVE",
+      susEventWritten: false,
+    });
+    expect(commandBatches.at(-1)).toContainEqual({ kind: "StartLocationWatch" });
+  });
+
   it("projects an automatic arm with the frozen band and exact banner intent", () => {
     const { bridge, commandBatches } = harness();
     const zone = highZone();

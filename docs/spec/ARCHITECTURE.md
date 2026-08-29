@@ -12,15 +12,12 @@ size it costs more than it returns and the build window is nine evenings.
 app/                      Next.js routes
   page.tsx                the map. the entry point. no login.
   layout.tsx              fonts, theme tokens, the providers
-  api/                    server-only Firestore writes
-console/                  the state view, its own route
 src/
   domain/                 THE PURE ENGINE. zero DOM, zero React, zero browser API.
     model/                SessionState, SessionEvent, Command, PersistedSession, Rules
-    engine/               SessionEngine, ArmingEvaluator, IntervalCalculator, Anonymiser
+    engine/               SessionEngine, ArmingEvaluator, IntervalCalculator
   data/
     db/                   IndexedDB via idb: schema, stores, migrations
-    remote/               Firestore writers
     zone/                 zone loading from public/assets
     repository/           the only thing the UI touches
   ui/
@@ -41,8 +38,8 @@ the rest of the app can be tested without a browser, and so the tab-lifecycle ru
 | Rule | Why |
 |---|---|
 | `src/domain/` has **zero browser API, React or DOM** | The engine and the rules must be unit-testable under vitest with no browser. This is what lets us verify the trust boundary in `TEST_PLAN.md`. Grep it for `window`, `document`, `navigator`, `localStorage`, `fetch`, `Date.now`: nothing. |
-| The UI talks to repositories only, never to IndexedDB or Firestore | One seam to fake in tests. |
-| `SessionEngine` is a pure state machine | Input: events. Output: state plus a list of side-effect commands. It does **not** fire notifications, write Firestore or touch the network itself. |
+| The UI talks to local repositories only, never directly to IndexedDB | One seam to fake in tests. Lite has no remote data layer. |
+| `SessionEngine` is a pure state machine | Input: events. Output: state plus a list of side-effect commands. It does **not** fire notifications, write remote data or touch the network itself. |
 | `src/platform/` performs commands, the engine decides them | Keeps every timing rule testable without a browser. |
 
 ## The core decision: engine emits commands, the app performs them
@@ -60,10 +57,10 @@ export function onEvent(
 Time enters as `ctx.nowEpochMs`; the engine never calls `Date.now()`. Every rule in
 `BUSINESS_RULES.md` is tested against this function directly.
 
-**Commands are intent only.** `NotifyFamily` carries no phone number and no message.
-`WriteSusEvent` carries no zone name. The performer builds any payload from its own store
-at the moment it acts. The full command list is frozen in `STATE_MACHINE.md`; do not add a
-command that carries personal data.
+**Commands are intent only.** The frozen union retains remote-delivery intents for the
+round-two design, but Lite installs no performer for them. `NotifyFamily` carries no phone
+number and no message; `WriteSusEvent` carries no zone name. The full command list is frozen
+in `STATE_MACHINE.md`; do not add a command that carries personal data.
 
 ## Timing, location and the tab
 
@@ -76,26 +73,15 @@ Full detail and the honest limitation are in `WEB_PLATFORM.md`. The architectura
 | Resuming | On `visibilitychange` and on load, **recompute** from `deadlineEpochMs`. Never resume a countdown from where it paused. A frozen tab is the normal case, not the edge case. |
 | Staying awake | `navigator.wakeLock.request("screen")` while armed, re-acquired on `visibilitychange` because the browser drops it. |
 | Persistence | IndexedDB via `idb`, async everywhere. |
-| Firestore writes | Enqueued to IndexedDB first, then flushed. See below. |
+| Remote delivery | **Absent in Lite.** No Firestore client, queue or flusher is constructed. |
 | UI state | React state driven by a reducer that wraps the pure engine. |
 
-## The offline queue is not optional
+## Lite has no outbound queue
 
-F22 and F32. Every outbound write goes to IndexedDB `queued_event` first, then a flusher
-drains it.
-
-```
-Engine emits WriteSusEvent
-  -> insert into queued_event (status = PENDING)
-  -> QueueFlusher attempts the Firestore write
-     -> success: status = SENT
-     -> failure: status stays PENDING, retry with backoff 5s, 15s, 60s, 5min, then on
-        the next `online` event
-```
-
-Rationale: an unlit road in Vizag at 4 a.m. is where connectivity is worst and where the
-escalation matters most. **Losing signal must never lose the escalation.** This is a
-submission claim, so it must actually be true.
+F22, remote writers and the console are cut to round two. Ordinary map tiles are the only
+off-origin product requests; the safety ladder carries no personal, session or precise
+location data and never queues or claims a later send. This keeps the privacy claim
+executable rather than aspirational.
 
 ## Dependency list, and nothing else
 
@@ -106,8 +92,7 @@ Runtime, pinned in `BUILD_CONFIG.md`:
 | `next`, `react`, `react-dom` | framework and UI |
 | `typescript` | language |
 | `leaflet` | map rendering with OpenStreetMap Standard tiles. **Decided, see `MAP_SPEC.md`.** |
-| `firebase` | Firestore and anonymous Auth, for the state view writes |
-| `idb` | IndexedDB wrapper: local persistence and the offline queue |
+| `idb` | IndexedDB wrapper: local persistence |
 
 Dev only: `@types/node`, `@types/react`, `@types/react-dom`, `@types/leaflet`, `vitest`,
 `eslint`, `eslint-config-next`. These are required by gates G2 and G3 and by
@@ -124,38 +109,36 @@ analytics SDK, any crash reporter that phones home, any AI or ML library, any HT
 (`fetch` is native), any date library (epoch millis and `Intl` are enough). If a thing
 seems to need one, it probably needs less code.
 
-**The one Service Worker** exists solely to post notifications, because Chrome on Android
-has no `Notification` constructor. It has no `fetch` handler and caches nothing. Do not give
-it one, and do not add a second. `WEB_PLATFORM.md` is the authority on this.
+**The one Service Worker** is a narrowly retained round-two notification capability, because
+Chrome on Android has no `Notification` constructor. Lite does not request notification
+permission or post notifications. The worker has no `fetch` handler and caches nothing. Do
+not give it one, and do not add a second. `WEB_PLATFORM.md` is the authority on this.
 
 ## DI: four providers, no container
 
-There is no Hilt and no DI container. Four React context providers, created in
-`app/layout.tsx`. **Do not create a fifth without asking.**
+There is no Hilt and no DI container. Lite uses the local providers it needs in
+`app/layout.tsx`. Do not add a remote provider without the round-two decision.
 
 | Provider | Supplies |
 |---|---|
 | `AppProvider` | `Clock`, `Rules.DEFAULT`, locale |
 | `DataProvider` | the IndexedDB handle and every store accessor |
-| `RemoteProvider` | the Firestore and Auth clients |
-| `RepositoryProvider` | the six repositories below, wired to the two above |
+| `RepositoryProvider` | the local repositories below, wired to the local stores |
 
 `Clock` is injected, never `Date.now()` at a call site. That single rule is what makes the
 entire ladder testable with a fake clock.
 
 ## Repository interfaces
 
-Six. The UI and `src/platform/` touch **only** these, never IndexedDB or Firestore directly.
+Four. The UI and `src/platform/` touch **only** these local interfaces, never IndexedDB
+directly.
 
 | Interface | Responsibility |
 |---|---|
 | `ZoneRepository` | zones, cards, stations from bundled assets; nearest station; point-in-polygon |
-| `SessionRepository` | current session, session events, cooldowns, persisted deadlines |
+| `SessionRepository` | current session, cooldowns and persisted deadlines. Lite has no local session-event timeline. |
 | `FavouriteRepository` | CRUD over `contact`. **Never uploads.** |
 | `SettingsRepository` | PIN hash and verify via Web Crypto, language, onboarded flag, demo speed |
-| `QueueRepository` | enqueue, drain, backoff, status; the only path to Firestore |
-| `StateViewRepository` | builds SUS and SOS payloads via `Anonymiser`, hands them to the queue |
-
 Each has a `Fake` in `src/test` used by the engine and UI tests. Write the fake in the same
 node as the interface, never later.
 

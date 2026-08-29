@@ -82,6 +82,7 @@ export interface HomeScreenProps {
   readonly founderContact: string | null;
   readonly locale: SaayaLocale;
   readonly mapZones: readonly MapZone[];
+  readonly openDemoOnMount?: boolean;
   readonly policeStations: readonly PoliceStation[];
   readonly zoneDetails: readonly ZoneDetail[];
 }
@@ -92,6 +93,7 @@ export function HomeScreen({
   founderContact,
   locale,
   mapZones,
+  openDemoOnMount = false,
   policeStations,
   zoneDetails,
 }: HomeScreenProps) {
@@ -108,7 +110,7 @@ export function HomeScreen({
     useState<ArmAcknowledgement | null>(null);
   const [armBannerVisible, setArmBannerVisible] = useState(false);
   const [pageStoppedWarning, setPageStoppedWarning] = useState(false);
-  const [demoPanelOpen, setDemoPanelOpen] = useState(false);
+  const [demoPanelOpen, setDemoPanelOpen] = useState(openDemoOnMount);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [locationHelpOpen, setLocationHelpOpen] = useState(false);
@@ -563,7 +565,7 @@ export function HomeScreen({
         <AboutScreen
           copy={copy}
           founderContact={founderContact}
-          mockedClaims={[]}
+          mockedClaims={[copy.aboutMockDelivery]}
           onBack={() => setAboutOpen(false)}
           realClaims={[
             copy.aboutRealMap,
@@ -612,6 +614,13 @@ export function HomeScreen({
         tileAvailability={tileAvailability}
       />
 
+      <div aria-label={copy.appName} className="home-screen__brand-lockup">
+        {/* The supplied compact v2 mark is the production brand asset. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img alt="" src="/assets/icons/saaya-icon-v2-small.svg" />
+        <span>{copy.appName}</span>
+      </div>
+
       <HomeSessionSurface
         activeZoneDetail={activeZoneDetail}
         armAcknowledgement={armAcknowledgement}
@@ -631,6 +640,7 @@ export function HomeScreen({
         onLocationHelpOpen={handleLocationHelpOpen}
         onManualArm={handleManualArm}
         onManualDisarm={handleManualDisarm}
+        onOpenDemo={() => setDemoPanelOpen(true)}
         onPinAccepted={handlePinAccepted}
         pageStoppedWarning={pageStoppedWarning}
         policeStations={policeStations}
@@ -650,6 +660,14 @@ export function HomeScreen({
 
       <div className="home-screen__controls">
         <MapControlButtonStack>
+          <button
+            aria-label={copy.cdHelpNow}
+            className="home-screen__sos-control"
+            onClick={handleHelpNow}
+            type="button"
+          >
+            {copy.ctaHelpNow}
+          </button>
           <MapControlButton
             icon="my_location"
             label={copy.cdRecentre}
@@ -718,6 +736,47 @@ export function HomeScreen({
           z-index: 4;
           inset-block-start: calc(env(safe-area-inset-top) + var(--space-12));
           inset-inline-end: var(--screen-padding);
+        }
+
+        .home-screen__brand-lockup {
+          position: fixed;
+          z-index: 4;
+          inset-block-start: calc(env(safe-area-inset-top) + var(--space-12));
+          inset-inline-start: var(--screen-padding);
+          display: inline-flex;
+          align-items: center;
+          gap: var(--space-8);
+          padding: var(--space-8) var(--space-12);
+          border-radius: var(--radius-control);
+          background: var(--color-card-fill);
+          color: var(--color-text-primary);
+          font-size: var(--type-label-size);
+          font-weight: var(--weight-semibold);
+          letter-spacing: var(--type-label-tracking);
+          line-height: var(--type-label-line-height);
+        }
+
+        .home-screen__brand-lockup img {
+          inline-size: var(--space-30);
+          block-size: var(--space-30);
+        }
+
+        :global(.home-screen__sos-control) {
+          min-block-size: var(--minimum-touch-target);
+          padding: 0 var(--space-14);
+          border: 0;
+          border-radius: var(--radius-control);
+          background: var(--color-danger);
+          color: var(--color-text-primary);
+          font: inherit;
+          font-size: var(--type-label-size);
+          font-weight: var(--weight-semibold);
+          line-height: var(--type-label-line-height);
+        }
+
+        :global(.home-screen__sos-control:focus-visible) {
+          outline: 2px solid var(--color-brand-light);
+          outline-offset: 2px;
         }
       `}</style>
       </main>

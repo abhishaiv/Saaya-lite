@@ -82,7 +82,7 @@ const STATUS_LABELS: StatusPillLabels = {
   shadowManual: "Watching, you turned this on",
   checkIn1: "Checking in",
   checkIn2: "Still there?",
-  family: "Telling your favourites",
+  family: "Preparing a message",
   sos: "SOS active",
 };
 
@@ -228,7 +228,7 @@ function LadderFixture({
     phase,
     primary,
     secondary,
-    title: rung === "FAMILY_ESCALATED" ? "Your favourites were told" : "Are you safe?",
+    title: rung === "FAMILY_ESCALATED" ? "What your favourite would receive" : "Are you safe?",
   } as const;
 
   return (
@@ -411,7 +411,7 @@ export function ComponentGallery() {
 
       <PreviewSection id="gallery-c7" title="C7 · DisclosureBanner">
         <div className="gallery-stack">
-          <DisclosureBanner content="Mock: family delivery is simulated in this prototype." kind="mock" />
+          <DisclosureBanner content="Mock: this local message preview is not sent." kind="mock" />
           <DisclosureBanner
             content="Keep this page open. A web page cannot arm in the background."
             kind="prototype-limitation"
@@ -504,7 +504,7 @@ export function ComponentGallery() {
           <PreviewCell className="gallery-map-control-frame" label="right stack">
             <MapControlButtonStack>
               <MapControlButton icon="my_location" label="Centre my location" onClick={noop} />
-              <MapControlButton icon="visibility" label="What police see" onClick={noop} />
+              <MapControlButton icon="sos" label="Start SOS" onClick={noop} />
               <MapControlButton icon="settings" label="Settings" onClick={noop} />
             </MapControlButtonStack>
           </PreviewCell>

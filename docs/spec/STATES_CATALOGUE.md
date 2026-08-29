@@ -27,9 +27,9 @@ common way a demo breaks in front of a judge.
 | step loading | none, all local |
 | contact name empty | inline "Add a name" under the field on blur |
 | phone wrong length | inline "10 digits, without the country code" |
-| notifications denied | continue. Banner on Home with `warn_notif_denied`, offering `cta_retry`, which re-requests. **No settings link:** a page cannot open browser settings. If the re-request returns `denied` without prompting, the browser has remembered it; say so rather than looping. |
+| notifications | Lite does not request notification permission. Check-ins are in-page while the page is open; never promise a system alert. |
 | location denied once | rationale again, softer. Continue button stays enabled. |
-| location denied permanently | `onb_location_partial`, plus a line on re-enabling it in the browser's site settings, plus a working Continue. **Never dead-end.** |
+| location denied permanently | the shared `loc_help_*` recovery sheet and `cta_retry`. It never claims to open browser settings; if the browser silently denies again, leave the instructions visible. **Never dead-end.** |
 | PIN weak | `err_pin_weak` inline, boxes clear |
 | PIN mismatch | `err_pin_mismatch`, both entries clear, focus returns to the first box |
 
@@ -39,10 +39,10 @@ common way a demo breaks in front of a judge.
 | map tiles loading | zones and location render immediately over `background`. **Never a blocking spinner.** |
 | tiles failed | dark background, zones drawn, small "Map offline, zones still work" note |
 | location unavailable | no dot, `StatusPill` unchanged, `caption` in the sheet: "Finding you" |
-| location permission revoked while running | persistent `DisclosureBanner`, `warn_location_denied`, session moves to `RESOLVED(DISARMED)` |
+| location permission revoked while running | persistent `DisclosureBanner`, `warn_location_denied`. `AUTO_ZONE` resolves `DISARMED`; `MANUAL` continues its timer-only ladder. |
 | position unavailable | banner explaining location is on but no fix is arriving, with the browser's site-settings route. No dead end. |
 | zone data failed to parse | **fatal, and say so.** "Saaya Lite could not load Visakhapatnam data." No silent empty map, because an empty map looks like a safe city. |
-| queue has `FAILED_PERMANENT` | persistent banner, `warn_queue_failed`, tap to retry |
+| remote delivery | not applicable in Lite: it has no writer, queue or retry banner |
 | tab was closed or frozen mid-session | on next load, `warn_page_stopped`, then the recovery table in `STATE_MACHINE.md` runs. Never silently restart a countdown. |
 | demo mode active | permanent labelled banner. **Never hidden.** |
 
@@ -62,27 +62,26 @@ common way a demo breaks in front of a judge.
 | countdown running | ring `linear`, numeral `tnum`, no other animation |
 | deadline passed | card removes itself, ladder advances underneath |
 | answered | 160 ms exit |
-| tab was hidden or closed | the Notification API carries it if permission was granted. On resume, re-present with the **correct remaining time** recomputed from `deadlineEpochMs`, never a reset countdown. |
-| notification permission denied | in-app card only, plus a Home banner warning she may miss a check-in when the app is closed |
-| the page is hidden at check-in 2 | a browser cannot wake a locked phone and has no full-screen intent. Fire the notification with `requireInteraction: true`, play the urgent sound if the page is audible, and disclose this limit in the write-up. Never claim the screen will turn on. |
+| tab was hidden or closed | On resume, re-present with the **correct remaining time** recomputed from `deadlineEpochMs`, never a reset countdown. The browser does not deliver an OS alert in Lite. |
+| the page is hidden at check-in 2 | a browser cannot wake a locked phone or show a full-screen intent. Re-present the in-page card on return and disclose the limit. Never claim the screen will turn on. |
 
 ## S7 Family escalation
 | State | Treatment |
 |---|---|
 | no favourite configured | `family_no_contact`. **Ladder continues to SOS.** Never blocks. |
 | composing | instant, local |
-| offline | message still shown, `DisclosureBanner` says it is queued. Cancel still works. |
-| cancelled | confirmation, return to Home, SUS outcome patched |
+| offline | local message preview and cancel window remain usable. Nothing is queued or promised for later delivery. |
+| cancelled | confirmation, return to Home; no remote outcome exists in Lite |
 
 ## S8 SOS
 | State | Treatment |
 |---|---|
 | entering | **no animation** |
-| location unavailable | send the last known fix with its age stated on screen: "Last known, 40 s ago". Never send nothing, never claim it is current. |
-| offline | `sos_queued`, prominent. Everything else works. |
-| Firestore write failed | queued and retried at priority. UI shows queued, never "sent". |
+| location unavailable | SOS remains local. Show the available emergency dial actions without claiming a location was sent. |
+| offline | `sos_local_offline`, prominent. No network is needed for the local-only SOS. |
+| remote delivery | not applicable in Lite: no Firestore write is attempted, queued or retried |
 | dialer unavailable | show numbers as selectable text |
-| stopped | confirmation, return Home, incident patched to `STOPPED` |
+| stopped | confirmation, return Home; no incident is patched in Lite |
 
 ## S9 PIN entry
 | State | Treatment |
@@ -91,13 +90,10 @@ common way a demo breaks in front of a judge.
 | locked | boxes at 30%, `err_pin_locked` with a live countdown |
 | forgot | `pin_no_recovery`, calm, stated once, no recovery offered |
 
-## S10 Police view
-| State | Treatment |
-|---|---|
-| `IDLE`, `SHADOW`, both check-ins | section 1 headlines **"Right now: nothing."** This is the point of the screen. |
-| `FAMILY_ESCALATED` | section 1 shows the real anonymised SUS record just written |
-| `SOS_ACTIVE` | section 1 shows the real incident just written |
-| sample generation failed | fall back to a stated example clearly labelled "example", never a blank section |
+## S10 Police view — cut, round two
+
+Lite does not render a state-view screen, write an anonymised record or write an SOS incident.
+Do not add a dead entry point for it to Home, Settings or the demo.
 
 ## S11 Settings
 | State | Treatment |

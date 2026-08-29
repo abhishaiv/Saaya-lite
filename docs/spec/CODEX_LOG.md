@@ -293,3 +293,30 @@ T1.3 (2026-08-26): C1-C14, the 320 px development gallery, self-hosted fonts and
 **Shipped:** The map now uses keyless OpenStreetMap Standard tiles with its required attribution and outline-first zones. Onboarding starts with Welcome, then presents visible favourite name and `+91` phone labels, validates ten national digits, and stores the local number as E.164. Local build, strict checks, all 154 tests, G6, G10 and graph validation passed before deployment.
 
 **Chrome evidence:** At `https://saaya-lite.vercel.app/` in Chrome at 390 × 844, the deployed Home surface loaded 15 OpenStreetMap tiles, zero CARTO tiles and no API-key text; its 19 unselected zones were outlines. A fresh local Chrome origin displayed the Welcome screen, then the three visibly labeled name/phone controls and fixed `+91` prefix.
+
+### M1/M4 - local-only safety-flow feedback          2026-08-29
+
+**Asked:** Make the current Lite build clearer for a new user: use the v2 Saaya Lite mark,
+make onboarding and the demo path explicit, soften the map, expose Shadow, timed check-ins
+and direct SOS, retain the small Vizag-only beta disclosure, and make the post-M2/M3 cut
+truthful everywhere.
+
+**Shipped:** The welcome and Home surfaces use the supplied v2 compact mark; onboarding now
+ends in a required safety-flow tour that opens the labelled demo controls; Home has visible
+`Start Shadow`, demo and `I need help now` controls; direct SOS offers user-controlled
+`tel:` handoffs for 112, 181 and a nearest station when known. Family escalation is an
+explicitly local message preview, and every Lite-facing document now says writers, queue,
+state view and console are round two. The keyless, outline-first OpenStreetMap surface keeps
+zones present without making the map read as an alarm wall.
+
+**Verified locally:** `npm run build`, strict TypeScript, ESLint, 157 Vitest tests, G6 over
+115 source files, G10 and the knowledge-graph check pass. Static boundary checks found no
+browser/network API in `src/domain`, no Firebase/Firestore/application-send path and only
+user-controlled `tel:` links. The spec graph remains 397 declared and 397 actual facts.
+
+**Needed correcting:** cutting M2/M3 had left stronger words behind - notification,
+state-view, queue and delivery promises in UI copy and setup material. Reconciliation was
+the correct fix, not adding an unreviewed backend. Final Chrome interaction verification is
+pending because the connected Chrome extension is temporarily unreachable; the browser and
+extension diagnostics are otherwise healthy. Fresh verifier workers also exhausted their
+usage allowance, so this checkpoint remains pending rather than claiming G9 passed.

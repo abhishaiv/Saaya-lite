@@ -282,6 +282,23 @@ describe("pure session engine", () => {
     });
   });
 
+  it("lets an idle user raise SOS directly and starts the browser-facing watch", () => {
+    const result = onEvent(
+      "IDLE",
+      { kind: "HelpNowTapped" },
+      context({ armedAtEpochMs: null, armedHourBand: null, zone: null }),
+    );
+
+    expect(result.state).toBe("SOS_ACTIVE");
+    expect(result.commands).toContainEqual({ kind: "StartLocationWatch" });
+    expect(result.commands).toContainEqual({ kind: "RequestWakeLock" });
+    expect(result.commands).toContainEqual({
+      kind: "WriteSosIncident",
+      trigger: "MANUAL_HELP_BUTTON",
+    });
+    expect(result.commands).toContainEqual({ kind: "WriteSusEvent" });
+  });
+
   it("keeps every manual ladder state running when location is revoked", () => {
     const states = [
       "SHADOW",

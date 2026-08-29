@@ -26,13 +26,13 @@ same representation that crosses into IndexedDB, so nothing is converted at the 
 | `SHADOW` | Armed and watching. She did nothing to start it. | **nothing** |
 | `CHECKIN_1` | Gentle check-in showing, 90 s countdown. | **nothing** |
 | `CHECKIN_2` | Urgent check-in showing, 60 s countdown. | **nothing** |
-| `FAMILY_ESCALATED` | Contacts notified, 60 s cancel window open. | **anonymised SUS event** + contacts |
-| `SOS_ACTIVE` | Full emergency. | **full SOS incident**, identity and precise location |
+| `FAMILY_ESCALATED` | Local family-message preview, 60 s cancel window open. | nothing |
+| `SOS_ACTIVE` | Local-only SOS with user-controlled dial actions. | nothing from Saaya |
 | `RESOLVED` | Terminal for this session. | nothing further |
 
-**The trust boundary sits between `CHECKIN_2` and `FAMILY_ESCALATED` for the SUS event,
-and between `FAMILY_ESCALATED` and `SOS_ACTIVE` for identity and precise location.**
-No other transition may write to Firestore. This is a correctness requirement.
+**Lite has no delivery boundary in round one: no transition writes to Firestore, a queue or
+contacts.** The pure engine retains future delivery intents for M2, but the runtime has no
+consumer for them and the UI never claims they were performed.
 
 ## Events
 
@@ -48,7 +48,7 @@ No other transition may write to Firestore. This is a correctness requirement.
 | `HelpNowTapped` | user |
 | `CancelTapped` | user |
 | `PinAccepted` | user, after PIN verify |
-| `AppKilledRestart` | service restart, see recovery |
+| `AppKilledRestart` | page recovery after a frozen or closed tab, see recovery |
 
 ---
 
@@ -62,26 +62,27 @@ The state is never parameterised; the outcome rides alongside it.
 
 | From | Event | Guard | To | Commands |
 |---|---|---|---|---|
-| `IDLE` | `ZoneEntered` | arming matrix says yes AND no cooldown active | `SHADOW` | capture `armedHourBand=current hourBand`, `ScheduleTimer(CHECKIN, interval)`, persist its absolute deadline, show arm banner, start FGS |
+| `IDLE` | `ZoneEntered` | arming matrix says yes AND no cooldown active | `SHADOW` | capture `armedHourBand=current hourBand`, `ScheduleTimer(CHECKIN, interval)`, persist its absolute deadline, show arm banner, start the location watch and request the wake lock |
 | `IDLE` | `ZoneEntered` | matrix says no, or cooldown | `IDLE` | none, and **do not notify her**. Silence is correct here. |
-| `IDLE` | `ManualArm` | - | `SHADOW` | keep `armedHourBand=null`, `ScheduleTimer(CHECKIN, 10 min)`, persist its absolute deadline, start FGS |
+| `IDLE` | `ManualArm` | - | `SHADOW` | keep `armedHourBand=null`, `ScheduleTimer(CHECKIN, 10 min)`, persist its absolute deadline, start the location watch and request the wake lock |
+| `IDLE` | `HelpNowTapped` | - | `SOS_ACTIVE` | begin the location watch and wake lock, then see SOS entry below. A direct SOS is available at any point after onboarding. |
 | `SHADOW` | `CheckInTimerFired` | - | `CHECKIN_1` | `ShowCheckIn(90, GENTLE)`, `ScheduleTimer(CD1, 90)` |
-| `SHADOW` | `ZoneExited` | armMode = AUTO_ZONE | `RESOLVED(DISARMED)` | `CancelTimer(CHECKIN)`, stop FGS, log `ZONE_EXIT` |
+| `SHADOW` | `ZoneExited` | armMode = AUTO_ZONE | `RESOLVED(DISARMED)` | `CancelTimer(CHECKIN)`, stop the local watch, release the wake lock, log `ZONE_EXIT` |
 | `SHADOW` | `ZoneExited` | armMode = MANUAL | `SHADOW` | none. Manual arming is not zone-bound. |
-| `SHADOW` | `ManualDisarm` | - | `RESOLVED(DISARMED)` | cancel timers, stop FGS, start 45 min cooldown for this zone |
+| `SHADOW` | `ManualDisarm` | - | `RESOLVED(DISARMED)` | cancel timers, stop the local watch, release the wake lock, start 45 min cooldown for this zone |
 | `SHADOW` | `HelpNowTapped` | - | `SOS_ACTIVE` | see SOS entry below |
 | `CHECKIN_1` | `OkTapped` | - | `SHADOW` | `CancelTimer(CD1)`, `ScheduleTimer(CHECKIN, interval from armedHourBand)`, persist its absolute deadline, 20 min cooldown |
-| `CHECKIN_1` | `CountdownExpired(1)` | - | `CHECKIN_2` | `ShowCheckIn(60, URGENT)`, `PlayUrgentAlert`, `ScheduleTimer(CD2, 60)` |
+| `CHECKIN_1` | `CountdownExpired(1)` | - | `CHECKIN_2` | `ShowCheckIn(60, URGENT)`, `ScheduleTimer(CD2, 60)`. The frozen `PlayUrgentAlert` intent has no Lite performer. |
 | `CHECKIN_1` | `HelpNowTapped` | - | `SOS_ACTIVE` | see SOS entry |
-| `CHECKIN_1` | `ManualDisarm` | - | `RESOLVED(DISARMED)` | `CancelTimer(CD1)`, `HideCheckIn`, stop FGS, start 45 min cooldown for this zone |
+| `CHECKIN_1` | `ManualDisarm` | - | `RESOLVED(DISARMED)` | `CancelTimer(CD1)`, `HideCheckIn`, stop the local watch, release the wake lock, start 45 min cooldown for this zone |
 | `CHECKIN_2` | `OkTapped` | - | `SHADOW` | as above |
-| `CHECKIN_2` | `CountdownExpired(2)` | - | `FAMILY_ESCALATED` | `WriteSusEvent(...)`, `NotifyFamily(...)`, `ScheduleTimer(CANCEL, 60)` |
+| `CHECKIN_2` | `CountdownExpired(2)` | - | `FAMILY_ESCALATED` | `ShowFamilyScreen`, `ScheduleTimer(CANCEL, 60)`; future `WriteSusEvent` and `NotifyFamily` intents are ignored in Lite |
 | `CHECKIN_2` | `HelpNowTapped` | - | `SOS_ACTIVE` | see SOS entry |
-| `CHECKIN_2` | `ManualDisarm` | - | `RESOLVED(DISARMED)` | `CancelTimer(CD2)`, `HideCheckIn`, stop FGS, start 45 min cooldown for this zone |
-| `FAMILY_ESCALATED` | `CancelTapped` | - | `RESOLVED(CANCELLED)` | `CancelTimer(CANCEL)`, patch SUS outcome to `CANCELLED_BY_USER`, notify contacts of the cancel |
-| `FAMILY_ESCALATED` | `CountdownExpired(cancel)` | - | `SOS_ACTIVE` | `WriteSosIncident(trigger=LADDER_LAPSE)`, patch SUS outcome to `ESCALATED_TO_SOS`, `RequirePinToStop` |
+| `CHECKIN_2` | `ManualDisarm` | - | `RESOLVED(DISARMED)` | `CancelTimer(CD2)`, `HideCheckIn`, stop the local watch, release the wake lock, start 45 min cooldown for this zone |
+| `FAMILY_ESCALATED` | `CancelTapped` | - | `RESOLVED(CANCELLED)` | `CancelTimer(CANCEL)`, local cleanup; future outcome and cancel-notification intents are ignored in Lite |
+| `FAMILY_ESCALATED` | `CountdownExpired(cancel)` | - | `SOS_ACTIVE` | `ShowSos`, `RequirePinToStop`; future incident intents are ignored in Lite |
 | `FAMILY_ESCALATED` | `HelpNowTapped` | - | `SOS_ACTIVE` | as above but `trigger=MANUAL_HELP_BUTTON` |
-| `SOS_ACTIVE` | `PinAccepted` | - | `RESOLVED(ESCALATED_SOS)` | patch incident `status=STOPPED, stoppedAt`, stop FGS |
+| `SOS_ACTIVE` | `PinAccepted` | - | `RESOLVED(ESCALATED_SOS)` | local cleanup and stop the local watch. The future incident-patch intent is ignored in Lite. |
 | `SOS_ACTIVE` | anything else | - | `SOS_ACTIVE` | **ignore.** Only a correct PIN leaves SOS. |
 | any | `AppKilledRestart` | - | see recovery | |
 
@@ -100,18 +101,16 @@ notification or interruption.
 
 ## SOS entry, common block
 
-Whenever any state transitions to `SOS_ACTIVE`:
+Whenever any state transitions to `SOS_ACTIVE`, Lite performs only local SOS behaviour:
 
-1. Write `session_event(SOS_TRIGGERED)` locally.
-2. Build the full timeline from `session_event` rows for this session.
-3. `WriteSosIncident` with precise location, uid, timeline, nearest station.
-4. If no SUS event exists yet for this session (she tapped Help Now directly from
-   `SHADOW` or `CHECKIN_1`), **also write a SUS event** with `outcome=ESCALATED_TO_SOS`,
-   so the civic layer is not blind to a session that skipped the ladder.
-5. Notify contacts at full urgency.
-6. Show the on-screen statement that the state now has it (F25).
-7. Escalate location sampling to 5 s.
-8. `RequirePinToStop`.
+1. Show the local-only SOS disclosure. Lite does not promise a local audit timeline.
+2. An IDLE entry starts the location watch and requests the wake lock; the same 5 s SOS sampling then applies.
+3. Offer user-controlled `tel:` handoffs for 112, 181 and the nearest station where known.
+4. Require the PIN to stop SOS.
+
+The pure engine also retains remote, patch and notification commands as **future M2 intents
+only**. The round-one runtime has no consumer for them,
+`susEventWritten` stays false, and no UI says that a state view or contact received anything.
 
 ## Recovery after a frozen or closed tab
 
@@ -123,7 +122,7 @@ A hidden tab is throttled and a closed tab stops entirely. On the next visibilit
 | `SHADOW` | restart the location watch and restore the next check-in from persisted `deadlineEpochMs`. Never recompute it from `armedAt` or current rules. If already overdue, fire `CheckInTimerFired` immediately. |
 | `CHECKIN_1` / `CHECKIN_2` | recompute remaining countdown from the persisted deadline. **If the deadline already passed while dead, advance the ladder immediately.** Do not silently reset the countdown. |
 | `FAMILY_ESCALATED` | recompute the cancel window. If it lapsed while dead, **go straight to SOS.** |
-| `SOS_ACTIVE` | resume SOS, keep requiring the PIN, re-show the notification. |
+| `SOS_ACTIVE` | resume SOS, keep requiring the PIN, and re-present the in-page SOS overlay when the page is visible. |
 
 The rule underneath: **a frozen or closed tab must never rescue her from the ladder.** A
 phone that dies mid-ladder is more likely to be a real emergency, not less. On web this is
@@ -135,10 +134,10 @@ the common case rather than the rare one, which makes the rule more important, n
 |---|---|
 | Zone exit while in `CHECKIN_2` | Ladder continues. Leaving the zone does not prove she is safe, and she still has not answered. |
 | Two overlapping zones | Use the **highest** `risk_tier`. On a tie, the higher `risk_score`. |
-| Airplane mode at escalation | Everything queues. UI shows "queued, will send when connected". Ladder timing is unaffected. |
+| Airplane mode at escalation | The local ladder remains visible. Lite has no queue or future-send claim. |
 | No contact configured | Ladder still runs. Family step shows "no contact set, add one" and proceeds to SOS on lapse. Never block the ladder on missing config. |
 | Location revoked mid-session, `AUTO_ZONE` | Move to `RESOLVED(DISARMED)`, persistent warning. It armed on containment and can no longer tell whether she is contained. Never pretend to watch when blind. |
-| Location revoked mid-session, `MANUAL` | **The session continues.** She asked to be watched, and the ladder is timers rather than coordinates, so it needs no fix to run. Show the same persistent warning, because the SOS payload will carry a last-known fix with its age stated, or none. Disarming here would take the fallback from exactly the user who would not grant location in the first place. |
+| Location revoked mid-session, `MANUAL` | **The session continues.** She asked to be watched, and the ladder is timers rather than coordinates, so it needs no fix to run. Show the same persistent warning; a current fix can still choose the nearest local dial action, but Lite sends no payload. Disarming here would take the fallback from exactly the user who would not grant location in the first place. |
 | The browser froze or closed the tab | Detect on load by comparing `deadlineEpochMs` with now. Show an honest "Saaya was stopped by your browser" notice, then apply the recovery table above. Never silently restart the countdown. |
 | She uninstalls mid-SOS | Out of scope. Do not attempt to prevent. |
 | Clock change or DST | Countdowns are absolute `deadlineEpochMs`, so a wall-clock change moves them with it. That is accepted: epoch millis are UTC and IST has no DST. Hour bands are derived from wall clock in Asia/Kolkata. Never use `performance.now()` for a deadline: it does not survive a frozen tab. |
@@ -210,6 +209,7 @@ export type Command =
   | { kind: "SetLocationSampling"; intervalSec: number }
   | { kind: "RequestWakeLock" }
   | { kind: "ReleaseWakeLock" }
+  // Round-two local-history intent. Lite has no session_event store or performer.
   | { kind: "LogSessionEvent"; type: string; detail?: string }
   | { kind: "StartCooldown"; zoneId: string; minutes: number }
   | { kind: "PlayUrgentAlert" }
@@ -230,6 +230,7 @@ export interface PersistedSession {
   // band it armed under, and would silently switch to the current band.
   armedHourBand: HourBand | null;
   deadlineEpochMs: number | null;
+  // Reserved for the round-two writer. The Lite runtime always persists false.
   susEventWritten: boolean;
   outcome?: Outcome;
 }
@@ -300,7 +301,7 @@ outdoors and longer indoors. Decided behaviour:
 | First fix arrives, she is inside a HIGH zone at NIGHT_DEEP | Start the 60 s enter dwell now. She arms 60 s later, not instantly, exactly as if she had walked in. |
 | First fix has accuracy worse than 100 m | Ignore for containment, keep sampling. Show the dot with its accuracy circle. |
 | No fix within 60 s | `loc_slow` in the sheet. Keep trying: this is a slow fix, not a denied permission, so there is nothing to re-enable and no link to offer. Do not give up and do not claim to be watching. |
-| Manual arm with no fix | **Allowed.** Arms in `MANUAL` mode with a 10 min interval. The ladder does not need a coordinate to run: only the SOS payload does, and by then there will be one, or the last known fix is sent with its age stated. |
+| Manual arm with no fix | **Allowed.** Arms in `MANUAL` mode with a 10 min interval. The ladder does not need a coordinate to run; a later current fix can choose the nearest local dial action, but Lite sends no payload. |
 
 There is no background arming. A browser cannot watch position with the page hidden, so
 every fix that feeds a dwell arrives while the page is visible and holding a wake lock; see

@@ -313,9 +313,9 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 393,
-  "edges": 680,
-  "events": 71
+  "entities": 395,
+  "edges": 682,
+  "events": 72
  },
  "entities": [
   {
@@ -3150,6 +3150,18 @@
    "id": "d.onboarding_field_clarity",
    "class": "Decision",
    "label": "Restore the Welcome step and make favourite name and phone visible labeled controls with a fixed India prefix and exact national-digit validation.",
+   "node": "M1"
+  },
+  {
+   "id": "d.lite.local_only_round_one",
+   "class": "Decision",
+   "label": "Lite is local-only in round one: state writers, queue, anonymiser transport and console are deferred to round two; user-controlled tel handoffs are the only SOS action beyond the device.",
+   "node": "M1"
+  },
+  {
+   "id": "art.m1_m4.local_safety_feedback",
+   "class": "Artifact",
+   "label": "Clear onboarding tour, v2 Saaya Lite brand treatment, outline-first keyless map, visible Shadow and direct SOS controls, local message preview and local-only SOS dial surface.",
    "node": "M1"
   }
  ],
@@ -8593,6 +8605,22 @@
    "at": "2026-08-28",
    "by": "codex",
    "confidence": "high"
+  },
+  {
+   "from": "art.m1_m4.local_safety_feedback",
+   "rel": "produced_by",
+   "to": "node.M1",
+   "at": "2026-08-29",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.m1_m4.local_safety_feedback",
+   "rel": "produced_by",
+   "to": "node.M4",
+   "at": "2026-08-29",
+   "by": "codex",
+   "confidence": "high"
   }
  ],
  "events": [
@@ -9401,6 +9429,17 @@
    "refs": [
     "d.keyless_osm_tiles",
     "d.onboarding_field_clarity"
+   ],
+   "node": "M1"
+  },
+  {
+   "id": "ev.0072",
+   "type": "spec_amended",
+   "at": "2026-08-29",
+   "actor": "codex",
+   "detail": "Approved local-only Lite boundary reconciled across UI and specifications; 181 added as a user-controlled SOS dial handoff.",
+   "refs": [
+    "d.lite.local_only_round_one"
    ],
    "node": "M1"
   }

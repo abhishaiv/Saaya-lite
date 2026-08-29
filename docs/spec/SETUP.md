@@ -1,7 +1,19 @@
 # Saaya Lite - Environment Setup
-Do this once, at T1.2. Every step is explicit so nothing is guessed.
+Lite needs Node 20, npm and Google Chrome. Every setup step is explicit so nothing is
+guessed.
 
-## Firebase project — DONE 2026-08-19
+## Lite setup now
+
+Firebase, anonymous auth, Firestore, rules/indexes, queueing, state writers and the console
+are cut to round two. **Do not create, register, configure or deploy a Firebase project for
+Lite.** The app is a local-only browser prototype deployed through the Vercel repository
+connection. No Firebase configuration belongs in `.env.local` for this build.
+
+## Round-two Firebase archive — do not run for Lite
+
+These historical project values and procedures are retained only to describe a separately
+approved future build. They do not mean Firebase configuration exists, is expected or may be
+used by Lite.
 
 | Field | Value |
 |---|---|
@@ -13,16 +25,15 @@ Do this once, at T1.2. Every step is explicit so nothing is guessed.
 | Two mobile apps | registered on the previous platform. Unused by the web SDK, harmless, ignore them. |
 | `google-services.json` | an Android artefact. **The web build does not use it.** Gitignored. |
 
-**Still outstanding, and needed at `T1.2` (node 5), not `T8.2`:** register a **Web** app in
-Project settings → Your apps → Add app → Web, and paste its config in. The entire product
-is now a web app, so the Firebase **web** SDK is what performs anonymous auth at `T1.2`,
-long before the console needs it at `T8.2`. The two mobile app ids on the project will not
-work for it.
+**Round-two only:** register a **Web** app in
+Project settings → Your apps → Add app → Web, and paste its config in. The future web SDK
+would perform anonymous auth before a future console reads records. The two mobile app ids
+would not work for that future web build.
 
-The same config serves both surfaces: the app reads it from `NEXT_PUBLIC_FIREBASE_*`
-environment variables, and the console reads `console/firebase-config.js`. Register once.
+The future config would serve both future surfaces: the app from `NEXT_PUBLIC_FIREBASE_*`
+environment variables and the console from `console/firebase-config.js`. Lite uses neither.
 
-## Firebase project — original steps
+## Round-two Firebase project steps — do not run for Lite
 
 **A NEW project. Never the Saaya production project.**
 
@@ -49,13 +60,13 @@ environment variables, and the console reads `console/firebase-config.js`. Regis
 |---|---|
 | Node | 20 LTS |
 | npm | bundled with Node 20, lockfile committed |
-| Firebase CLI | `npm i -g firebase-tools`, then `firebase login`. Only for rules, indexes and the seed script. |
-| a Chromium browser | for the mobile-emulation and devtools checks in `TEST_PLAN.md` |
+| Firebase CLI | round two only; not required or used by Lite |
+| Google Chrome | for the mobile-emulation and Chrome checks in `TEST_PLAN.md` |
 
 No JDK, no Android SDK, no Xcode. If a step asks for one, it is left over from the previous
 platform: stop and report it.
 
-## `firebase.json`
+## Round-two `firebase.json` — do not create or deploy for Lite
 
 ```json
 {
@@ -92,7 +103,7 @@ The repo is public deliberately: the hackathon accepts a source-code repository 
 submission artifact, and our whole posture is that we would rather be checked than believed.
 Nothing secret lives here — see `SECRETS_AND_ACCESS.md`, there is nothing to leak.
 
-## Repository layout
+## Lite repository layout
 
 ```
 Saaya Lite/
@@ -103,28 +114,22 @@ Saaya Lite/
   docs/spec/                this pack
   app/                      Next.js routes (App Router)
   src/                      domain, data, ui
-  console/                  static site: index.html, app.js, style.css
-  scripts/seed-zones.mjs    one-off zone seeding
-  firebase.json
-  firestore.rules
-  firestore.indexes.json
+  public/assets/            frozen Vizag data, map assets and local fonts
+  scripts/                  local checks and graph tooling
   package.json
   .gitignore
 ```
 
-## Deploy commands
+## Lite deploy and verification
 
 ```bash
-firebase deploy --only firestore:rules
-firebase deploy --only firestore:indexes
-firebase deploy --only hosting
-node scripts/seed-zones.mjs        # once, at T8.1, idempotent
+npm run build
 ```
 
-**Never `firebase deploy` bare.** It deploys everything including functions we do not have,
-and it is the command that has caused problems on the main Saaya project.
+The founder's Vercel repository connection creates the preview. Do not run a Firebase deploy
+command for Lite.
 
-## Verification after setup
+## Round-two Firebase verification — do not run for Lite
 
 | # | Check |
 |---|---|

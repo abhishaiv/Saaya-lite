@@ -18,6 +18,7 @@ export function AppGate(props: HomeScreenProps) {
   }
   const repository = repositoryRef.current;
   const [route, setRoute] = useState<GateRoute>("LOADING");
+  const [openDemoOnFirstHome, setOpenDemoOnFirstHome] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -34,10 +35,13 @@ export function AppGate(props: HomeScreenProps) {
     return (
       <OnboardingScreen
         copy={M4_COPY[props.locale]}
-        onCompleted={() => setRoute("HOME")}
+        onCompleted={() => {
+          setOpenDemoOnFirstHome(true);
+          setRoute("HOME");
+        }}
         repository={repository}
       />
     );
   }
-  return <HomeScreen {...props} />;
+  return <HomeScreen {...props} openDemoOnMount={openDemoOnFirstHome} />;
 }

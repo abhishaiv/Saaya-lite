@@ -214,9 +214,9 @@ Last seen: near ${zoneArea}
 
 Nearest police station: ${stationName}, ${stationPhone} (${distanceM} m away)
 
-She has ${cancelWindowSec} seconds to cancel this. If she does not, Saaya raises a full SOS and her precise location is shared.
+She has ${cancelWindowSec} seconds to cancel this. If she does not, Saaya opens a local SOS screen. No message is sent and no location is shared.
 
-Sent by Saaya Lite. This is a prototype and this message was not actually delivered.`;
+Prepared locally by Saaya Lite. This preview has not been sent.`;
 }
 
 function remainingSeconds(

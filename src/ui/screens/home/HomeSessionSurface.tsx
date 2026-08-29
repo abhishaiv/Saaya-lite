@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 
 import type { SessionState } from "../../../domain/model/session";
+import { nearestStation } from "../../../domain/engine/nearestStation";
 import type { ZoneDetail } from "../../../data/repository/zoneRepository";
 import type { PoliceStation } from "../../../domain/model/policeStation";
 import type { LatLng } from "../../../domain/model/zone";
@@ -42,6 +43,7 @@ export interface HomeSessionSurfaceProps {
   readonly onLocationHelpOpen: () => void;
   readonly onManualArm: () => void;
   readonly onManualDisarm: () => void;
+  readonly onOpenDemo: () => void;
   readonly onPinAccepted: () => void;
   readonly pageStoppedWarning: boolean;
   readonly policeStations: readonly PoliceStation[];
@@ -66,6 +68,7 @@ export function HomeSessionSurface({
   onLocationHelpOpen,
   onManualArm,
   onManualDisarm,
+  onOpenDemo,
   onPinAccepted,
   pageStoppedWarning,
   policeStations,
@@ -85,6 +88,9 @@ export function HomeSessionSurface({
       : locationStatus === "SLOW" || locationStatus === "POSITION_UNAVAILABLE"
         ? copy.locSlow
         : contextLine;
+  const sosPoint = currentPoint ?? activeZoneDetail?.zone.centroid ?? null;
+  const sosStation =
+    sosPoint === null ? null : nearestStation(sosPoint, policeStations)?.station ?? null;
 
   return (
     <>
@@ -152,13 +158,31 @@ export function HomeSessionSurface({
           </div>
 
           {state === "IDLE" ? (
-            <SaayaButton
-              onClick={onManualArm}
-              variant="primary"
-              workingLabel={copy.stateWorking}
-            >
-              {copy.ctaArmManually}
-            </SaayaButton>
+            <div className="home-session-sheet-actions">
+              <SaayaButton
+                onClick={onManualArm}
+                variant="primary"
+                workingLabel={copy.stateWorking}
+              >
+                {copy.ctaArmManually}
+              </SaayaButton>
+              <SaayaButton
+                onClick={onOpenDemo}
+                variant="ghost"
+                workingLabel={copy.stateWorking}
+              >
+                {copy.setDemo}
+              </SaayaButton>
+              <SaayaButton
+                accent="danger"
+                aria-label={copy.cdHelpNow}
+                onClick={onHelpNow}
+                variant="accent"
+                workingLabel={copy.stateWorking}
+              >
+                {copy.ctaHelpNow}
+              </SaayaButton>
+            </div>
           ) : state === "SHADOW" ? (
             <div className="home-session-sheet-actions">
               <SaayaButton
@@ -207,7 +231,11 @@ export function HomeSessionSurface({
       ) : null}
 
       {state === "SOS_ACTIVE" ? (
-        <SosOverlay copy={copy} onPinAccepted={onPinAccepted} />
+        <SosOverlay
+          copy={copy}
+          nearestStation={sosStation}
+          onPinAccepted={onPinAccepted}
+        />
       ) : null}
 
       <style jsx>{`

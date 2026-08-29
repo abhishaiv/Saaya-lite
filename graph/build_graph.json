@@ -777,11 +777,11 @@
     "T4.1",
     "T1.3"
    ],
-   "produces": [
-    "checkin_screens",
+  "produces": [
+   "checkin_screens",
     "notif_channels",
-    "fullscreen_overlay"
-   ],
+   "fullscreen_overlay"
+  ],
    "reads": [
     "SCREENS.md",
     "COPY.md",
@@ -1245,21 +1245,18 @@
    ],
    "produces": [
     "gate_routing",
-    "onboarding",
-    "pin_stored_hashed",
-    "favourites_local",
-    "checkin_screens",
-    "notif_channels",
-    "fullscreen_overlay",
+   "onboarding",
+   "pin_stored_hashed",
+   "favourites_local",
+   "checkin_screens",
+    "in_page_checkins",
+   "fullscreen_overlay",
     "family_screen",
     "escalation_message",
     "mock_disclosure_visible",
     "sos_screen",
     "pin_entry",
-    "sos_inescapable",
-    "settings_contacts",
-    "settings_pin_change",
-    "settings_language"
+    "sos_inescapable"
    ],
    "reads": [
     "SCREENS.md",
@@ -1276,15 +1273,32 @@
    ],
    "extra_gates": [
     "PinStorageTest",
-    "checkin2_over_lockscreen"
+    "checkin2_in_page_overlay"
    ],
    "risk": "med",
    "cumulative_hours": 29.5,
-   "status": "pending",
-   "run_id": null,
-   "gates_passed": [],
-   "artifacts": [],
-   "corrections": [],
+   "status": "pending_external_verification",
+   "run_id": "run.M1_M4.2026-08-29.local_feedback.001",
+   "gates_passed": [
+    "G1_npm_run_build",
+    "G2_tsc_no_emit_and_next_lint",
+    "G3_vitest_157_tests",
+    "G4_session_surface_and_sos_contract_tests",
+    "G6_grounded_115_source_files",
+    "G7_local_only_boundary_static_audit",
+    "G10_reads_check_17_types_closed"
+   ],
+   "pending_gates": [
+    "G8_latest_feedback_flow_in_Chrome",
+    "G9_fresh_spec_verifier_unavailable"
+   ],
+   "artifacts": [
+    "art.m1_m4.local_safety_feedback"
+   ],
+   "corrections": [
+    "made the local-only round-one boundary explicit after M2 and M3 were cut, so no family, SOS, About or setup surface claims a writer, state view or console",
+    "added the v2 compact brand mark, the required safety-flow tour, a visible Start Shadow action and direct local SOS dial handoffs"
+   ],
    "verify_lenses": [
     "spec"
    ],
@@ -1300,13 +1314,13 @@
    "merge_reason": "All four read COMPONENT_LIBRARY, SCREENS, COPY and STATE_MACHINE. Merging loads that set once instead of four times.",
    "build_order": [
     "1. Onboarding, MINIMAL: one flow for name + phone, PIN, and the location prompt. Everything after depends on a favourite and a PIN existing.",
-    "2. Check-in 1 and check-in 2, with the Notification API and the full-screen in-page overlay.",
+    "2. Check-in 1 and check-in 2 as in-page states; Lite does not request notification permission or promise a system alert.",
     "3. Family escalation: the composer and its screen.",
     "4. SOS screen and PIN entry.",
-    "5. REDUCIBLE TAIL, only if budget allows: onboarding polish. Language selector, second and third contacts, progress-dot animation."
+    "5. CUT: onboarding polish, language selector, second and third contacts and progress-dot animation."
    ],
-   "cut_line": "Steps 1 to 4 are the product. Step 5 is polish and may be dropped without the demo suffering. Commit after each step.",
-   "note": "Owns S1 Gate as well as onboarding: the Gate routes on the `onboarded` flag and is meaningless before onboarding exists. Until M1 lands, the app opens Home directly, which is correct for the M4 checkpoint."
+   "cut_line": "Steps 1 to 4 are the product. Step 5 is cut from Lite. Commit after each step.",
+   "note": "Owns S1 Gate as well as onboarding: the Gate routes on the `onboarded` flag. Lite's first run is a minimal name/favourite/location/PIN setup followed by the required safety-flow tour, which opens the labelled DemoPanel."
   },
   "M2": {
    "id": "M2",

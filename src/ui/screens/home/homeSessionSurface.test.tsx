@@ -42,6 +42,7 @@ function render(
       onLocationHelpOpen={() => undefined}
       onManualArm={() => undefined}
       onManualDisarm={() => undefined}
+      onOpenDemo={() => undefined}
       onPinAccepted={() => undefined}
       pageStoppedWarning={false}
       policeStations={[]}
@@ -55,6 +56,8 @@ describe("M4 Home session surface", () => {
     const html = render("IDLE");
 
     expect(html).toContain(M4_COPY.en.ctaArmManually);
+    expect(html).toContain(M4_COPY.en.setDemo);
+    expect(html).toContain(M4_COPY.en.ctaHelpNow);
     expect(html).toContain('data-position="peek"');
     expect(html).not.toContain(M4_COPY.en.ctaImHome);
   });

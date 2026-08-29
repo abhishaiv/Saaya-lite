@@ -5,12 +5,11 @@ Every screen, every state. Strings are referenced by key and defined in `COPY.md
 
 ```
 Gate (no UI)
- ├─ not onboarded ─> Onboarding (4 steps) ─> Home
+ ├─ not onboarded ─> Onboarding setup + safety-flow tour ─> Home + DemoPanel
  └─ onboarded ─────> Home
 Home
  ├─ ZoneDetailSheet (bottom sheet)
- ├─ Settings ─> ContactEdit | PinChange | DemoPanel
- ├─ PoliceView ("What the police see")
+ ├─ Settings ─> About | DemoPanel
  └─ session overlays, driven by state, not by navigation:
       CheckIn1 (heads-up + in-app card)
       CheckIn2 (full screen, in page)
@@ -36,13 +35,14 @@ No UI. Reads `onboarded`. Routes. Max 300 ms; show nothing rather than a flash.
 Built by `M1`, which owns the `onboarded` flag. Before `M1` lands the app opens Home
 directly; that is correct at the `M4` checkpoint, not a gap.
 
-## S2. Onboarding (F1, 4 steps, target under 90 s total)
+## S2. Onboarding (F1, target under 90 s before the tour)
 
-Progress dots at top. No step is skippable except step 2's second contact.
+Minimal first-run setup. The required safety-flow tour follows PIN setup; no progress dots,
+language selector or extra-contact flow ships in Lite.
 
 ### S2.1 Welcome
-- Saaya wordmark, `onb_welcome_title`, `onb_welcome_body`.
-- Language selector (F4): English / తెలుగు. Applies immediately, no restart.
+- The current v2 small Saaya icon beside the live-text Saaya Lite lockup, `onb_welcome_title`, `onb_welcome_body`.
+- `onb_beta_vizag` is always visible here in the existing `caption` type: the beta is tuned only to Vizag data. This is scope disclosure, not a claim of citywide coverage.
 - Primary: `cta_continue`.
 
 ### S2.2 Trusted contact (F2)
@@ -60,7 +60,8 @@ Progress dots at top. No step is skippable except step 2's second contact.
   would work for some users and silently vanish for others.
 - Validation: name non-empty, phone exactly 10 digits after prefix.
 - `onb_contact_privacy` in a `DisclosureBanner`: this stays on your phone and is never uploaded.
-- Primary: `cta_continue`. Secondary: `cta_add_another` (max 3).
+- Primary: `cta_continue`. Lite captures one favourite in this flow; additional-contact
+  management is deferred rather than showing an unfinished control.
 
 ### S2.3 Location (F3)
 - **Rationale screen before the system dialog.** `onb_location_title`, `onb_location_body`.
@@ -78,7 +79,12 @@ Progress dots at top. No step is skippable except step 2's second contact.
 - 4-digit entry, then confirm entry.
 - Reject `0000`, `1234`, `1111`, all-identical (`err_pin_weak`).
 - Mismatch: `err_pin_mismatch`, clear both.
-- Primary: `cta_finish` -> writes `onboarded = true` -> Home.
+- Primary: `cta_finish` saves the PIN -> safety-flow tour. `onboarded = true` is written only when she opens the demo, so every new user reaches the tour.
+
+### S2.5 Safety-flow tour
+- Required for every newly onboarded user. It introduces the exact consumer journey, not internal "SUS" terminology: `onb_tour_title`, `onb_tour_body`, `onb_tour_shadow`, `onb_tour_checkins`, `onb_tour_sos`.
+- Primary `cta_open_demo` lands on Home with the existing labelled `DemoPanel` already open. The panel remains replayable from Home and Settings.
+- The tour tells her which control begins Shadow, how a missed check-in reaches the family stage, and where the direct SOS control leads. It never claims anything is sent by the prototype.
 
 ## S3. Home (F6, F9, F11, F12, F13, F14)
 
@@ -88,17 +94,17 @@ Full-bleed dark map, controls floating over it.
 |---|---|
 | Top | `StatusPill` showing session state. Settings icon. |
 | Map | Vizag, 19 rendered zone polygons (5 safe zones not drawn), fill from zone data. Current location dot. |
-| Bottom sheet, collapsed | Current-hour context line, `home_hour_context`. Arm/Disarm button. |
-| Floating | "What the police see" entry point (S10). |
+| Bottom sheet, collapsed | Current-hour context line, `home_hour_context`. Watch, Demo panel and direct SOS entry. |
+| Floating | The always-visible red direct-SOS control. There is no state-view entry point in Lite. |
 
 ### States
 | State | Home shows |
 |---|---|
-| `IDLE` | `StatusPill` = `status_idle`. Button = `cta_arm_manually`. |
+| `IDLE` | `StatusPill` = `status_idle`. Buttons = `cta_arm_manually`, `set_demo`, `cta_help_now`. The floating red `sos` control is an always-visible equivalent of `cta_help_now`. |
 | `SHADOW`, auto | `StatusPill` = `status_shadow_auto`. **Arm banner (F11)**: which zone, what hour, and that she did not start it. Button = `cta_im_home`. |
 | `SHADOW`, manual | `StatusPill` = `status_shadow_manual`. Button = `cta_im_home`. |
 | location denied | Persistent `DisclosureBanner`, `warn_location_denied`, opening the location help sheet below. **No deep link:** a page cannot open browser site settings, and a button that claims to is a dead end. |
-| queue has `FAILED_PERMANENT` | Persistent banner, `warn_queue_failed`. |
+| remote delivery | **Not applicable in Lite.** This round has no writer or offline delivery queue, so Home never claims a send is pending or failed. |
 | demo mode on | Persistent labelled banner, `demo_mode_active`. Never hidden. |
 
 Map must render usably on a 720x1280 device at 2 GB RAM. Cap polygon redraw; do not
@@ -146,32 +152,32 @@ that low recorded crime is not the same as safe.
 Built from `C3 LadderCard` + `C4 CountdownRing` + `C2 BigActionButton`. Geometry, states
 and motion come from `COMPONENT_LIBRARY.md` and `MOTION_SPEC.md`, not from this file.
 
-Heads-up notification plus, if foregrounded, an in-app card.
+In-page card while the page is open. Lite does not request notification permission or claim
+an operating-system notification will arrive.
 
 - `CountdownRing`, 90 s, **`brand` lavender `#A78BFA`**, card border 1.0 px.
 - `checkin1_title`, and `checkin1_reason` stating **why it checked now** (zone, tier,
   hour). This is the visible proof of adaptive timing versus T-Safe's fixed clock.
 - `BigActionButton` = `cta_im_ok`.
 - Text button = `cta_help_now`, danger colour.
-- Dismissing the notification does **not** cancel the countdown. Say so: `checkin_persist_note`.
+- The countdown is absolute and stays active until she answers or it expires.
 
 ## S6. CheckIn2
 
 Full screen, in page. **A browser cannot show over the lock screen or turn the screen on.**
-The overlay covers the viewport, the notification is posted with `requireInteraction: true`,
-and the state is re-presented on the next `visibilitychange`. Disclosed, never implied.
+The overlay covers the viewport while the page is open and is re-presented on the next
+`visibilitychange`. Disclosed, never implied.
 
 - `CountdownRing`, 60 s, **`amber` `#F09921`**, card border 1.5 px.
 - `checkin2_title`, `checkin2_body` stating exactly what happens at zero.
-- Urgent sound and the long `navigator.vibrate` pattern where it exists. **Nothing here
-  bypasses Do Not Disturb or the silent switch**, and the notification is dismissible. The
-  in-page overlay is the channel that always works. See `INTERACTION_SPEC.md`.
+- The in-page overlay is the only Lite channel. It never claims to bypass Do Not Disturb,
+  the silent switch or a locked screen. See `INTERACTION_SPEC.md`.
 - Same two actions. Back is consumed.
 
 ## S7. FamilyEscalation
 
-- **`danger` red `#FF3B30`**, card border 2.0 px. This is the iOS L3 grading, where the copy is "Your favourites are being notified". `family_title`, `family_body`.
-- **The exact message that would be sent**, rendered in a card, per `BUSINESS_RULES.md` §8.
+- **`danger` red `#FF3B30`**, card border 2.0 px. This is the iOS L3 grading, where the copy is the local preview `family_title`, `family_body`.
+- **The local message preview**, rendered in a card, per `BUSINESS_RULES.md` §8. It never leaves this phone and does not claim that a favourite was contacted.
 - `DisclosureBanner`: `family_mock_disclosure` (F21), not removable.
 - `CountdownRing`, 60 s, **`danger`** (F20). `family_cancel_note` stating SOS follows.
 - `BigActionButton` = `cta_cancel_im_fine`.
@@ -182,12 +188,10 @@ and the state is re-presented on the next `visibilitychange`. Disclosed, never i
 
 - Danger red. No animation on entry.
 - `sos_title`, elapsed timer.
-- `sos_state_notified` (F25): the state now has this, stated plainly, with what was sent.
-- What was sent, itemised: precise location, the session timeline, nearest station.
-  Contacts notified as a **count**, never names.
-- Quick dial row: 112, 181, nearest station. All `ACTION_DIAL`.
+- `sos_local_only` (F25): this round-one beta sends no report. The permanent `police_no_govt_link` disclosure remains visible, so neither the SOS title nor a dial action implies a state or police connection.
+- Quick dial row: 112, 181, nearest station when a current fix or active-zone centroid makes one meaningful. Every action is a user-controlled `tel:` handoff to the browser's dialler; Saaya does not call or send anything automatically.
 - `BigActionButton` = `cta_stop_sos` -> S9.
-- Queue state if offline: `sos_queued`.
+- No queue state: there is no round-one writer or offline delivery queue.
 
 ## S9. PinEntry (F24)
 
@@ -195,19 +199,12 @@ and the state is re-presented on the next `visibilitychange`. Disclosed, never i
 - Wrong: `err_pin_wrong` with attempts remaining. After 5, lock 60 s doubling to 15 min,
   `err_pin_locked`.
 - **No forgot-PIN path.** `pin_no_recovery` explains why, once, calmly.
-- Correct: SOS stops, incident patched to `STOPPED`, return Home.
+- Correct: SOS stops locally and returns Home. Lite patches no remote incident.
 
-## S10. PoliceView (F28)
+## S10. PoliceView (F28) — cut, round two
 
-Three honest sections, in this order.
-
-1. **Right now** — what the state can see about her at this moment. In `IDLE` and
-   `SHADOW` and both check-ins this is literally **nothing**, and we show that as the
-   headline, not as fine print.
-2. **If you miss two check-ins** — a rendered sample SUS record: zone, tier, hour band,
-   date. Annotated to show no coordinate, no session id, no name.
-3. **If SOS triggers** — a rendered sample SOS incident: precise location, the timeline,
-   nearest station, pseudonymous id. Annotated as the only moment identity crosses.
+Lite has no state-view screen or state record. Do not render an entry point or a fabricated
+sample: its absence is part of the local-only promise.
 
 Footer: `police_no_govt_link` (F30), permanent.
 This is the trust screen. It is worth more than a privacy policy she will not read.
@@ -218,10 +215,6 @@ Title `set_title`. Rows, in this order, each a `COPY.md` key:
 
 | Row | Key | Sub-label |
 |---|---|---|
-| Favourites (add, edit, delete, min 0 allowed) | `set_favourites` | `set_favourites_sub` |
-| Language | `set_language` | |
-| Change PIN (requires current PIN) | `set_pin` | `set_pin_sub` |
-| What the police see | `set_police` | |
 | About | `set_about` | |
 | Demo panel | `set_demo` | `set_demo_sub` |
 
@@ -231,13 +224,10 @@ demo panel was unreachable. Ownership:
 | Section | Built by |
 |---|---|
 | The shell itself, about + disclaimers, **Demo panel** entry | `M4` |
-| Contacts, change PIN, language | `M1` |
-| "What the police see" entry, and the screen behind it (S10) | `M2` |
+| Contact editing, PIN changes, language | cut from this Lite checkpoint |
 
-**A section appears when its screen exists.** `M4` does not render a "What the police see"
-row that leads nowhere: `M2` adds the row when it builds S10. A dead entry point at the
-`M4` checkpoint would be worse than an absent one, since that checkpoint is the first thing
-shown to anyone.
+**A section appears when its screen exists.** S10 is cut in Lite, so Settings must not
+render a "What the police see" row. A dead entry point would be worse than an absent one.
 
 `M4` is complete when it has built its own rows. It does not wait for `M1` or `M2`.
 
@@ -297,8 +287,8 @@ rest, and it is the screen most likely to be read closely by a judge.
 |---|---|
 | Header | Saaya Lite wordmark, then `about_version` with `versionName` and `versionCode` |
 | What this is | `about_what_title`, `about_what_body` |
-| **What is real** | `about_real_title`, then the eight bullets `about_real_map`, `about_real_detail`, `about_real_arm`, `about_real_ladder`, `about_real_family`, `about_real_sos`, `about_real_writes`, `about_real_console` |
-| **What is mocked** | `about_mock_title`, `about_mock_delivery`, `about_mock_console` |
+| **What is real** | `about_real_title`, then only the claims the current node has passed to the screen. Lite currently supplies map, detail, ladder, family preview and SOS. |
+| **What is mocked** | `about_mock_title` and `about_mock_delivery` only when a mock is currently rendered. The console is cut and never listed. |
 | **What this is not** | `about_not_title`, then `police_no_govt_link` in full |
 | **No AI** | `about_noai_title`, `about_noai_body` |
 | Data | `about_data_title`, `about_data_body` |
@@ -318,8 +308,8 @@ end.** Each node renders the bullets it owns and no others:
 | `about_real_map`, `about_real_detail` | `M4` |
 | `about_real_arm` | `T4.2` |
 | `about_real_ladder`, `about_real_family`, `about_real_sos` | `M1` |
-| `about_real_writes` | `M2` |
-| `about_real_console` | `M3` |
+| `about_real_writes` | cut, round two — do not render |
+| `about_real_console` | cut, round two — do not render |
 
 `M4` builds the About screen and ships **two** bullets. It does not print the other six
 against work that does not exist yet. Each later node adds its own line as it lands, so

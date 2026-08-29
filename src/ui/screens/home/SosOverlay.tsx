@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 
 import { IndexedDbOnboardingRepository } from "../../../data/db/indexedDbOnboardingRepository";
+import type { PoliceStation } from "../../../domain/model/policeStation";
 import {
   MINUTES_PER_HOUR,
   PIN_INITIAL_LOCKOUT_SEC,
@@ -15,20 +16,28 @@ import { BrowserPinHasher } from "../../../platform/pinHash";
 import { installConsumeBackGuard } from "../../../platform/sosBackGuard";
 import { installSosFocusTrap } from "../../../platform/sosFocusTrap";
 import { BigActionButton } from "../../components/BigActionButton";
+import { DisclosureBanner } from "../../components/DisclosureBanner";
 import { PinEntryBox } from "../../components/PinEntryBox";
 import { formatCopy, type M4Copy } from "../../copy/strings";
 
 const MILLIS_PER_SECOND = 1_000; // GROUNDED-EXEMPT: SI conversion between an epoch-millis deadline and seconds.
 const TWO_DIGIT_CLOCK = 2; // GROUNDED-EXEMPT: structural fixed-width rendering of seconds in an elapsed-duration clock.
 const PIN_MAX_LOCKOUT_SEC = PIN_MAX_LOCKOUT_MIN * MINUTES_PER_HOUR;
+const INDIA_EMERGENCY_NUMBER = "112"; // fact: data.emergency.number.in
+const WOMEN_SUPPORT_NUMBER = "181"; // fact: data.emergency.number.women_support
 
 export interface SosOverlayProps {
   readonly copy: M4Copy;
+  readonly nearestStation: PoliceStation | null;
   readonly onPinAccepted: () => void;
 }
 
 /** M1 step 4: a sticky, non-animated SOS surface with its local PIN gate. */
-export function SosOverlay({ copy, onPinAccepted }: SosOverlayProps) {
+export function SosOverlay({
+  copy,
+  nearestStation,
+  onPinAccepted,
+}: SosOverlayProps) {
   const repositoryRef = useRef<IndexedDbOnboardingRepository | null>(null);
   const overlayRef = useRef<HTMLElement | null>(null);
   if (repositoryRef.current === null) {
@@ -147,13 +156,34 @@ export function SosOverlay({ copy, onPinAccepted }: SosOverlayProps) {
       <div className="sos-overlay__surface">
         <h1>{view === "SOS" ? copy.sosTitle : copy.pinTitle}</h1>
         {view === "SOS" ? (
-          <BigActionButton
-            accent="danger"
-            aria-label={copy.cdStopSos}
-            label={copy.ctaStopSos}
-            onClick={() => setView("PIN")}
-            workingLabel={copy.stateWorking}
-          />
+          <>
+            <DisclosureBanner
+              content={copy.sosLocalOnly}
+              kind="prototype-limitation"
+            />
+            <DisclosureBanner
+              content={copy.policeNoGovtLink}
+              kind="prototype-limitation"
+            />
+            <div className="sos-overlay__dials">
+              <DialAction copy={copy} number={INDIA_EMERGENCY_NUMBER} />
+              <DialAction copy={copy} number={WOMEN_SUPPORT_NUMBER} />
+              {nearestStation === null ? null : (
+                <DialAction
+                  copy={copy}
+                  number={nearestStation.phone}
+                  label={nearestStation.name}
+                />
+              )}
+            </div>
+            <BigActionButton
+              accent="danger"
+              aria-label={copy.cdStopSos}
+              label={copy.ctaStopSos}
+              onClick={() => setView("PIN")}
+              workingLabel={copy.stateWorking}
+            />
+          </>
         ) : (
           <div className="sos-overlay__pin">
             {isLocked ? (
@@ -225,6 +255,25 @@ export function SosOverlay({ copy, onPinAccepted }: SosOverlayProps) {
           gap: var(--space-16);
         }
 
+        .sos-overlay__dials {
+          display: grid;
+          gap: var(--space-8);
+        }
+
+        .sos-overlay__call {
+          display: inline-flex;
+          min-block-size: var(--minimum-touch-target);
+          align-items: center;
+          justify-content: center;
+          border: var(--border-hairline) solid var(--color-text-primary);
+          border-radius: var(--radius-control);
+          color: var(--color-text-primary);
+          font-size: var(--type-body-size);
+          font-weight: var(--weight-semibold);
+          line-height: var(--type-body-line-height);
+          text-decoration: none;
+        }
+
         .sos-overlay__error,
         .sos-overlay__no-recovery {
           max-inline-size: 100%; /* GROUNDED-EXEMPT: local text must remain inside the overlay surface. */
@@ -235,8 +284,33 @@ export function SosOverlay({ copy, onPinAccepted }: SosOverlayProps) {
         .sos-overlay__no-recovery {
           color: var(--color-text-on-card);
         }
+
+        .sos-overlay__call:focus-visible {
+          outline: 2px solid var(--color-brand-light);
+          outline-offset: 2px;
+        }
       `}</style>
     </section>
+  );
+}
+
+type DialActionProps = Readonly<{
+  copy: M4Copy;
+  label?: string;
+  number: string;
+}>;
+
+function DialAction({ copy, label, number }: DialActionProps) {
+  const destination = label ?? number;
+
+  return (
+    <a
+      aria-label={formatCopy(copy.cdStationCall, destination)}
+      className="sos-overlay__call"
+      href={`tel:${number}`}
+    >
+      {formatCopy(copy.cdStationCall, destination)}
+    </a>
   );
 }
 

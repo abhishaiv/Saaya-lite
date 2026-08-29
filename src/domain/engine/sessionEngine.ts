@@ -71,6 +71,10 @@ export function onEvent(
 }
 
 function fromIdle(event: SessionEvent, ctx: EngineContext): EngineResult {
+  if (event.kind === "HelpNowTapped") {
+    return enterSos("MANUAL_HELP_BUTTON", ctx, false, true);
+  }
+
   if (event.kind === "ManualArm") {
     const delaySec = checkInDelaySec(ctx.rules, "MANUAL", null, null);
     return {
@@ -281,9 +285,16 @@ function enterSos(
   trigger: SosTrigger,
   ctx: EngineContext,
   hideCheckIn = false,
+  startFreshWatch = false,
 ): EngineResult {
   const commands: Command[] = [];
   if (hideCheckIn) commands.push({ kind: "HideCheckIn" });
+  if (startFreshWatch) {
+    commands.push(
+      { kind: "StartLocationWatch" },
+      { kind: "RequestWakeLock" },
+    );
+  }
   commands.push(
     { kind: "LogSessionEvent", type: "SOS_TRIGGERED" },
     { kind: "WriteSosIncident", trigger },

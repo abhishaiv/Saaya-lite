@@ -133,18 +133,24 @@ export class HomeEngineBridge implements RuntimeSessionBridge {
     persisted: PersistedSession,
     input: { readonly nowEpochMs: number; readonly zone: Zone | null },
   ): RuntimeSessionSnapshot {
-    this.memory = {
-      activeZoneId: persisted.zoneId,
-      armedAtEpochMs: persisted.armedAtEpochMs,
-      armedHourBand: persisted.armedHourBand,
-      armMode: persisted.armMode,
-      cooldowns: this.memory.cooldowns,
-      deadlineEpochMs: persisted.deadlineEpochMs,
-      sessionId: persisted.sessionId,
-      state: persisted.state,
-      susEventWritten: persisted.susEventWritten,
+    // Lite has no writer in this round. A stale persisted flag must not resurrect the
+    // future delivery contract into the local-only runtime after a reload.
+    const localPersisted: PersistedSession = {
+      ...persisted,
+      susEventWritten: false,
     };
-    return this.dispatch({ kind: "AppKilledRestart", persisted }, input);
+    this.memory = {
+      activeZoneId: localPersisted.zoneId,
+      armedAtEpochMs: localPersisted.armedAtEpochMs,
+      armedHourBand: localPersisted.armedHourBand,
+      armMode: localPersisted.armMode,
+      cooldowns: this.memory.cooldowns,
+      deadlineEpochMs: localPersisted.deadlineEpochMs,
+      sessionId: localPersisted.sessionId,
+      state: localPersisted.state,
+      susEventWritten: false,
+    };
+    return this.dispatch({ kind: "AppKilledRestart", persisted: localPersisted }, input);
   }
 
   dispatch(
@@ -170,7 +176,10 @@ export class HomeEngineBridge implements RuntimeSessionBridge {
       zone: input.zone,
     });
 
-    if (result.state === "SHADOW" && this.memory.state === "IDLE") {
+    if (
+      (result.state === "SHADOW" || result.state === "SOS_ACTIVE") &&
+      this.memory.state === "IDLE"
+    ) {
       const auto = event.kind === "ZoneEntered";
       this.memory = {
         activeZoneId: auto ? event.zoneId : input.zone?.stationId ?? null,
@@ -180,7 +189,7 @@ export class HomeEngineBridge implements RuntimeSessionBridge {
         cooldowns: this.memory.cooldowns,
         deadlineEpochMs: null,
         sessionId: this.createSessionId(),
-        state: "SHADOW",
+        state: result.state,
         susEventWritten: false,
       };
     } else {
@@ -190,9 +199,6 @@ export class HomeEngineBridge implements RuntimeSessionBridge {
         event.kind === "CountdownExpired"
       ) {
         this.memory.deadlineEpochMs = null;
-      }
-      if (result.commands.some(({ kind }) => kind === "WriteSusEvent")) {
-        this.memory.susEventWritten = true;
       }
     }
 

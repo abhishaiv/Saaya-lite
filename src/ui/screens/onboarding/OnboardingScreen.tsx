@@ -18,7 +18,7 @@ import {
   toIndianE164,
 } from "./onboardingRules";
 
-type OnboardingStep = "WELCOME" | "FAVOURITE" | "LOCATION" | "PIN";
+type OnboardingStep = "WELCOME" | "FAVOURITE" | "LOCATION" | "PIN" | "TOUR";
 type LocationResult = "RATIONALE" | "GRANTED" | "DENIED";
 
 export interface OnboardingScreenProps {
@@ -84,6 +84,15 @@ export function OnboardingScreen({
     setSaving(true);
     try {
       await repository.savePin(pin);
+      setStep("TOUR");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function finishTour() {
+    setSaving(true);
+    try {
       await repository.saveOnboarded();
       onCompleted();
     } finally {
@@ -96,11 +105,19 @@ export function OnboardingScreen({
       <section aria-live="polite" className="onboarding-screen__card">
         {step === "WELCOME" ? (
           <section className="onboarding-screen__welcome">
-            <p className="onboarding-screen__app-name">{copy.appName}</p>
+            <div className="onboarding-screen__brand-lockup">
+              {/* Local SVG brand mark stays CSS-token-sized; Next image optimisation adds no value. */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img alt="" src="/assets/icons/saaya-icon-v2-small.svg" />
+              <p className="onboarding-screen__app-name">{copy.appName}</p>
+            </div>
             <OnboardingHeading
               body={copy.onbWelcomeBody}
               title={copy.onbWelcomeTitle}
             />
+            <p className="onboarding-screen__beta-note">
+              {copy.onbBetaVizag}
+            </p>
             <ContinueToFavourite
               copy={copy}
               onClick={() => setStep("FAVOURITE")}
@@ -272,6 +289,28 @@ export function OnboardingScreen({
             </SaayaButton>
           </form>
         ) : null}
+
+        {step === "TOUR" ? (
+          <section className="onboarding-screen__tour">
+            <OnboardingHeading
+              body={copy.onbTourBody}
+              title={copy.onbTourTitle}
+            />
+            <ol>
+              <li>{copy.onbTourShadow}</li>
+              <li>{copy.onbTourCheckins}</li>
+              <li>{copy.onbTourSos}</li>
+            </ol>
+            <SaayaButton
+              loading={saving}
+              onClick={() => void finishTour()}
+              variant="primary"
+              workingLabel={copy.stateWorking}
+            >
+              {copy.ctaOpenDemo}
+            </SaayaButton>
+          </section>
+        ) : null}
       </section>
 
       <style jsx>{`
@@ -310,6 +349,34 @@ export function OnboardingScreen({
           font-weight: var(--weight-semibold);
           letter-spacing: var(--type-label-tracking);
           line-height: var(--type-label-line-height);
+        }
+
+        .onboarding-screen__brand-lockup {
+          display: inline-flex;
+          align-items: center;
+          gap: var(--space-12);
+        }
+
+        .onboarding-screen__brand-lockup img {
+          inline-size: var(--minimum-touch-target);
+          block-size: var(--minimum-touch-target);
+        }
+
+        .onboarding-screen__beta-note {
+          margin: 0;
+          color: var(--color-text-secondary);
+          font-size: var(--type-caption-size);
+          line-height: var(--type-caption-line-height);
+        }
+
+        .onboarding-screen__tour ol {
+          display: grid;
+          gap: var(--space-12);
+          margin: 0;
+          padding-inline-start: var(--space-20);
+          color: var(--color-text-on-card);
+          font-size: var(--type-body-size);
+          line-height: var(--type-body-line-height);
         }
 
         .onboarding-screen__user-name label,
