@@ -313,9 +313,9 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 396,
-  "edges": 683,
-  "events": 73
+  "entities": 397,
+  "edges": 684,
+  "events": 74
  },
  "entities": [
   {
@@ -3168,6 +3168,13 @@
    "id": "fail.m1.pin_confirmation",
    "class": "Failure",
    "label": "Onboarding rendered two masked four-digit PIN fields because the old S2.4 confirmation requirement made the flow appear to demand eight digits",
+   "node": "M1",
+   "gate": "G5"
+  },
+  {
+   "id": "fail.m1.weak_pin_retry",
+   "class": "Failure",
+   "label": "Weak-PIN rejection retained all four digits in the masked max-length onboarding input, leaving no practical way to enter a replacement PIN",
    "node": "M1",
    "gate": "G5"
   }
@@ -8636,6 +8643,14 @@
    "at": "2026-08-29",
    "by": "codex",
    "confidence": "high"
+  },
+  {
+   "from": "fail.m1.weak_pin_retry",
+   "rel": "caused_by",
+   "to": "node.M1",
+   "at": "2026-08-29",
+   "by": "codex",
+   "confidence": "high"
   }
  ],
  "events": [
@@ -9466,6 +9481,17 @@
    "detail": "Replaced the duplicate onboarding PIN confirmation row with one four-digit entry after user feedback; this prevents the flow appearing to require an eight-digit PIN.",
    "refs": [
     "fail.m1.pin_confirmation"
+   ],
+   "node": "M1"
+  },
+  {
+   "id": "ev.0074",
+   "type": "gate_failed",
+   "at": "2026-08-29",
+   "actor": "codex",
+   "detail": "User feedback reproduced an onboarding retry failure: a rejected weak PIN remained in the four-digit masked field and blocked replacement entry.",
+   "refs": [
+    "fail.m1.weak_pin_retry"
    ],
    "node": "M1"
   }

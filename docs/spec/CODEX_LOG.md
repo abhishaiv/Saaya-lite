@@ -336,3 +336,17 @@ row.
 
 **Verdict:** Saved a user-visible setup failure. The targeted reproduction failed before the
 change, then the full 158-test suite, type check, lint, build, grounding and reads checks passed.
+
+### M1 - weak-PIN retry correction          2026-08-29, ~12 minutes active
+
+**Asked:** Restore a usable retry path after the “pick something less obvious” validation.
+
+**Shipped:** A rejected weak PIN is cleared before the validation error is shown, so the next
+four digits are a new entry rather than an attempted append to a full masked field.
+
+**Needed correcting:** The error branch retained its four digits in a controlled `maxLength=4`
+input. With the actual field visually hidden behind the PIN boxes, users had no practical way
+to replace the rejected value. The new regression test failed against that path before the fix.
+
+**Verdict:** Saved a broken onboarding path. All 159 Vitest tests, type check, lint, build,
+grounding, reads and knowledge-graph checks pass.

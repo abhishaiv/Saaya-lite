@@ -73,6 +73,7 @@ export function OnboardingScreen({
     event.preventDefault();
     if (!isCompletePin(pin)) return;
     if (isWeakPin(pin)) {
+      setPin("");
       setPinError(copy.errPinWeak);
       return;
     }

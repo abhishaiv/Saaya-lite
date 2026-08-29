@@ -12,4 +12,15 @@ describe("onboarding PIN setup", () => {
     expect(source.match(/<PinEntryBox/g)).toHaveLength(1);
     expect(source).not.toContain("confirmedPin");
   });
+
+  it("clears a rejected weak PIN so a new PIN can be entered immediately", () => {
+    const source = readFileSync(
+      new URL("./OnboardingScreen.tsx", import.meta.url),
+      "utf8",
+    );
+
+    expect(source).toMatch(
+      /if \(isWeakPin\(pin\)\) \{\s*setPin\(""\);\s*setPinError\(copy\.errPinWeak\);/,
+    );
+  });
 });
