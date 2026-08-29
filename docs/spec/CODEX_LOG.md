@@ -320,3 +320,19 @@ the correct fix, not adding an unreviewed backend. Final Chrome interaction veri
 pending because the connected Chrome extension is temporarily unreachable; the browser and
 extension diagnostics are otherwise healthy. Fresh verifier workers also exhausted their
 usage allowance, so this checkpoint remains pending rather than claiming G9 passed.
+
+### M1 - onboarding PIN-entry correction          2026-08-29, ~10 minutes active
+
+**Asked:** Fix the PIN setup screen, which appeared to require eight numbers.
+
+**Shipped:** Onboarding now has exactly one masked four-digit PIN entry, with the existing
+weak-PIN validation intact. A regression test asserts that the screen cannot grow a second
+`PinEntryBox` or confirmation state again.
+
+**Needed correcting:** S2.4 still prescribed a confirmation entry, so the component rendered
+two four-digit fields. That was technically literal to the old spec but confusing in the
+calm-day onboarding flow; the amended screen contract now explicitly prohibits the duplicate
+row.
+
+**Verdict:** Saved a user-visible setup failure. The targeted reproduction failed before the
+change, then the full 158-test suite, type check, lint, build, grounding and reads checks passed.

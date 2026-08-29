@@ -313,9 +313,9 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 395,
-  "edges": 682,
-  "events": 72
+  "entities": 396,
+  "edges": 683,
+  "events": 73
  },
  "entities": [
   {
@@ -3163,6 +3163,13 @@
    "class": "Artifact",
    "label": "Clear onboarding tour, v2 Saaya Lite brand treatment, outline-first keyless map, visible Shadow and direct SOS controls, local message preview and local-only SOS dial surface.",
    "node": "M1"
+  },
+  {
+   "id": "fail.m1.pin_confirmation",
+   "class": "Failure",
+   "label": "Onboarding rendered two masked four-digit PIN fields because the old S2.4 confirmation requirement made the flow appear to demand eight digits",
+   "node": "M1",
+   "gate": "G5"
   }
  ],
  "edges": [
@@ -8621,6 +8628,14 @@
    "at": "2026-08-29",
    "by": "codex",
    "confidence": "high"
+  },
+  {
+   "from": "fail.m1.pin_confirmation",
+   "rel": "caused_by",
+   "to": "doc.screens",
+   "at": "2026-08-29",
+   "by": "codex",
+   "confidence": "high"
   }
  ],
  "events": [
@@ -9440,6 +9455,17 @@
    "detail": "Approved local-only Lite boundary reconciled across UI and specifications; 181 added as a user-controlled SOS dial handoff.",
    "refs": [
     "d.lite.local_only_round_one"
+   ],
+   "node": "M1"
+  },
+  {
+   "id": "ev.0073",
+   "type": "spec_amended",
+   "at": "2026-08-29",
+   "actor": "codex",
+   "detail": "Replaced the duplicate onboarding PIN confirmation row with one four-digit entry after user feedback; this prevents the flow appearing to require an eight-digit PIN.",
+   "refs": [
+    "fail.m1.pin_confirmation"
    ],
    "node": "M1"
   }

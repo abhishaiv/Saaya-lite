@@ -40,7 +40,6 @@ export function OnboardingScreen({
   const [locationResult, setLocationResult] =
     useState<LocationResult>("RATIONALE");
   const [pin, setPin] = useState("");
-  const [confirmedPin, setConfirmedPin] = useState("");
   const [pinError, setPinError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -72,13 +71,9 @@ export function OnboardingScreen({
 
   async function finishOnboarding(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!isCompletePin(pin) || !isCompletePin(confirmedPin)) return;
+    if (!isCompletePin(pin)) return;
     if (isWeakPin(pin)) {
       setPinError(copy.errPinWeak);
-      return;
-    }
-    if (pin !== confirmedPin) {
-      setPinError(copy.errPinMismatch);
       return;
     }
     setSaving(true);
@@ -263,15 +258,6 @@ export function OnboardingScreen({
                 state={pinError === null ? "default" : "error"}
                 value={pin}
               />
-              <PinEntryBox
-                ariaLabel={copy.onbPinBody}
-                onChange={(value) => {
-                  setConfirmedPin(value);
-                  setPinError(null);
-                }}
-                state={pinError === null ? "default" : "error"}
-                value={confirmedPin}
-              />
             </div>
             {pinError === null ? null : (
               <p className="onboarding-screen__error" role="alert">
@@ -279,7 +265,7 @@ export function OnboardingScreen({
               </p>
             )}
             <SaayaButton
-              disabled={!isCompletePin(pin) || !isCompletePin(confirmedPin)}
+              disabled={!isCompletePin(pin)}
               loading={saving}
               type="submit"
               variant="primary"

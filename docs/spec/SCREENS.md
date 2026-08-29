@@ -76,9 +76,8 @@ language selector or extra-contact flow ships in Lite.
 
 ### S2.4 PIN (F5)
 - `onb_pin_title`, `onb_pin_body` explaining it stops a live SOS.
-- 4-digit entry, then confirm entry.
+- One 4-digit entry. Do not require a confirmation row: onboarding is a calm-day setup flow, and two masked rows read as an eight-digit PIN.
 - Reject `0000`, `1234`, `1111`, all-identical (`err_pin_weak`).
-- Mismatch: `err_pin_mismatch`, clear both.
 - Primary: `cta_finish` saves the PIN -> safety-flow tour. `onboarded = true` is written only when she opens the demo, so every new user reaches the tour.
 
 ### S2.5 Safety-flow tour
