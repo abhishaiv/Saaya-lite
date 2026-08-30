@@ -389,9 +389,23 @@ export function HomeScreen({
   const handleTileAvailability = useCallback((status: TileAvailability) => {
     setTileAvailability(status);
   }, []);
-  const handleZoneSelected = useCallback((zoneId: string | null) => {
-    setSelectedZoneId(zoneId);
-  }, []);
+  const handleZoneSelected = useCallback(
+    (zoneId: string | null) => {
+      if (hasForegroundSafetySurface(engineView.state)) {
+        setSelectedZoneId(null);
+        return;
+      }
+
+      setSelectedZoneId(zoneId);
+    },
+    [engineView.state],
+  );
+
+  useEffect(() => {
+    if (hasForegroundSafetySurface(engineView.state)) {
+      setSelectedZoneId(null);
+    }
+  }, [engineView.state]);
   const handleManualArm = useCallback(() => {
     setPageStoppedWarning(false);
     engineRef.current?.dispatch(
@@ -761,6 +775,15 @@ export function HomeScreen({
       `}</style>
       </main>
     </>
+  );
+}
+
+function hasForegroundSafetySurface(state: SessionState): boolean {
+  return (
+    state === "CHECKIN_1" ||
+    state === "CHECKIN_2" ||
+    state === "FAMILY_ESCALATED" ||
+    state === "SOS_ACTIVE"
   );
 }
 

@@ -357,3 +357,7 @@ grounding, reads and knowledge-graph checks pass.
 with a compact on-map `SUS` / `Demo` / `SOS` dock. A demo picker now closes when it arms or a
 timed rung begins; timed cards implement a visual-only vertical minimize gesture, leaving the
 safety state and SOS behavior unchanged.
+
+**Needed correcting:** The first swipe implementation treated even one pixel of tap drift as
+a swipe. It now lets the browser’s native touch-pan arbitration decide when a real gesture has
+started, rather than inventing a product-specific distance threshold.

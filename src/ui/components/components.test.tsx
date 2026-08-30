@@ -12,7 +12,7 @@ import { EmptyState } from "./EmptyState";
 import {
   LADDER_CARD_BACK_POLICY,
   LadderCard,
-  ladderCardSwipeRelease,
+  ladderCardNativePanCancels,
 } from "./LadderCard";
 import { MapControlButton } from "./MapControlButton";
 import { PinEntryBox } from "./PinEntryBox";
@@ -126,11 +126,10 @@ describe("C3 and C4 ladder surfaces", () => {
     expect(minimizable).toContain('data-swipe-dismisses="visual-only"');
   });
 
-  it("treats either vertical swipe direction as a visual-only minimize gesture", () => {
-    expect(ladderCardSwipeRelease(0, 0, 0, 24)).toBe(true);
-    expect(ladderCardSwipeRelease(0, 24, 0, 0)).toBe(true);
-    expect(ladderCardSwipeRelease(0, 0, 24, 0)).toBe(false);
-    expect(ladderCardSwipeRelease(0, 0, 0, 0)).toBe(false);
+  it("minimizes only after the browser recognizes a touch pan", () => {
+    expect(ladderCardNativePanCancels("touch")).toBe(true);
+    expect(ladderCardNativePanCancels("mouse")).toBe(false);
+    expect(ladderCardNativePanCancels("pen")).toBe(false);
   });
 
   it("removes a deadline-passed card", () => {

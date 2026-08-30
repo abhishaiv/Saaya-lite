@@ -84,21 +84,15 @@ const phaseClassNames: Readonly<
 
 type LadderCardSwipe = Readonly<{
   pointerId: number;
-  startClientX: number;
-  startClientY: number;
+  pointerType: string;
 }>;
 
-/** A direction-only swipe rule avoids inventing an unproven pixel threshold. */
-export function ladderCardSwipeRelease(
-  startClientX: number,
-  startClientY: number,
-  endClientX: number,
-  endClientY: number,
-): boolean {
-  const deltaX = endClientX - startClientX;
-  const deltaY = endClientY - startClientY;
-
-  return deltaY !== 0 && Math.abs(deltaY) > Math.abs(deltaX);
+/**
+ * Browser touch-pan arbitration is the gesture threshold. It avoids inventing
+ * a pixel distance and cannot mistake ordinary tap drift for a swipe.
+ */
+export function ladderCardNativePanCancels(pointerType: string): boolean {
+  return pointerType === "touch";
 }
 
 function isInteractiveTarget(target: EventTarget | null): boolean {
@@ -167,8 +161,7 @@ export function LadderCard(props: LadderCardProps) {
     capturePointer(event.currentTarget, event.pointerId);
     setSwipe({
       pointerId: event.pointerId,
-      startClientX: event.clientX,
-      startClientY: event.clientY,
+      pointerType: event.pointerType,
     });
   }
 
@@ -178,18 +171,7 @@ export function LadderCard(props: LadderCardProps) {
     }
 
     releasePointer(event.currentTarget, event.pointerId);
-    const minimize = ladderCardSwipeRelease(
-      swipe.startClientX,
-      swipe.startClientY,
-      event.clientX,
-      event.clientY,
-    );
     setSwipe(null);
-
-    if (minimize) {
-      event.preventDefault();
-      onMinimize?.();
-    }
   }
 
   function handlePointerCancel(event: ReactPointerEvent<HTMLDivElement>) {
@@ -199,6 +181,10 @@ export function LadderCard(props: LadderCardProps) {
 
     releasePointer(event.currentTarget, event.pointerId);
     setSwipe(null);
+
+    if (ladderCardNativePanCancels(swipe.pointerType)) {
+      onMinimize?.();
+    }
   }
 
   return (
@@ -288,7 +274,7 @@ export function LadderCard(props: LadderCardProps) {
           border-radius: var(--radius-card);
           background: var(--color-card-fill);
           pointer-events: auto;
-          touch-action: none;
+          touch-action: pan-y;
           transform: translateY(0) scale(1);
         }
 

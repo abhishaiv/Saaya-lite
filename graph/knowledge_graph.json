@@ -313,9 +313,9 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 399,
-  "edges": 685,
-  "events": 75
+  "entities": 401,
+  "edges": 686,
+  "events": 76
  },
  "entities": [
   {
@@ -3188,6 +3188,18 @@
    "id": "d.home_compact_map_controls",
    "class": "Decision",
    "label": "Use compact Home SUS Demo SOS controls and visual-only ladder minimize",
+   "node": "M4"
+  },
+  {
+   "id": "f.home_swipe_tap_drift",
+   "class": "Failure",
+   "label": "One-pixel tap drift could visually minimize a timed safety card",
+   "node": "M4"
+  },
+  {
+   "id": "d.home_native_touch_pan",
+   "class": "Decision",
+   "label": "Use native touch-pan arbitration for visual-only timed-card minimize",
    "node": "M4"
   }
  ],
@@ -8671,6 +8683,14 @@
    "at": "2026-08-30",
    "by": "codex",
    "confidence": "high"
+  },
+  {
+   "from": "d.home_native_touch_pan",
+   "rel": "motivated_by",
+   "to": "f.home_swipe_tap_drift",
+   "at": "2026-08-30",
+   "by": "codex",
+   "confidence": "high"
   }
  ],
  "events": [
@@ -9524,6 +9544,18 @@
    "refs": [
     "f.home_overlay_stack",
     "d.home_compact_map_controls"
+   ],
+   "node": "M4"
+  },
+  {
+   "id": "ev.0076",
+   "type": "decision_made",
+   "at": "2026-08-30",
+   "actor": "codex",
+   "detail": "Native touch-pan arbitration prevents tap drift from minimizing a timed card",
+   "refs": [
+    "f.home_swipe_tap_drift",
+    "d.home_native_touch_pan"
    ],
    "node": "M4"
   }

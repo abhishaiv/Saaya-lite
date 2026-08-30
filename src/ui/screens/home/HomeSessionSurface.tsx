@@ -240,8 +240,8 @@ export function HomeSessionSurface({
           z-index: 6; /* GROUNDED-EXEMPT: compact recovery notice sits above map controls and below a live ladder surface. */
           inset-inline-start: var(--screen-padding);
           inset-block-end: calc(
-            env(safe-area-inset-bottom) + var(--minimum-touch-target) +
-              var(--space-24)
+            var(--home-action-dock-clearance) +
+              var(--minimum-touch-target) + var(--space-8)
           );
           max-inline-size: calc(100% - (var(--screen-padding) * 2)); /* GROUNDED-EXEMPT: the compact notice stays inside the viewport gutters. */
           margin: 0;
