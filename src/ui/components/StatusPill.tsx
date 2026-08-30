@@ -143,7 +143,7 @@ export function StatusPill(props: StatusPillProps) {
           inset-inline-start: 0;
           display: inline-flex;
           align-items: center;
-          block-size: 36px;
+          block-size: var(--status-pill-height);
           padding-inline: var(--space-14);
           border: 1px solid
             rgb(from var(--status-pill-accent) r g b / 0.4);

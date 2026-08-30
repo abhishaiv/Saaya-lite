@@ -260,7 +260,7 @@ export function SosOverlay({
           gap: var(--space-8);
         }
 
-        .sos-overlay__call {
+        :global(.sos-overlay__call) {
           display: inline-flex;
           min-block-size: var(--minimum-touch-target);
           align-items: center;
@@ -285,7 +285,7 @@ export function SosOverlay({
           color: var(--color-text-on-card);
         }
 
-        .sos-overlay__call:focus-visible {
+        :global(.sos-overlay__call:focus-visible) {
           outline: 2px solid var(--color-brand-light);
           outline-offset: 2px;
         }

@@ -242,7 +242,10 @@ export function HomeSessionSurface({
         .home-session-arm-banner {
           position: fixed;
           z-index: 9; /* GROUNDED-EXEMPT: local stack above Home and the demo sheet for a transient acknowledgement. */
-          inset-block-start: env(safe-area-inset-top);
+          inset-block-start: calc(
+            env(safe-area-inset-top) + var(--space-12) +
+              var(--status-pill-height) + var(--space-8)
+          );
           inset-inline: 0;
           pointer-events: none;
         }

@@ -72,6 +72,7 @@
   --space-48: 48px;
 
   --screen-padding: 20px;
+  --status-pill-height: 36px; /* dim.pill.height */
   --minimum-touch-target: 48px;
   --sheet-peek-height: 160px;
   --sheet-expanded-height: 55dvh;

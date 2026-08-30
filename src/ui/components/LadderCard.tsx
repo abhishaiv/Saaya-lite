@@ -154,6 +154,7 @@ export function LadderCard(props: LadderCardProps) {
       <style jsx>{`
         .ladder-card {
           position: fixed;
+          z-index: 10; /* GROUNDED-EXEMPT: the active ladder must stay above the Home demo sheet and below session truth and SOS. */
           inset: 0;
           isolation: isolate;
           display: flex;
