@@ -16,6 +16,7 @@ export interface CheckInOverlayProps {
   readonly deadlineEpochMs: number | null;
   readonly demoSpeedEnabled: boolean;
   readonly onHelpNow: () => void;
+  readonly onMinimize: () => void;
   readonly onOk: () => void;
   readonly reason: string | null;
   readonly state: "CHECKIN_1" | "CHECKIN_2";
@@ -27,6 +28,7 @@ export function CheckInOverlay({
   deadlineEpochMs,
   demoSpeedEnabled,
   onHelpNow,
+  onMinimize,
   onOk,
   reason,
   state,
@@ -92,6 +94,8 @@ export function CheckInOverlay({
         />
       }
       rung={state}
+      minimizeLabel={copy.cdCloseSheet}
+      onMinimize={onMinimize}
       secondary={
         <SaayaButton
           aria-label={copy.cdHelpNow}
@@ -99,7 +103,7 @@ export function CheckInOverlay({
           variant="textOnly"
           workingLabel={copy.stateWorking}
         >
-          {copy.ctaHelpNow}
+          SOS
         </SaayaButton>
       }
       title={title}

@@ -252,7 +252,9 @@ export function HomeMap({
           position: absolute;
           z-index: 3;
           inset-inline-start: var(--screen-padding);
-          inset-block-end: calc(var(--sheet-peek-height) + var(--space-32));
+          inset-block-end: calc(
+            var(--home-action-dock-clearance) + var(--space-8)
+          );
           margin: 0;
           padding: var(--space-8) var(--space-12);
           border-radius: var(--radius-small);
@@ -266,7 +268,9 @@ export function HomeMap({
           position: fixed;
           z-index: 10; /* GROUNDED-EXEMPT: licence attribution remains above every Home sheet state. */
           inset-inline-start: var(--screen-padding);
-          inset-block-end: calc(env(safe-area-inset-bottom) + var(--space-4));
+          inset-block-end: calc(
+            var(--home-action-dock-clearance) + var(--space-4)
+          );
           color: var(--color-text-tertiary);
           font-size: calc(10 / 16 * 1rem); /* type.map.attribution / type.rem.base */
           line-height: var(--type-label-line-height);

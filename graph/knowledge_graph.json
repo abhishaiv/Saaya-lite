@@ -313,9 +313,9 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 397,
-  "edges": 684,
-  "events": 74
+  "entities": 399,
+  "edges": 685,
+  "events": 75
  },
  "entities": [
   {
@@ -3177,6 +3177,18 @@
    "label": "Weak-PIN rejection retained all four digits in the masked max-length onboarding input, leaving no practical way to enter a replacement PIN",
    "node": "M1",
    "gate": "G5"
+  },
+  {
+   "id": "f.home_overlay_stack",
+   "class": "Failure",
+   "label": "Persistent Home overlays obscured the mobile map",
+   "node": "M4"
+  },
+  {
+   "id": "d.home_compact_map_controls",
+   "class": "Decision",
+   "label": "Use compact Home SUS Demo SOS controls and visual-only ladder minimize",
+   "node": "M4"
   }
  ],
  "edges": [
@@ -8651,6 +8663,14 @@
    "at": "2026-08-29",
    "by": "codex",
    "confidence": "high"
+  },
+  {
+   "from": "d.home_compact_map_controls",
+   "rel": "motivated_by",
+   "to": "f.home_overlay_stack",
+   "at": "2026-08-30",
+   "by": "codex",
+   "confidence": "high"
   }
  ],
  "events": [
@@ -9494,6 +9514,18 @@
     "fail.m1.weak_pin_retry"
    ],
    "node": "M1"
+  },
+  {
+   "id": "ev.0075",
+   "type": "decision_made",
+   "at": "2026-08-30",
+   "actor": "codex",
+   "detail": "Compact Home controls remove the persistent map-overlay stack without changing safety state",
+   "refs": [
+    "f.home_overlay_stack",
+    "d.home_compact_map_controls"
+   ],
+   "node": "M4"
   }
  ]
 }

@@ -350,3 +350,10 @@ to replace the rejected value. The new regression test failed against that path 
 
 **Verdict:** Saved a broken onboarding path. All 159 Vitest tests, type check, lint, build,
 grounding, reads and knowledge-graph checks pass.
+
+### M4 — compact mobile map controls          2026-08-30
+
+**Correction:** Replaced Home’s persistent map sheet, notice stack and duplicate SOS control
+with a compact on-map `SUS` / `Demo` / `SOS` dock. A demo picker now closes when it arms or a
+timed rung begins; timed cards implement a visual-only vertical minimize gesture, leaving the
+safety state and SOS behavior unchanged.

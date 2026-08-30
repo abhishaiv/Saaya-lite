@@ -17,8 +17,6 @@ import {
   DEFAULT_RULES,
   DEMO_ARM_TIME,
   DEMO_RULES,
-  displayRisk,
-  displayRiskLabel,
 } from "../../../domain/engine/rules";
 import type { Command, SessionState } from "../../../domain/model/session";
 import { RiskTier } from "../../../domain/model/zone";
@@ -50,7 +48,7 @@ import {
   browserWakeLockApi,
   WakeLockController,
 } from "../../../platform/wakeLock";
-import { MapControlButton, MapControlButtonStack } from "../../components/MapControlButton";
+import { MapControlButton } from "../../components/MapControlButton";
 import { formatCopy, M4_COPY, type SaayaLocale } from "../../copy/strings";
 import { HomeEngineBridge, type HomeEngineView } from "./homeEngineBridge";
 import { HomeMap } from "./HomeMap";
@@ -103,9 +101,6 @@ export function HomeScreen({
   const [selectedZoneId, setSelectedZoneId] = useState<string | null>(null);
   const [tileAvailability, setTileAvailability] =
     useState<TileAvailability>("loading");
-  const [nowEpochMs, setNowEpochMs] = useState(() =>
-    browserClock.nowEpochMs(),
-  );
   const [armAcknowledgement, setArmAcknowledgement] =
     useState<ArmAcknowledgement | null>(null);
   const [armBannerVisible, setArmBannerVisible] = useState(false);
@@ -166,13 +161,6 @@ export function HomeScreen({
         : selectHighestRiskZone(containingZones(preparedZones, location)),
     [location, preparedZones],
   );
-  const currentZoneDetail = useMemo(
-    () =>
-      currentZone === null
-        ? null
-        : zoneDetails.find(({ id }) => id === currentZone.stationId) ?? null,
-    [currentZone, zoneDetails],
-  );
   const activeZoneDetail = useMemo(
     () =>
       engineView.activeZoneId === null
@@ -180,15 +168,6 @@ export function HomeScreen({
         : zoneDetails.find(({ id }) => id === engineView.activeZoneId) ?? null,
     [engineView.activeZoneId, zoneDetails],
   );
-  const contextLine = useMemo(() => {
-    if (currentZoneDetail === null) return null;
-    const band = hourBandAtEpochMs(nowEpochMs);
-    const riskBand = localizedRiskBand(
-      copy,
-      displayRiskLabel(displayRisk(currentZoneDetail.zone.riskScore, band)),
-    );
-    return formatCopy(copy.homeHourContext, currentZoneDetail.label, riskBand);
-  }, [copy, currentZoneDetail, nowEpochMs]);
   const checkInReason = useMemo(() => {
     if (
       engineView.state !== "CHECKIN_1" ||
@@ -238,7 +217,6 @@ export function HomeScreen({
         onLiveFix(fix) {
           setLocation(fix);
           setLocationHelpOpen(false);
-          setNowEpochMs(fix.observedAtEpochMs);
         },
         onStatus(status) {
           setLocationStatus(status);
@@ -388,6 +366,20 @@ export function HomeScreen({
     setSettingsOpen(false);
   }, [engineView.state]);
 
+  useEffect(() => {
+    if (
+      !demoPanelOpen ||
+      engineView.state === "IDLE" ||
+      engineView.state === "SHADOW"
+    ) {
+      return;
+    }
+
+    // A timed rung is the one foreground surface. The demo controls must not
+    // remain underneath it and obscure the map or compete with SOS.
+    setDemoPanelOpen(false);
+  }, [demoPanelOpen, engineView.state]);
+
   const handleMapController = useCallback(
     (controller: LeafletMapController | null) => {
       mapControllerRef.current = controller;
@@ -402,7 +394,6 @@ export function HomeScreen({
   }, []);
   const handleManualArm = useCallback(() => {
     setPageStoppedWarning(false);
-    setNowEpochMs(browserClock.nowEpochMs());
     engineRef.current?.dispatch(
       { kind: "ManualArm" },
       { nowEpochMs: browserClock.nowEpochMs(), zone: currentZone },
@@ -422,7 +413,6 @@ export function HomeScreen({
     const activeZone =
       zones.find(({ stationId }) => stationId === engineView.activeZoneId) ??
       currentZone;
-    setNowEpochMs(nowEpochMs);
     engineRef.current?.dispatch(
       { kind: "OkTapped" },
       { nowEpochMs, zone: activeZone },
@@ -433,7 +423,6 @@ export function HomeScreen({
     const activeZone =
       zones.find(({ stationId }) => stationId === engineView.activeZoneId) ??
       currentZone;
-    setNowEpochMs(nowEpochMs);
     engineRef.current?.dispatch(
       { kind: "CancelTapped" },
       { nowEpochMs, zone: activeZone },
@@ -444,7 +433,6 @@ export function HomeScreen({
     const activeZone =
       zones.find(({ stationId }) => stationId === engineView.activeZoneId) ??
       currentZone;
-    setNowEpochMs(nowEpochMs);
     engineRef.current?.dispatch(
       { kind: "HelpNowTapped" },
       { nowEpochMs, zone: activeZone },
@@ -455,7 +443,6 @@ export function HomeScreen({
     const activeZone =
       zones.find(({ stationId }) => stationId === engineView.activeZoneId) ??
       currentZone;
-    setNowEpochMs(nowEpochMs);
     engineRef.current?.dispatch(
       { kind: "PinAccepted" },
       { nowEpochMs, zone: activeZone },
@@ -518,6 +505,9 @@ export function HomeScreen({
           nowEpochMs: browserClock.nowEpochMs(),
           zone: detail.zone,
         });
+        // Hand the map back after a simulated entry rather than leaving the
+        // picker beneath any live safety surface it may produce.
+        setDemoPanelOpen(false);
         const persisted = engine.persistedSession();
         if (persisted !== null) {
           markDemoArmedSession(persisted.sessionId);
@@ -564,7 +554,7 @@ export function HomeScreen({
   const appSessionStatus = (
     <AppSessionStatus
       copy={copy}
-      showIdle={!aboutOpen && !settingsOpen}
+      showIdle={false}
       view={engineView}
     />
   );
@@ -625,19 +615,20 @@ export function HomeScreen({
         tileAvailability={tileAvailability}
       />
 
-      <div aria-label={copy.appName} className="home-screen__brand-lockup">
-        {/* The supplied compact v2 mark is the production brand asset. */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img alt="" src="/assets/icons/saaya-icon-v2-small.svg" />
-        <span>{copy.appName}</span>
-      </div>
+      {engineView.state === "IDLE" || engineView.state === "RESOLVED" ? (
+        <div aria-label={copy.appName} className="home-screen__brand-lockup">
+          {/* The supplied compact v2 mark is the production brand asset. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img alt="" src="/assets/icons/saaya-icon-v2-small.svg" />
+          <span>{copy.appName}</span>
+        </div>
+      ) : null}
 
       <HomeSessionSurface
         activeZoneDetail={activeZoneDetail}
         armAcknowledgement={armAcknowledgement}
         armBannerVisible={armBannerVisible}
         checkInReason={checkInReason}
-        contextLine={contextLine}
         copy={copy}
         demoModeActive={demoSpeedEnabled || demoSessionActive}
         demoSpeedEnabled={demoSpeedEnabled}
@@ -670,21 +661,11 @@ export function HomeScreen({
       </div>
 
       <div className="home-screen__controls">
-        <MapControlButtonStack>
-          <button
-            aria-label={copy.cdHelpNow}
-            className="home-screen__sos-control"
-            onClick={handleHelpNow}
-            type="button"
-          >
-            {copy.ctaHelpNow}
-          </button>
-          <MapControlButton
-            icon="my_location"
-            label={copy.cdRecentre}
-            onClick={() => mapControllerRef.current?.recenter()}
-          />
-        </MapControlButtonStack>
+        <MapControlButton
+          icon="my_location"
+          label={copy.cdRecentre}
+          onClick={() => mapControllerRef.current?.recenter()}
+        />
       </div>
 
       <output className="home-screen__asset-count" hidden>
@@ -728,6 +709,11 @@ export function HomeScreen({
 
       <style jsx>{`
         .home-screen {
+          --home-action-dock-clearance: calc(
+            env(safe-area-inset-bottom) + var(--minimum-touch-target) +
+              var(--space-24)
+          );
+
           position: relative;
           min-block-size: 100dvh; /* GROUNDED-EXEMPT: structural viewport fill. */
           overflow: hidden;
@@ -739,7 +725,7 @@ export function HomeScreen({
           position: fixed;
           z-index: 4;
           inset-inline-end: var(--screen-padding);
-          inset-block-end: calc(var(--sheet-peek-height) + var(--space-20));
+          inset-block-end: var(--home-action-dock-clearance);
         }
 
         .home-screen__settings {
@@ -772,43 +758,10 @@ export function HomeScreen({
           block-size: var(--space-30);
         }
 
-        :global(.home-screen__sos-control) {
-          min-block-size: var(--minimum-touch-target);
-          padding: 0 var(--space-14);
-          border: 0;
-          border-radius: var(--radius-control);
-          background: var(--color-danger);
-          color: var(--color-text-primary);
-          font: inherit;
-          font-size: var(--type-label-size);
-          font-weight: var(--weight-semibold);
-          line-height: var(--type-label-line-height);
-        }
-
-        :global(.home-screen__sos-control:focus-visible) {
-          outline: 2px solid var(--color-brand-light);
-          outline-offset: 2px;
-        }
       `}</style>
       </main>
     </>
   );
-}
-
-function localizedRiskBand(
-  copy: (typeof M4_COPY)[SaayaLocale],
-  label: ReturnType<typeof displayRiskLabel>,
-): string {
-  switch (label) {
-    case "Low":
-      return copy.riskBandLow;
-    case "Moderate":
-      return copy.riskBandModerate;
-    case "Elevated":
-      return copy.riskBandElevated;
-    case "High":
-      return copy.riskBandHigh;
-  }
 }
 
 function localizedRiskTier(

@@ -37,7 +37,7 @@ describe("M4 app-shell session status", () => {
     }
   });
 
-  it("keeps Home's IDLE status but omits it from non-Home routes", () => {
+  it("renders IDLE only when a screen explicitly opts in", () => {
     expect(
       renderToStaticMarkup(
         <AppSessionStatus copy={M4_COPY.en} showIdle view={view("IDLE")} />,

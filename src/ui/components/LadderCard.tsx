@@ -1,9 +1,15 @@
-import { useEffect, type ReactNode } from "react";
+import {
+  useEffect,
+  useState,
+  type PointerEvent as ReactPointerEvent,
+  type ReactNode,
+} from "react";
 
 import {
   MaterialSymbol,
   type MaterialSymbolName,
 } from "../icons/MaterialSymbol";
+import { capturePointer, releasePointer } from "../../platform/pointerCapture";
 import { installConsumeBackGuard } from "../../platform/sosBackGuard";
 
 export type LadderCardRung =
@@ -33,6 +39,10 @@ type LadderCardSharedProps = {
   secondary: ReactNode;
   ariaLabel?: string;
   className?: string;
+  /** A vertical swipe only hides the visual card. The safety state and deadline keep running. */
+  onMinimize?: () => void;
+  /** Localized visible-action label for the visual-only minimize gesture. */
+  minimizeLabel?: string;
 };
 
 export type LadderCardProps = Readonly<
@@ -72,12 +82,39 @@ const phaseClassNames: Readonly<
   answered: "ladder-card--answered",
 };
 
+type LadderCardSwipe = Readonly<{
+  pointerId: number;
+  startClientX: number;
+  startClientY: number;
+}>;
+
+/** A direction-only swipe rule avoids inventing an unproven pixel threshold. */
+export function ladderCardSwipeRelease(
+  startClientX: number,
+  startClientY: number,
+  endClientX: number,
+  endClientY: number,
+): boolean {
+  const deltaX = endClientX - startClientX;
+  const deltaY = endClientY - startClientY;
+
+  return deltaY !== 0 && Math.abs(deltaY) > Math.abs(deltaX);
+}
+
+function isInteractiveTarget(target: EventTarget | null): boolean {
+  return (
+    target instanceof HTMLElement &&
+    target.closest("a, button, input, select, textarea") !== null
+  );
+}
+
 /**
  * C3's modal ladder surface. Browser back/history handling belongs to the screen or
  * platform adapter; this component exposes the required policy as data and a typed prop.
  */
 export function LadderCard(props: LadderCardProps) {
   const backPolicy = props.backPolicy ?? LADDER_CARD_BACK_POLICY[props.rung];
+  const [swipe, setSwipe] = useState<LadderCardSwipe | null>(null);
 
   useEffect(
     () =>
@@ -96,6 +133,8 @@ export function LadderCard(props: LadderCardProps) {
     className,
     id = "ladder-card",
     message,
+    minimizeLabel,
+    onMinimize,
     phase,
     primary,
     rung,
@@ -105,6 +144,7 @@ export function LadderCard(props: LadderCardProps) {
   const presentation = rungPresentation[rung];
   const titleId = `${id}-title`;
   const messageId = `${id}-message`;
+  const canMinimize = onMinimize !== undefined && minimizeLabel !== undefined;
   const classes = [
     "ladder-card",
     presentation.className,
@@ -114,24 +154,76 @@ export function LadderCard(props: LadderCardProps) {
     .filter(Boolean)
     .join(" ");
 
+  function handlePointerDown(event: ReactPointerEvent<HTMLDivElement>) {
+    if (
+      !canMinimize ||
+      !event.isPrimary ||
+      event.button !== 0 ||
+      isInteractiveTarget(event.target)
+    ) {
+      return;
+    }
+
+    capturePointer(event.currentTarget, event.pointerId);
+    setSwipe({
+      pointerId: event.pointerId,
+      startClientX: event.clientX,
+      startClientY: event.clientY,
+    });
+  }
+
+  function handlePointerUp(event: ReactPointerEvent<HTMLDivElement>) {
+    if (swipe?.pointerId !== event.pointerId) {
+      return;
+    }
+
+    releasePointer(event.currentTarget, event.pointerId);
+    const minimize = ladderCardSwipeRelease(
+      swipe.startClientX,
+      swipe.startClientY,
+      event.clientX,
+      event.clientY,
+    );
+    setSwipe(null);
+
+    if (minimize) {
+      event.preventDefault();
+      onMinimize?.();
+    }
+  }
+
+  function handlePointerCancel(event: ReactPointerEvent<HTMLDivElement>) {
+    if (swipe?.pointerId !== event.pointerId) {
+      return;
+    }
+
+    releasePointer(event.currentTarget, event.pointerId);
+    setSwipe(null);
+  }
+
   return (
     <>
       <div
         aria-describedby={messageId}
         aria-label={ariaLabel}
         aria-labelledby={ariaLabel ? undefined : titleId}
-        aria-modal="true"
         className={classes}
         data-back-policy={backPolicy}
         data-phase={phase}
         data-rung={rung}
         data-scrim-dismisses="false"
-        data-swipe-dismisses="false"
+        data-swipe-dismisses={canMinimize ? "visual-only" : "false"}
         role="dialog"
       >
         <div aria-hidden="true" className="ladder-card__scrim" />
 
-        <div className="ladder-card__surface">
+        <div
+          aria-label={canMinimize ? minimizeLabel : undefined}
+          className="ladder-card__surface"
+          onPointerCancel={canMinimize ? handlePointerCancel : undefined}
+          onPointerDown={canMinimize ? handlePointerDown : undefined}
+          onPointerUp={canMinimize ? handlePointerUp : undefined}
+        >
           <span aria-hidden="true" className="ladder-card__icon">
             <MaterialSymbol
               decorative
@@ -162,6 +254,7 @@ export function LadderCard(props: LadderCardProps) {
           justify-content: flex-end;
           padding-inline: var(--space-30);
           padding-block-end: calc(44px + env(safe-area-inset-bottom));
+          pointer-events: none;
         }
 
         .ladder-card--checkin-one {
@@ -182,7 +275,8 @@ export function LadderCard(props: LadderCardProps) {
         .ladder-card__scrim {
           position: absolute;
           inset: 0;
-          background: var(--color-scrim);
+          background: transparent;
+          pointer-events: none;
         }
 
         .ladder-card__surface {
@@ -193,6 +287,8 @@ export function LadderCard(props: LadderCardProps) {
           padding: var(--space-22);
           border-radius: var(--radius-card);
           background: var(--color-card-fill);
+          pointer-events: auto;
+          touch-action: none;
           transform: translateY(0) scale(1);
         }
 

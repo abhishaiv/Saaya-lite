@@ -36,6 +36,7 @@ export interface FamilyEscalationOverlayProps {
   readonly detail: ZoneDetail | null;
   readonly onCancel: () => void;
   readonly onHelpNow: () => void;
+  readonly onMinimize: () => void;
   readonly policeStations: readonly PoliceStation[];
 }
 
@@ -48,6 +49,7 @@ export function FamilyEscalationOverlay({
   detail,
   onCancel,
   onHelpNow,
+  onMinimize,
   policeStations,
 }: FamilyEscalationOverlayProps) {
   const repositoryRef = useRef<IndexedDbOnboardingRepository | null>(null);
@@ -163,6 +165,8 @@ export function FamilyEscalationOverlay({
         />
       }
       rung="FAMILY_ESCALATED"
+      minimizeLabel={copy.cdCloseSheet}
+      onMinimize={onMinimize}
       secondary={
         <SaayaButton
           aria-label={copy.cdHelpNow}
@@ -170,7 +174,7 @@ export function FamilyEscalationOverlay({
           variant="textOnly"
           workingLabel={copy.stateWorking}
         >
-          {copy.ctaHelpNow}
+          SOS
         </SaayaButton>
       }
       title={title}

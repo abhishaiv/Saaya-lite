@@ -28,7 +28,6 @@ function render(
       armAcknowledgement={null}
       armBannerVisible={false}
       checkInReason={null}
-      contextLine={M4_COPY.en.homeHourContext}
       copy={M4_COPY.en}
       currentPoint={null}
       demoModeActive={false}
@@ -52,17 +51,21 @@ function render(
 }
 
 describe("M4 Home session surface", () => {
-  it("shows the manual-arm action in the collapsed sheet", () => {
+  it("uses a compact direct-action dock instead of a persistent Home sheet", () => {
     const html = render("IDLE");
 
-    expect(html).toContain(M4_COPY.en.ctaArmManually);
-    expect(html).toContain(M4_COPY.en.setDemo);
-    expect(html).toContain(M4_COPY.en.ctaHelpNow);
-    expect(html).toContain('data-position="peek"');
-    expect(html).not.toContain(M4_COPY.en.ctaImHome);
+    expect(html).toContain("home-session-action-dock");
+    expect(html).toContain('data-home-action="sus"');
+    expect(html).toContain('data-home-action="demo"');
+    expect(html).toContain('data-home-action="sos"');
+    expect(html).toContain(">SUS<");
+    expect(html).toContain(">Demo<");
+    expect(html).toContain(">SOS<");
+    expect(html).not.toContain("saaya-bottom-sheet");
+    expect(html).not.toContain(M4_COPY.en.warnKeepOpenBody);
   });
 
-  it("shows automatic SHADOW, a transient acknowledgement, and the same copy in the sheet", () => {
+  it("shows automatic SHADOW with its transient acknowledgement and a compact end action", () => {
     const acknowledgement = {
       title: M4_COPY.en.homeArmBannerTitle,
       body: M4_COPY.en.homeArmBannerBody,
@@ -74,12 +77,13 @@ describe("M4 Home session surface", () => {
     });
 
     expect(html).toContain(M4_COPY.en.homeArmBannerTitle);
-    expect(html.split(M4_COPY.en.homeArmBannerBody)).toHaveLength(3);
-    expect(html).toContain(M4_COPY.en.ctaImHome);
-    expect(html).toContain(M4_COPY.en.warnKeepOpenBody);
+    expect(html.split(M4_COPY.en.homeArmBannerBody)).toHaveLength(2);
+    expect(html).toContain(">End SUS<");
+    expect(html).toContain('data-home-action="sos"');
+    expect(html).not.toContain(M4_COPY.en.warnKeepOpenBody);
   });
 
-  it("keeps the automatic-arm detail available after the banner auto-hides", () => {
+  it("does not keep the automatic-arm acknowledgement as a second persistent map surface", () => {
     const html = render("SHADOW", {
       armAcknowledgement: {
         title: M4_COPY.te.homeArmBannerTitle,
@@ -91,7 +95,7 @@ describe("M4 Home session surface", () => {
     });
 
     expect(html).not.toContain(M4_COPY.te.homeArmBannerTitle);
-    expect(html).toContain(M4_COPY.te.homeArmBannerBody);
+    expect(html).not.toContain(M4_COPY.te.homeArmBannerBody);
   });
 
   it("shows the honest permission warning without claiming the active watch is healthy", () => {
@@ -102,10 +106,11 @@ describe("M4 Home session surface", () => {
     expect(html).not.toContain(M4_COPY.en.warnKeepOpenBody);
   });
 
-  it("keeps the labelled demo-speed disclosure visible outside the panel", () => {
+  it("labels active Demo state on the compact dock without a full-width disclosure", () => {
     const html = render("IDLE", { demoModeActive: true });
 
-    expect(html).toContain(M4_COPY.en.demoModeActive);
+    expect(html).toContain('data-demo-active="true"');
+    expect(html).not.toContain(M4_COPY.en.demoModeActive);
   });
 
   it("projects every escalated status without exposing a Home disarm shortcut", () => {
@@ -125,5 +130,7 @@ describe("M4 Home session surface", () => {
     expect(render("CHECKIN_1")).toContain(M4_COPY.en.checkin1Title);
     expect(render("CHECKIN_2")).toContain(M4_COPY.en.checkin2Title);
     expect(render("SOS_ACTIVE")).toContain(M4_COPY.en.sosTitle);
+    expect(render("CHECKIN_1")).toContain('data-swipe-dismisses="visual-only"');
+    expect(render("FAMILY_ESCALATED")).toContain('data-swipe-dismisses="visual-only"');
   });
 });

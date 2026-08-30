@@ -9,7 +9,11 @@ import { BigActionButton } from "./BigActionButton";
 import { CountdownRing } from "./CountdownRing";
 import { DisclosureBanner } from "./DisclosureBanner";
 import { EmptyState } from "./EmptyState";
-import { LADDER_CARD_BACK_POLICY, LadderCard } from "./LadderCard";
+import {
+  LADDER_CARD_BACK_POLICY,
+  LadderCard,
+  ladderCardSwipeRelease,
+} from "./LadderCard";
 import { MapControlButton } from "./MapControlButton";
 import { PinEntryBox } from "./PinEntryBox";
 import { SaayaBottomSheet } from "./SaayaBottomSheet";
@@ -92,7 +96,7 @@ describe("C1 and C2 action controls", () => {
 });
 
 describe("C3 and C4 ladder surfaces", () => {
-  it("closes the back policy and never makes the card dismissible", () => {
+  it("closes the back policy and only permits visual minimization when requested", () => {
     expect(LADDER_CARD_BACK_POLICY).toEqual({
       CHECKIN_1: "delegate",
       CHECKIN_2: "consume",
@@ -102,10 +106,31 @@ describe("C3 and C4 ladder surfaces", () => {
     for (const rung of ["CHECKIN_1", "CHECKIN_2", "FAMILY_ESCALATED"] as const) {
       const markup = ladderMarkup(rung);
       expect(markup).toContain('role="dialog"');
-      expect(markup).toContain('aria-modal="true"');
       expect(markup).toContain('data-scrim-dismisses="false"');
       expect(markup).toContain('data-swipe-dismisses="false"');
     }
+
+    const minimizable = renderToStaticMarkup(
+      <LadderCard
+        message="Message"
+        minimizeLabel="Minimize"
+        onMinimize={noop}
+        phase="visible"
+        primary={<button type="button">Primary</button>}
+        rung="CHECKIN_1"
+        secondary={<button type="button">Secondary</button>}
+        title="Title"
+      />,
+    );
+
+    expect(minimizable).toContain('data-swipe-dismisses="visual-only"');
+  });
+
+  it("treats either vertical swipe direction as a visual-only minimize gesture", () => {
+    expect(ladderCardSwipeRelease(0, 0, 0, 24)).toBe(true);
+    expect(ladderCardSwipeRelease(0, 24, 0, 0)).toBe(true);
+    expect(ladderCardSwipeRelease(0, 0, 24, 0)).toBe(false);
+    expect(ladderCardSwipeRelease(0, 0, 0, 0)).toBe(false);
   });
 
   it("removes a deadline-passed card", () => {
