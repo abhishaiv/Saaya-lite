@@ -17,13 +17,14 @@ export default function HomePage({ searchParams }: HomePageProps) {
   ) {
     throw new Error("Saaya build metadata is missing or invalid");
   }
-  const { demoZones, mapZones, policeStations, zoneDetails } =
+  const { demoZones, heatmapHotspots, mapZones, policeStations, zoneDetails } =
     bundledZoneRepository.snapshot();
   return (
     <AppGate
       buildVersion={{ name: versionName, code: Number(versionCodeText) }}
       demoZones={demoZones}
       founderContact={process.env.SAAYA_FOUNDER_CONTACT?.trim() || null}
+      heatmapHotspots={heatmapHotspots}
       locale={locale}
       mapZones={mapZones}
       policeStations={policeStations}

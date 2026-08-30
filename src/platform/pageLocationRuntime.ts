@@ -1,5 +1,5 @@
 import type { Rules } from "../domain/model/session";
-import type { Zone } from "../domain/model/zone";
+import type { HeatmapHotspot } from "../domain/model/heatmapHotspot";
 import { LocationArmingRuntime, type RuntimeSessionBridge } from "./armingRuntime";
 import { browserClock, browserScheduler, type Clock, type Scheduler } from "./clock";
 import {
@@ -22,7 +22,7 @@ export class PageLocationRuntime {
   private readonly watch: BrowserLocationWatch;
 
   constructor(
-    zones: readonly Zone[],
+    hotspots: readonly HeatmapHotspot[],
     rules: Rules,
     session: RuntimeSessionBridge,
     callbacks: PageLocationCallbacks,
@@ -30,7 +30,7 @@ export class PageLocationRuntime {
     private readonly clock: Clock = browserClock,
     scheduler: Scheduler = browserScheduler,
   ) {
-    this.arming = new LocationArmingRuntime(zones, rules, session, {
+    this.arming = new LocationArmingRuntime(hotspots, rules, session, {
       onSamplingChanged: (sampling) => this.watch.setSampling(sampling),
       onLiveFix: callbacks.onLiveFix,
     });

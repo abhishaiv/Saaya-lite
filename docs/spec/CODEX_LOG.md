@@ -361,3 +361,25 @@ safety state and SOS behavior unchanged.
 **Needed correcting:** The first swipe implementation treated even one pixel of tap drift as
 a swipe. It now lets the browser’s native touch-pan arbitration decide when a real gesture has
 started, rather than inventing a product-specific distance threshold.
+
+### M4/T4.2 — localized hotspot-circle correction          2026-08-31
+
+**Asked:** Replace the city-scale risk polygons with practical localized risk areas, using
+red, orange and yellow only, and make the visible geometry the automatic-arming geometry.
+
+**Shipped:** Imported the audited, Vizag-only aggregate anchor source (104 anchors; SHA-256
+`c35870b194851f5ed2d25840c17bb0669781c439bbad1b246e8c366118c4f5ec`) and derived 70 visible
+hotspot circles: 10 HIGH at 200 m, 41 MODERATE at 150 m and 19 ELEVATED at 100 m. Leaflet,
+the SVG fallback and the page-open dwell runtime now share those same Haversine circles.
+SAFE-only and unclassified anchors draw and arm nothing; no individual reports, names or counts
+are displayed.
+
+**Needed correcting:** Historical police-jurisdiction polygons were visually too broad and
+still governed containment. A map circle whose automatic trigger was a different broad shape
+would make a false safety claim. The historical polygons now classify frozen aggregate anchors
+once at load; only the localized circles can begin the five-fix, 60-second, accuracy-gated proof.
+
+**Verified:** strict TypeScript, ESLint, production build, 161 Vitest tests, grounding over all
+18 changed source files, reads closure and knowledge-graph integrity passed. Fresh spec, trust-
+boundary and provenance verifiers all returned no findings; the spec verifier also caught and
+closed the SVG fallback's last polygon-bounds dependency before this verdict.

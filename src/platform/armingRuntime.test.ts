@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { bundledZoneData } from "../data/zone/zoneLoader";
+import { containingHotspotZones } from "../data/zone/containment";
 import { onEvent } from "../domain/engine/sessionEngine";
 import {
   DEFAULT_RULES,
@@ -19,7 +20,8 @@ import type {
   SessionEvent,
   SessionState,
 } from "../domain/model/session";
-import { RiskTier, type Zone } from "../domain/model/zone";
+import type { HeatmapHotspot } from "../domain/model/heatmapHotspot";
+import { RiskTier, type LatLng, type Zone } from "../domain/model/zone";
 import { secondsToEpochMs } from "./clock";
 import {
   LocationArmingRuntime,
@@ -73,16 +75,24 @@ class EngineBridge implements RuntimeSessionBridge {
   }
 }
 
-function highZone(): Zone {
-  const zone = bundledZoneData.zones.find(
-    (candidate) => candidate.riskTier === RiskTier.HIGH,
+function highHotspot(): HeatmapHotspot {
+  const hotspot = bundledZoneData.heatmapHotspots.find(
+    (candidate) => candidate.zone.riskTier === RiskTier.HIGH,
   );
-  if (zone === undefined) throw new Error("Frozen HIGH zone is missing");
-  return zone;
+  if (hotspot === undefined) throw new Error("Frozen HIGH hotspot is missing");
+  return hotspot;
 }
 
 function proofFix(
-  zone: Zone,
+  hotspot: HeatmapHotspot,
+  index: number,
+  totalSpanSec = ENTER_DWELL_SEC,
+): LiveLocationFix {
+  return proofFixAt(hotspot.center, index, totalSpanSec);
+}
+
+function proofFixAt(
+  point: LatLng,
   index: number,
   totalSpanSec = ENTER_DWELL_SEC,
 ): LiveLocationFix {
@@ -90,33 +100,33 @@ function proofFix(
   const spanSec = (totalSpanSec * index) / proofSegments;
   return {
     source: "LIVE_WATCH",
-    ...zone.centroid,
+    ...point,
     accuracyM: MAX_CONTAINMENT_ACCURACY_M,
     observedAtEpochMs: secondsToEpochMs(spanSec),
   };
 }
 
 describe("page-open automatic arming", () => {
-  it("arms after a five-fix polygon proof without any tap", () => {
+  it("arms after a five-fix hotspot-circle proof without any tap", () => {
     const session = new EngineBridge();
     const sampling: LocationSampling[] = [];
     const runtime = new LocationArmingRuntime(
-      bundledZoneData.zones,
+      bundledZoneData.heatmapHotspots,
       DEFAULT_RULES,
       session,
       { onSamplingChanged: (value) => sampling.push(value) },
     );
-    const zone = highZone();
+    const hotspot = highHotspot();
     runtime.start();
 
     for (let index = 0; index < MIN_ENTRY_FIXES; index += 1) {
-      runtime.acceptLiveFix(proofFix(zone, index));
+      runtime.acceptLiveFix(proofFix(hotspot, index));
     }
 
     expect(session.state).toBe("SHADOW");
-    expect(session.activeZoneId).toBe(zone.stationId);
+    expect(session.activeZoneId).toBe(hotspot.zone.stationId);
     expect(session.events).toEqual([
-      { kind: "ZoneEntered", zoneId: zone.stationId },
+      { kind: "ZoneEntered", zoneId: hotspot.zone.stationId },
     ]);
     expect(session.events.some((event) => event.kind.includes("Tapped"))).toBe(
       false,
@@ -137,12 +147,12 @@ describe("page-open automatic arming", () => {
   it("returns to quiet idle when the arming matrix rejects the completed proof", () => {
     const session = new EngineBridge();
     session.hourBand = "DAWN";
-    const moderate = bundledZoneData.zones.find(
-      (zone) => zone.riskTier === RiskTier.MODERATE,
+    const moderate = bundledZoneData.heatmapHotspots.find(
+      (hotspot) => hotspot.zone.riskTier === RiskTier.MODERATE,
     );
     if (moderate === undefined) throw new Error("Frozen MODERATE zone is missing");
     const runtime = new LocationArmingRuntime(
-      bundledZoneData.zones,
+      bundledZoneData.heatmapHotspots,
       DEFAULT_RULES,
       session,
       { onSamplingChanged: () => undefined },
@@ -157,20 +167,48 @@ describe("page-open automatic arming", () => {
     expect(runtime.pendingZoneId()).toBeNull();
   });
 
-  it("applies demo timing to dwell after the global rules switch", () => {
+  it("does not arm from a former broad polygon point outside every hotspot", () => {
+    const legacyOnlyZone = bundledZoneData.zones.find(
+      (zone) =>
+        zone.riskTier === RiskTier.HIGH &&
+        containingHotspotZones(
+          bundledZoneData.heatmapHotspots,
+          zone.centroid,
+        ).length === 0,
+    );
+    if (legacyOnlyZone === undefined) {
+      throw new Error("Frozen HIGH parent lacks a polygon-only regression point");
+    }
     const session = new EngineBridge();
     const runtime = new LocationArmingRuntime(
-      bundledZoneData.zones,
+      bundledZoneData.heatmapHotspots,
       DEFAULT_RULES,
       session,
       { onSamplingChanged: () => undefined },
     );
-    const zone = highZone();
+
+    for (let index = 0; index < MIN_ENTRY_FIXES; index += 1) {
+      runtime.acceptLiveFix(proofFixAt(legacyOnlyZone.centroid, index));
+    }
+
+    expect(session.state).toBe("IDLE");
+    expect(session.events).toEqual([]);
+  });
+
+  it("applies demo timing to dwell after the global rules switch", () => {
+    const session = new EngineBridge();
+    const runtime = new LocationArmingRuntime(
+      bundledZoneData.heatmapHotspots,
+      DEFAULT_RULES,
+      session,
+      { onSamplingChanged: () => undefined },
+    );
+    const hotspot = highHotspot();
     runtime.setRules(DEMO_RULES);
 
     for (let index = 0; index < MIN_ENTRY_FIXES; index += 1) {
       runtime.acceptLiveFix(
-        proofFix(zone, index, ENTER_DWELL_SEC / DEMO_DIVISOR),
+        proofFix(hotspot, index, ENTER_DWELL_SEC / DEMO_DIVISOR),
       );
     }
 
@@ -180,19 +218,19 @@ describe("page-open automatic arming", () => {
   it("discards pending proof when the watch is interrupted", () => {
     const session = new EngineBridge();
     const runtime = new LocationArmingRuntime(
-      bundledZoneData.zones,
+      bundledZoneData.heatmapHotspots,
       DEFAULT_RULES,
       session,
       { onSamplingChanged: () => undefined },
     );
-    const zone = highZone();
+    const hotspot = highHotspot();
     const incompleteFixCount = MIN_ENTRY_FIXES - 1;
     for (let index = 0; index < incompleteFixCount; index += 1) {
-      runtime.acceptLiveFix(proofFix(zone, index));
+      runtime.acceptLiveFix(proofFix(hotspot, index));
     }
 
     runtime.interruptWatch("PAGE_HIDDEN", 0);
-    runtime.acceptLiveFix(proofFix(zone, MIN_ENTRY_FIXES - 1));
+    runtime.acceptLiveFix(proofFix(hotspot, MIN_ENTRY_FIXES - 1));
 
     expect(session.state).toBe("IDLE");
     expect(session.events).toEqual([]);
@@ -200,11 +238,11 @@ describe("page-open automatic arming", () => {
 
   it("resolves an automatic session honestly when location permission is revoked", () => {
     const session = new EngineBridge();
-    const zone = highZone();
+    const hotspot = highHotspot();
     session.state = "SHADOW";
-    session.activeZoneId = zone.stationId;
+    session.activeZoneId = hotspot.zone.stationId;
     const runtime = new LocationArmingRuntime(
-      bundledZoneData.zones,
+      bundledZoneData.heatmapHotspots,
       DEFAULT_RULES,
       session,
       { onSamplingChanged: () => undefined },
@@ -229,7 +267,7 @@ describe("page-open automatic arming", () => {
     session.state = "SHADOW";
     session.armMode = "MANUAL";
     const runtime = new LocationArmingRuntime(
-      bundledZoneData.zones,
+      bundledZoneData.heatmapHotspots,
       DEFAULT_RULES,
       session,
       { onSamplingChanged: () => undefined },

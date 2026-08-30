@@ -1,4 +1,5 @@
 import { bundledZoneData, type ZoneData } from "../zone/zoneLoader";
+import type { HeatmapHotspot } from "../../domain/model/heatmapHotspot";
 import type { PoliceStation } from "../../domain/model/policeStation";
 import { RiskTier, type Zone } from "../../domain/model/zone";
 import type { ZoneCard } from "../../domain/model/zoneCard";
@@ -23,6 +24,7 @@ export interface ZoneDetail {
 
 export interface ZoneRepositorySnapshot {
   readonly mapZones: readonly MapZone[];
+  readonly heatmapHotspots: readonly HeatmapHotspot[];
   readonly demoZones: readonly DemoZone[];
   readonly policeStations: readonly PoliceStation[];
   readonly zoneDetails: readonly ZoneDetail[];
@@ -88,6 +90,7 @@ export class BundledZoneRepository implements ZoneRepository {
   snapshot(): ZoneRepositorySnapshot {
     return {
       mapZones: joinMapZones(this.data),
+      heatmapHotspots: this.data.heatmapHotspots,
       demoZones: demoZones(this.data.zones),
       policeStations: this.data.policeStations,
       zoneDetails: zoneDetails(this.data),

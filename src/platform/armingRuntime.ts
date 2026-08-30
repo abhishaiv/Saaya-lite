@@ -14,11 +14,10 @@ import type {
   SessionEvent,
   SessionState,
 } from "../domain/model/session";
+import type { HeatmapHotspot } from "../domain/model/heatmapHotspot";
 import type { Zone } from "../domain/model/zone";
 import {
-  containingZones,
-  prepareContainmentZones,
-  type ContainmentZone,
+  containingHotspotZones,
 } from "../data/zone/containment";
 import type {
   LiveLocationFix,
@@ -49,17 +48,14 @@ export interface ArmingRuntimeCallbacks {
 
 export class LocationArmingRuntime {
   private dwellState: DwellState = resetDwellEvidence();
-  private readonly containmentZones: readonly ContainmentZone[];
   private sampling: LocationSampling | null = null;
 
   constructor(
-    zones: readonly Zone[],
+    private readonly hotspots: readonly HeatmapHotspot[],
     private rules: Rules,
     private readonly session: RuntimeSessionBridge,
     private readonly callbacks: ArmingRuntimeCallbacks,
-  ) {
-    this.containmentZones = prepareContainmentZones(zones);
-  }
+  ) {}
 
   start(): void {
     this.synchronizeSampling();
@@ -85,7 +81,7 @@ export class LocationArmingRuntime {
       {
         nowEpochMs: fix.observedAtEpochMs,
         accuracyM: fix.accuracyM,
-        insideZones: containingZones(this.containmentZones, fix),
+        insideZones: containingHotspotZones(this.hotspots, fix),
         activeZoneId: before.activeZoneId,
       },
       this.rules,
@@ -151,8 +147,8 @@ export class LocationArmingRuntime {
   private zoneById(zoneId: string | null): Zone | null {
     if (zoneId === null) return null;
     return (
-      this.containmentZones.find(({ zone }) => zone.stationId === zoneId)
-        ?.zone ?? null
+      this.hotspots.find((hotspot) => hotspot.zone.stationId === zoneId)?.zone ??
+      null
     );
   }
 }

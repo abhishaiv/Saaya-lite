@@ -124,6 +124,7 @@ Copy from `assets/` in this repo:
 | File | Contents |
 |---|---|
 | `vizag_heatmap.geojson` | 24 Polygon zones. Each is a police station jurisdiction and carries `risk_tier`, `risk_score`, `color`, `opacity`, `total_cases`, `women_safety_cases`, `crime_breakdown`, `geofence_radius_m`, `areas_covered`, `risk_notes`, station lat/lon. |
+| `vizag_heatmap_points.json` | 104 immutable, aggregate locality anchors. SHA-256 `c35870b194851f5ed2d25840c17bb0669781c439bbad1b246e8c366118c4f5ec`; used only to derive localized red/orange/yellow hotspots, never as individual incident data. |
 | `zone_info_cards.json` | 19 detail cards, keyed by `station_id`. Only the 19 non-safe zones have one. |
 | `vizag_police_points.json` | 37 stations with `phone`, `address`, lat/lon. |
 

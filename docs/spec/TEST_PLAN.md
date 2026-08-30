@@ -56,7 +56,7 @@ hand off and no background-permission branch. Do not test for those.
 |---|---|
 | Pending enter | a first qualifying inside fix starts a pending dwell; `SessionEngine`, Home and map remain `IDLE` |
 | Sampling request | exactly 15 s at `enableHighAccuracy: true` |
-| Successful proof | five qualifying inside fixes spanning at least 60 s emit exactly one `ZoneEntered` |
+| Successful proof | five qualifying inside-circle fixes spanning at least 60 s emit exactly one `ZoneEntered` |
 | Outside reset | any qualifying outside fix clears that zone's accumulated proof |
 | Inaccurate fix | accuracy > 100 m cannot start, extend or complete dwell |
 | Trust boundary | a pending dwell emits no backend write, family effect, product event or session persistence |
@@ -68,11 +68,12 @@ hand off and no background-permission branch. Do not test for those.
 
 | Test | Assertion |
 |---|---|
-| Prefilter admits every vertex | for all 24 zones, **every** polygon vertex passes that zone's bounding-box prefilter. This is the property `geofence_radius_m` failed on 126 of 165 vertices, so it is a regression guard, not a formality. |
-| Prefilter never excludes an inside point | a point known inside a polygon always passes the prefilter. A false negative here silently prevents arming. |
-| Boundary counts as inside | a vertex and a point on an edge both test as contained |
-| Polygon is authoritative | a point inside the bounding box but outside the polygon is **not** contained |
-| Radius is unread | `geofenceRadiusM` appears in no containment code path |
+| Frozen hotspot parse | 104 aggregate anchors parse within the district envelope; all three shipped copies are byte-identical to SHA-256 `c35870b194851f5ed2d25840c17bb0669781c439bbad1b246e8c366118c4f5ec` |
+| Visible hotspot join | exactly 70 derived circles: HIGH 10, MODERATE 41, ELEVATED 19; every one has exactly one non-SAFE parent zone |
+| Excluded anchors | 18 SAFE-only and 16 unclassified anchors yield no circle, no colour and no containment candidate |
+| Circle boundary | the center and an exact-radius boundary point are contained; a point beyond the radius is not |
+| Circle is authoritative | a point inside a former broad parent polygon but outside every localized circle is not contained and cannot begin dwell |
+| Radius is unread | `geofenceRadiusM` appears in no hotspot build or live-containment code path |
 
 ### `anonymiser.test.ts` and `queue.test.ts` — **Cut, round two**
 Lite ships no Firestore writer, delivery queue or payload builder. The pure engine retains
@@ -80,9 +81,10 @@ future delivery intents, but the round-one runtime ignores them. M2 returns only
 writers and their adversarial payload tests can ship together.
 
 ### `zoneParsing.test.ts`
-24 features parse; tier counts are HIGH 6, MODERATE 9, ELEVATED 4, SAFE 5; every centroid **and every polygon vertex**
-falls inside the district envelope `lat 17.4..18.1, lon 82.9..83.7` (**catches the GeoJSON lon/lat swap**); all
-19 non-safe zones join to a `zone_info_cards.json` entry; all 37 stations parse with a phone.
+24 parent features parse; tier counts are HIGH 6, MODERATE 9, ELEVATED 4, SAFE 5; every centroid, every polygon
+vertex and all 104 aggregate anchors fall inside the district envelope `lat 17.4..18.1, lon 82.9..83.7`
+(**catches the GeoJSON lon/lat swap**); all 19 non-safe parents join to a `zone_info_cards.json` entry; all 37
+stations parse with a phone.
 
 ## Layer 2: browser integration tests - **two only**
 
@@ -103,7 +105,7 @@ Run on a **real mobile browser** at the Vercel preview URL, not a desktop devtoo
 | M1 | open the URL cold on a phone | loads under 2.5 s on 3G, no console errors |
 | M2 | complete onboarding | setup completes under 90 s, then the Saaya v2 lockup, Vizag-only beta note and safety-flow tour appear before the map's labelled DemoPanel opens |
 | M3 | deny geolocation | continues, explains, never dead-ends |
-| M4 | the map | 19 zones drawn, 5 SAFE zones absent, attribution visible |
+| M4 | the map | 70 localized red/orange/yellow circles, no green or broad polygon layer, 5 SAFE parents absent, attribution visible |
 | M5 | throttle to offline, reload | zones still render with the map-offline note |
 | M6 | tap a high zone | counts, top crimes, nearest station, `tel:` link opens the dialer |
 | M7 | select a SAFE zone **from the DemoPanel picker** | `zone_safe_no_data`, not an empty card, and **no session arms**. SAFE zones are not drawn, so there is no map tap to test. |

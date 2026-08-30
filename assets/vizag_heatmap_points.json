@@ -1,0 +1,834 @@
+[
+  {
+    "name": "Visakhapatnam",
+    "latitude": 17.71282,
+    "longitude": 83.30246,
+    "crimeCount": 708,
+    "womenSafetyCount": 125,
+    "weight": 1.0
+  },
+  {
+    "name": "RK Beach",
+    "latitude": 17.71521,
+    "longitude": 83.32264,
+    "crimeCount": 592,
+    "womenSafetyCount": 109,
+    "weight": 0.8362
+  },
+  {
+    "name": "Seethammadhara",
+    "latitude": 17.72805,
+    "longitude": 83.322,
+    "crimeCount": 361,
+    "womenSafetyCount": 55,
+    "weight": 0.5099
+  },
+  {
+    "name": "Complex",
+    "latitude": 17.72582,
+    "longitude": 83.30568,
+    "crimeCount": 336,
+    "womenSafetyCount": 50,
+    "weight": 0.4746
+  },
+  {
+    "name": "Old Town",
+    "latitude": 17.69426,
+    "longitude": 83.30393,
+    "crimeCount": 312,
+    "womenSafetyCount": 56,
+    "weight": 0.4407
+  },
+  {
+    "name": "Kancharapalem",
+    "latitude": 17.73173,
+    "longitude": 83.27102,
+    "crimeCount": 301,
+    "womenSafetyCount": 49,
+    "weight": 0.4251
+  },
+  {
+    "name": "New Port",
+    "latitude": 17.674,
+    "longitude": 83.235,
+    "crimeCount": 291,
+    "womenSafetyCount": 48,
+    "weight": 0.411
+  },
+  {
+    "name": "Visakhapatnam",
+    "latitude": 17.68713,
+    "longitude": 83.21807,
+    "crimeCount": 246,
+    "womenSafetyCount": 53,
+    "weight": 0.3475
+  },
+  {
+    "name": "Malkapuram",
+    "latitude": 17.68219,
+    "longitude": 83.24766,
+    "crimeCount": 240,
+    "womenSafetyCount": 30,
+    "weight": 0.339
+  },
+  {
+    "name": "Visakhapatnam Port",
+    "latitude": 17.69047,
+    "longitude": 83.28729,
+    "crimeCount": 220,
+    "womenSafetyCount": 22,
+    "weight": 0.3107
+  },
+  {
+    "name": "Arilova",
+    "latitude": 17.75194,
+    "longitude": 83.29857,
+    "crimeCount": 208,
+    "womenSafetyCount": 47,
+    "weight": 0.2938
+  },
+  {
+    "name": "Steel Plant",
+    "latitude": 17.64283,
+    "longitude": 83.22005,
+    "crimeCount": 161,
+    "womenSafetyCount": 23,
+    "weight": 0.2274
+  },
+  {
+    "name": "MVP Colony",
+    "latitude": 17.74647,
+    "longitude": 83.33646,
+    "crimeCount": 141,
+    "womenSafetyCount": 17,
+    "weight": 0.1992
+  },
+  {
+    "name": "Andhra University",
+    "latitude": 17.72645,
+    "longitude": 83.33634,
+    "crimeCount": 114,
+    "womenSafetyCount": 20,
+    "weight": 0.161
+  },
+  {
+    "name": "Visakhapatnam Airport",
+    "latitude": 17.72487,
+    "longitude": 83.22823,
+    "crimeCount": 112,
+    "womenSafetyCount": 25,
+    "weight": 0.1582
+  },
+  {
+    "name": "Gajuwaka",
+    "latitude": 17.68229,
+    "longitude": 83.20193,
+    "crimeCount": 103,
+    "womenSafetyCount": 18,
+    "weight": 0.1455
+  },
+  {
+    "name": "Duvvada",
+    "latitude": 17.6543,
+    "longitude": 83.1858,
+    "crimeCount": 101,
+    "womenSafetyCount": 0,
+    "weight": 0.1427
+  },
+  {
+    "name": "PM Palem",
+    "latitude": 17.77966,
+    "longitude": 83.37335,
+    "crimeCount": 79,
+    "womenSafetyCount": 15,
+    "weight": 0.1116
+  },
+  {
+    "name": "Sheela Nagar",
+    "latitude": 17.71685,
+    "longitude": 83.21777,
+    "crimeCount": 78,
+    "womenSafetyCount": 4,
+    "weight": 0.1102
+  },
+  {
+    "name": "Aganampudi",
+    "latitude": 17.67435,
+    "longitude": 83.17832,
+    "crimeCount": 75,
+    "womenSafetyCount": 16,
+    "weight": 0.1059
+  },
+  {
+    "name": "Pendurthi",
+    "latitude": 17.81735,
+    "longitude": 83.18528,
+    "crimeCount": 71,
+    "womenSafetyCount": 10,
+    "weight": 0.1003
+  },
+  {
+    "name": "Bheemili",
+    "latitude": 17.88741,
+    "longitude": 83.45438,
+    "crimeCount": 70,
+    "womenSafetyCount": 10,
+    "weight": 0.0989
+  },
+  {
+    "name": "Gopalapatnam",
+    "latitude": 17.7497,
+    "longitude": 83.22284,
+    "crimeCount": 62,
+    "womenSafetyCount": 10,
+    "weight": 0.0876
+  },
+  {
+    "name": "Madhavadhara",
+    "latitude": 17.73846,
+    "longitude": 83.28763,
+    "crimeCount": 47,
+    "womenSafetyCount": 0,
+    "weight": 0.0664
+  },
+  {
+    "name": "Anandapuram",
+    "latitude": 17.85644,
+    "longitude": 83.31243,
+    "crimeCount": 45,
+    "womenSafetyCount": 9,
+    "weight": 0.0636
+  },
+  {
+    "name": "Seven Hills Hospital",
+    "latitude": 17.74226,
+    "longitude": 83.31942,
+    "crimeCount": 41,
+    "womenSafetyCount": 8,
+    "weight": 0.0579
+  },
+  {
+    "name": "Naval Dockyard",
+    "latitude": 17.68999,
+    "longitude": 83.27097,
+    "crimeCount": 41,
+    "womenSafetyCount": 5,
+    "weight": 0.0579
+  },
+  {
+    "name": "Simhachalam",
+    "latitude": 17.76646,
+    "longitude": 83.24456,
+    "crimeCount": 40,
+    "womenSafetyCount": 5,
+    "weight": 0.0565
+  },
+  {
+    "name": "Madhurawada",
+    "latitude": 17.81827,
+    "longitude": 83.34481,
+    "crimeCount": 37,
+    "womenSafetyCount": 5,
+    "weight": 0.0523
+  },
+  {
+    "name": "Yarada",
+    "latitude": 17.65188,
+    "longitude": 83.28114,
+    "crimeCount": 34,
+    "womenSafetyCount": 5,
+    "weight": 0.048
+  },
+  {
+    "name": "Arilova",
+    "latitude": 17.72008,
+    "longitude": 83.3375,
+    "crimeCount": 31,
+    "womenSafetyCount": 2,
+    "weight": 0.0438
+  },
+  {
+    "name": "Padmanabham",
+    "latitude": 17.8983,
+    "longitude": 83.3725,
+    "crimeCount": 30,
+    "womenSafetyCount": 4,
+    "weight": 0.0424
+  },
+  {
+    "name": "Simhachalam",
+    "latitude": 17.7666,
+    "longitude": 83.28384,
+    "crimeCount": 27,
+    "womenSafetyCount": 0,
+    "weight": 0.0381
+  },
+  {
+    "name": "Anakapalli",
+    "latitude": 17.68987,
+    "longitude": 83.00408,
+    "crimeCount": 26,
+    "womenSafetyCount": 3,
+    "weight": 0.0367
+  },
+  {
+    "name": "Arilova",
+    "latitude": 17.71323,
+    "longitude": 83.23624,
+    "crimeCount": 23,
+    "womenSafetyCount": 2,
+    "weight": 0.0325
+  },
+  {
+    "name": "Kommadi",
+    "latitude": 17.78442,
+    "longitude": 83.35717,
+    "crimeCount": 22,
+    "womenSafetyCount": 4,
+    "weight": 0.0311
+  },
+  {
+    "name": "Jagannadhapuram",
+    "latitude": 17.71052,
+    "longitude": 83.29295,
+    "crimeCount": 20,
+    "womenSafetyCount": 2,
+    "weight": 0.0282
+  },
+  {
+    "name": "Pendurthi",
+    "latitude": 17.76593,
+    "longitude": 83.22033,
+    "crimeCount": 19,
+    "womenSafetyCount": 5,
+    "weight": 0.0268
+  },
+  {
+    "name": "PM Palem",
+    "latitude": 17.82211,
+    "longitude": 83.36821,
+    "crimeCount": 18,
+    "womenSafetyCount": 4,
+    "weight": 0.0254
+  },
+  {
+    "name": "Kailasapuram",
+    "latitude": 17.72518,
+    "longitude": 83.21792,
+    "crimeCount": 18,
+    "womenSafetyCount": 6,
+    "weight": 0.0254
+  },
+  {
+    "name": "Pendurthi",
+    "latitude": 17.76239,
+    "longitude": 83.3421,
+    "crimeCount": 15,
+    "womenSafetyCount": 4,
+    "weight": 0.0212
+  },
+  {
+    "name": "Pendurthi",
+    "latitude": 17.7215,
+    "longitude": 83.3546,
+    "crimeCount": 13,
+    "womenSafetyCount": 0,
+    "weight": 0.0184
+  },
+  {
+    "name": "Steel Plant",
+    "latitude": 17.66213,
+    "longitude": 83.14369,
+    "crimeCount": 12,
+    "womenSafetyCount": 1,
+    "weight": 0.0169
+  },
+  {
+    "name": "Yendada",
+    "latitude": 17.7681,
+    "longitude": 83.36497,
+    "crimeCount": 12,
+    "womenSafetyCount": 0,
+    "weight": 0.0169
+  },
+  {
+    "name": "Malkapuram",
+    "latitude": 17.6852,
+    "longitude": 83.15939,
+    "crimeCount": 11,
+    "womenSafetyCount": 8,
+    "weight": 0.0155
+  },
+  {
+    "name": "Jodugullapalem",
+    "latitude": 17.6692,
+    "longitude": 83.2872,
+    "crimeCount": 11,
+    "womenSafetyCount": 11,
+    "weight": 0.0155
+  },
+  {
+    "name": "Kasimkota",
+    "latitude": 17.58991,
+    "longitude": 83.05967,
+    "crimeCount": 10,
+    "womenSafetyCount": 3,
+    "weight": 0.0141
+  },
+  {
+    "name": "Anakapalle",
+    "latitude": 17.74454,
+    "longitude": 83.25141,
+    "crimeCount": 10,
+    "womenSafetyCount": 0,
+    "weight": 0.0141
+  },
+  {
+    "name": "KGH Area",
+    "latitude": 17.689,
+    "longitude": 83.24203,
+    "crimeCount": 9,
+    "womenSafetyCount": 6,
+    "weight": 0.0127
+  },
+  {
+    "name": "Gangavaram",
+    "latitude": 17.6572,
+    "longitude": 83.2567,
+    "crimeCount": 9,
+    "womenSafetyCount": 6,
+    "weight": 0.0127
+  },
+  {
+    "name": "Chinnamushidiwada",
+    "latitude": 17.747,
+    "longitude": 83.287,
+    "crimeCount": 9,
+    "womenSafetyCount": 0,
+    "weight": 0.0127
+  },
+  {
+    "name": "Pendurthi",
+    "latitude": 17.71775,
+    "longitude": 83.19828,
+    "crimeCount": 9,
+    "womenSafetyCount": 0,
+    "weight": 0.0127
+  },
+  {
+    "name": "Akkayyapalem",
+    "latitude": 17.69248,
+    "longitude": 83.19991,
+    "crimeCount": 8,
+    "womenSafetyCount": 0,
+    "weight": 0.0113
+  },
+  {
+    "name": "Parawada",
+    "latitude": 17.621,
+    "longitude": 83.1278,
+    "crimeCount": 7,
+    "womenSafetyCount": 0,
+    "weight": 0.0099
+  },
+  {
+    "name": "Duvvada",
+    "latitude": 17.71157,
+    "longitude": 83.17385,
+    "crimeCount": 6,
+    "womenSafetyCount": 0,
+    "weight": 0.0085
+  },
+  {
+    "name": "Kancharapalem",
+    "latitude": 17.7178,
+    "longitude": 83.3678,
+    "crimeCount": 6,
+    "womenSafetyCount": 2,
+    "weight": 0.0085
+  },
+  {
+    "name": "Gajuwaka",
+    "latitude": 17.78225,
+    "longitude": 83.34258,
+    "crimeCount": 6,
+    "womenSafetyCount": 0,
+    "weight": 0.0085
+  },
+  {
+    "name": "Murali Nagar",
+    "latitude": 17.81467,
+    "longitude": 83.35433,
+    "crimeCount": 6,
+    "womenSafetyCount": 0,
+    "weight": 0.0085
+  },
+  {
+    "name": "Paradesipalem",
+    "latitude": 17.8557,
+    "longitude": 83.3138,
+    "crimeCount": 6,
+    "womenSafetyCount": 0,
+    "weight": 0.0085
+  },
+  {
+    "name": "Pharma City",
+    "latitude": 17.63,
+    "longitude": 83.135,
+    "crimeCount": 5,
+    "womenSafetyCount": 0,
+    "weight": 0.0071
+  },
+  {
+    "name": "Appikonda",
+    "latitude": 17.5872,
+    "longitude": 83.2778,
+    "crimeCount": 4,
+    "womenSafetyCount": 0,
+    "weight": 0.0056
+  },
+  {
+    "name": "Bheemunipatnam",
+    "latitude": 17.847,
+    "longitude": 83.397,
+    "crimeCount": 4,
+    "womenSafetyCount": 2,
+    "weight": 0.0056
+  },
+  {
+    "name": "Thagarapuvalasa",
+    "latitude": 17.9278,
+    "longitude": 83.3758,
+    "crimeCount": 4,
+    "womenSafetyCount": 0,
+    "weight": 0.0056
+  },
+  {
+    "name": "Lankelapalem",
+    "latitude": 17.678,
+    "longitude": 83.162,
+    "crimeCount": 4,
+    "womenSafetyCount": 0,
+    "weight": 0.0056
+  },
+  {
+    "name": "Gajuwaka",
+    "latitude": 17.6828,
+    "longitude": 83.1471,
+    "crimeCount": 4,
+    "womenSafetyCount": 4,
+    "weight": 0.0056
+  },
+  {
+    "name": "Kapuluppada",
+    "latitude": 17.82642,
+    "longitude": 83.39892,
+    "crimeCount": 4,
+    "womenSafetyCount": 0,
+    "weight": 0.0056
+  },
+  {
+    "name": "Pendurthy",
+    "latitude": 17.7802,
+    "longitude": 83.2204,
+    "crimeCount": 4,
+    "womenSafetyCount": 0,
+    "weight": 0.0056
+  },
+  {
+    "name": "Atchutapuram",
+    "latitude": 17.6815,
+    "longitude": 83.0182,
+    "crimeCount": 4,
+    "womenSafetyCount": 0,
+    "weight": 0.0056
+  },
+  {
+    "name": "NAD Junction",
+    "latitude": 17.74254,
+    "longitude": 83.23605,
+    "crimeCount": 4,
+    "womenSafetyCount": 1,
+    "weight": 0.0056
+  },
+  {
+    "name": "Araku",
+    "latitude": 17.80154,
+    "longitude": 83.21072,
+    "crimeCount": 4,
+    "womenSafetyCount": 2,
+    "weight": 0.0056
+  },
+  {
+    "name": "Autonagar",
+    "latitude": 17.7217,
+    "longitude": 83.1789,
+    "crimeCount": 3,
+    "womenSafetyCount": 0,
+    "weight": 0.0042
+  },
+  {
+    "name": "Chodavaram",
+    "latitude": 17.8254,
+    "longitude": 82.955,
+    "crimeCount": 3,
+    "womenSafetyCount": 1,
+    "weight": 0.0042
+  },
+  {
+    "name": "Parawada",
+    "latitude": 17.68303,
+    "longitude": 83.03,
+    "crimeCount": 3,
+    "womenSafetyCount": 0,
+    "weight": 0.0042
+  },
+  {
+    "name": "Boyapalem",
+    "latitude": 17.78893,
+    "longitude": 83.32603,
+    "crimeCount": 3,
+    "womenSafetyCount": 0,
+    "weight": 0.0042
+  },
+  {
+    "name": "Yelamanchili",
+    "latitude": 17.5667,
+    "longitude": 82.95,
+    "crimeCount": 3,
+    "womenSafetyCount": 0,
+    "weight": 0.0042
+  },
+  {
+    "name": "Sheela Nagar",
+    "latitude": 17.6948,
+    "longitude": 83.1859,
+    "crimeCount": 2,
+    "womenSafetyCount": 0,
+    "weight": 0.0028
+  },
+  {
+    "name": "Nakkavanipalem",
+    "latitude": 17.681,
+    "longitude": 83.208,
+    "crimeCount": 2,
+    "womenSafetyCount": 1,
+    "weight": 0.0028
+  },
+  {
+    "name": "Krishna Gardens",
+    "latitude": 17.8328,
+    "longitude": 83.4179,
+    "crimeCount": 2,
+    "womenSafetyCount": 1,
+    "weight": 0.0028
+  },
+  {
+    "name": "Sabbavaram",
+    "latitude": 17.76598,
+    "longitude": 83.10198,
+    "crimeCount": 2,
+    "womenSafetyCount": 0,
+    "weight": 0.0028
+  },
+  {
+    "name": "Atchutapuram SEZ",
+    "latitude": 17.5597,
+    "longitude": 83.0293,
+    "crimeCount": 2,
+    "womenSafetyCount": 0,
+    "weight": 0.0028
+  },
+  {
+    "name": "Ramakrishnapuram",
+    "latitude": 17.761,
+    "longitude": 83.328,
+    "crimeCount": 2,
+    "womenSafetyCount": 2,
+    "weight": 0.0028
+  },
+  {
+    "name": "Murali Nagar",
+    "latitude": 17.7428,
+    "longitude": 83.3565,
+    "crimeCount": 2,
+    "womenSafetyCount": 0,
+    "weight": 0.0028
+  },
+  {
+    "name": "Bavikonda",
+    "latitude": 17.8159,
+    "longitude": 83.4145,
+    "crimeCount": 2,
+    "womenSafetyCount": 0,
+    "weight": 0.0028
+  },
+  {
+    "name": "Duvvada",
+    "latitude": 17.7067,
+    "longitude": 83.1175,
+    "crimeCount": 2,
+    "womenSafetyCount": 0,
+    "weight": 0.0028
+  },
+  {
+    "name": "Gopalapatnam",
+    "latitude": 17.7036,
+    "longitude": 83.15138,
+    "crimeCount": 1,
+    "womenSafetyCount": 0,
+    "weight": 0.0014
+  },
+  {
+    "name": "Vepagunta",
+    "latitude": 17.7942,
+    "longitude": 83.3183,
+    "crimeCount": 1,
+    "womenSafetyCount": 0,
+    "weight": 0.0014
+  },
+  {
+    "name": "Rushikonda Beach",
+    "latitude": 17.7799,
+    "longitude": 83.3866,
+    "crimeCount": 1,
+    "womenSafetyCount": 0,
+    "weight": 0.0014
+  },
+  {
+    "name": "Bheemili",
+    "latitude": 17.7958,
+    "longitude": 83.3314,
+    "crimeCount": 1,
+    "womenSafetyCount": 1,
+    "weight": 0.0014
+  },
+  {
+    "name": "Batajangalapalem",
+    "latitude": 17.8263,
+    "longitude": 83.0929,
+    "crimeCount": 1,
+    "womenSafetyCount": 0,
+    "weight": 0.0014
+  },
+  {
+    "name": "V Madugula",
+    "latitude": 17.7889,
+    "longitude": 83.0292,
+    "crimeCount": 1,
+    "womenSafetyCount": 0,
+    "weight": 0.0014
+  },
+  {
+    "name": "Kasimkota",
+    "latitude": 17.68644,
+    "longitude": 83.02468,
+    "crimeCount": 1,
+    "womenSafetyCount": 0,
+    "weight": 0.0014
+  },
+  {
+    "name": "Nakkapalli",
+    "latitude": 17.7167,
+    "longitude": 83.0167,
+    "crimeCount": 1,
+    "womenSafetyCount": 0,
+    "weight": 0.0014
+  },
+  {
+    "name": "Makavarapalem",
+    "latitude": 17.6863,
+    "longitude": 83.0325,
+    "crimeCount": 1,
+    "womenSafetyCount": 0,
+    "weight": 0.0014
+  },
+  {
+    "name": "Chodavaram",
+    "latitude": 17.573,
+    "longitude": 83.017,
+    "crimeCount": 1,
+    "womenSafetyCount": 0,
+    "weight": 0.0014
+  },
+  {
+    "name": "Kunchangi",
+    "latitude": 17.62,
+    "longitude": 83.05,
+    "crimeCount": 1,
+    "womenSafetyCount": 0,
+    "weight": 0.0014
+  },
+  {
+    "name": "S Rayavaram",
+    "latitude": 17.6583,
+    "longitude": 83.0045,
+    "crimeCount": 1,
+    "womenSafetyCount": 1,
+    "weight": 0.0014
+  },
+  {
+    "name": "Atchutapuram",
+    "latitude": 17.636,
+    "longitude": 83.125,
+    "crimeCount": 1,
+    "womenSafetyCount": 0,
+    "weight": 0.0014
+  },
+  {
+    "name": "Butchayyapeta",
+    "latitude": 17.6213,
+    "longitude": 82.9786,
+    "crimeCount": 1,
+    "womenSafetyCount": 0,
+    "weight": 0.0014
+  },
+  {
+    "name": "Appikonda",
+    "latitude": 17.595,
+    "longitude": 83.175,
+    "crimeCount": 1,
+    "womenSafetyCount": 0,
+    "weight": 0.0014
+  },
+  {
+    "name": "Rambilli",
+    "latitude": 17.6542,
+    "longitude": 83.0407,
+    "crimeCount": 1,
+    "womenSafetyCount": 0,
+    "weight": 0.0014
+  },
+  {
+    "name": "Gangavaram",
+    "latitude": 17.6667,
+    "longitude": 83.1,
+    "crimeCount": 1,
+    "womenSafetyCount": 1,
+    "weight": 0.0014
+  },
+  {
+    "name": "Vadlapudi",
+    "latitude": 17.6864,
+    "longitude": 83.1177,
+    "crimeCount": 1,
+    "womenSafetyCount": 0,
+    "weight": 0.0014
+  },
+  {
+    "name": "Chinagantyada",
+    "latitude": 17.89944,
+    "longitude": 83.1877,
+    "crimeCount": 1,
+    "womenSafetyCount": 0,
+    "weight": 0.0014
+  },
+  {
+    "name": "Chinagadili",
+    "latitude": 17.85,
+    "longitude": 83.24,
+    "crimeCount": 1,
+    "womenSafetyCount": 0,
+    "weight": 0.0014
+  }
+]

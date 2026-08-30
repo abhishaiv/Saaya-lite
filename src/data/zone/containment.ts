@@ -1,53 +1,29 @@
-import { RiskTier, type LatLng, type Zone } from "../../domain/model/zone";
+import { haversineDistanceM } from "../../domain/engine/nearestStation";
+import type { HeatmapHotspot } from "../../domain/model/heatmapHotspot";
+import type { LatLng, Zone } from "../../domain/model/zone";
 
-export interface PolygonBounds {
-  readonly minimumLatitude: number;
-  readonly maximumLatitude: number;
-  readonly minimumLongitude: number;
-  readonly maximumLongitude: number;
-}
-
-export interface ContainmentZone {
-  readonly zone: Zone;
-  readonly bounds: PolygonBounds;
-}
-
-export function polygonBounds(polygon: readonly LatLng[]): PolygonBounds {
-  const first = polygon[0];
-  if (first === undefined) {
-    throw new Error("Cannot compute containment bounds for an empty polygon");
-  }
-
-  let minimumLatitude = first.latitude;
-  let maximumLatitude = first.latitude;
-  let minimumLongitude = first.longitude;
-  let maximumLongitude = first.longitude;
-
-  for (const point of polygon) {
-    minimumLatitude = Math.min(minimumLatitude, point.latitude);
-    maximumLatitude = Math.max(maximumLatitude, point.latitude);
-    minimumLongitude = Math.min(minimumLongitude, point.longitude);
-    maximumLongitude = Math.max(maximumLongitude, point.longitude);
-  }
-
-  return {
-    minimumLatitude,
-    maximumLatitude,
-    minimumLongitude,
-    maximumLongitude,
-  };
-}
-
-export function boundsContainPoint(
-  bounds: PolygonBounds,
+/**
+ * Live containment is intentionally based on these localized circles, not
+ * the broad source-classification polygons below.
+ */
+export function hotspotContainsPoint(
+  hotspot: HeatmapHotspot,
   point: LatLng,
 ): boolean {
-  return (
-    point.latitude >= bounds.minimumLatitude &&
-    point.latitude <= bounds.maximumLatitude &&
-    point.longitude >= bounds.minimumLongitude &&
-    point.longitude <= bounds.maximumLongitude
-  );
+  return haversineDistanceM(hotspot.center, point) <= hotspot.radiusM;
+}
+
+export function containingHotspotZones(
+  hotspots: readonly HeatmapHotspot[],
+  point: LatLng,
+): readonly Zone[] {
+  const zones = new Map<string, Zone>();
+  for (const hotspot of hotspots) {
+    if (hotspotContainsPoint(hotspot, point)) {
+      zones.set(hotspot.zone.stationId, hotspot.zone);
+    }
+  }
+  return [...zones.values()];
 }
 
 export function polygonContainsPoint(
@@ -81,28 +57,6 @@ export function polygonContainsPoint(
   }
 
   return inside;
-}
-
-export function prepareContainmentZones(
-  zones: readonly Zone[],
-): readonly ContainmentZone[] {
-  return zones
-    .filter((zone) => zone.riskTier !== RiskTier.SAFE)
-    .map((zone) => ({ zone, bounds: polygonBounds(zone.polygon) }));
-}
-
-export function containingZones(
-  preparedZones: readonly ContainmentZone[],
-  point: LatLng,
-): readonly Zone[] {
-  const matches: Zone[] = [];
-  for (const prepared of preparedZones) {
-    if (!boundsContainPoint(prepared.bounds, point)) continue;
-    if (polygonContainsPoint(prepared.zone.polygon, point)) {
-      matches.push(prepared.zone);
-    }
-  }
-  return matches;
 }
 
 function pointIsOnSegment(

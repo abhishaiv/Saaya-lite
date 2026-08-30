@@ -38,8 +38,8 @@ consumer for them and the UI never claims they were performed.
 
 | Event | Source |
 |---|---|
-| `ZoneEntered(zoneId)` | `watchPosition` fix + polygon test + 60 s dwell |
-| `ZoneExited(zoneId)` | `watchPosition` fix + polygon test + 180 s dwell |
+| `ZoneEntered(zoneId)` | `watchPosition` fix inside an authoritative localized hotspot circle + 60 s dwell |
+| `ZoneExited(zoneId)` | `watchPosition` fix outside every hotspot circle owned by the active parent zone + 180 s dwell |
 | `ManualArm` | user taps arm |
 | `ManualDisarm` | user taps "I am home" |
 | `CheckInTimerFired` | an absolute deadline in IndexedDB |
@@ -298,7 +298,7 @@ outdoors and longer indoors. Decided behaviour:
 |---|---|
 | App opens, no fix yet | Map renders zones immediately, no dot, sheet shows "Finding you". `IDLE`. **Never guess a zone from the last known fix on a cold start.** |
 | Last known fix exists and is under 5 minutes old | Use it for map centring only. **Never for an arming decision.** |
-| First fix arrives, she is inside a HIGH zone at NIGHT_DEEP | Start the 60 s enter dwell now. She arms 60 s later, not instantly, exactly as if she had walked in. |
+| First fix arrives, she is inside a HIGH hotspot circle at NIGHT_DEEP | Start the 60 s enter dwell now. She arms 60 s later, not instantly, exactly as if she had walked in. |
 | First fix has accuracy worse than 100 m | Ignore for containment, keep sampling. Show the dot with its accuracy circle. |
 | No fix within 60 s | `loc_slow` in the sheet. Keep trying: this is a slow fix, not a denied permission, so there is nothing to re-enable and no link to offer. Do not give up and do not claim to be watching. |
 | Manual arm with no fix | **Allowed.** Arms in `MANUAL` mode with a 10 min interval. The ladder does not need a coordinate to run; a later current fix can choose the nearest local dial action, but Lite sends no payload. |

@@ -1470,7 +1470,11 @@
     "COPY.md",
     "MOTION_SPEC.md",
     "STATE_MACHINE.md",
-    "BUSINESS_RULES.md"
+      "BUSINESS_RULES.md",
+      "DATA_MODEL.md",
+      "TEST_PLAN.md",
+      "INTERACTION_SPEC.md",
+      "DEMO_SCRIPT.md"
    ],
    "extra_gates": [
     "zones_render_offline"
@@ -1497,12 +1501,14 @@
     "art.m4.zone_detail",
     "art.m4.home_session_surface",
     "art.m4.demo_panel",
-    "art.m4.settings_shell"
+    "art.m4.settings_shell",
+    "art.m4.localized_hotspots"
    ],
    "corrections": [
     "closed the verifier findings for fractional map zoom, attribution visibility and rem scaling, app-shell session status, idle-watch recovery, 24-hour arm time and live demo timing",
     "kept demo provenance outside PersistedSession, made manual arming survive location denial, reconciled the stale location-revocation catalogue row, and added the fatal zone-data recovery state",
-    "made tile offline recovery evidence-based: enter on timeout, tileerror or browser offline; recover only after a successful tileload"
+    "made tile offline recovery evidence-based: enter on timeout, tileerror or browser offline; recover only after a successful tileload",
+    "replaced broad historical zone polygons with 70 founder-approved localized aggregate hotspot circles, now shared by rendering and automatic dwell containment; Safe and unclassified anchors remain absent"
    ],
    "verify_lenses": [
     "spec"

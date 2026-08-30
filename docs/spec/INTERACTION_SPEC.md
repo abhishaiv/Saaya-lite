@@ -53,7 +53,7 @@ either capability.
 | Screen | Gesture | Result |
 |---|---|---|
 | Map | pan, pinch, rotate disabled | pan and zoom only. Rotation is disorienting and adds nothing. |
-| Map | tap a zone | opens the zone sheet; stroke 1.5 to 3 px and fill +0.1 over 150 ms |
+| Map | tap a localized hotspot circle | opens its parent zone sheet; every circle for that parent moves from 1.5 to 3 px and fill +0.1 over 150 ms |
 | Map | tap empty space | dismisses the zone sheet |
 | Map | long press | **nothing.** No hidden actions. |
 | Map | double tap | zoom in one step |

@@ -92,7 +92,7 @@ Full-bleed dark map, controls floating over it.
 | Region | Contents |
 |---|---|
 | Top | `StatusPill` showing session state. Settings icon. |
-| Map | Vizag, 19 rendered zone polygons (5 safe zones not drawn), fill from zone data. Current location dot. |
+| Map | Vizag, 70 localized red/orange/yellow hotspot circles joined to 19 parent localities (5 SAFE parents absent), plus current location dot. No broad polygon layer or green circles. |
 | Bottom sheet, collapsed | Current-hour context line, `home_hour_context`. Watch, Demo panel and direct SOS entry. |
 | Floating | The always-visible red direct-SOS control. There is no state-view entry point in Lite. |
 
@@ -106,8 +106,8 @@ Full-bleed dark map, controls floating over it.
 | remote delivery | **Not applicable in Lite.** This round has no writer or offline delivery queue, so Home never claims a send is pending or failed. |
 | demo mode on | Persistent labelled banner, `demo_mode_active`. Never hidden. |
 
-Map must render usably on a 720x1280 device at 2 GB RAM. Cap polygon redraw; do not
-re-tessellate on every frame.
+Map must render usably on a 720x1280 device at 2 GB RAM. Derive circles once at load; do not
+rebuild map geometry on every frame.
 
 ## S4. Zone detail sheet (F7, F8)
 

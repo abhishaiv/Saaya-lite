@@ -21,7 +21,7 @@ Recorded on E9. Do not improvise on the day.
 |---|---|---|
 | 0:00 - 0:18 | Black, then the four closed doors as plain text | "It is 4 a.m. in Visakhapatnam. Nothing has happened yet. She could call her mother, who is asleep. Press SOS, which is for after. Or file a complaint, over a feeling. So she does nothing. Two hundred and forty mornings out of two hundred and forty." |
 | 0:18 - 0:38 | Two stat cards, government sources on screen | "India already built apps for this. Andhra Pradesh's Shakthi has one and a half crore downloads and eleven lakh SOS presses, which produced three thousand FIRs. That is nought point two eight percent. Telangana's T-Safe solved the check-in, and got thirteen hundred downloads in a month, because she still has to start it herself." |
-| 0:38 - 0:50 | Home, the Vizag map, zones drawn | "This is Saaya Lite. She opens it to check a stretch, not because she is afraid." |
+| 0:38 - 0:50 | Home, the Vizag map, localized hotspots drawn | "This is Saaya Lite. She opens it to check a stretch, not because she is afraid." |
 | 0:50 - 1:02 | Tap a zone, sheet opens with counts and station | "Twenty four areas from Visakhapatnam records, calibrated against NCRB. Women-safety cases called out separately. The nearest station, and how far it is." |
 | 1:02 - 1:20 | **The arm.** Simulate zone entry. Banner appears. Hands visibly off the phone. | "Now the part that matters. She enters a flagged area at a flagged hour, and Saaya wakes by itself. She pressed nothing. This is the whole difference." |
 | 1:20 - 1:38 | Check-in 1, lavender, then check-in 2, amber | "A check-in, and it tells her why it checked now. Not a fixed timer. If she answers, it goes quiet. She does not answer." |

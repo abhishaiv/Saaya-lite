@@ -9,8 +9,7 @@ import type {
 } from "../../../data/repository/zoneRepository";
 import { IndexedDbSessionRepository } from "../../../data/db/indexedDbSessionRepository";
 import {
-  containingZones,
-  prepareContainmentZones,
+  containingHotspotZones,
 } from "../../../data/zone/containment";
 import { selectHighestRiskZone } from "../../../domain/engine/armingEvaluator";
 import {
@@ -19,6 +18,7 @@ import {
   DEMO_RULES,
 } from "../../../domain/engine/rules";
 import type { Command, SessionState } from "../../../domain/model/session";
+import type { HeatmapHotspot } from "../../../domain/model/heatmapHotspot";
 import { RiskTier } from "../../../domain/model/zone";
 import type { PoliceStation } from "../../../domain/model/policeStation";
 import { browserClock } from "../../../platform/clock";
@@ -78,6 +78,7 @@ export interface HomeScreenProps {
   readonly buildVersion: BuildVersion;
   readonly demoZones: readonly DemoZone[];
   readonly founderContact: string | null;
+  readonly heatmapHotspots: readonly HeatmapHotspot[];
   readonly locale: SaayaLocale;
   readonly mapZones: readonly MapZone[];
   readonly openDemoOnMount?: boolean;
@@ -89,6 +90,7 @@ export function HomeScreen({
   buildVersion,
   demoZones,
   founderContact,
+  heatmapHotspots,
   locale,
   mapZones,
   openDemoOnMount = false,
@@ -153,13 +155,12 @@ export function HomeScreen({
         : zoneDetails.find(({ id }) => id === selectedZoneId) ?? null,
     [selectedZoneId, zoneDetails],
   );
-  const preparedZones = useMemo(() => prepareContainmentZones(zones), [zones]);
   const currentZone = useMemo(
     () =>
       location === null
         ? null
-        : selectHighestRiskZone(containingZones(preparedZones, location)),
-    [location, preparedZones],
+        : selectHighestRiskZone(containingHotspotZones(heatmapHotspots, location)),
+    [heatmapHotspots, location],
   );
   const activeZoneDetail = useMemo(
     () =>
@@ -205,7 +206,7 @@ export function HomeScreen({
     const sessions = new IndexedDbSessionRepository();
     const wakeLock = new WakeLockController(browserWakeLockApi());
     const runtime = new PageLocationRuntime(
-      zones,
+      heatmapHotspots,
       activeRules,
       engine,
       {
@@ -349,7 +350,7 @@ export function HomeScreen({
       void lifecycle.stop();
       locationRuntimeRef.current = null;
     };
-  }, [copy, locale, zoneDetails, zones]);
+  }, [copy, heatmapHotspots, locale, zoneDetails, zones]);
 
   useEffect(() => {
     if (engineView.state !== "IDLE") return;
@@ -620,6 +621,7 @@ export function HomeScreen({
       <HomeMap
         copy={mapCopy}
         location={location}
+        hotspots={heatmapHotspots}
         mapZones={mapZones}
         onController={handleMapController}
         onTileAvailability={handleTileAvailability}

@@ -13,7 +13,7 @@ the build depends on a credential that could fail on submission day.**
 | API key | **none required** |
 | Billing | **none** |
 | Tile failure | an honest offline state; bundled zones and detail continue to work |
-| Offline behaviour | zone polygons render from the bundled asset with no tiles, see below |
+| Offline behaviour | localized bundled hotspot circles render with no tiles, see below |
 
 ## Tiles: OpenStreetMap Standard
 
@@ -34,8 +34,8 @@ normal tile-error handler and would ship into the demo.
 | Cache | the browser HTTP cache only, governed by OpenStreetMap's headers. Nothing to configure, no cap to set, and no Service Worker tile cache in the prototype. |
 | Min zoom | 10 |
 | Max zoom | 17 |
-| Default | zoom 12.5, centred on `17.7100, 83.3000` |
-| Fractional zoom | `zoomSnap: 0.5` (`map.zoom.snap`). **Leaflet defaults to 1 and silently rounds 12.5 to 12**, so the default-zoom fact is unreachable without this. Set it on the map, not per call. |
+| Default | zoom 14, centred on `17.7100, 83.3000` so a 100–200 m hotspot is visible as a local area rather than a city-wide warning |
+| Fractional zoom | `zoomSnap: 0.5` (`map.zoom.snap`). Set it on the map, not per call, so Leaflet honours deliberate fractional camera changes. |
 
 ### Attribution, non-negotiable
 
@@ -48,44 +48,35 @@ per `DESIGN_SYSTEM.md`, not a flat `10px`. It is small text that a reader who ha
 their browser font most needs to be able to read, and a licence condition is the last thing
 to pin at a fixed size.
 
-## Zone rendering
+## Localized hotspot rendering
 
-19 non-`SAFE` polygons. `SAFE` zones carry `color: "#00000000"` and are **never drawn**.
+The map renders **70 localized, translucent hotspot circles** derived at load from the 104
+immutable aggregate locality anchors in `vizag_heatmap_points.json`. They are not individual
+incident locations and their names, counts and weights never appear in the UI.
+
+Every visible anchor joins once to one of the 19 non-`SAFE` parent localities. HIGH anchors
+are **200 m red**, MODERATE anchors are **150 m orange**, and ELEVATED anchors are **100 m
+yellow**. The 18 anchors that land only in a `SAFE` parent and the 16 that belong to no
+parent locality draw nothing. There is **no green layer** and no city-scale polygon fill.
 
 | Layer | Treatment |
 |---|---|
-| Base | **outline only.** No fill and no glow until she selects a zone; the map stays useful on a calm day instead of reading as a warning wall. |
+| Base | localized translucent circle at the parent zone's frozen opacity |
 | Stroke | same `color` at full strength, **1.5 px** |
-| Stroke, selected | **3 px**, with the zone's own fill opacity raised by 0.1 |
-| Glow, selected | a second stroke beneath at 6 px, same colour, 15% opacity; it marks the one stretch she is inspecting |
-| Label | `area_name`, `label` type, `textPrimary` at 80%, centred on the centroid, **hidden below zoom 12**. See below for where the field lives. |
-| Draw order | selected glow and fill (when present), stroke, label. Higher `risk_score` draws on top so a high zone is never buried under a moderate one. |
+| Stroke, selected | **3 px**, with the parent zone's fill opacity raised by 0.1 for every one of its circles |
+| Glow, selected | a second circle beneath at 6 px, same colour, 15% opacity |
+| Label | none. A dense ring of locality labels would make the circles unreadable. |
+| Draw order | lower `risk_score` first; a high-risk circle is never buried below a moderate one. |
 
-Precompute the polygon paths once at load. **Never re-tessellate per frame.**
+A circle tap selects its parent locality and opens the existing zone-detail sheet. The 19
+parent zones still join 1:1 to `zone_info_cards.json` on `station_id`; its `area_name` is
+used by the sheet and accessibility label, never as a dense map label. `station_name` and
+`areas_covered` remain unsuitable labels because they are a jurisdiction and a long list,
+respectively.
 
-### `area_name` lives in the cards asset, not the geojson
-
-`vizag_heatmap.geojson` carries `station_name` and `areas_covered` and **no `area_name`**.
-The field is in `zone_info_cards.json`, on all 19 entries. Join on `station_id`:
-
-```
-zoneCard(zone.stationId).areaName
-```
-
-The join is exactly 1:1 with the drawn set. 19 non-safe zones, 19 cards, no zone without a
-card and no card without a zone. It is already parsed: `ZoneCard.areaName` exists from T2.1.
-
-**Do not label with `station_name`.** It is a jurisdiction, not a place: it would put
-"II Town Police Station" over Soldierpet and "IV Town Police Station" over Asilmetta. She
-is checking a stretch she recognises, and she recognises the locality. Labelling the map
-with police boundaries would be a different product.
-
-**Do not label with `areas_covered` either.** It is a full list, far too long for a
-centroid-anchored single line that may never wrap.
-
-The 5 safe zones have no card and are not drawn, so they need no label. If a future zone
-were ever drawn without a card, that is a data defect: stop and report it rather than
-falling back to the station name.
+The historical polygons are used only once at data load to classify an immutable aggregate
+anchor to its parent locality. They are never drawn and are not the live containment shape.
+Precompute the circles once at load. **Never regenerate or tessellate them per frame.**
 
 ## Her location
 
@@ -149,7 +140,7 @@ untouched in either state, which is the point being claimed.
 | First zone paint | under 400 ms after Home composes, independent of tiles |
 | Frame rate while panning | 60 fps on a 2 GB device |
 | Tile caching | browser HTTP cache only. Nothing to configure, no cap, no Service Worker cache. See `WEB_PLATFORM.md`. |
-| Polygon paths | computed once at load, kept in memory |
+| Hotspot circles | derived once at load, kept in memory |
 
 If panning cannot hold 60 fps, drop tile detail first. **The zones are the product, the
 streets are context.**
@@ -167,19 +158,9 @@ Recorded so this is not relitigated mid-build.
 
 ---
 
-## Zone label collision
+## No hotspot-label collision system
 
-19 labels over Vizag will overlap at low zoom. Deterministic rules, no clever layout engine:
-
-1. Hidden entirely **below zoom 12**.
-2. At zoom 12 to 13, draw **HIGH tier only**.
-3. At zoom 14 and above, draw HIGH, ELEVATED and MODERATE.
-4. Sort candidates by `risk_score` descending. Walk the list, measure each label's bounding
-   box, and **skip any label whose box intersects one already placed**, plus 4 px padding.
-5. Placement is centroid-anchored, centred, single line. **Never wrap, never rotate, never
-   draw a leader line.** If it does not fit, it is skipped.
-
-The ordering means a high-risk zone always wins a collision, which is the correct bias:
-the label she most needs is the one that survives.
-
-Recompute only on zoom change, never per frame.
+There are deliberately no map labels over the localized circles. The map’s street labels
+remain the orientation layer; tapping a circle reveals its parent locality in the existing
+detail sheet. This keeps the safety surface legible at city scale without inventing a label
+placement system that would obscure the actual hotspots.

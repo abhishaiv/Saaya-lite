@@ -135,7 +135,7 @@ directly.
 
 | Interface | Responsibility |
 |---|---|
-| `ZoneRepository` | zones, cards, stations from bundled assets; nearest station; point-in-polygon |
+| `ZoneRepository` | parent zones, localized aggregate hotspots, cards and stations from bundled assets; nearest station; point-in-hotspot-circle |
 | `SessionRepository` | current session, cooldowns and persisted deadlines. Lite has no local session-event timeline. |
 | `FavouriteRepository` | CRUD over `contact`. **Never uploads.** |
 | `SettingsRepository` | PIN hash and verify via Web Crypto, language, onboarded flag, demo speed |

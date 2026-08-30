@@ -16,6 +16,7 @@ only as a clearly labelled round-two design, never as a current-product claim.
 | File | Parse into |
 |---|---|
 | `vizag_heatmap.geojson` | `Zone[]` |
+| `vizag_heatmap_points.json` | `HeatmapPoint[]`, then derived `HeatmapHotspot[]` |
 | `zone_info_cards.json` | `Record<string, ZoneCard>` keyed by `station_id` |
 | `vizag_police_points.json` | `PoliceStation[]` |
 
@@ -55,10 +56,10 @@ export interface Zone {
   readonly riskNotes: string | null;
 }
 
-`geofenceRadiusM` is parsed because the asset carries it, and **nothing reads it**. It is a
-legacy Android Geofencing radius and it does not describe its polygon: 126 of 165 vertices
-fall outside their own declared radius. The containment prefilter is the polygon bounding
-box. See the prefilter rule in `BUSINESS_RULES.md`.
+`geofenceRadiusM` is parsed because the historical asset carries it, and **nothing reads
+it**. It is a legacy Android geofencing field, not a localized hotspot radius. The historical
+polygon is used only once at data load to classify a frozen aggregate anchor to its parent
+locality; neither it nor `geofenceRadiusM` is live containment. See `BUSINESS_RULES.md`.
 ```
 
 **GeoJSON gotcha:** coordinates are `[longitude, latitude]`. Getting this backwards puts
@@ -83,6 +84,37 @@ and 34 of the 165 polygon vertices fall outside it entirely (vertices span
 
 **Rendering:** SAFE zones have `color: "#00000000"` and **must not be drawn**. They also
 have no entry in `zone_info_cards.json`, which is why that file has 19 entries and not 24.
+
+### `HeatmapPoint` and derived `HeatmapHotspot`
+
+```typescript
+export interface HeatmapPoint {
+  readonly name: string;
+  readonly latitude: number;
+  readonly longitude: number;
+  readonly crimeCount: number;
+  readonly womenSafetyCount: number;
+  readonly weight: number;
+}
+
+export interface HeatmapHotspot {
+  readonly id: string;
+  readonly center: LatLng;
+  readonly point: HeatmapPoint;
+  readonly radiusM: number;
+  readonly zone: Zone;
+}
+```
+
+`vizag_heatmap_points.json` is an immutable, audited set of **104 aggregate locality
+anchors**, copied byte-for-byte into `assets/`, `public/assets/` and the source bundle. It is
+not a file of individual incidents: source names, counts and weights remain data-validation
+fields and never render in the app. Every point is envelope-validated on parse.
+
+At load, the legacy parent polygons classify the anchor exactly once. Only the 70 anchors
+that join a non-SAFE parent make a `HeatmapHotspot`: HIGH uses 200 m, MODERATE 150 m, and
+ELEVATED 100 m. The 18 SAFE-only and 16 unclassified anchors are deliberately absent. The
+derived circle is both the rendered geometry and the sole live-containment geometry.
 
 ### `ZoneCard`
 

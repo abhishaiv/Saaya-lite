@@ -313,9 +313,9 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 401,
-  "edges": 686,
-  "events": 76
+  "entities": 403,
+  "edges": 687,
+  "events": 77
  },
  "entities": [
   {
@@ -3200,6 +3200,18 @@
    "id": "d.home_native_touch_pan",
    "class": "Decision",
    "label": "Use native touch-pan arbitration for visual-only timed-card minimize",
+   "node": "M4"
+  },
+  {
+   "id": "d.heatmap.localized_circles",
+   "class": "Decision",
+   "label": "Founder-approved localized red orange yellow aggregate hotspot circles replace broad map polygons",
+   "node": "M4"
+  },
+  {
+   "id": "art.m4.localized_hotspots",
+   "class": "Artifact",
+   "label": "Shared localized hotspot-circle source used by both Leaflet rendering and page-open automatic arming",
    "node": "M4"
   }
  ],
@@ -8691,6 +8703,14 @@
    "at": "2026-08-30",
    "by": "codex",
    "confidence": "high"
+  },
+  {
+   "from": "art.m4.localized_hotspots",
+   "rel": "produced_by",
+   "to": "node.M4",
+   "at": "2026-08-31",
+   "by": "codex",
+   "confidence": "high"
   }
  ],
  "events": [
@@ -9556,6 +9576,18 @@
    "refs": [
     "f.home_swipe_tap_drift",
     "d.home_native_touch_pan"
+   ],
+   "node": "M4"
+  },
+  {
+   "id": "ev.0077",
+   "type": "spec_amended",
+   "at": "2026-08-31",
+   "actor": "codex",
+   "detail": "Founder approved localized 100\u2013200 m aggregate hotspot circles as the rendered and authoritative auto-arm geometry; legacy polygons now classify frozen anchors only at load",
+   "refs": [
+    "d.heatmap.localized_circles",
+    "art.m4.localized_hotspots"
    ],
    "node": "M4"
   }

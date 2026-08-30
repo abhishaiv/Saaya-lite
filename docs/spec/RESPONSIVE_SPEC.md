@@ -85,12 +85,12 @@ because it lives in IndexedDB as an absolute deadline and not in component state
 |---|---|
 | Cold start to Home | under 2.5 s on a 2 GB device |
 | deployed site size | under 25 MB. Reasonable, not tuned. |
-| Map polygons | 19, drawn once, never re-tessellated per frame |
+| Map hotspot circles | 70, derived once, never rebuilt per frame |
 | Memory | under 150 MB resident |
 | Frame rate | 60 fps on Home, no frame over 32 ms during the ladder |
 
 If the map cannot hold 60 fps on the test device, reduce tile detail before reducing
-polygon fidelity. The zones are the product; the streets are context.
+hotspot fidelity. The localized circles are the product; the streets are context.
 
 **Hit these budgets, then stop.** Do not micro-optimise. If Home opens in 2.4 s, that is
 done, not an invitation to get it to 1.8 s.

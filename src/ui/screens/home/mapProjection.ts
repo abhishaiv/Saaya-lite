@@ -1,19 +1,22 @@
 import type { MapZone } from "../../../data/repository/zoneRepository";
+import { EARTH_RADIUS_M } from "../../../domain/engine/rules";
+import type { HeatmapHotspot } from "../../../domain/model/heatmapHotspot";
 import type { LatLng } from "../../../domain/model/zone";
 
 const SVG_EXTENT = 1_000; // GROUNDED-EXEMPT: normalized structural SVG coordinate space.
+const DEGREES_PER_HALF_TURN = 180; // GROUNDED-EXEMPT: angular unit conversion.
 
-export interface ProjectedMapZone {
+export interface ProjectedMapHotspot {
   readonly areaName: string;
   readonly colorHex: string;
   readonly fillOpacity: number;
   readonly id: string;
-  readonly labelX: number;
-  readonly labelY: number;
-  readonly path: string;
-  readonly riskScore: number;
+  readonly radius: number;
   readonly riskLevel: string;
-  readonly riskTier: string;
+  readonly riskScore: number;
+  readonly zoneId: string;
+  readonly x: number;
+  readonly y: number;
 }
 
 interface ProjectionBounds {
@@ -23,30 +26,50 @@ interface ProjectionBounds {
   readonly maximumLongitude: number;
 }
 
-function boundsFor(mapZones: readonly MapZone[]): ProjectionBounds {
-  const coordinates = mapZones.flatMap(({ zone }) => zone.polygon);
-  const first = coordinates[0];
-  if (first === undefined) {
-    throw new Error("Cannot project an empty map-zone collection");
-  }
+function circleBounds(hotspot: HeatmapHotspot): ProjectionBounds {
+  const angularRadius = hotspot.radiusM / EARTH_RADIUS_M;
+  const latitudeDelta =
+    (angularRadius * DEGREES_PER_HALF_TURN) / Math.PI;
+  const longitudeDelta =
+    latitudeDelta /
+    Math.max(
+      Math.abs(
+        Math.cos(
+          (hotspot.center.latitude * Math.PI) / DEGREES_PER_HALF_TURN,
+        ),
+      ),
+      Number.EPSILON,
+    );
 
-  return coordinates.reduce<ProjectionBounds>(
-    (bounds, coordinate) => ({
-      minimumLatitude: Math.min(bounds.minimumLatitude, coordinate.latitude),
-      maximumLatitude: Math.max(bounds.maximumLatitude, coordinate.latitude),
-      minimumLongitude: Math.min(bounds.minimumLongitude, coordinate.longitude),
-      maximumLongitude: Math.max(bounds.maximumLongitude, coordinate.longitude),
-    }),
-    {
-      minimumLatitude: first.latitude,
-      maximumLatitude: first.latitude,
-      minimumLongitude: first.longitude,
-      maximumLongitude: first.longitude,
-    },
-  );
+  return {
+    minimumLatitude: hotspot.center.latitude - latitudeDelta,
+    maximumLatitude: hotspot.center.latitude + latitudeDelta,
+    minimumLongitude: hotspot.center.longitude - longitudeDelta,
+    maximumLongitude: hotspot.center.longitude + longitudeDelta,
+  };
 }
 
-function project(point: LatLng, bounds: ProjectionBounds): readonly [number, number] {
+function boundsFor(hotspots: readonly HeatmapHotspot[]): ProjectionBounds {
+  const first = hotspots[0];
+  if (first === undefined) {
+    throw new Error("Cannot project an empty hotspot collection");
+  }
+
+  return hotspots.reduce<ProjectionBounds>((bounds, hotspot) => {
+    const circle = circleBounds(hotspot);
+    return {
+      minimumLatitude: Math.min(bounds.minimumLatitude, circle.minimumLatitude),
+      maximumLatitude: Math.max(bounds.maximumLatitude, circle.maximumLatitude),
+      minimumLongitude: Math.min(bounds.minimumLongitude, circle.minimumLongitude),
+      maximumLongitude: Math.max(bounds.maximumLongitude, circle.maximumLongitude),
+    };
+  }, circleBounds(first));
+}
+
+function project(
+  point: LatLng,
+  bounds: ProjectionBounds,
+): readonly [number, number] {
   const longitudeSpan = bounds.maximumLongitude - bounds.minimumLongitude;
   const latitudeSpan = bounds.maximumLatitude - bounds.minimumLatitude;
   if (longitudeSpan === 0 || latitudeSpan === 0) {
@@ -59,35 +82,52 @@ function project(point: LatLng, bounds: ProjectionBounds): readonly [number, num
   ];
 }
 
-function pathFor(polygon: readonly LatLng[], bounds: ProjectionBounds): string {
-  return polygon
-    .map((point, index) => {
-      const [x, y] = project(point, bounds);
-      return `${index === 0 ? "M" : "L"}${x.toFixed(2)} ${y.toFixed(2)}`;
-    })
-    .join(" ") + " Z";
+function projectRadius(
+  hotspot: HeatmapHotspot,
+  bounds: ProjectionBounds,
+): number {
+  const latitudeOffset =
+    ((hotspot.radiusM / EARTH_RADIUS_M) * DEGREES_PER_HALF_TURN) / Math.PI;
+  const [, centerY] = project(hotspot.center, bounds);
+  const [, edgeY] = project(
+    {
+      latitude: hotspot.center.latitude + latitudeOffset,
+      longitude: hotspot.center.longitude,
+    },
+    bounds,
+  );
+  return Math.abs(edgeY - centerY);
 }
 
-export function projectMapZones(
+/** Precompute fallback circles from the same localized records as Leaflet. */
+export function projectMapHotspots(
   mapZones: readonly MapZone[],
-): readonly ProjectedMapZone[] {
-  const bounds = boundsFor(mapZones);
-  return [...mapZones]
+  hotspots: readonly HeatmapHotspot[],
+): readonly ProjectedMapHotspot[] {
+  const bounds = boundsFor(hotspots);
+  const mapZonesById = new Map(
+    mapZones.map((mapZone) => [mapZone.zone.stationId, mapZone]),
+  );
+  return [...hotspots]
     .sort((left, right) => left.zone.riskScore - right.zone.riskScore)
-    .map(({ areaName, riskLevel, zone }) => {
-      const [labelX, labelY] = project(zone.centroid, bounds);
-      return {
-        areaName,
-        colorHex: zone.colorHex,
-        fillOpacity: zone.opacity,
-        id: zone.stationId,
-        labelX,
-        labelY,
-        path: pathFor(zone.polygon, bounds),
-        riskScore: zone.riskScore,
-        riskLevel,
-        riskTier: zone.riskTier,
-      };
+    .flatMap((hotspot) => {
+      const mapZone = mapZonesById.get(hotspot.zone.stationId);
+      if (mapZone === undefined) return [];
+      const [x, y] = project(hotspot.center, bounds);
+      return [
+        {
+          areaName: mapZone.areaName,
+          colorHex: hotspot.zone.colorHex,
+          fillOpacity: hotspot.zone.opacity,
+          id: hotspot.id,
+          radius: projectRadius(hotspot, bounds),
+          riskLevel: mapZone.riskLevel,
+          riskScore: hotspot.zone.riskScore,
+          zoneId: hotspot.zone.stationId,
+          x,
+          y,
+        },
+      ];
     });
 }
 

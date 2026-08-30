@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { KeyboardEvent, MouseEvent } from "react";
 
 import type { MapZone } from "../../../data/repository/zoneRepository";
+import type { HeatmapHotspot } from "../../../domain/model/heatmapHotspot";
 import type { SessionState } from "../../../domain/model/session";
 import type { LiveLocationFix } from "../../../platform/locationWatch";
 import {
@@ -12,7 +13,7 @@ import {
   type TileAvailability,
 } from "../../../platform/leafletMap";
 import {
-  projectMapZones,
+  projectMapHotspots,
   STATIC_MAP_VIEW_BOX,
 } from "./mapProjection";
 
@@ -25,6 +26,7 @@ export interface HomeMapCopy {
 
 export interface HomeMapProps {
   readonly copy: HomeMapCopy;
+  readonly hotspots: readonly HeatmapHotspot[];
   readonly location: LiveLocationFix | null;
   readonly mapZones: readonly MapZone[];
   readonly onController: (controller: LeafletMapController | null) => void;
@@ -44,6 +46,7 @@ const OPACITY_MAXIMUM = 1; // GROUNDED-EXEMPT: SVG opacity ceiling.
 
 export function HomeMap({
   copy,
+  hotspots,
   location,
   mapZones,
   onController,
@@ -58,7 +61,10 @@ export function HomeMap({
   const viewRef = useRef({ location, selectedZoneId, sessionState });
   viewRef.current = { location, selectedZoneId, sessionState };
   const [leafletReady, setLeafletReady] = useState(false);
-  const projectedZones = useMemo(() => projectMapZones(mapZones), [mapZones]);
+  const projectedHotspots = useMemo(
+    () => projectMapHotspots(mapZones, hotspots),
+    [hotspots, mapZones],
+  );
 
   useEffect(() => {
     const host = hostRef.current;
@@ -68,6 +74,7 @@ export function HomeMap({
     void mountLeafletMap(
       host,
       mapZones,
+      hotspots,
       {
         ariaZone: copy.ariaZone,
         onReady() {
@@ -94,19 +101,26 @@ export function HomeMap({
       controllerRef.current = null;
       onController(null);
     };
-  }, [copy.ariaZone, mapZones, onController, onTileAvailability, onZoneSelected]);
+  }, [
+    copy.ariaZone,
+    hotspots,
+    mapZones,
+    onController,
+    onTileAvailability,
+    onZoneSelected,
+  ]);
 
   useEffect(() => {
     controllerRef.current?.update({ location, selectedZoneId, sessionState });
   }, [location, selectedZoneId, sessionState]);
 
-  function selectStaticZone(event: MouseEvent<SVGPathElement>, id: string) {
+  function selectStaticZone(event: MouseEvent<SVGCircleElement>, id: string) {
     event.stopPropagation();
     onZoneSelected(id);
   }
 
   function selectStaticZoneFromKeyboard(
-    event: KeyboardEvent<SVGPathElement>,
+    event: KeyboardEvent<SVGCircleElement>,
     id: string,
   ) {
     if (event.key !== "Enter" && event.key !== " ") return;
@@ -124,63 +138,57 @@ export function HomeMap({
           aria-hidden={leafletReady}
           aria-label={copy.ariaMap}
           className="home-map__fallback"
-          data-map-layer="bundled-zones"
+          data-map-layer="bundled-hotspots"
           data-ready={leafletReady ? "false" : "true"}
           onClick={() => onZoneSelected(null)}
           preserveAspectRatio="xMidYMid meet"
           role="img"
           viewBox={STATIC_MAP_VIEW_BOX}
         >
-          {projectedZones.map((zone) => {
-            const selected = zone.id === selectedZoneId;
+          {projectedHotspots.map((hotspot) => {
+            const selected = hotspot.zoneId === selectedZoneId;
             return (
-              <g key={zone.id}>
+              <g key={hotspot.id}>
                 {selected ? (
-                  <path
-                    d={zone.path}
+                  <circle
+                    cx={hotspot.x}
+                    cy={hotspot.y}
                     fill="none"
                     pointerEvents="none"
-                    stroke={zone.colorHex}
+                    r={hotspot.radius}
+                    stroke={hotspot.colorHex}
                     strokeOpacity={ZONE_GLOW_OPACITY}
                     strokeWidth={ZONE_GLOW_STROKE_PX}
                   />
                 ) : null}
-                <path
-                  aria-label={copy.ariaZone(zone.areaName, zone.riskLevel)}
-                  d={zone.path}
-                  data-zone-id={zone.id}
-                  data-zone-treatment={selected ? "selected" : "outline"}
-                  fill={zone.colorHex}
+                <circle
+                  aria-label={copy.ariaZone(hotspot.areaName, hotspot.riskLevel)}
+                  cx={hotspot.x}
+                  cy={hotspot.y}
+                  data-hotspot-id={hotspot.id}
+                  data-hotspot-treatment={selected ? "selected" : "base"}
+                  data-zone-id={hotspot.zoneId}
+                  fill={hotspot.colorHex}
                   fillOpacity={
                     selected
                       ? Math.min(
                           OPACITY_MAXIMUM,
-                          zone.fillOpacity + ZONE_SELECTED_OPACITY_RAISE,
+                          hotspot.fillOpacity + ZONE_SELECTED_OPACITY_RAISE,
                         )
-                      : 0
+                      : hotspot.fillOpacity
                   }
-                  onClick={(event) => selectStaticZone(event, zone.id)}
+                  onClick={(event) => selectStaticZone(event, hotspot.zoneId)}
                   onKeyDown={(event) =>
-                    selectStaticZoneFromKeyboard(event, zone.id)
+                    selectStaticZoneFromKeyboard(event, hotspot.zoneId)
                   }
+                  r={hotspot.radius}
                   role="button"
-                  stroke={zone.colorHex}
+                  stroke={hotspot.colorHex}
                   strokeWidth={
                     selected ? ZONE_SELECTED_STROKE_PX : ZONE_STROKE_PX
                   }
                   tabIndex={leafletReady ? -1 : 0}
                 />
-                {zone.riskTier === "HIGH" ? (
-                  <text
-                    className="home-map__fallback-label"
-                    pointerEvents="none"
-                    textAnchor="middle"
-                    x={zone.labelX}
-                    y={zone.labelY}
-                  >
-                    {zone.areaName}
-                  </text>
-                ) : null}
               </g>
             );
           })}
@@ -227,25 +235,16 @@ export function HomeMap({
           visibility: hidden;
         }
 
-        .home-map__fallback path[role="button"] {
+        .home-map__fallback circle[role="button"] {
           cursor: pointer;
           transition:
             stroke-width var(--motion-150) var(--motion-standard),
             fill-opacity var(--motion-150) var(--motion-standard);
         }
 
-        .home-map__fallback path[role="button"]:focus-visible {
+        .home-map__fallback circle[role="button"]:focus-visible {
           outline: none;
           filter: drop-shadow(0 0 var(--space-4) var(--color-brand-light));
-        }
-
-        .home-map__fallback-label {
-          fill: rgb(from var(--color-text-primary) r g b / 0.8);
-          font-family: var(--font-family);
-          font-size: var(--type-label-size);
-          font-weight: var(--weight-semibold);
-          letter-spacing: var(--type-label-tracking);
-          line-height: var(--type-label-line-height);
         }
 
         .home-map__offline {

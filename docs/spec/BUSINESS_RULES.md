@@ -40,11 +40,11 @@ every zone.
 
 | Rule | Value | Why |
 |---|---|---|
-| Enter dwell before arming | **60 s** continuously inside the polygon | Prevents arming when she drives past the edge of a zone. |
+| Enter dwell before arming | **60 s** continuously inside an authoritative hotspot circle | Prevents arming when she drives past a localized hotspot. |
 | Exit dwell before disarming | **180 s** continuously outside | Prevents disarming from one bad GPS fix on a narrow road. |
 | Re-arm cooldown after a manual disarm in the same zone | **45 min** | If she disarmed here deliberately, do not immediately re-arm and nag her. |
 | Re-arm cooldown after `RESOLVED_OK` in the same zone | **20 min** | She answered. Give her space. |
-| Zone containment test | point-in-polygon on the real polygon | The pre-filter is each polygon's own **bounding box**, computed once at load. `geofence_radius_m` is **not used for containment**: see the rule below. The authoritative test is the polygon. |
+| Zone containment test | Haversine point-in-circle | A visible hotspot circle is authoritative: `distance(center, fix) <= radius`, with the boundary inside. The historical polygon is used only once at data load to classify a frozen anchor to its parent locality. |
 
 ## 4. Check-in intervals (F15)
 
@@ -219,30 +219,29 @@ the future round-two state-view delivery path, not to this submission.
 | Shadow armed | 15 s | `enableHighAccuracy: true` |
 | SOS active | 5 s | `enableHighAccuracy: true` |
 
-### The prefilter rule: never a false negative
+### Localized circle rule: no city-scale false positives
 
-A prefilter exists to avoid running point-in-polygon against all 19 non-safe zones on every
-fix. It may return extra candidates; it may **never** exclude a point the polygon would have
-accepted. A prefilter that produces a false negative silently prevents arming, which is the
-one failure this product cannot have.
+The authoritative live shape is one localized hotspot circle, not a police-jurisdiction
+polygon and not the legacy `geofence_radius_m` field. The fixed radius comes from its parent
+tier: HIGH **200 m**, MODERATE **150 m**, ELEVATED **100 m**. The Haversine test is
+`distance(center, fix) <= radius`; a boundary point is inside.
 
-**Use each polygon's bounding box.** It is computed once at load from the frozen asset, it is
-two comparisons per axis, and it provably contains every point of its polygon.
+The 104 frozen aggregate anchors are classified to their parent locality once at load using
+the historical polygon. That classification is not live containment. It yields 70 visible
+circles (10 HIGH, 41 MODERATE, 19 ELEVATED); anchors that are SAFE-only or unclassified are
+excluded. A point inside the former broad polygon but outside every hotspot circle must not
+start a dwell.
 
-**Do not use `geofence_radius_m`.** It is a legacy parameter from the Android Geofencing
-API, which could only register circles; it was never an approximation of polygon extent.
-Measured against the frozen asset, **126 of 165 polygon vertices lie outside their own
-declared radius, across 23 of the 24 zones**, the worst being Bheemili at 21,535 m from its
-centroid against a declared 2,000 m. Since a boundary point counts as inside, using these
-radii would have refused to arm across most of Vizag. The field stays in the asset because
-the asset is frozen and audited; nothing reads it.
+**Do not use `geofence_radius_m`.** It is a legacy Android field that does not describe a
+localized hotspot. It stays parsed only because the historical asset is frozen and audited;
+nothing reads it for rendering or containment.
 
 Discard any fix with `accuracy > 100 m` for zone-containment decisions. SOS may still use a
 current or last-known fix to choose a nearest **local dial action**, but Lite never sends a
 payload or location to a console.
 
 A pending dwell is private to the dwell evaluator and leaves `SessionEngine` in `IDLE`.
-The containment proof requires at least **five** qualifying in-polygon fixes spanning at
+The containment proof requires at least **five** qualifying in-circle fixes spanning at
 least the existing **60 s** enter dwell. A qualifying outside fix resets the proof;
 accuracy worse than **100 m** is ignored. Any interruption of the position watch, which
 includes the page being hidden, discards the proof completely and it restarts from zero:
@@ -262,11 +261,13 @@ Standard haversine on that radius. At Vizag's scale the error against a geodesic
 a metre, which is well inside the `locality-approx` precision the station data already
 declares. Do not add a geodesic library.
 
-### Point in polygon
+### Localized hotspot circle
 
-Ray casting (even-odd rule). A point exactly on an edge counts as **inside**, so a boundary
-never leaves her unwatched. Test the vertical ray to avoid the horizontal-edge degenerate
-case.
+Use the frozen IUGG-earth-radius Haversine implementation for live containment. A point on
+the circle boundary counts as **inside**. The historical point-in-polygon implementation is
+retained solely to associate an immutable aggregate source anchor with its parent locality at
+load time; it must not return from that one-time source-classification path to the location
+watch.
 
 ### Distance display
 

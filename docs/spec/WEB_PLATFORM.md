@@ -42,7 +42,7 @@ Saying exactly where the browser stops is a better architecture answer than pret
 | Previous platform | Web | Notes |
 |---|---|---|
 | `FusedLocationProvider` | `navigator.geolocation.watchPosition` | `enableHighAccuracy: true` while armed. Sampling rates from `BUSINESS_RULES` still apply. |
-| Geofencing API | **point-in-polygon in JS, on every fix**, with each polygon's **bounding box** as the pre-filter | the polygon is authoritative. `geofence_radius_m` is **not** used: see the prefilter rule below. |
+| Geofencing API | **Haversine point-in-localized-circle in JS, on every fix** | the derived hotspot circle is authoritative. The historical polygon classifies frozen anchors once at load and `geofence_radius_m` is never used. |
 | Wake lock plus a visible page | **Wake Lock API** + Page Visibility | `navigator.wakeLock.request('screen')` while armed, so the ladder keeps running |
 | `an absolute deadline in IndexedDB` | `setTimeout` + an **absolute deadline in IndexedDB** | on visibility change, recompute from the deadline. Never trust the timer to have run. |
 | System notifications | **Not used in Lite** | Check-ins are in-page while the page is open. Lite neither asks for notification permission nor calls `showNotification`. |
