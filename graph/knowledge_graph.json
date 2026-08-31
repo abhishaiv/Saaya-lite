@@ -315,7 +315,7 @@
  "counts": {
   "entities": 403,
   "edges": 687,
-  "events": 77
+  "events": 78
  },
  "entities": [
   {
@@ -9588,6 +9588,18 @@
    "refs": [
     "d.heatmap.localized_circles",
     "art.m4.localized_hotspots"
+   ],
+   "node": "M4"
+  },
+  {
+   "id": "ev.0078",
+   "type": "anchor_taken",
+   "at": "2026-08-31",
+   "actor": "codex",
+   "detail": "Chrome production check found 70 visible Leaflet hotspot circles with only #FF3B30, #FF9500 and #FFCC00; Vercel served the pinned aggregate source asset with HTTP 200",
+   "refs": [
+    "art.m4.localized_hotspots",
+    "d.heatmap.localized_circles"
    ],
    "node": "M4"
   }
