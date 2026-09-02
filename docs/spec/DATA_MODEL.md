@@ -229,9 +229,11 @@ Mirror of the bundled zone properties so the console can draw the same map. No u
 
 ### `sus_events/{autoId}` - the anonymised civic signal (F27)
 
-**Written when family escalation fires (ladder step 3), never at arming and never at
-check-in.** A SUS event means: *a woman in this zone at this hour did not answer a safety
-check.* That is the "felt unsafe, never reported" signal.
+**Written when an `AUTO_ZONE` family escalation fires (ladder step 3), never at arming and
+never at check-in.** A SUS event means: *a woman in this verified zone at this frozen hour did
+not answer a safety check.* That is the "felt unsafe, never reported" signal. A `MANUAL`
+session has no verified zone/hour evidence, so it remains local through `FAMILY_ESCALATED` and
+emits no civic signal; it may create the detailed incident only once it reaches `SOS_ACTIVE`.
 
 ```json
 {
@@ -285,10 +287,11 @@ Written **only** at SOS. This is the one place precision and identity cross.
     { "at": "04:10:12", "type": "CHECKIN_1_SHOWN" },
     { "at": "04:11:42", "type": "CHECKIN_1_MISSED" },
     { "at": "04:12:42", "type": "CHECKIN_2_MISSED" },
-    { "at": "04:13:42", "type": "FAMILY_NOTIFIED" },
+    { "at": "04:13:42", "type": "FAMILY_MESSAGE_SHOWN" },
     { "at": "04:14:42", "type": "SOS_TRIGGERED" }
   ],
-  "contactsNotified": 1,
+  "favouritesConfigured": 1,
+  "familyMessageDelivery": "DISPLAYED_ONLY",
   "status": "ACTIVE",
   "stoppedAt": null,
   "appVersion": "1.0.0"
@@ -297,7 +300,10 @@ Written **only** at SOS. This is the one place precision and identity cross.
 
 `trigger` is `LADDER_LAPSE` or `MANUAL_HELP_BUTTON`.
 `status` is `ACTIVE` then `STOPPED`.
-**`contactsNotified` is a count. Never upload contact names or numbers.**
+**`favouritesConfigured` is a count. Never upload contact names or numbers.**
+`familyMessageDelivery` is `DISPLAYED_ONLY` until the user opens a prefilled message in her
+own messaging app; it may then be `HANDED_TO_DEVICE`. It never claims the message was
+delivered, because Saaya Lite cannot observe a send or delivery from another app.
 
 The `timeline` is what makes this an incident rather than a press, and it is the direct
 answer to Shakthi's 0.28%. Do not trim it.
@@ -430,7 +436,7 @@ The column is nullable JSON. These are the only shapes it ever holds.
 | `CHECKIN_2_SHOWN` | `{"deadlineEpochMs":1755835872000}` |
 | `CHECKIN_2_MISSED` | `null` |
 | `OK_TAPPED` | `{"step":1}` or `{"step":2}` |
-| `FAMILY_PREVIEW_SHOWN` | `null` |
+| `FAMILY_MESSAGE_SHOWN` | `null` |
 | `CANCELLED` | `{"secondsRemaining":18}` |
 | `SOS_TRIGGERED` | `{"trigger":"LADDER_LAPSE"}` or `{"trigger":"MANUAL_HELP_BUTTON"}` |
 | `SOS_STOPPED` | `{"pinAttempts":1}` |

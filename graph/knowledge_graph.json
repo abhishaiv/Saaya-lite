@@ -313,9 +313,9 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 403,
-  "edges": 687,
-  "events": 78
+  "entities": 407,
+  "edges": 692,
+  "events": 80
  },
  "entities": [
   {
@@ -3213,6 +3213,30 @@
    "class": "Artifact",
    "label": "Shared localized hotspot-circle source used by both Leaflet rendering and page-open automatic arming",
    "node": "M4"
+  },
+  {
+   "id": "dec.round2.civic_auto_zone_only",
+   "class": "Decision",
+   "label": "Founder approved AUTO_ZONE-only civic signal; manual sessions remain local through FAMILY_ESCALATED",
+   "node": "M2"
+  },
+  {
+   "id": "q.m2.contacts_notified",
+   "class": "Question",
+   "label": "SOS schema calls contactsNotified a notification count although the family message is display-only and never sent",
+   "node": "M2"
+  },
+  {
+   "id": "dec.round2.sos_delivery_state",
+   "class": "Decision",
+   "label": "Founder replaced false notification claims with configured-favourite count and observable family-message handoff state",
+   "node": "M2"
+  },
+  {
+   "id": "art.m2.phase1.delivery_primitives",
+   "class": "Artifact",
+   "label": "M2 checkpoint: anonymiser, durable queue, trace, Firebase writer primitives, and truthful family-message payload contract",
+   "node": "M2"
   }
  ],
  "edges": [
@@ -8711,6 +8735,46 @@
    "at": "2026-08-31",
    "by": "codex",
    "confidence": "high"
+  },
+  {
+   "from": "dec.round2.civic_auto_zone_only",
+   "rel": "enforces",
+   "to": "con.boundary",
+   "at": "2026-09-02",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "dec.round2.sos_delivery_state",
+   "rel": "enforces",
+   "to": "con.favourites",
+   "at": "2026-09-02",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "dec.round2.sos_delivery_state",
+   "rel": "enforces",
+   "to": "con.boundary",
+   "at": "2026-09-02",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "dec.round2.sos_delivery_state",
+   "rel": "supersedes",
+   "to": "q.m2.contacts_notified",
+   "at": "2026-09-02",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.m2.phase1.delivery_primitives",
+   "rel": "produced_by",
+   "to": "node.M2",
+   "at": "2026-09-02",
+   "by": "codex",
+   "confidence": "high"
   }
  ],
  "events": [
@@ -9602,6 +9666,28 @@
     "d.heatmap.localized_circles"
    ],
    "node": "M4"
+  },
+  {
+   "id": "ev.0079",
+   "type": "spec_amended",
+   "at": "2026-09-02",
+   "actor": "codex",
+   "detail": "Round-two civic signal limited to verified AUTO_ZONE sessions; manual sessions emit no civic record and may create the detailed incident only at SOS_ACTIVE",
+   "refs": [
+    "dec.round2.civic_auto_zone_only"
+   ],
+   "node": "M2"
+  },
+  {
+   "id": "ev.0080",
+   "type": "spec_amended",
+   "at": "2026-09-02",
+   "actor": "codex",
+   "detail": "SOS payload now records favouritesConfigured and familyMessageDelivery; FAMILY_MESSAGE_SHOWN replaces the false FAMILY_NOTIFIED timeline claim",
+   "refs": [
+    "dec.round2.sos_delivery_state"
+   ],
+   "node": "M2"
   }
  ]
 }

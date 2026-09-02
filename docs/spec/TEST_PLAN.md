@@ -23,6 +23,7 @@ protect the submission's claims**, so they are not optional.
 | Happy path | `IDLE` + `ZoneEntered(high, 04:00)` -> `SHADOW`, one `ScheduleTimer` |
 | No arm in a safe zone | stays `IDLE`, **emits zero commands and no visible alert** |
 | Full ladder | `SHADOW` -> `CHECKIN_1` -> `CHECKIN_2` -> `FAMILY_ESCALATED` -> `SOS_ACTIVE` at exactly 90 / 60 / 60 s |
+| Civic-record arm-mode boundary | an `AUTO_ZONE` family escalation emits one `WriteSusEvent`; a `MANUAL` family escalation remains local and emits none. Either mode can create the detailed incident only at `SOS_ACTIVE`. |
 | `OK` at step 1 | returns to `SHADOW`, cancels CD1, reschedules, applies the 20 min cooldown |
 | `OK` at step 2 | same |
 | Manual disarm at step 1 | `RESOLVED(DISARMED)`; exact commands are `CancelTimer(CD1)`, `HideCheckIn`, `StopLocationWatch`, `ReleaseWakeLock`, `StartCooldown(45)`; no write, notification or PIN command |

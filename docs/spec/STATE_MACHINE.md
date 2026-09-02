@@ -76,10 +76,12 @@ The state is never parameterised; the outcome rides alongside it.
 | `CHECKIN_1` | `HelpNowTapped` | - | `SOS_ACTIVE` | see SOS entry |
 | `CHECKIN_1` | `ManualDisarm` | - | `RESOLVED(DISARMED)` | `CancelTimer(CD1)`, `HideCheckIn`, stop the local watch, release the wake lock, start 45 min cooldown for this zone |
 | `CHECKIN_2` | `OkTapped` | - | `SHADOW` | as above |
-| `CHECKIN_2` | `CountdownExpired(2)` | - | `FAMILY_ESCALATED` | `ShowFamilyScreen`, `ScheduleTimer(CANCEL, 60)`; future `WriteSusEvent` and `NotifyFamily` intents are ignored in Lite |
+| `CHECKIN_2` | `CountdownExpired(2)` | `armMode = AUTO_ZONE` | `FAMILY_ESCALATED` | `WriteSusEvent`, `NotifyFamily`, `ShowFamilyScreen`, `ScheduleTimer(CANCEL, 60)`; Lite ignores the future delivery intents |
+| `CHECKIN_2` | `CountdownExpired(2)` | `armMode = MANUAL` | `FAMILY_ESCALATED` | `NotifyFamily`, `ShowFamilyScreen`, `ScheduleTimer(CANCEL, 60)`; no civic-record intent is emitted |
 | `CHECKIN_2` | `HelpNowTapped` | - | `SOS_ACTIVE` | see SOS entry |
 | `CHECKIN_2` | `ManualDisarm` | - | `RESOLVED(DISARMED)` | `CancelTimer(CD2)`, `HideCheckIn`, stop the local watch, release the wake lock, start 45 min cooldown for this zone |
-| `FAMILY_ESCALATED` | `CancelTapped` | - | `RESOLVED(CANCELLED)` | `CancelTimer(CANCEL)`, local cleanup; future outcome and cancel-notification intents are ignored in Lite |
+| `FAMILY_ESCALATED` | `CancelTapped` | `AUTO_ZONE` civic record was durably queued | `RESOLVED(CANCELLED)` | `CancelTimer(CANCEL)`, `PatchSusOutcome(CANCELLED_BY_USER)`, local cleanup; Lite ignores the delivery intent |
+| `FAMILY_ESCALATED` | `CancelTapped` | otherwise | `RESOLVED(CANCELLED)` | `CancelTimer(CANCEL)`, local cleanup; no civic outcome patch |
 | `FAMILY_ESCALATED` | `CountdownExpired(cancel)` | - | `SOS_ACTIVE` | `ShowSos`, `RequirePinToStop`; future incident intents are ignored in Lite |
 | `FAMILY_ESCALATED` | `HelpNowTapped` | - | `SOS_ACTIVE` | as above but `trigger=MANUAL_HELP_BUTTON` |
 | `SOS_ACTIVE` | `PinAccepted` | - | `RESOLVED(ESCALATED_SOS)` | local cleanup and stop the local watch. The future incident-patch intent is ignored in Lite. |
@@ -98,6 +100,18 @@ the current wall-clock band does not replace it. For every `MANUAL` session,
 `armedHourBand` is null and the fixed 10-minute interval applies. `armedAt` remains the
 original session-arm time after “I’m OK”. Merely changing hour bands emits no command, write,
 notification or interruption.
+
+### Round-two civic-record scope
+
+**Founder decision 2026-09-02:** only an `AUTO_ZONE` session emits the anonymous civic
+signal at `FAMILY_ESCALATED`. Its verified containment, frozen zone and frozen hour band are
+the evidence that makes that coarse signal meaningful. A `MANUAL` session stays local through
+`FAMILY_ESCALATED`: it emits no civic record and does not infer a zone or hour band. Either
+arm mode may create the detailed incident only after it reaches `SOS_ACTIVE`.
+
+`NotifyFamily` is an engine intent to compose and show the family-message preview. It is not
+a claim that the message was sent: the delivery state remains `DISPLAYED_ONLY` until the user
+opens a prefilled device-messaging link, and never records delivery.
 
 ## SOS entry, common block
 

@@ -383,3 +383,18 @@ once at load; only the localized circles can begin the five-fix, 60-second, accu
 18 changed source files, reads closure and knowledge-graph integrity passed. Fresh spec, trust-
 boundary and provenance verifiers all returned no findings; the spec verifier also caught and
 closed the SVG fallback's last polygon-bounds dependency before this verdict.
+
+### M2 Phase 1 — truthful delivery primitives checkpoint          2026-09-02
+
+**Checkpointed:** Added the isolated anonymiser, durable IndexedDB queue, retry policy, trace,
+and Firebase writer primitives needed for round two. They are not connected to the visible Lite
+runtime or any deployment yet, so the product still makes no remote-delivery claim.
+
+**Needed correcting:** `contactsNotified` and `FAMILY_NOTIFIED` falsely implied a sent family
+message. The payload now carries only `favouritesConfigured` and
+`familyMessageDelivery: DISPLAYED_ONLY`, with timeline event `FAMILY_MESSAGE_SHOWN`; no contact
+name or number can enter either outbound payload. The anonymous civic record is AUTO_ZONE-only.
+
+**Verification:** TypeScript, lint, 182 Vitest tests, production build, grounded-source scan,
+reads closure, graph integrity and a local adversarial review pass. Fresh verifier-worker G9 is
+explicitly pending because the service usage allowance was exhausted; it is not reported as a pass.

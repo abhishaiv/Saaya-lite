@@ -203,6 +203,27 @@ describe("pure session engine", () => {
     });
   });
 
+  it("keeps a manual family escalation local until SOS", () => {
+    const first = onEvent(
+      "SHADOW",
+      { kind: "CheckInTimerFired" },
+      context({ armMode: "MANUAL", armedHourBand: null, zone: null }),
+    );
+    const second = onEvent(
+      first.state,
+      { kind: "CountdownExpired", timer: "CD1" },
+      context({ armMode: "MANUAL", armedHourBand: null, zone: null }),
+    );
+    const family = onEvent(
+      second.state,
+      { kind: "CountdownExpired", timer: "CD2" },
+      context({ armMode: "MANUAL", armedHourBand: null, zone: null }),
+    );
+
+    expect(family.state).toBe("FAMILY_ESCALATED");
+    expect(backendCommands(family.commands)).toEqual([]);
+  });
+
   it.each([
     ["CHECKIN_1", "CD1"],
     ["CHECKIN_2", "CD2"],
@@ -271,11 +292,44 @@ describe("pure session engine", () => {
     expect(result.commands).toContainEqual({ kind: "ReleaseWakeLock" });
   });
 
-  it("enters SOS directly from Shadow and preserves the civic signal", () => {
+  it("keeps manual family cancellation local", () => {
+    const result = onEvent(
+      "FAMILY_ESCALATED",
+      { kind: "CancelTapped" },
+      context({ armMode: "MANUAL", armedHourBand: null, susEventWritten: true, zone: null }),
+    );
+
+    expect(result.state).toBe("RESOLVED");
+    expect(result.outcome).toBe("CANCELLED");
+    expect(backendCommands(result.commands)).toEqual([]);
+  });
+
+  it("does not claim the civic write completed when a family timer reaches SOS", () => {
+    const result = onEvent(
+      "FAMILY_ESCALATED",
+      { kind: "CountdownExpired", timer: "CANCEL" },
+      context({ susEventWritten: false }),
+    );
+
+    expect(result.commands).toContainEqual({
+      kind: "WriteSosIncident",
+      trigger: "LADDER_LAPSE",
+    });
+    expect(result.commands).not.toContainEqual({
+      kind: "PatchSusOutcome",
+      outcome: "ESCALATED_TO_SOS",
+    });
+  });
+
+  it("enters SOS directly from Shadow without fabricating a civic signal", () => {
     const result = onEvent("SHADOW", { kind: "HelpNowTapped" }, context());
 
     expect(result.state).toBe("SOS_ACTIVE");
-    expect(result.commands).toContainEqual({ kind: "WriteSusEvent" });
+    expect(result.commands).not.toContainEqual({ kind: "WriteSusEvent" });
+    expect(result.commands).not.toContainEqual({
+      kind: "PatchSusOutcome",
+      outcome: "ESCALATED_TO_SOS",
+    });
     expect(result.commands).toContainEqual({
       kind: "WriteSosIncident",
       trigger: "MANUAL_HELP_BUTTON",
@@ -296,7 +350,7 @@ describe("pure session engine", () => {
       kind: "WriteSosIncident",
       trigger: "MANUAL_HELP_BUTTON",
     });
-    expect(result.commands).toContainEqual({ kind: "WriteSusEvent" });
+    expect(result.commands).not.toContainEqual({ kind: "WriteSusEvent" });
   });
 
   it("keeps every manual ladder state running when location is revoked", () => {

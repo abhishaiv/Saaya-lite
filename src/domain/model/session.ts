@@ -62,7 +62,7 @@ export type Command =
   | { kind: "NotifyFamily" }
   | { kind: "CancelFamilyNotification" }
   | { kind: "WriteSusEvent" }
-  | { kind: "PatchSusOutcome"; outcome: SusOutcome }
+  | { kind: "PatchSusOutcome"; outcome: Exclude<SusOutcome, "PENDING"> }
   | { kind: "WriteSosIncident"; trigger: SosTrigger }
   | { kind: "PatchSosStatus"; status: SosStatus }
   | { kind: "ScheduleTimer"; id: TimerId; delaySec: number }

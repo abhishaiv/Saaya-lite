@@ -196,7 +196,7 @@ function fromCheckInTwo(event: SessionEvent, ctx: EngineContext): EngineResult {
     return {
       state: "FAMILY_ESCALATED",
       commands: [
-        { kind: "WriteSusEvent" },
+        ...(ctx.armMode === "AUTO_ZONE" ? ([{ kind: "WriteSusEvent" }] as const) : []),
         { kind: "NotifyFamily" },
         { kind: "ShowFamilyScreen" },
         { kind: "ScheduleTimer", id: "CANCEL", delaySec },
@@ -220,9 +220,13 @@ function fromFamilyEscalated(
   ctx: EngineContext,
 ): EngineResult {
   if (event.kind === "CancelTapped") {
+    const civicOutcome =
+      ctx.armMode === "AUTO_ZONE" && ctx.susEventWritten
+        ? ([{ kind: "PatchSusOutcome", outcome: "CANCELLED_BY_USER" }] as const)
+        : [];
     return resolved("CANCELLED", [
       { kind: "CancelTimer", id: "CANCEL" },
-      { kind: "PatchSusOutcome", outcome: "CANCELLED_BY_USER" },
+      ...civicOutcome,
       { kind: "CancelFamilyNotification" },
       { kind: "StopLocationWatch" },
       { kind: "ReleaseWakeLock" },
@@ -230,11 +234,11 @@ function fromFamilyEscalated(
   }
 
   if (event.kind === "CountdownExpired" && event.timer === "CANCEL") {
-    return enterSos("LADDER_LAPSE", { ...ctx, susEventWritten: true });
+    return enterSos("LADDER_LAPSE", ctx);
   }
 
   if (event.kind === "HelpNowTapped") {
-    return enterSos("MANUAL_HELP_BUTTON", { ...ctx, susEventWritten: true });
+    return enterSos("MANUAL_HELP_BUTTON", ctx);
   }
 
   return unchanged("FAMILY_ESCALATED");
@@ -299,9 +303,10 @@ function enterSos(
     { kind: "LogSessionEvent", type: "SOS_TRIGGERED" },
     { kind: "WriteSosIncident", trigger },
   );
-  if (!ctx.susEventWritten) commands.push({ kind: "WriteSusEvent" });
+  if (ctx.armMode === "AUTO_ZONE" && ctx.susEventWritten) {
+    commands.push({ kind: "PatchSusOutcome", outcome: "ESCALATED_TO_SOS" });
+  }
   commands.push(
-    { kind: "PatchSusOutcome", outcome: "ESCALATED_TO_SOS" },
     { kind: "NotifyFamily" },
     { kind: "ShowSos" },
     {
