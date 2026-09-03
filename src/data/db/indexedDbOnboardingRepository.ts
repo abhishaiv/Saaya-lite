@@ -1,7 +1,11 @@
 import { openDB, type DBSchema, type IDBPDatabase } from "idb";
 
 import type { PinHasher, StoredPinHash } from "../../platform/pinHash";
-import type { Favourite, OnboardingRepository } from "../repository/onboardingRepository";
+import type {
+  Favourite,
+  OnboardingRepository,
+  StoredLocale,
+} from "../repository/onboardingRepository";
 
 interface OnboardingSettings {
   readonly onboarded: boolean;
@@ -24,6 +28,7 @@ const DATABASE_VERSION = 1; // GROUNDED-EXEMPT: initial isolated IndexedDB schem
 const SETTINGS_KEY = "current";
 const PRIMARY_FAVOURITE_KEY = "primary";
 const USER_NAME_KEY = "user_name";
+const LANGUAGE_KEY = "language";
 
 /** IndexedDB-backed local-only onboarding data. It never has a remote dependency. */
 export class IndexedDbOnboardingRepository implements OnboardingRepository {
@@ -34,6 +39,11 @@ export class IndexedDbOnboardingRepository implements OnboardingRepository {
 
   async loadOnboarded(): Promise<boolean> {
     return (await this.settings()).onboarded;
+  }
+
+  async loadLanguage(): Promise<StoredLocale | null> {
+    const value = await (await this.database()).get("settings", LANGUAGE_KEY);
+    return value === "en" || value === "te" ? value : null;
   }
 
   async loadPrimaryFavourite(): Promise<Favourite | null> {
@@ -52,6 +62,10 @@ export class IndexedDbOnboardingRepository implements OnboardingRepository {
     const database = await this.database();
     const settings = await this.settings();
     await database.put("settings", { ...settings, onboarded: true }, SETTINGS_KEY);
+  }
+
+  async saveLanguage(locale: StoredLocale): Promise<void> {
+    await (await this.database()).put("settings", locale, LANGUAGE_KEY);
   }
 
   async savePin(pin: string): Promise<void> {

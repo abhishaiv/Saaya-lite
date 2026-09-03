@@ -49,6 +49,7 @@ import {
   WakeLockController,
 } from "../../../platform/wakeLock";
 import { MapControlButton } from "../../components/MapControlButton";
+import { localizedStaticRiskLevel } from "../../copy/localizedRiskLevel";
 import { formatCopy, M4_COPY, type SaayaLocale } from "../../copy/strings";
 import { HomeEngineBridge, type HomeEngineView } from "./homeEngineBridge";
 import { HomeMap } from "./HomeMap";
@@ -84,6 +85,7 @@ export interface HomeScreenProps {
   readonly openDemoOnMount?: boolean;
   readonly policeStations: readonly PoliceStation[];
   readonly zoneDetails: readonly ZoneDetail[];
+  readonly onLocaleChange?: (locale: SaayaLocale) => void;
 }
 
 export function HomeScreen({
@@ -93,11 +95,16 @@ export function HomeScreen({
   heatmapHotspots,
   locale,
   mapZones,
+  onLocaleChange,
   openDemoOnMount = false,
   policeStations,
   zoneDetails,
 }: HomeScreenProps) {
   const copy = M4_COPY[locale];
+  const copyRef = useRef(copy);
+  const localeRef = useRef(locale);
+  copyRef.current = copy;
+  localeRef.current = locale;
   const [location, setLocation] = useState<LiveLocationFix | null>(null);
   const [locationStatus, setLocationStatus] = useState<LocationStatus>("SEARCHING");
   const [selectedZoneId, setSelectedZoneId] = useState<string | null>(null);
@@ -241,17 +248,18 @@ export function HomeScreen({
             const demoArmedSession =
               demoArmInFlightRef.current ||
               (sessionId !== null && isDemoArmedSession(sessionId));
+            const currentCopy = copyRef.current;
             setArmAcknowledgement({
               body: formatCopy(
-                copy.homeArmBannerBody,
+                currentCopy.homeArmBannerBody,
                 detail.label,
                 formatSessionArmTime(
                   armedAtEpochMs,
-                  locale,
+                  localeRef.current,
                   demoArmedSession,
                 ),
               ),
-              title: copy.homeArmBannerTitle,
+              title: currentCopy.homeArmBannerTitle,
             });
             setArmBannerVisible(true);
           }
@@ -300,17 +308,18 @@ export function HomeScreen({
           if (persisted.armMode === "AUTO_ZONE" && persisted.zoneId !== null) {
             const detail = zoneDetails.find(({ id }) => id === persisted.zoneId);
             if (detail !== undefined) {
+              const currentCopy = copyRef.current;
               setArmAcknowledgement({
                 body: formatCopy(
-                  copy.homeArmBannerBody,
+                  currentCopy.homeArmBannerBody,
                   detail.label,
                   formatSessionArmTime(
                     persisted.armedAtEpochMs,
-                    locale,
+                    localeRef.current,
                     recoveredDemoSession,
                   ),
                 ),
-                title: copy.homeArmBannerTitle,
+                title: currentCopy.homeArmBannerTitle,
               });
               setArmBannerVisible(false);
             }
@@ -350,7 +359,7 @@ export function HomeScreen({
       void lifecycle.stop();
       locationRuntimeRef.current = null;
     };
-  }, [copy, heatmapHotspots, locale, zoneDetails, zones]);
+  }, [heatmapHotspots, zoneDetails, zones]);
 
   useEffect(() => {
     if (engineView.state !== "IDLE") return;
@@ -560,7 +569,11 @@ export function HomeScreen({
     () => ({
       ariaMap: copy.cdMap,
       ariaZone: (areaName: string, riskLevel: string) =>
-        formatCopy(copy.cdZone, areaName, riskLevel),
+        formatCopy(
+          copy.cdZone,
+          areaName,
+          localizedStaticRiskLevel(copy, riskLevel),
+        ),
       attribution: copy.aboutAttribMap,
       offline: copy.mapOffline,
     }),
@@ -603,12 +616,14 @@ export function HomeScreen({
         {appSessionStatus}
         <SettingsScreen
           copy={copy}
+          locale={locale}
           onBack={() => setSettingsOpen(false)}
           onOpenAbout={() => setAboutOpen(true)}
           onOpenDemo={() => {
             setSettingsOpen(false);
             setDemoPanelOpen(true);
           }}
+          onLocaleChange={onLocaleChange ?? (() => undefined)}
         />
       </>
     );
@@ -650,6 +665,7 @@ export function HomeScreen({
         demoSpeedEnabled={demoSpeedEnabled}
         currentPoint={location}
         engineView={engineView}
+        locale={locale}
         locationStatus={locationStatus}
         onArmBannerHidden={() => setArmBannerVisible(false)}
         onCheckInOk={handleCheckInOk}

@@ -45,13 +45,18 @@ export type M4Copy = Readonly<{
   cdZone: string;
   ctaCall: string;
   ctaCancelImFine: string;
+  ctaCountdown: string;
   ctaContinue: string;
+  ctaDemo: string;
+  ctaEndSus: string;
   ctaFinish: string;
   ctaHelpNow: string;
   ctaImOk: string;
   ctaArmManually: string;
   ctaImHome: string;
   ctaOpenDemo: string;
+  ctaSos: string;
+  ctaSus: string;
   demoJumpFamily: string;
   demoMissCheckin: string;
   demoModeActive: string;
@@ -61,7 +66,8 @@ export type M4Copy = Readonly<{
   demoReset: string;
   demoResetDone: string;
   demoSessionLiveReason: string;
-  demoSpeedNote: string;
+  demoSpeedNoteFast: string;
+  demoSpeedNoteNormal: string;
   demoSpeedToggle: string;
   demoTriggerSos: string;
   errPinLocked: string;
@@ -71,6 +77,7 @@ export type M4Copy = Readonly<{
   errZoneData: string;
   familyBody: string;
   familyCancelNote: string;
+  familyMessageTemplate: string;
   familyMockDisclosure: string;
   familyNoContact: string;
   familySubjectFallback: string;
@@ -120,6 +127,9 @@ export type M4Copy = Readonly<{
   riskBandHigh: string;
   riskBandLow: string;
   riskBandModerate: string;
+  riskLevelElevated: string;
+  riskLevelHigh: string;
+  riskLevelModerate: string;
   stateWorking: string;
   setAbout: string;
   setDemo: string;
@@ -127,6 +137,8 @@ export type M4Copy = Readonly<{
   setFavourites: string;
   setFavouritesSub: string;
   setLanguage: string;
+  setLanguageEnglish: string;
+  setLanguageTelugu: string;
   setPin: string;
   setPinSub: string;
   setPolice: string;
@@ -200,13 +212,18 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     cdZone: "%1$s, %2$s risk area. Open details.",
     ctaCall: "Call",
     ctaCancelImFine: "Cancel, I am fine",
+    ctaCountdown: "%1$s · %2$ds",
     ctaContinue: "Continue",
+    ctaDemo: "Demo",
+    ctaEndSus: "End SUS",
     ctaFinish: "Finish",
     ctaHelpNow: "I need help now",
     ctaImOk: "I am OK",
     ctaArmManually: "Start Shadow",
     ctaImHome: "I am home",
     ctaOpenDemo: "Open the demo",
+    ctaSos: "SOS",
+    ctaSus: "SUS",
     demoJumpFamily: "Jump to family escalation",
     demoMissCheckin: "Simulate a missed check-in",
     demoModeActive: "Demo speed is on. Timers are 6x faster than the real product.",
@@ -216,7 +233,8 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     demoReset: "Reset session",
     demoResetDone: "Session reset. Nothing was sent.",
     demoSessionLiveReason: "Finish or stop the current session first",
-    demoSpeedNote: "Timers run %1$dx faster. The full ladder takes %2$d seconds instead of %3$d.",
+    demoSpeedNoteFast: "Timers run %1$dx faster. The full ladder takes %2$d seconds instead of %3$d.",
+    demoSpeedNoteNormal: "Timers run at normal speed (%1$dx). The full ladder takes %3$d seconds.",
     demoSpeedToggle: "Demo speed",
     demoTriggerSos: "Trigger SOS",
     errPinLocked: "Too many attempts. Try again in %1$s.",
@@ -226,6 +244,20 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     errZoneData: "Saaya Lite could not load Visakhapatnam data. Reloading the page should fix this.",
     familyBody: "This is the message Saaya prepared on this phone. It has not been sent.",
     familyCancelNote: "If you do not cancel in %1$d seconds, Saaya opens the local-only SOS screen.",
+    familyMessageTemplate: `Saaya alert - %1$s may need help.
+
+%1$s did not answer two safety check-ins.
+
+Where: %2$s area, Visakhapatnam
+When: %3$s, %4$s
+Area risk: %5$s - %6$d women-safety cases on record here
+Last seen: near %7$s
+
+Nearest police station: %8$s, %9$s (%10$d m away)
+
+She has %11$d seconds to cancel this. If she does not, Saaya opens a local SOS screen. No message is sent and no location is shared.
+
+Prepared locally by Saaya Lite. This preview has not been sent.`,
     familyMockDisclosure: "Prototype: this message is composed but not actually sent. Real delivery needs Indian DLT registration.",
     familyNoContact: "You haven't added a favourite yet. Saaya can still open an SOS.",
     familySubjectFallback: "Someone using Saaya Lite",
@@ -275,6 +307,9 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     riskBandHigh: "High",
     riskBandLow: "Low",
     riskBandModerate: "Moderate",
+    riskLevelElevated: "Elevated Risk",
+    riskLevelHigh: "High Risk",
+    riskLevelModerate: "Moderate Risk",
     stateWorking: "Working",
     setAbout: "About",
     setDemo: "Demo panel",
@@ -282,6 +317,8 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     setFavourites: "Favourites",
     setFavouritesSub: "Whose local message preview you can review",
     setLanguage: "Language",
+    setLanguageEnglish: "English",
+    setLanguageTelugu: "Telugu",
     setPin: "Change PIN",
     setPinSub: "Needs your current PIN",
     setPolice: "State view (round two)",
@@ -353,13 +390,18 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     cdZone: "%1$s, %2$s ప్రమాద ప్రాంతం. వివరాలు తెరువు.",
     ctaCall: "కాల్ చేయి",
     ctaCancelImFine: "రద్దు చేయి, నేను బాగున్నాను",
+    ctaCountdown: "%1$s · %2$d సెకన్లు",
     ctaContinue: "కొనసాగించు",
+    ctaDemo: "డెమో",
+    ctaEndSus: "SUS ఆపు",
     ctaFinish: "పూర్తి చేయి",
     ctaHelpNow: "నాకు ఇప్పుడే సహాయం కావాలి",
     ctaImOk: "నేను బాగున్నాను",
     ctaArmManually: "షాడో ప్రారంభించు",
     ctaImHome: "నేను ఇంటికి చేరాను",
     ctaOpenDemo: "డెమో తెరువు",
+    ctaSos: "SOS",
+    ctaSus: "SUS",
     demoJumpFamily: "ఆత్మీయుల దశకు వెళ్లు",
     demoMissCheckin: "చెక్-ఇన్ మిస్ అయినట్టు చూపించు",
     demoModeActive: "డెమో వేగం ఆన్‌లో ఉంది. టైమర్లు అసలు ఉత్పత్తి కంటే 6 రెట్లు వేగంగా ఉన్నాయి.",
@@ -369,7 +411,8 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     demoReset: "సెషన్‌ను రీసెట్ చేయి",
     demoResetDone: "సెషన్ రీసెట్ అయింది. ఏదీ పంపబడలేదు.",
     demoSessionLiveReason: "ముందుగా ప్రస్తుత సెషన్‌ను పూర్తి చేయండి లేదా ఆపండి",
-    demoSpeedNote: "టైమర్లు %1$d రెట్లు వేగంగా నడుస్తాయి. పూర్తి నిచ్చెన %3$d సెకన్లకు బదులు %2$d సెకన్లు పడుతుంది.",
+    demoSpeedNoteFast: "టైమర్లు %1$d రెట్లు వేగంగా నడుస్తాయి. పూర్తి నిచ్చెన %3$d సెకన్లకు బదులు %2$d సెకన్లు పడుతుంది.",
+    demoSpeedNoteNormal: "టైమర్లు సాధారణ వేగంతో (%1$dx) నడుస్తాయి. పూర్తి నిచ్చెనకు %3$d సెకన్లు పడతాయి.",
     demoSpeedToggle: "డెమో వేగం",
     demoTriggerSos: "SOS ప్రారంభించు",
     errPinLocked: "చాలా ప్రయత్నాలు. %1$s తర్వాత మళ్లీ ప్రయత్నించండి.",
@@ -379,6 +422,20 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     errZoneData: "సాయ లైట్ విశాఖపట్నం డేటాను లోడ్ చేయలేకపోయింది. పేజీని మళ్లీ లోడ్ చేస్తే సరిపోతుంది.",
     familyBody: "సాయ మీ ఫోన్‌లో తయారు చేసిన సందేశం ఇది. ఇది పంపబడలేదు.",
     familyCancelNote: "%1$d సెకన్లలో మీరు రద్దు చేయకపోతే, సాయ స్థానిక SOS స్క్రీన్‌ను తెరుస్తుంది.",
+    familyMessageTemplate: `సాయ హెచ్చరిక - %1$s కు సహాయం అవసరం కావచ్చు.
+
+%1$s రెండు భద్రతా చెక్-ఇన్‌లకు స్పందించలేదు.
+
+ఎక్కడ: విశాఖపట్నంలోని %2$s ప్రాంతం
+ఎప్పుడు: %3$s, %4$s
+ప్రాంత ప్రమాద స్థాయి: %5$s - ఇక్కడ నమోదైన మహిళా భద్రతా కేసులు %6$d
+చివరిసారిగా కనిపించిన చోటు: %7$s సమీపంలో
+
+సమీప పోలీస్ స్టేషన్: %8$s, %9$s (%10$d మీ. దూరంలో)
+
+దీన్ని రద్దు చేయడానికి ఆమెకు %11$d సెకన్లు ఉన్నాయి. ఆమె రద్దు చేయకపోతే, సాయ స్థానిక SOS స్క్రీన్‌ను తెరుస్తుంది. ఏ సందేశమూ పంపబడదు, లొకేషన్ షేర్ చేయబడదు.
+
+సాయ లైట్ ఈ సందేశాన్ని ఈ ఫోన్‌లోనే తయారుచేసింది. ఈ ప్రివ్యూ పంపబడలేదు.`,
     familyMockDisclosure: "ప్రోటోటైప్: ఈ సందేశం తయారైంది కానీ నిజంగా పంపబడలేదు. నిజమైన డెలివరీకి భారత DLT నమోదు అవసరం.",
     familyNoContact: "మీరు ఇంకా ఆత్మీయులను జోడించలేదు. అయినా సాయ SOS తెరవగలదు.",
     familySubjectFallback: "సాయ లైట్ ఉపయోగిస్తున్న వ్యక్తి",
@@ -428,6 +485,9 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     riskBandHigh: "అత్యధికం",
     riskBandLow: "తక్కువ",
     riskBandModerate: "మధ్యస్థం",
+    riskLevelElevated: "పెరిగిన ప్రమాదం",
+    riskLevelHigh: "అధిక ప్రమాదం",
+    riskLevelModerate: "మధ్యస్థ ప్రమాదం",
     stateWorking: "పని జరుగుతోంది",
     setAbout: "గురించి",
     setDemo: "డెమో ప్యానెల్",
@@ -435,6 +495,8 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     setFavourites: "ఆత్మీయులు",
     setFavouritesSub: "మీ స్థానిక సందేశ ప్రివ్యూ ఎవరికి సంబంధించినదో",
     setLanguage: "భాష",
+    setLanguageEnglish: "ఇంగ్లీష్",
+    setLanguageTelugu: "తెలుగు",
     setPin: "PIN మార్చు",
     setPinSub: "మీ ప్రస్తుత PIN అవసరం",
     setPolice: "రాష్ట్ర వ్యూ (రెండో రౌండ్)",

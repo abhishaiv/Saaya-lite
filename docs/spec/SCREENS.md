@@ -9,7 +9,7 @@ Gate (no UI)
  └─ onboarded ─────> Home
 Home
  ├─ ZoneDetailSheet (bottom sheet)
- ├─ Settings ─> About | DemoPanel
+ ├─ Settings ─> About | DemoPanel | language choice
  └─ session overlays, driven by state, not by navigation:
       CheckIn1 (heads-up + in-app card)
       CheckIn2 (full screen, in page)
@@ -115,7 +115,9 @@ Opens on zone tap, **at C8's expanded state (55% of screen height), not the 160 
 The details are the reason the sheet exists, so it opens showing them. Swipe down dismisses;
 there is no intermediate peek for this sheet. Bottom sheet, top radius per C8, drag to dismiss.
 
-- Header: `area_name`, `ZoneChip` with `risk_level`.
+- Header: `area_name`, `ZoneChip` with the static source `risk_level`, localized through
+  `risk_level_moderate` / `_elevated` / `_high`. It remains distinct from the hour-aware
+  display band below.
 - Stat row: `incident_count` labelled `zone_stat_incidents`, `women_safety_count` labelled
   `zone_stat_women`. Label the second clearly; it is the number she actually cares about.
 - Hour-aware line: reuse `home_hour_context` ("Right now, %1$s reads %2$s") with the band
@@ -216,6 +218,7 @@ Title `set_title`. Rows, in this order, each a `COPY.md` key:
 |---|---|---|
 | About | `set_about` | |
 | Demo panel | `set_demo` | `set_demo_sub` |
+| Language | `set_language` | Inline `set_language_english` / `set_language_telugu` choices; persisted locally. |
 
 **Settings is a shell three nodes fill.** It had no owning node at all, which is why the
 demo panel was unreachable. Ownership:
@@ -223,7 +226,8 @@ demo panel was unreachable. Ownership:
 | Section | Built by |
 |---|---|
 | The shell itself, about + disclaimers, **Demo panel** entry | `M4` |
-| Contact editing, PIN changes, language | cut from this Lite checkpoint |
+| Persisted language choice | Phase 1B |
+| Contact editing, PIN changes | cut from this Lite checkpoint |
 
 **A section appears when its screen exists.** S10 is cut in Lite, so Settings must not
 render a "What the police see" row. A dead entry point would be worse than an absent one.
@@ -261,7 +265,7 @@ labels would break the demo for exactly the Telugu-speaking reviewer this is bui
 
 | Control | Key |
 |---|---|
-| Speed toggle, divisor `demo.divisor` | `demo_speed_toggle`, with `demo_speed_note` showing the resulting ladder timings live |
+| Speed toggle, divisor `demo.divisor` | `demo_speed_toggle`, with `demo_speed_note_fast` or `demo_speed_note_normal` selected from its live state and showing the resulting ladder timings |
 | Zone picker over all 24 | `demo_pick_zone`, hint `demo_pick_zone_hint`, a11y `cd_demo_zone_picker`. Arming through this control pins the hour to `demo.arm.hour`, 04:00 IST, per `BUSINESS_RULES.md`. Picking a HIGH zone at the real 5 pm must not produce an armed session: `DAY` is not in the arming matrix. |
 | Simulate a missed check-in | `demo_miss_checkin` |
 | Jump to family escalation | `demo_jump_family` |

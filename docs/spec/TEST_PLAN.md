@@ -87,6 +87,14 @@ vertex and all 104 aggregate anchors fall inside the district envelope `lat 17.4
 (**catches the GeoJSON lon/lat swap**); all 19 non-safe parents join to a `zone_info_cards.json` entry; all 37
 stations parse with a phone.
 
+### Phase 1B reachability
+| Test | Assertion |
+|---|---|
+| `localePreference.test.ts` | resolve persisted `language` before `?lang`, retain the URL locale when no preference exists, and leave a live engine session plus its persisted deadline unchanged when only the presentation preference changes. |
+| `demoPanel.test.tsx` | use the fast and normal parameterised speed notes in English and Telugu; neither path freezes a ladder timing. |
+| `onboardingRules.test.ts` | her `user_name` is optional while a real favourite name and exactly ten phone digits remain required. |
+| `familyEscalationOverlay.test.ts`, `homeSessionSurface.test.tsx`, `zoneDetailSheet.test.tsx` | render the one copy-table family-message template, compact countdown action and static risk category in English and Telugu; replace every shared placeholder and source category without a hard-coded English preview or suffix. |
+
 ## Layer 2: browser integration tests - **two only**
 
 Prototype posture: these are slower to write than unit tests. Write only the three that

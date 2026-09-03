@@ -7,7 +7,7 @@ import { CountdownRing } from "../../components/CountdownRing";
 import { BigActionButton } from "../../components/BigActionButton";
 import { LadderCard } from "../../components/LadderCard";
 import { SaayaButton } from "../../components/SaayaButton";
-import type { M4Copy } from "../../copy/strings";
+import { formatCopy, type M4Copy } from "../../copy/strings";
 
 const COUNTDOWN_TICK_MS = 1000; // fact: motion.1000ms
 
@@ -87,6 +87,7 @@ export function CheckInOverlay({
         <BigActionButton
           accent={isFirst ? "brand" : "amber"}
           aria-label={copy.cdImOk}
+          countdownLabel={formatCopy(copy.ctaCountdown, copy.ctaImOk, seconds)}
           countdownSeconds={seconds}
           label={copy.ctaImOk}
           onClick={onOk}
@@ -103,7 +104,7 @@ export function CheckInOverlay({
           variant="textOnly"
           workingLabel={copy.stateWorking}
         >
-          SOS
+          {copy.ctaSos}
         </SaayaButton>
       }
       title={title}

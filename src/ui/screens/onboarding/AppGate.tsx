@@ -4,8 +4,9 @@ import { useEffect, useRef, useState } from "react";
 
 import { IndexedDbOnboardingRepository } from "../../../data/db/indexedDbOnboardingRepository";
 import { BrowserPinHasher } from "../../../platform/pinHash";
-import { M4_COPY } from "../../copy/strings";
+import { M4_COPY, type SaayaLocale } from "../../copy/strings";
 import { HomeScreen, type HomeScreenProps } from "../home/HomeScreen";
+import { resolveAppLocale, saveAppLocale } from "./localePreference";
 import { OnboardingScreen } from "./OnboardingScreen";
 
 type GateRoute = "LOADING" | "ONBOARDING" | "HOME";
@@ -18,23 +19,33 @@ export function AppGate(props: HomeScreenProps) {
   }
   const repository = repositoryRef.current;
   const [route, setRoute] = useState<GateRoute>("LOADING");
+  const [locale, setLocale] = useState<SaayaLocale>(props.locale);
   const [openDemoOnFirstHome, setOpenDemoOnFirstHome] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
-    void repository.loadOnboarded().then((onboarded) => {
-      if (!cancelled) setRoute(onboarded ? "HOME" : "ONBOARDING");
+    void Promise.all([
+      repository.loadOnboarded(),
+      resolveAppLocale(repository, props.locale),
+    ]).then(([onboarded, resolvedLocale]) => {
+      if (cancelled) return;
+      setLocale(resolvedLocale);
+      setRoute(onboarded ? "HOME" : "ONBOARDING");
     });
     return () => {
       cancelled = true;
     };
-  }, [repository]);
+  }, [repository, props.locale]);
+
+  function changeLocale(nextLocale: SaayaLocale) {
+    void saveAppLocale(repository, nextLocale).then(() => setLocale(nextLocale));
+  }
 
   if (route === "LOADING") return null;
   if (route === "ONBOARDING") {
     return (
       <OnboardingScreen
-        copy={M4_COPY[props.locale]}
+        copy={M4_COPY[locale]}
         onCompleted={() => {
           setOpenDemoOnFirstHome(true);
           setRoute("HOME");
@@ -43,5 +54,12 @@ export function AppGate(props: HomeScreenProps) {
       />
     );
   }
-  return <HomeScreen {...props} openDemoOnMount={openDemoOnFirstHome} />;
+  return (
+    <HomeScreen
+      {...props}
+      locale={locale}
+      onLocaleChange={changeLocale}
+      openDemoOnMount={openDemoOnFirstHome}
+    />
+  );
 }

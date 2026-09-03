@@ -2,7 +2,8 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
 import type { SessionState } from "../../../domain/model/session";
-import { M4_COPY } from "../../copy/strings";
+import { CHECK_IN_1_SEC } from "../../../domain/engine/rules";
+import { formatCopy, M4_COPY } from "../../copy/strings";
 import { HomeSessionSurface } from "./HomeSessionSurface";
 import type { HomeEngineView } from "./homeEngineBridge";
 
@@ -33,6 +34,7 @@ function render(
       demoModeActive={false}
       demoSpeedEnabled={false}
       engineView={view(state, "MANUAL")}
+      locale="en"
       locationStatus="CURRENT"
       onArmBannerHidden={() => undefined}
       onCheckInOk={() => undefined}
@@ -58,9 +60,11 @@ describe("M4 Home session surface", () => {
     expect(html).toContain('data-home-action="sus"');
     expect(html).toContain('data-home-action="demo"');
     expect(html).toContain('data-home-action="sos"');
-    expect(html).toContain(">SUS<");
-    expect(html).toContain(">Demo<");
-    expect(html).toContain(">SOS<");
+    expect(html).toContain(`>${M4_COPY.en.ctaSus}<`);
+    expect(html).toContain(`>${M4_COPY.en.ctaDemo}<`);
+    expect(html).toContain(`>${M4_COPY.en.ctaSos}<`);
+    expect(html).toContain(`aria-label="${M4_COPY.en.ctaDemo}"`);
+    expect(html).toContain(`aria-label="${M4_COPY.en.ctaSos}"`);
     expect(html).not.toContain("saaya-bottom-sheet");
     expect(html).not.toContain(M4_COPY.en.warnKeepOpenBody);
   });
@@ -78,7 +82,7 @@ describe("M4 Home session surface", () => {
 
     expect(html).toContain(M4_COPY.en.homeArmBannerTitle);
     expect(html.split(M4_COPY.en.homeArmBannerBody)).toHaveLength(2);
-    expect(html).toContain(">End SUS<");
+    expect(html).toContain(`>${M4_COPY.en.ctaEndSus}<`);
     expect(html).toContain('data-home-action="sos"');
     expect(html).not.toContain(M4_COPY.en.warnKeepOpenBody);
   });
@@ -111,6 +115,34 @@ describe("M4 Home session surface", () => {
 
     expect(html).toContain('data-demo-active="true"');
     expect(html).not.toContain(M4_COPY.en.demoModeActive);
+  });
+
+  it("keeps SUS as the shared term while translating the surrounding Telugu action", () => {
+    const html = render("SHADOW", {
+      copy: M4_COPY.te,
+      engineView: view("SHADOW", "MANUAL"),
+    });
+
+    expect(html).toContain(M4_COPY.te.ctaEndSus);
+    expect(html).toContain('aria-label="SUS ఆపు"');
+  });
+
+  it("uses a copy-backed Telugu countdown action rather than an English suffix", () => {
+    const html = render("CHECKIN_1", {
+      copy: M4_COPY.te,
+      locale: "te",
+    });
+
+    expect(html).toContain(
+      formatCopy(
+        M4_COPY.te.ctaCountdown,
+        M4_COPY.te.ctaImOk,
+        CHECK_IN_1_SEC,
+      ),
+    );
+    expect(html).not.toContain(
+      `${M4_COPY.te.ctaImOk} · ${CHECK_IN_1_SEC}s`,
+    );
   });
 
   it("projects every escalated status without exposing a Home disarm shortcut", () => {

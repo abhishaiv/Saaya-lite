@@ -49,7 +49,7 @@ describe("M4 bilingual demo panel", () => {
       const html = render(locale, true);
       expect(html).toContain(
         formatCopy(
-          M4_COPY[locale].demoSpeedNote,
+          M4_COPY[locale].demoSpeedNoteFast,
           DEMO_DIVISOR,
           DEMO_TOTAL_SEC,
           LADDER_TOTAL_SEC,
@@ -61,19 +61,22 @@ describe("M4 bilingual demo panel", () => {
   });
 
   it("keeps simulation controls unavailable until the labelled demo mode is on", () => {
-    const html = render("en", false);
+    for (const locale of ["en", "te"] as const) {
+      const html = render(locale, false);
 
-    expect(html).toContain(
-      formatCopy(
-        M4_COPY.en.demoSpeedNote,
-        NORMAL_DEMO_DIVISOR,
-        LADDER_TOTAL_SEC,
-        LADDER_TOTAL_SEC,
-      ),
-    );
-    expect(html).toContain('role="switch"');
-    expect(html).toContain("disabled");
-    expect(html).toContain(M4_COPY.en.demoMissCheckin);
+      expect(html).toContain(
+        formatCopy(
+          M4_COPY[locale].demoSpeedNoteNormal,
+          NORMAL_DEMO_DIVISOR,
+          LADDER_TOTAL_SEC,
+          LADDER_TOTAL_SEC,
+        ),
+      );
+      expect(M4_COPY[locale].demoSpeedNoteNormal).not.toContain("%2$d");
+      expect(html).toContain('role="switch"');
+      expect(html).toContain("disabled");
+      expect(html).toContain(M4_COPY[locale].demoMissCheckin);
+    }
   });
 
   it("explains disabled simulation controls during a live session in both languages", () => {

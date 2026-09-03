@@ -74,6 +74,7 @@ describe("C1 and C2 action controls", () => {
     const running = renderToStaticMarkup(
       <BigActionButton
         accent="brand"
+        countdownLabel="I'm OK · 42s"
         countdownSeconds={42} // GROUNDED-EXEMPT: component-spec illustration, not a product timer.
         label="I'm OK"
         workingLabel="Working"

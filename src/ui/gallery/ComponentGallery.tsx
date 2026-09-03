@@ -195,6 +195,7 @@ function BigActionButtonFixture({
     <BigActionButton
       accent={accent}
       className={forcedStateClass(state)}
+      countdownLabel={`I'm OK · ${GALLERY_COUNTDOWN_PARTIAL}s`}
       countdownSeconds={state === "default" ? GALLERY_COUNTDOWN_PARTIAL : undefined}
       disabled={state === "disabled"}
       label="I'm OK"

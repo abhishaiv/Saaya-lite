@@ -20,6 +20,7 @@ import {
 import { SaayaBottomSheet } from "../../components/SaayaBottomSheet";
 import { StatRow } from "../../components/StatRow";
 import { ZoneChip } from "../../components/ZoneChip";
+import { localizedStaticRiskLevel } from "../../copy/localizedRiskLevel";
 import { formatCopy, type M4Copy } from "../../copy/strings";
 import { MaterialSymbol } from "../../icons/MaterialSymbol";
 
@@ -94,7 +95,7 @@ export function ZoneDetailSheet({
             {card === null ? null : (
               <ZoneChip
                 colorHex={detail.zone.colorHex}
-                label={card.riskLevel}
+                label={localizedStaticRiskLevel(copy, card.riskLevel)}
                 riskTier={detail.zone.riskTier}
               />
             )}

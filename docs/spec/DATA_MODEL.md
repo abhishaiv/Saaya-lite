@@ -123,7 +123,7 @@ export interface ZoneCard {
   readonly stationId: string;
   readonly areaName: string;        // the locality, e.g. "Soldierpet". THE MAP LABEL.
   readonly fullAreas: string;
-  readonly riskLevel: string;      // "High Risk" - display string, use as-is
+  readonly riskLevel: string;      // frozen static category, localized for display without using the hour-aware band
   readonly riskTier: string;
   readonly incidentCount: number;
   readonly womenSafetyCount: number;

@@ -9,6 +9,8 @@ type NativeButtonProps = Omit<
 
 export type BigActionButtonProps = NativeButtonProps & {
   accent: BigActionButtonAccent;
+  /** Localized COPY.md label shown when a live countdown is present. */
+  countdownLabel?: string;
   countdownSeconds?: number;
   label: string;
   loading?: boolean;
@@ -30,6 +32,7 @@ export function BigActionButton({
   accent,
   "aria-label": ariaLabel,
   className,
+  countdownLabel,
   countdownSeconds,
   disabled = false,
   label,
@@ -41,7 +44,7 @@ export function BigActionButton({
   const hasCountdown =
     typeof countdownSeconds === "number" && countdownSeconds > 0;
   const visibleLabel = hasCountdown
-    ? `${label} · ${countdownSeconds}s`
+    ? (countdownLabel ?? label)
     : label;
   const isDisabled = disabled || loading;
   const classes = [

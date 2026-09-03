@@ -19,7 +19,8 @@ import { CountdownRing } from "../../components/CountdownRing";
 import { DisclosureBanner } from "../../components/DisclosureBanner";
 import { LadderCard } from "../../components/LadderCard";
 import { SaayaButton } from "../../components/SaayaButton";
-import type { M4Copy } from "../../copy/strings";
+import { localizedStaticRiskLevel } from "../../copy/localizedRiskLevel";
+import { formatCopy, type M4Copy, type SaayaLocale } from "../../copy/strings";
 
 const COUNTDOWN_TICK_MS = 1000; // fact: motion.1000ms
 
@@ -34,6 +35,7 @@ export interface FamilyEscalationOverlayProps {
   readonly deadlineEpochMs: number | null;
   readonly demoSpeedEnabled: boolean;
   readonly detail: ZoneDetail | null;
+  readonly locale: SaayaLocale;
   readonly onCancel: () => void;
   readonly onHelpNow: () => void;
   readonly onMinimize: () => void;
@@ -47,6 +49,7 @@ export function FamilyEscalationOverlay({
   deadlineEpochMs,
   demoSpeedEnabled,
   detail,
+  locale,
   onCancel,
   onHelpNow,
   onMinimize,
@@ -91,20 +94,20 @@ export function FamilyEscalationOverlay({
     const point = currentPoint ?? detail.zone.centroid;
     const stationDistance = nearestStation(point, policeStations);
     if (stationDistance === null) return null;
-    return composeFamilyMessage({
+    return composeFamilyMessage(copy, {
       cancelWindowSec: totalSeconds,
-      day: formatIndiaFamilyDay(nowEpochMs),
+      day: formatIndiaFamilyDay(nowEpochMs, locale),
       distanceM: Math.round(stationDistance.distanceM),
       name: identity.userName ?? copy.familySubjectFallback,
       stationName: stationDistance.station.name,
       stationPhone: stationDistance.station.phone,
-      time: formatIndiaFamilyTime(nowEpochMs),
+      time: formatIndiaFamilyTime(nowEpochMs, locale),
       womenSafetyCases: detail.zone.womenSafetyCases,
       zoneName: detail.label,
-      zoneRisk: detail.card.riskLevel,
+      zoneRisk: localizedStaticRiskLevel(copy, detail.card.riskLevel),
       zoneArea: detail.zone.areasCovered.split(",")[0]?.trim() ?? detail.zone.areasCovered,
     });
-  }, [copy.familySubjectFallback, currentPoint, detail, identity, nowEpochMs, policeStations, totalSeconds]);
+  }, [copy, currentPoint, detail, identity, locale, nowEpochMs, policeStations, totalSeconds]);
 
   const title =
     identity !== null && identity.favourite === null
@@ -158,6 +161,7 @@ export function FamilyEscalationOverlay({
         <BigActionButton
           accent="danger"
           aria-label={copy.cdCancelEscalation}
+          countdownLabel={formatCopy(copy.ctaCountdown, copy.ctaCancelImFine, seconds)}
           countdownSeconds={seconds}
           label={copy.ctaCancelImFine}
           onClick={onCancel}
@@ -174,7 +178,7 @@ export function FamilyEscalationOverlay({
           variant="textOnly"
           workingLabel={copy.stateWorking}
         >
-          SOS
+          {copy.ctaSos}
         </SaayaButton>
       }
       title={title}
@@ -182,7 +186,7 @@ export function FamilyEscalationOverlay({
   );
 }
 
-function composeFamilyMessage({
+export function composeFamilyMessage(copy: M4Copy, {
   cancelWindowSec,
   day,
   distanceM,
@@ -207,20 +211,20 @@ function composeFamilyMessage({
   zoneName: string;
   zoneRisk: string;
 }>): string {
-  return `Saaya alert - ${name} may need help.
-
-${name} did not answer two safety check-ins.
-
-Where: ${zoneName} area, Visakhapatnam
-When: ${time}, ${day}
-Area risk: ${zoneRisk} - ${womenSafetyCases} women-safety cases on record here
-Last seen: near ${zoneArea}
-
-Nearest police station: ${stationName}, ${stationPhone} (${distanceM} m away)
-
-She has ${cancelWindowSec} seconds to cancel this. If she does not, Saaya opens a local SOS screen. No message is sent and no location is shared.
-
-Prepared locally by Saaya Lite. This preview has not been sent.`;
+  return formatCopy(
+    copy.familyMessageTemplate,
+    name,
+    zoneName,
+    time,
+    day,
+    zoneRisk,
+    womenSafetyCases,
+    zoneArea,
+    stationName,
+    stationPhone,
+    distanceM,
+    cancelWindowSec,
+  );
 }
 
 function remainingSeconds(

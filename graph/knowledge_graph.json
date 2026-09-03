@@ -313,9 +313,9 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 407,
-  "edges": 692,
-  "events": 80
+  "entities": 411,
+  "edges": 696,
+  "events": 84
  },
  "entities": [
   {
@@ -3237,6 +3237,30 @@
    "class": "Artifact",
    "label": "M2 checkpoint: anonymiser, durable queue, trace, Firebase writer primitives, and truthful family-message payload contract",
    "node": "M2"
+  },
+  {
+   "id": "art.phase1b.bilingual_reachability",
+   "class": "Artifact",
+   "label": "Phase 1B bilingual SUS/Demo/SOS copy, persisted language preference, truthful demo timing, and optional own-name onboarding gate",
+   "node": "M1"
+  },
+  {
+   "id": "d.phase1b.locale_presentation",
+   "class": "Decision",
+   "label": "Changing the persisted locale updates presentation only; it must not restart an active session or alter its absolute deadline.",
+   "node": "M1"
+  },
+  {
+   "id": "fail.phase1b.demo_note_tautology",
+   "class": "Failure",
+   "label": "Phase 1B normal-speed demo note repeated identical current and real totals, preserving a judged-path tautology.",
+   "node": "M4"
+  },
+  {
+   "id": "fail.phase1b.aria_copy_drift",
+   "class": "Failure",
+   "label": "Phase 1B compact Demo and SOS controls used distinct copy keys for visible and accessibility labels.",
+   "node": "M4"
   }
  ],
  "edges": [
@@ -8775,6 +8799,38 @@
    "at": "2026-09-02",
    "by": "codex",
    "confidence": "high"
+  },
+  {
+   "from": "art.phase1b.bilingual_reachability",
+   "rel": "produced_by",
+   "to": "node.M1",
+   "at": "2026-09-03",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.phase1b.bilingual_reachability",
+   "rel": "produced_by",
+   "to": "node.M4",
+   "at": "2026-09-03",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.phase1b.demo_note_tautology",
+   "rel": "caused_by",
+   "to": "art.phase1b.bilingual_reachability",
+   "at": "2026-09-03",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.phase1b.aria_copy_drift",
+   "rel": "caused_by",
+   "to": "art.phase1b.bilingual_reachability",
+   "at": "2026-09-03",
+   "by": "codex",
+   "confidence": "high"
   }
  ],
  "events": [
@@ -9688,6 +9744,51 @@
     "dec.round2.sos_delivery_state"
    ],
    "node": "M2"
+  },
+  {
+   "id": "ev.0081",
+   "type": "decision_made",
+   "at": "2026-09-03",
+   "actor": "codex",
+   "detail": "Phase 1B checkpoint: bilingual reachability and truthful demo/onboarding presentation verified",
+   "refs": [
+    "art.phase1b.bilingual_reachability",
+    "d.phase1b.locale_presentation"
+   ],
+   "node": "M1"
+  },
+  {
+   "id": "ev.0082",
+   "type": "verifier_killed",
+   "at": "2026-09-03",
+   "actor": "codex",
+   "detail": "Fresh Phase 1B spec verifier rejected the tautological normal-speed demo note",
+   "refs": [
+    "fail.phase1b.demo_note_tautology"
+   ],
+   "node": "M4"
+  },
+  {
+   "id": "ev.0083",
+   "type": "verifier_killed",
+   "at": "2026-09-03",
+   "actor": "codex",
+   "detail": "Fresh Phase 1B spec verifier rejected compact control aria-label copy drift",
+   "refs": [
+    "fail.phase1b.aria_copy_drift"
+   ],
+   "node": "M4"
+  },
+  {
+   "id": "ev.0084",
+   "type": "verifier_passed",
+   "at": "2026-09-03",
+   "actor": "codex",
+   "detail": "Fresh Phase 1B spec verifier passed after normal-speed note and direct-control label corrections",
+   "refs": [
+    "art.phase1b.bilingual_reachability"
+   ],
+   "node": "M1"
   }
  ]
 }

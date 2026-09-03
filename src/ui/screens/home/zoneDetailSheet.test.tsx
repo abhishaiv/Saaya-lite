@@ -35,7 +35,7 @@ describe("M4 zone detail sheet", () => {
     );
 
     expect(html).toContain('data-position="expanded"');
-    expect(html).toContain(highRiskDetail.card?.riskLevel);
+    expect(html).toContain(english.riskLevelHigh);
     expect(highRiskDetail.card?.riskLevel).toBe("High Risk");
     expect(html).toContain(english.riskBandElevated);
     expect(html).toContain(english.zoneStatIncidents);
@@ -43,6 +43,23 @@ describe("M4 zone detail sheet", () => {
     expect(html.replaceAll("&amp;", "&")).toContain(
       highRiskDetail.card?.topCrimes,
     );
+  });
+
+  it("localizes the frozen static source category without changing the hour-aware band", () => {
+    const html = renderToStaticMarkup(
+      <ZoneDetailSheet
+        copy={telugu}
+        currentPoint={null}
+        detail={highRiskDetail}
+        hourBand="DAY"
+        onDismiss={() => undefined}
+        policeStations={snapshot.policeStations}
+      />,
+    );
+
+    expect(html).toContain(telugu.riskLevelHigh);
+    expect(html).not.toContain("High Risk");
+    expect(html).toContain(telugu.riskBandElevated);
   });
 
   it("renders the nearest station, selectable number, tel handoff, and approximation note", () => {

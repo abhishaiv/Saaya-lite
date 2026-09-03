@@ -21,9 +21,12 @@ export function formatIndiaUiTime(
   }).format(epochMs);
 }
 
-/** The frozen English format used inside the composed family message. */
-export function formatIndiaFamilyTime(epochMs: number): string {
-  return new Intl.DateTimeFormat("en-IN", {
+/** The family message stays h:mm a while its visible locale follows the app. */
+export function formatIndiaFamilyTime(
+  epochMs: number,
+  locale: SaayaLocale,
+): string {
+  return new Intl.DateTimeFormat(FORMAT_LOCALES[locale], {
     hour: "numeric",
     hourCycle: "h12",
     minute: "2-digit",
@@ -33,9 +36,12 @@ export function formatIndiaFamilyTime(epochMs: number): string {
     .toUpperCase();
 }
 
-/** The family message is readable prose, so its day is a full English weekday. */
-export function formatIndiaFamilyDay(epochMs: number): string {
-  return new Intl.DateTimeFormat("en-IN", {
+/** A visible family-message day follows the current app locale. */
+export function formatIndiaFamilyDay(
+  epochMs: number,
+  locale: SaayaLocale,
+): string {
+  return new Intl.DateTimeFormat(FORMAT_LOCALES[locale], {
     timeZone: SAAYA_TIME_ZONE,
     weekday: "long",
   }).format(epochMs);

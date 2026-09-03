@@ -54,7 +54,7 @@ export function DemoPanel({
     : NORMAL_DEMO_DIVISOR;
   const currentTotalSec = LADDER_TOTAL_SEC / currentDivisor;
   const speedNote = formatCopy(
-    copy.demoSpeedNote,
+    demoSpeedEnabled ? copy.demoSpeedNoteFast : copy.demoSpeedNoteNormal,
     currentDivisor,
     currentTotalSec,
     LADDER_TOTAL_SEC,

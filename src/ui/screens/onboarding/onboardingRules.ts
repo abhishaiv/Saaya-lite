@@ -19,6 +19,16 @@ export function hasFavouriteInput(name: string, phone: string): boolean {
   return name.trim().length > 0 && isValidIndianMobileNumber(phone);
 }
 
+/** Her name is optional; the real favourite remains required for the message preview. */
+export function canContinueFromFavouriteStep(input: Readonly<{
+  favouriteName: string;
+  phone: string;
+  userName: string;
+}>): boolean {
+  void input.userName;
+  return hasFavouriteInput(input.favouriteName, input.phone);
+}
+
 export function isCompletePin(value: string): boolean {
   return value.length === PIN_LENGTH;
 }

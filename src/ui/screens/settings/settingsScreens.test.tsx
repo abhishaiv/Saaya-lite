@@ -12,7 +12,9 @@ describe("M4 Settings ownership", () => {
       const html = renderToStaticMarkup(
         <SettingsScreen
           copy={copy}
+          locale={locale}
           onBack={() => undefined}
+          onLocaleChange={() => undefined}
           onOpenAbout={() => undefined}
           onOpenDemo={() => undefined}
         />,
@@ -23,7 +25,9 @@ describe("M4 Settings ownership", () => {
       expect(html).toContain(copy.setDemoSub);
       expect(html).toContain(copy.policeNoGovtLink);
       expect(html).not.toContain(copy.setFavourites);
-      expect(html).not.toContain(copy.setLanguage);
+      expect(html).toContain(copy.setLanguage);
+      expect(html).toContain(copy.setLanguageEnglish);
+      expect(html).toContain(copy.setLanguageTelugu);
       expect(html).not.toContain(copy.setPin);
       expect(html).not.toContain(copy.setPolice);
     }

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  canContinueFromFavouriteStep,
   hasFavouriteInput,
   isCompletePin,
   isValidIndianMobileNumber,
@@ -31,6 +32,27 @@ describe("minimal onboarding rules", () => {
     expect(hasFavouriteInput("Meera", validPhone)).toBe(true);
     expect(hasFavouriteInput("", validPhone)).toBe(false);
     expect(hasFavouriteInput("Meera", "")).toBe(false);
+  });
+
+  it("keeps her own name optional without weakening the required favourite", () => {
+    const validPhone = ONBOARDING_PHONE_COUNTRY_CODE.replace("+", "")
+      .repeat(ONBOARDING_PHONE_DIGITS)
+      .substring(0, ONBOARDING_PHONE_DIGITS); // GROUNDED-EXEMPT: test string starts at index zero.
+
+    expect(
+      canContinueFromFavouriteStep({
+        favouriteName: "Asha",
+        phone: validPhone,
+        userName: "",
+      }),
+    ).toBe(true);
+    expect(
+      canContinueFromFavouriteStep({
+        favouriteName: "",
+        phone: validPhone,
+        userName: "Meera",
+      }),
+    ).toBe(false);
   });
 
   it("requires and rejects the frozen PIN forms", () => {

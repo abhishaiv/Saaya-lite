@@ -398,3 +398,19 @@ name or number can enter either outbound payload. The anonymous civic record is 
 **Verification:** TypeScript, lint, 182 Vitest tests, production build, grounded-source scan,
 reads closure, graph integrity and a local adversarial review pass. Fresh verifier-worker G9 is
 explicitly pending because the service usage allowance was exhausted; it is not reported as a pass.
+
+### Phase 1B — bilingual reachability checkpoint          2026-09-03
+
+**Checkpointed:** Moved judged-path SUS, Demo, SOS, countdown and static-risk labels into the
+bilingual copy table; added persisted Settings language choice with URL fallback; made both
+demo-speed disclosures truthful; and kept her own name optional while retaining a real
+favourite name and phone as the family-message requirement.
+
+**Needed correcting:** The family preview, map accessibility label, zone-card risk category and
+compact countdown suffix still leaked English outside the copy table. A shared static-risk mapper
+and copy-backed templates now localize those presentation values without changing frozen source
+data or the active session.
+
+**Verification:** TypeScript, lint, 192 Vitest tests, production build, grounded-source scan,
+reads closure and graph integrity passed. Fresh verifier-worker G9 remains pending because the
+service usage allowance is unavailable; it is not reported as a pass.

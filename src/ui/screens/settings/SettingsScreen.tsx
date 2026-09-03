@@ -1,18 +1,22 @@
 "use client";
 
-import type { M4Copy } from "../../copy/strings";
+import type { M4Copy, SaayaLocale } from "../../copy/strings";
 import { MaterialSymbol } from "../../icons/MaterialSymbol";
 
 export interface SettingsScreenProps {
   readonly copy: M4Copy;
+  readonly locale: SaayaLocale;
   readonly onBack: () => void;
+  readonly onLocaleChange: (locale: SaayaLocale) => void;
   readonly onOpenAbout: () => void;
   readonly onOpenDemo: () => void;
 }
 
 export function SettingsScreen({
   copy,
+  locale,
   onBack,
+  onLocaleChange,
   onOpenAbout,
   onOpenDemo,
 }: SettingsScreenProps) {
@@ -31,6 +35,11 @@ export function SettingsScreen({
           label={copy.setDemo}
           onClick={onOpenDemo}
           supporting={copy.setDemoSub}
+        />
+        <SettingsLanguageRow
+          copy={copy}
+          locale={locale}
+          onLocaleChange={onLocaleChange}
         />
       </nav>
 
@@ -164,5 +173,79 @@ function SettingsRow({ label, onClick, supporting }: SettingsRowProps) {
         }
       `}</style>
     </button>
+  );
+}
+
+type SettingsLanguageRowProps = Readonly<{
+  copy: M4Copy;
+  locale: SaayaLocale;
+  onLocaleChange: (locale: SaayaLocale) => void;
+}>;
+
+function SettingsLanguageRow({
+  copy,
+  locale,
+  onLocaleChange,
+}: SettingsLanguageRowProps) {
+  return (
+    <div aria-label={copy.setLanguage} className="settings-language-row" role="group">
+      <strong>{copy.setLanguage}</strong>
+      <div className="settings-language-row__choices">
+        <button
+          aria-pressed={locale === "en"}
+          onClick={() => onLocaleChange("en")}
+          type="button"
+        >
+          {copy.setLanguageEnglish}
+        </button>
+        <button
+          aria-pressed={locale === "te"}
+          onClick={() => onLocaleChange("te")}
+          type="button"
+        >
+          {copy.setLanguageTelugu}
+        </button>
+      </div>
+
+      <style jsx>{`
+        .settings-language-row {
+          display: grid;
+          gap: var(--space-12);
+          padding: var(--space-16);
+          border-block-end: var(--border-hairline) solid var(--color-surface-elevated);
+        }
+
+        .settings-language-row > strong {
+          font-size: var(--type-body-size);
+          line-height: var(--type-body-line-height);
+        }
+
+        .settings-language-row__choices {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr)); /* GROUNDED-EXEMPT: exactly two supported local language choices. */
+          gap: var(--space-8);
+        }
+
+        .settings-language-row button {
+          min-block-size: var(--minimum-touch-target);
+          padding-inline: var(--space-12);
+          border: var(--border-hairline) solid var(--color-surface-elevated);
+          border-radius: var(--radius-control);
+          background: transparent;
+          color: var(--color-text-primary);
+          font: inherit;
+        }
+
+        .settings-language-row button[aria-pressed="true"] {
+          border-color: var(--color-brand-light);
+          background: var(--color-surface-elevated);
+        }
+
+        .settings-language-row button:focus-visible {
+          outline: 2px solid var(--color-brand-light);
+          outline-offset: 2px;
+        }
+      `}</style>
+    </div>
   );
 }

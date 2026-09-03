@@ -9,7 +9,7 @@ import { PinEntryBox } from "../../components/PinEntryBox";
 import { SaayaButton } from "../../components/SaayaButton";
 import type { M4Copy } from "../../copy/strings";
 import {
-  hasFavouriteInput,
+  canContinueFromFavouriteStep,
   isCompletePin,
   isValidIndianMobileNumber,
   isWeakPin,
@@ -45,7 +45,11 @@ export function OnboardingScreen({
 
   async function saveFavourite(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!hasFavouriteInput(name, phone)) return;
+    if (!canContinueFromFavouriteStep({
+      favouriteName: name,
+      phone,
+      userName,
+    })) return;
     setSaving(true);
     try {
       await repository.saveUserName(userName.trim() || null);
@@ -183,7 +187,11 @@ export function OnboardingScreen({
               kind="prototype-limitation"
             />
             <SaayaButton
-              disabled={!hasFavouriteInput(name, phone)}
+              disabled={!canContinueFromFavouriteStep({
+                favouriteName: name,
+                phone,
+                userName,
+              })}
               loading={saving}
               type="submit"
               variant="primary"

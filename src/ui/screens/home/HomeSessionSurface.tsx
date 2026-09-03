@@ -9,7 +9,7 @@ import type { PoliceStation } from "../../../domain/model/policeStation";
 import type { LatLng } from "../../../domain/model/zone";
 import type { LocationStatus } from "../../../platform/locationWatch";
 import { ArmBanner } from "../../components/ArmBanner";
-import type { M4Copy } from "../../copy/strings";
+import type { M4Copy, SaayaLocale } from "../../copy/strings";
 import type { HomeEngineView } from "./homeEngineBridge";
 import { CheckInOverlay } from "./CheckInOverlay";
 import { FamilyEscalationOverlay } from "./FamilyEscalationOverlay";
@@ -30,6 +30,7 @@ export interface HomeSessionSurfaceProps {
   readonly copy: M4Copy;
   readonly demoModeActive: boolean;
   readonly engineView: HomeEngineView;
+  readonly locale: SaayaLocale;
   readonly locationStatus: LocationStatus;
   readonly onArmBannerHidden: () => void;
   readonly onCheckInOk: () => void;
@@ -56,6 +57,7 @@ export function HomeSessionSurface({
   copy,
   demoModeActive,
   engineView,
+  locale,
   locationStatus,
   onArmBannerHidden,
   onCheckInOk,
@@ -131,7 +133,7 @@ export function HomeSessionSurface({
         >
           {demoModeActive && state !== "IDLE" ? (
             <span className="home-session-demo-badge" role="status">
-              Demo
+              {copy.ctaDemo}
             </span>
           ) : null}
           {isMinimized ? (
@@ -146,44 +148,44 @@ export function HomeSessionSurface({
           ) : state === "IDLE" ? (
             <>
               <button
-                aria-label="SUS"
+                aria-label={copy.ctaSus}
                 className="home-session-action home-session-action--sus"
                 data-home-action="sus"
                 onClick={onManualArm}
                 type="button"
               >
-                SUS
+                {copy.ctaSus}
               </button>
               <button
-                aria-label={copy.cdDemoPanel}
+                aria-label={copy.ctaDemo}
                 className="home-session-action home-session-action--demo"
                 data-home-action="demo"
                 onClick={onOpenDemo}
                 type="button"
               >
-                Demo
+                {copy.ctaDemo}
               </button>
             </>
           ) : (
             <button
-              aria-label="End SUS"
+              aria-label={copy.ctaEndSus}
               className="home-session-action home-session-action--sus"
               data-home-action="sus"
               onClick={onManualDisarm}
               type="button"
             >
-              End SUS
+              {copy.ctaEndSus}
             </button>
           )}
 
           <button
-            aria-label={copy.cdHelpNow}
+            aria-label={copy.ctaSos}
             className="home-session-action home-session-action--sos"
             data-home-action="sos"
             onClick={onHelpNow}
             type="button"
           >
-            SOS
+            {copy.ctaSos}
           </button>
         </div>
       ) : null}
@@ -208,6 +210,7 @@ export function HomeSessionSurface({
           deadlineEpochMs={engineView.deadlineEpochMs}
           demoSpeedEnabled={demoSpeedEnabled}
           detail={activeZoneDetail}
+          locale={locale}
           onCancel={onFamilyCancel}
           onHelpNow={onHelpNow}
           onMinimize={() => setMinimizedRung(state)}

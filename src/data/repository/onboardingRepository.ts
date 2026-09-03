@@ -5,11 +5,15 @@ export interface Favourite {
   readonly phone: string;
 }
 
+export type StoredLocale = "en" | "te";
+
 export interface OnboardingRepository {
+  loadLanguage(): Promise<StoredLocale | null>;
   loadOnboarded(): Promise<boolean>;
   loadPrimaryFavourite(): Promise<Favourite | null>;
   loadUserName(): Promise<string | null>;
   saveOnboarded(): Promise<void>;
+  saveLanguage(locale: StoredLocale): Promise<void>;
   savePin(pin: string): Promise<void>;
   savePrimaryFavourite(favourite: Favourite): Promise<void>;
   saveUserName(userName: string | null): Promise<void>;
@@ -17,6 +21,7 @@ export interface OnboardingRepository {
 }
 
 export class FakeOnboardingRepository implements OnboardingRepository {
+  language: StoredLocale | null = null;
   onboarded = false;
   primaryFavourite: Favourite | null = null;
   storedPin: StoredPinHash | null = null;
@@ -26,6 +31,10 @@ export class FakeOnboardingRepository implements OnboardingRepository {
 
   async loadOnboarded(): Promise<boolean> {
     return this.onboarded;
+  }
+
+  async loadLanguage(): Promise<StoredLocale | null> {
+    return this.language;
   }
 
   async loadPrimaryFavourite(): Promise<Favourite | null> {
@@ -38,6 +47,10 @@ export class FakeOnboardingRepository implements OnboardingRepository {
 
   async saveOnboarded(): Promise<void> {
     this.onboarded = true;
+  }
+
+  async saveLanguage(locale: StoredLocale): Promise<void> {
+    this.language = locale;
   }
 
   async savePin(pin: string): Promise<void> {

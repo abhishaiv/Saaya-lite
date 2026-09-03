@@ -52,6 +52,10 @@ demo video.
 | `home_hour_context` | Right now, %1$s reads %2$s | ప్రస్తుతం, %1$s %2$s గా ఉంది |
 | `cta_arm_manually` | Start Shadow | షాడో ప్రారంభించు |
 | `cta_im_home` | I am home | నేను ఇంటికి చేరాను |
+| `cta_sus` | SUS | SUS |
+| `cta_end_sus` | End SUS | SUS ఆపు |
+| `cta_demo` | Demo | డెమో |
+| `cta_sos` | SOS | SOS |
 | `warn_location_denied` | Saaya cannot wake on its own without location. | లొకేషన్ లేకుండా సాయ దానంతట అదే మేల్కొనదు. |
 | `loc_help_title` | Turn location back on | లొకేషన్ మళ్లీ ఆన్ చేయండి |
 | `loc_help_body` | In your browser, open the site settings for this page and allow Location. Then come back and tap Try again. | మీ బ్రౌజర్‌లో ఈ పేజీ సైట్ సెట్టింగ్‌లు తెరిచి, లొకేషన్‌ను అనుమతించండి. తర్వాత తిరిగి వచ్చి "మళ్లీ ప్రయత్నించు" నొక్కండి. |
@@ -73,6 +77,9 @@ demo video.
 | `risk_band_moderate` | Moderate | మధ్యస్థం |
 | `risk_band_elevated` | Elevated | ఎక్కువ |
 | `risk_band_high` | High | అత్యధికం |
+| `risk_level_moderate` | Moderate Risk | మధ్యస్థ ప్రమాదం |
+| `risk_level_elevated` | Elevated Risk | పెరిగిన ప్రమాదం |
+| `risk_level_high` | High Risk | అధిక ప్రమాదం |
 | **Check-ins** | | |
 | `checkin1_title` | Just checking in | ఒకసారి చూస్తున్నాం |
 | `checkin1_body` **(iOS verbatim)** | All good? Tap I'm OK and we'll keep quietly watching over you. | అంతా బాగుందా? "నేను బాగున్నాను" నొక్కండి, మేము నిశ్శబ్దంగా మిమ్మల్ని గమనిస్తూ ఉంటాం. |
@@ -86,6 +93,8 @@ demo video.
 | `family_title` | What your favourite would receive | మీ ఆత్మీయుడు పొందే సందేశం |
 | `family_body` | This is the message Saaya prepared on this phone. It has not been sent. | సాయ మీ ఫోన్‌లో తయారు చేసిన సందేశం ఇది. ఇది పంపబడలేదు. |
 | `family_cancel_note` | If you do not cancel in %1$d seconds, Saaya opens the local-only SOS screen. | %1$d సెకన్లలో మీరు రద్దు చేయకపోతే, సాయ స్థానిక SOS స్క్రీన్‌ను తెరుస్తుంది. |
+| `cta_countdown` | %1$s · %2$ds | %1$s · %2$d సెకన్లు |
+| `family_message_template` | Saaya alert - %1$s may need help.\n\n%1$s did not answer two safety check-ins.\n\nWhere: %2$s area, Visakhapatnam\nWhen: %3$s, %4$s\nArea risk: %5$s - %6$d women-safety cases on record here\nLast seen: near %7$s\n\nNearest police station: %8$s, %9$s (%10$d m away)\n\nShe has %11$d seconds to cancel this. If she does not, Saaya opens a local SOS screen. No message is sent and no location is shared.\n\nPrepared locally by Saaya Lite. This preview has not been sent. | సాయ హెచ్చరిక - %1$s కు సహాయం అవసరం కావచ్చు.\n\n%1$s రెండు భద్రతా చెక్-ఇన్‌లకు స్పందించలేదు.\n\nఎక్కడ: విశాఖపట్నంలోని %2$s ప్రాంతం\nఎప్పుడు: %3$s, %4$s\nప్రాంత ప్రమాద స్థాయి: %5$s - ఇక్కడ నమోదైన మహిళా భద్రతా కేసులు %6$d\nచివరిసారిగా కనిపించిన చోటు: %7$s సమీపంలో\n\nసమీప పోలీస్ స్టేషన్: %8$s, %9$s (%10$d మీ. దూరంలో)\n\nదీన్ని రద్దు చేయడానికి ఆమెకు %11$d సెకన్లు ఉన్నాయి. ఆమె రద్దు చేయకపోతే, సాయ స్థానిక SOS స్క్రీన్‌ను తెరుస్తుంది. ఏ సందేశమూ పంపబడదు, లొకేషన్ షేర్ చేయబడదు.\n\nసాయ లైట్ ఈ సందేశాన్ని ఈ ఫోన్‌లోనే తయారుచేసింది. ఈ ప్రివ్యూ పంపబడలేదు. |
 | `family_mock_disclosure` | Prototype: this message is composed but not actually sent. Real delivery needs Indian DLT registration. | ప్రోటోటైప్: ఈ సందేశం తయారైంది కానీ నిజంగా పంపబడలేదు. నిజమైన డెలివరీకి భారత DLT నమోదు అవసరం. |
 | `family_no_contact` | You haven't added a favourite yet. Saaya can still open an SOS. | మీరు ఇంకా ఆత్మీయులను జోడించలేదు. అయినా సాయ SOS తెరవగలదు. |
 | `cta_cancel_im_fine` | Cancel, I am fine | రద్దు చేయి, నేను బాగున్నాను |
@@ -113,6 +122,8 @@ demo video.
 | `set_favourites` | Favourites | ఆత్మీయులు |
 | `set_favourites_sub` | Whose local message preview you can review | మీ స్థానిక సందేశ ప్రివ్యూ ఎవరికి సంబంధించినదో |
 | `set_language` | Language | భాష |
+| `set_language_english` | English | ఇంగ్లీష్ |
+| `set_language_telugu` | Telugu | తెలుగు |
 | `set_pin` | Change PIN | PIN మార్చు |
 | `set_pin_sub` | Needs your current PIN | మీ ప్రస్తుత PIN అవసరం |
 | `set_police` | State view (round two) | రాష్ట్ర వ్యూ (రెండో రౌండ్) |
@@ -153,7 +164,8 @@ demo video.
 | `demo_mode_active` | Demo speed is on. Timers are 6x faster than the real product. | డెమో వేగం ఆన్‌లో ఉంది. టైమర్లు అసలు ఉత్పత్తి కంటే 6 రెట్లు వేగంగా ఉన్నాయి. |
 | `demo_panel_header` | These are prototype controls for demonstrating the journey. They are not product features. | ఇవి ప్రయాణాన్ని చూపించడానికి ప్రోటోటైప్ నియంత్రణలు. ఇవి ఉత్పత్తి ఫీచర్లు కావు. |
 | `demo_speed_toggle` | Demo speed | డెమో వేగం |
-| `demo_speed_note` | Timers run %1$dx faster. The full ladder takes %2$d seconds instead of %3$d. | టైమర్లు %1$d రెట్లు వేగంగా నడుస్తాయి. పూర్తి నిచ్చెన %3$d సెకన్లకు బదులు %2$d సెకన్లు పడుతుంది. |
+| `demo_speed_note_fast` | Timers run %1$dx faster. The full ladder takes %2$d seconds instead of %3$d. | టైమర్లు %1$d రెట్లు వేగంగా నడుస్తాయి. పూర్తి నిచ్చెన %3$d సెకన్లకు బదులు %2$d సెకన్లు పడుతుంది. |
+| `demo_speed_note_normal` | Timers run at normal speed (%1$dx). The full ladder takes %3$d seconds. | టైమర్లు సాధారణ వేగంతో (%1$dx) నడుస్తాయి. పూర్తి నిచ్చెనకు %3$d సెకన్లు పడతాయి. |
 | `demo_pick_zone` | Simulate entering a zone | ఒక జోన్‌లోకి ప్రవేశించినట్టు చూపించు |
 | `demo_pick_zone_hint` | Choose any of the 24 Visakhapatnam zones. | విశాఖపట్నంలోని 24 జోన్లలో ఏదైనా ఎంచుకోండి. |
 | `demo_miss_checkin` | Simulate a missed check-in | చెక్-ఇన్ మిస్ అయినట్టు చూపించు |
