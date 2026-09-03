@@ -412,5 +412,5 @@ and copy-backed templates now localize those presentation values without changin
 data or the active session.
 
 **Verification:** TypeScript, lint, 192 Vitest tests, production build, grounded-source scan,
-reads closure and graph integrity passed. Fresh verifier-worker G9 remains pending because the
-service usage allowance is unavailable; it is not reported as a pass.
+reads closure and graph integrity passed. The fresh Phase 1B spec verifier passed after two
+recorded corrections; Chrome real-phone verification remains open.
