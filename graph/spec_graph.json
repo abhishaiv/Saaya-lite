@@ -3068,10 +3068,11 @@
    "kind": "string",
    "value": "DISPLAYED_ONLY",
    "unit": "enum",
-   "means": "initial SOS payload state: the family message is visible in Saaya Lite but no messaging app handoff has occurred",
-   "sourced_from": "ROUND2_COMPLETION_PLAN.md:161-192",
+   "means": "only allowed web SOS payload state: a device-handoff navigation attempt proves neither app-open nor send or delivery",
+   "sourced_from": "founder Phase 1C amendment 2026-09-04",
    "governs": "DATA_MODEL.md",
    "frozen": true,
+   "was": "initial SOS payload state: the family message is visible in Saaya Lite but no messaging app handoff has occurred",
    "platform": "web"
   },
   {
@@ -3083,6 +3084,7 @@
    "sourced_from": "ROUND2_COMPLETION_PLAN.md:161-192",
    "governs": "DATA_MODEL.md",
    "frozen": true,
+   "superseded_by": "founder Phase 1C amendment 2026-09-04: browser handoff attempts never establish app-open",
    "platform": "web"
   },
   {

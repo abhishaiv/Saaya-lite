@@ -120,10 +120,13 @@ automatic arming with no press, the adaptive check-in ladder, escalation timing,
 escalation to family with its cancel window, the PIN-protected SOS, and both writes into
 the state view. All of it deterministic. Full detail in FEATURES.md.
 
-**Mocked, and disclosed on screen:** SMS and WhatsApp delivery to family contacts (real
-delivery requires India DLT registration, a months-long regulatory path). The state side
-is a real screen reading real data from our own backend, but it has **no connection to
-AP Police, Shakthi, T-Safe, 112 or ERSS**, and carries that disclaimer in the product.
+**Mocked — SMS and WhatsApp device handoff are implemented, but Chrome real-phone verification
+is pending:** at family escalation Saaya prepares
+the local message, then she can deliberately attempt a handoff to her own SMS or WhatsApp app
+to review and send it herself. Saaya never sends it, observes delivery or uploads the favourite
+or message. The state side is a real screen reading real data from our own backend, but it has
+**no connection to AP Police, Shakthi, T-Safe, 112 or ERSS**, and carries that disclaimer in
+the product.
 
 **Not built in the lite version at all, and present in full Saaya:** the on-device AI
 engine (audio, motion, threat detection), the live unsafe-roads display, evidence

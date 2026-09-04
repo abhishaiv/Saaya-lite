@@ -16,7 +16,7 @@ an emergency dial action.
 |---|---|---|---|---|
 | 1 | **Shadow** | Zone and hour arm it silently. Watching. | **Nothing** | One tap |
 | 2 | **SUS** | Check-in prompt with a countdown | **Nothing** | "I'm OK", one tap |
-| 3 | **Family escalation preview** | A context-rich local message preview. Cancel window open. | **Nothing** | Cancel, one tap |
+| 3 | **Family escalation preview** | A context-rich local message preview. Cancel window open. | **No Saaya-controlled transmission**; she may deliberately attempt to open her own messaging app | Cancel, one tap |
 | 4 | **SOS** | Full local-only SOS with user-controlled dial actions. | **No Saaya data; she may choose a dialler handoff** | **PIN** |
 
 SOS is reached two ways: she taps *I need help now* at any point, or step 3's cancel
@@ -33,10 +33,11 @@ between her and the local-only SOS surface and its user-controlled dial actions.
 | Anonymised record | no | no | no | no |
 | Route reconstructable | **no** | **no** | **no** | **no** |
 
-Nothing leaves the device during the ladder in this round-one build. Family escalation is a
-local preview and SOS offers only user-controlled dialler handoffs. The proposed civic signal
-and detailed incident are cut to round two and must not be claimed in the product, video or
-submission.
+No Saaya-controlled transmission occurs during the ladder in this round-one build. At family
+escalation, a deliberate tap may attempt to open the exact local message in her own messaging app; Saaya
+never sends it, observes delivery or uploads it. SOS offers only user-controlled dialler
+handoffs. The proposed civic signal and detailed incident are cut to round two and must not be
+claimed in the product, video or submission.
 
 **Round-two design only — how the proposed SUS record would be anonymised:**
 - It snaps to its **zone** and integer hour, never a coordinate or fine time: "Zone 7,
@@ -51,10 +52,12 @@ The round-two SOS incident would keep full precision; Lite never writes one.
 
 ## Stage 1: Onboarding, once, on a calm day
 
-**Status vocabulary.** `Real` means built and working. `Mocked` means composed and
-shown but not dispatched, and labelled as such in the product. **`Cut`** means dropped from
-scope and **not claimed anywhere** as delivered. A cut feature must not appear in the
-submission write-up, the video or the console as though it exists.
+**Status vocabulary.** `Real` means built and working. `Mocked` means a declared product
+experience is composed and shown but not performed, and is labelled as such in the product.
+F21 is a temporary verification state: its device-handoff controls are implemented, but it
+stays mocked until SMS and WhatsApp pass their Chrome real-phone checks. **`Cut`** means
+dropped from scope and **not claimed anywhere** as delivered. A cut feature must not appear in
+the submission write-up, the video or the console as though it exists.
 
 | # | Feature | What she experiences | Why it helps her | Status |
 |---|---|---|---|---|
@@ -98,9 +101,9 @@ Without this stage there is no product, only an engine. Nobody installs an engin
 
 | # | Feature | What she experiences | Why it helps her | Status |
 |---|---|---|---|---|
-| F19 | Context-rich escalation preview | She sees the local message that a favourite would receive: which zone, what hour, that zone's reported history, her last known area, and that she did not answer a check | Context is not decoration. The prototype makes its proposed message legible without pretending to deliver it. | Real |
+| F19 | Context-rich escalation preview | She sees the local message that a favourite could review: which zone, what hour, that zone's reported history, her last known area, and that she did not answer a check | Context is not decoration. The prototype makes its proposed message legible without pretending Saaya delivered it. | Real |
 | F20 | Cancel window | A grace period with a visible timer | She fell asleep. Her phone was in her bag. False positives are what get a safety app deleted, and this is the last gate before local-only SOS. | Real |
-| F21 | Mocked delivery, disclosed on screen | The message is composed and shown, marked as not dispatched | Real SMS needs India DLT registration, months of regulatory lead. The disclosure lives in the product, not only the write-up. | **MOCKED** |
+| F21 | User-controlled device handoff | She can tap implemented SMS or WhatsApp controls that attempt to open a locally composed message for review and sending; Chrome real-phone verification is pending | Saaya Lite never sends, contacts, observes delivery or uploads the message, name or favourite. The visible disclosure makes that limit explicit. | **Mocked — SMS and WhatsApp device handoff are implemented, but Chrome real-phone verification is pending.** |
 | F22 | Offline queue | Nothing visible, it just survives | A dropped network on an unlit road is normal, not exceptional. Losing signal must never lose the escalation. | **Cut, round two** |
 
 ## Stage 6: SOS
@@ -143,8 +146,8 @@ Without this stage there is no product, only an engine. Nobody installs an engin
 - No on-device audio, motion or threat detection. That is full Saaya.
 - No live unsafe-roads display. Heat-zone markings only.
 - No live location sharing to contacts. Safetipin built it and removed it because it
-  becomes control in the Indian family context. Lite does not contact favourites at all: it
-  only shows the local message preview that a future delivery system would use.
+  becomes control in the Indian family context. Lite never contacts favourites automatically;
+  a deliberate device-handoff tap can only attempt to open the exact local message for her to review and send.
 - No evidence capture, no watch app, no fake call.
 - No connection to any live government system, and no government logos or branding.
 - No real personal data. Every demo contact, name and incident is synthetic.

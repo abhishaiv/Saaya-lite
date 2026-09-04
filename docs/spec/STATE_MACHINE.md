@@ -76,11 +76,11 @@ The state is never parameterised; the outcome rides alongside it.
 | `CHECKIN_1` | `HelpNowTapped` | - | `SOS_ACTIVE` | see SOS entry |
 | `CHECKIN_1` | `ManualDisarm` | - | `RESOLVED(DISARMED)` | `CancelTimer(CD1)`, `HideCheckIn`, stop the local watch, release the wake lock, start 45 min cooldown for this zone |
 | `CHECKIN_2` | `OkTapped` | - | `SHADOW` | as above |
-| `CHECKIN_2` | `CountdownExpired(2)` | `armMode = AUTO_ZONE` | `FAMILY_ESCALATED` | `WriteSusEvent`, `NotifyFamily`, `ShowFamilyScreen`, `ScheduleTimer(CANCEL, 60)`; Lite ignores the future delivery intents |
-| `CHECKIN_2` | `CountdownExpired(2)` | `armMode = MANUAL` | `FAMILY_ESCALATED` | `NotifyFamily`, `ShowFamilyScreen`, `ScheduleTimer(CANCEL, 60)`; no civic-record intent is emitted |
+| `CHECKIN_2` | `CountdownExpired(2)` | `armMode = AUTO_ZONE` | `FAMILY_ESCALATED` | `WriteSusEvent`, `NotifyFamily`, `ShowFamilyScreen`, `ScheduleTimer(CANCEL, 60)`; Lite ignores automatic delivery intents, while the screen may offer a separate user-controlled local device handoff |
+| `CHECKIN_2` | `CountdownExpired(2)` | `armMode = MANUAL` | `FAMILY_ESCALATED` | `NotifyFamily`, `ShowFamilyScreen`, `ScheduleTimer(CANCEL, 60)`; no civic-record intent is emitted; the same separate user-controlled local device handoff may be shown |
 | `CHECKIN_2` | `HelpNowTapped` | - | `SOS_ACTIVE` | see SOS entry |
 | `CHECKIN_2` | `ManualDisarm` | - | `RESOLVED(DISARMED)` | `CancelTimer(CD2)`, `HideCheckIn`, stop the local watch, release the wake lock, start 45 min cooldown for this zone |
-| `FAMILY_ESCALATED` | `CancelTapped` | `AUTO_ZONE` civic record was durably queued | `RESOLVED(CANCELLED)` | `CancelTimer(CANCEL)`, `PatchSusOutcome(CANCELLED_BY_USER)`, local cleanup; Lite ignores the delivery intent |
+| `FAMILY_ESCALATED` | `CancelTapped` | `AUTO_ZONE` civic record was durably queued | `RESOLVED(CANCELLED)` | `CancelTimer(CANCEL)`, `PatchSusOutcome(CANCELLED_BY_USER)`, local cleanup; Lite ignores the automatic delivery intent |
 | `FAMILY_ESCALATED` | `CancelTapped` | otherwise | `RESOLVED(CANCELLED)` | `CancelTimer(CANCEL)`, local cleanup; no civic outcome patch |
 | `FAMILY_ESCALATED` | `CountdownExpired(cancel)` | - | `SOS_ACTIVE` | `ShowSos`, `RequirePinToStop`; future incident intents are ignored in Lite |
 | `FAMILY_ESCALATED` | `HelpNowTapped` | - | `SOS_ACTIVE` | as above but `trigger=MANUAL_HELP_BUTTON` |
@@ -110,8 +110,9 @@ the evidence that makes that coarse signal meaningful. A `MANUAL` session stays 
 arm mode may create the detailed incident only after it reaches `SOS_ACTIVE`.
 
 `NotifyFamily` is an engine intent to compose and show the family-message preview. It is not
-a claim that the message was sent: the delivery state remains `DISPLAYED_ONLY` until the user
-opens a prefilled device-messaging link, and never records delivery.
+a claim that the message was sent: a browser tap does not prove an installed messaging app
+opened, so the web app keeps `familyMessageDelivery` as `DISPLAYED_ONLY`. Device verification
+is human evidence, never a payload state; the app never records delivery.
 
 ## SOS entry, common block
 

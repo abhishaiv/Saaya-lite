@@ -2,10 +2,12 @@
 
 ## Principle
 
-**Anything that could identify her stays on the device.** Contacts, PIN, session history
-and precise location live in IndexedDB and are never uploaded. Lite constructs no Firestore
-client, payload, delivery queue or console. The former state-view schemas below are retained
-only as a clearly labelled round-two design, never as a current-product claim.
+**Anything that could identify her never reaches a Saaya backend before SOS.** Contacts, PIN,
+session history and precise location live in IndexedDB and are never uploaded. A deliberate
+family-message tap constructs a custom-scheme URI containing the selected recipient and exact
+local message, never a request to a Saaya service; it does not prove another app opened. Lite constructs no Firestore client, payload,
+delivery queue or console. The former state-view schemas below are retained only as a clearly
+labelled round-two design, never as a current-product claim.
 
 ---
 
@@ -301,9 +303,9 @@ Written **only** at SOS. This is the one place precision and identity cross.
 `trigger` is `LADDER_LAPSE` or `MANUAL_HELP_BUTTON`.
 `status` is `ACTIVE` then `STOPPED`.
 **`favouritesConfigured` is a count. Never upload contact names or numbers.**
-`familyMessageDelivery` is `DISPLAYED_ONLY` until the user opens a prefilled message in her
-own messaging app; it may then be `HANDED_TO_DEVICE`. It never claims the message was
-delivered, because Saaya Lite cannot observe a send or delivery from another app.
+`familyMessageDelivery` remains `DISPLAYED_ONLY` in the web app. A browser navigation attempt
+does not prove that an installed messaging app opened or that a message was sent, so no inferred
+handoff, sent or delivered state is recorded.
 
 The `timeline` is what makes this an incident rather than a press, and it is the direct
 answer to Shakthi's 0.28%. Do not trim it.

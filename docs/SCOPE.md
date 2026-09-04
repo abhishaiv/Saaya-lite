@@ -20,7 +20,7 @@ not read as a stripped demo. Fewer things, finished.
    it we would be shipping an engine that nobody has a reason to own.
 2. **Shadow.** Zone and hour arm it. No press. Nothing leaves the phone.
 3. **SUS.** Adaptive check-in ladder. Still nothing leaves the phone.
-4. **Family escalation preview.** Context-rich and local, with a cancel window. Nothing is delivered.
+4. **Family escalation preview and handoff.** Context-rich and local, with a cancel window. If she chooses, a device-handoff tap attempts to open her own messaging app with the exact message ready for review and sending.
 5. **SOS.** PIN-protected, full-bleed, with an honest local-only disclosure and user-controlled dial actions.
 
 **Cut to round two 2026-08-28:** the state view itself, anonymised SUS records, full SOS
@@ -42,7 +42,7 @@ implying intelligence we did not build.
 | Evidence capture and upload | Belongs to the SOS layer of full Saaya, not to the before layer. |
 | Watch app, fake call | Not part of the claim. |
 | Live location sharing to contacts | Deliberately out. Safetipin built it and removed it because it becomes control in the Indian family context. Lite shows a local escalation preview, never a dot she cannot switch off. |
-| Real SMS or WhatsApp delivery | Needs India DLT registration. Months of regulatory lead time. |
+| Automated server-sent SMS or WhatsApp delivery | Needs India DLT registration or Meta approval and a provider. Saaya Lite does not add either; it only offers a user-controlled device handoff. |
 | Any live government integration | Forbidden by the brief and by our own honest-disclaimer rule. |
 
 ## Real vs mocked, decided before building
@@ -59,7 +59,7 @@ implying intelligence we did not build.
 | Full SOS incident to the state view | **Cut, round two** |
 | Web console with 24h / 7d / 30d filters | **Cut, round two.** The live demo link is the citizen app. |
 | Demo trigger to simulate zone entry | **REAL, a dev affordance**, labelled on screen |
-| SMS and WhatsApp delivery to contacts | **MOCKED**, disclosed in the UI |
+| SMS and WhatsApp user-controlled device handoff | **Mocked — SMS and WhatsApp device handoff are implemented, but Chrome real-phone verification is pending.** Saaya prepares locally; her tap attempts to open her own app with the message ready for review and sending. |
 | Connection to AP Police, Shakthi, T-Safe, 112, ERSS | **NONE**, stated in-product |
 | Any AI or ML | **NONE**. Nothing is inferred. Everything is a rule. |
 | Demo contacts, names, incidents | **SYNTHETIC** |

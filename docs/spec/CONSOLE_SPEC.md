@@ -136,7 +136,7 @@ On press, the console signs in anonymously (the Firestore rules already require
 | 0 s | nothing yet | "04:05. She gets into an auto in Dwaraka Nagar. High-risk area, deep night. Saaya arms itself. She pressed nothing." |
 | +4 s | nothing yet | "04:10. Saaya checks in. It tells her why it checked now. She does not answer." |
 | +10 s | nothing yet | "04:12. It asks again, louder. Still nothing. Until this moment the state has seen **nothing about her at all**." |
-| +14 s | **`sus_events` doc** | "04:13. Her favourite is told. And this is the first thing a station receives: an area, an hour, a date. No coordinate. No name. Nothing linking it to any other trip she has taken." |
+| +14 s | **`sus_events` doc** | "04:13. She sees a prepared local message and may attempt to open it in her own messaging app. And this is the first thing a station receives: an area, an hour, a date. No coordinate. No name. Nothing linking it to any other trip she has taken." |
 | +22 s | nothing yet | "She has 60 seconds to cancel. She does not." |
 | +28 s | **`sos_incidents` doc** | "04:14. SOS. Now, and only now, her precise location and the last few minutes cross. Open the timeline below: a control room gets a sequence, not a dot." |
 

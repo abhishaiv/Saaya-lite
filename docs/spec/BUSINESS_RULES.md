@@ -151,7 +151,9 @@ The last row matters: someone holding her phone must not be able to reset their 
 
 ## 8. Escalation payload to family (F19)
 
-Composed on device. Never sent, per F21. Displayed exactly as it would be sent.
+Composed on device and displayed exactly as it could be sent. At `FAMILY_ESCALATED`, she may
+choose a user-controlled device handoff to her own SMS or WhatsApp app. Saaya Lite never sends,
+contacts, delivers or observes delivery itself.
 
 ```
 Saaya alert - {name} may need help.
@@ -166,19 +168,24 @@ Last seen: near {areasCoveredFirstItem}
 Nearest police station: {stationName}, {phone} ({distanceM} m away)
 
 She has {cancelWindowSec} seconds to cancel this. If she does not, Saaya opens a local SOS
-screen. No message is sent and no location is shared.
+screen.
 
-Prepared locally by Saaya Lite. This preview has not been sent.
+Prepared locally by Saaya Lite.
 ```
 
-The last line is F21's disclosure and is **not removable**.
+The visible F21 disclosure is **not removable**: Saaya Lite does not send or know whether the
+message was sent; her tap only attempts to open her messaging app with the message ready. The
+handoff URI is constructed only during that tap. There is no prefetch, probe, automatic open,
+provider, server route, delivery receipt or inferred handoff state.
 
 `{name}` is **her** name, from `user_name` in the settings store, not the contact's. If it
 is unset, substitute `family_subject_fallback` rather than leaving a gap or omitting the
 line: the recipient still needs to know the alert is about a person and not a test.
 
-**Her name never leaves the device.** It appears only in this locally composed preview,
-which is displayed and never sent. Lite has neither a SUS event nor an SOS incident writer.
+**Her name, favourite and composed message never enter a Saaya backend.** They remain local
+until she deliberately taps a handoff control. Her own messaging app may then receive the
+recipient and exact displayed message; Saaya Lite receives no delivery status. Lite has neither
+a SUS event nor an SOS incident writer.
 
 ## 9. Nearest station (F8)
 

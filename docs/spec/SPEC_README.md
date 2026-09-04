@@ -71,7 +71,7 @@ Build these, they are cheap and they are the point:**
 
 | Build it | Because |
 |---|---|
-| `allowBackup="false"` + data extraction rules | makes "favourites never leave the device" true, not merely claimed |
+| local-only favourite storage + no Saaya upload path | makes "favourites never reach a Saaya backend" true, not merely claimed; a deliberate own-app navigation attempt is separately disclosed |
 | The Firestore rule rejecting `latitude`/`longitude`/`sessionId`/`uid` | lets a reviewer verify the privacy claim without trusting our client |
 | `AnonymiserTest` and `SessionEngineTest` | the only proof the trust boundary actually holds |
 | Every in-product mock label | Honesty is a scored criterion |
@@ -101,11 +101,14 @@ These have a reason behind them that is not obvious from the code. Do not "impro
    Precise location and identity cross only at SOS. Never move this line for convenience.
 3. **A SUS record snaps to its zone and carries no session id.** Never write a coordinate
    and never write anything that links two SUS records to the same phone or person.
-4. **Contacts never leave the device.** They live in Room and are never uploaded.
+4. **Favourites never reach a Saaya backend.** They live in local storage and are never
+   uploaded. Only a direct tap constructs a custom-scheme URI containing the selected recipient
+   and exact message; Saaya never observes app-open, send or delivery.
 5. **No live location sharing exists.** Not disabled, not hidden. Absent. Contacts receive
    an escalation, never a trackable dot.
-6. **Every mock is labelled in the UI.** SMS is shown as composed and not dispatched, in
-   the product itself, not only in the write-up.
+6. **Every actual mock is labelled in the UI.** The family screen explicitly says that Saaya
+   prepares the message locally and the user may attempt to open her own messaging app to
+   review and send it; it never claims automatic sending, app-open success or delivery.
 7. **No government branding, logos, or implied endorsement.** The disclaimer is permanent.
 8. **All demo data is synthetic.** No real names, numbers, Aadhaar, PAN, OTP or payment
    data, ever, including in test fixtures.

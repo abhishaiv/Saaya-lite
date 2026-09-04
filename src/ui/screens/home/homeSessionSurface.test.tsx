@@ -47,6 +47,7 @@ function render(
       onPinAccepted={() => undefined}
       pageStoppedWarning={false}
       policeStations={[]}
+      sessionId={null}
       {...options}
     />,
   );

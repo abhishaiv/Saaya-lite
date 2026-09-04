@@ -275,7 +275,9 @@ export function HomeScreen({
     commandListenerRef.current = (commands, view) => {
       if (view.state === "RESOLVED") {
         const sessionId = engine.persistedSession()?.sessionId;
-        if (sessionId !== undefined) clearDemoArmedSession(sessionId);
+        if (sessionId !== undefined) {
+          clearDemoArmedSession(sessionId);
+        }
         setDemoSessionActive(false);
       }
       // The labelled demo picker simulates the already-proven zone entry. Starting
@@ -594,7 +596,7 @@ export function HomeScreen({
         <AboutScreen
           copy={copy}
           founderContact={founderContact}
-          mockedClaims={[copy.aboutMockDelivery]}
+          mockedClaims={[copy.familyMockDisclosure]}
           onBack={() => setAboutOpen(false)}
           realClaims={[
             copy.aboutRealMap,
@@ -678,6 +680,7 @@ export function HomeScreen({
         onPinAccepted={handlePinAccepted}
         pageStoppedWarning={pageStoppedWarning}
         policeStations={policeStations}
+        sessionId={engineRef.current?.persistedSession()?.sessionId ?? null}
       />
 
       <div className="home-screen__settings">

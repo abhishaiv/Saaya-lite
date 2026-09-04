@@ -78,16 +78,17 @@ console is a round-two feature and must not be claimed by Lite.
 
 - Escalation composes the family message with its context: zone, hour, that zone's
   reported history, last known area, and the non-response.
-- Cancel window with a visible timer. Mocked-delivery disclosure in the UI. No offline
-  queue in Lite.
-- **DoD:** escalation reaches the local message preview, cancel works, the mock disclosure
-  is on screen, and a dropped network never changes the local flow or implies delivery.
+- Cancel window with a visible timer. User-controlled handoff limitation in the UI. No
+  offline queue in Lite.
+- **DoD:** escalation reaches the local message preview, cancel works, the visible handoff
+  limitation is on screen, and a dropped network never changes the local flow or implies
+  automatic delivery.
 
 - SOS trigger from both routes: *I need help now*, and cancel-window lapse.
 - PIN-protected stop. On-screen local-only disclosure and user-controlled dial actions.
 - State writers are cut to round two; this build makes no SUS or SOS write.
-- **DoD:** the trust boundary holds under test. Nothing leaves the device and no screen
-  claims otherwise.
+- **DoD:** the trust boundary holds under test. No Saaya-controlled delivery occurs and no
+  screen claims otherwise.
 
 - State-view/console route, writers and live incident data are deferred to round two. Lite
   has no console URL, state-facing screen or incident delivery path.

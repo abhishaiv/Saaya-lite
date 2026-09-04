@@ -1278,26 +1278,32 @@
    "risk": "med",
    "cumulative_hours": 29.5,
    "status": "pending_external_verification",
-   "run_id": "run.M1_M4.2026-08-29.local_feedback.001",
+   "run_id": "run.M1.2026-09-04.phase1c.001",
    "gates_passed": [
     "G1_npm_run_build",
     "G2_tsc_no_emit_and_next_lint",
-    "G3_vitest_157_tests",
-    "G4_session_surface_and_sos_contract_tests",
-    "G6_grounded_115_source_files",
-    "G7_local_only_boundary_static_audit",
+    "G3_vitest_199_tests",
+    "G4_phase1c_family_message_contract_tests",
+    "G5_phase1c_local_contract",
+    "G6_grounded_7_changed_source_files",
+    "G7_family_message_local_only_boundary",
+    "G9_fresh_spec_and_boundary_verifiers_pass",
     "G10_reads_check_17_types_closed"
    ],
    "pending_gates": [
-    "G8_latest_feedback_flow_in_Chrome",
-    "G9_fresh_spec_verifier_unavailable"
+    "G8_Chrome_real_phone_language_switch_and_family_preview",
+    "G8_Chrome_real_phone_SMS_and_WhatsApp_handoffs"
    ],
    "artifacts": [
-    "art.m1_m4.local_safety_feedback"
+    "art.m1_m4.local_safety_feedback",
+    "art.phase1b.bilingual_reachability",
+    "art.phase1c.family_message_handoff"
    ],
    "corrections": [
     "made the local-only round-one boundary explicit after M2 and M3 were cut, so no family, SOS, About or setup surface claims a writer, state view or console",
-    "added the v2 compact brand mark, the required safety-flow tour, a visible Start Shadow action and direct local SOS dial handoffs"
+    "added the v2 compact brand mark, the required safety-flow tour, a visible Start Shadow action and direct local SOS dial handoffs",
+    "kept F21 mocked until separate Chrome phone checks and removed every inferred app-open, handoff, sent or delivered state",
+    "made invalid or missing favourite data suppress both the handoff controls and every handoff announcement"
    ],
    "verify_lenses": [
     "spec"

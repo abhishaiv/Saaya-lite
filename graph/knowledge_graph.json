@@ -313,9 +313,9 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 411,
-  "edges": 696,
-  "events": 84
+  "entities": 417,
+  "edges": 704,
+  "events": 87
  },
  "entities": [
   {
@@ -3261,6 +3261,48 @@
    "class": "Failure",
    "label": "Phase 1B compact Demo and SOS controls used distinct copy keys for visible and accessibility labels.",
    "node": "M4"
+  },
+  {
+   "id": "art.phase1c.family_message_handoff",
+   "class": "Artifact",
+   "label": "Phase 1C user-controlled SMS and WhatsApp custom-scheme attempts, exact local message, no inferred delivery state",
+   "node": "M1"
+  },
+  {
+   "id": "dec.phase1c.family_message_boundary",
+   "class": "Decision",
+   "label": "Founder uses favouritesConfigured count and permanently DISPLAYED_ONLY familyMessageDelivery; a custom-scheme tap proves neither app-open nor send",
+   "node": "M1",
+   "by": "founder",
+   "date": "2026-09-04"
+  },
+  {
+   "id": "fail.phase1c.inferred_handoff",
+   "class": "Failure",
+   "label": "Verifier rejected HANDED_TO_DEVICE because a web navigation attempt cannot establish app-open or sending",
+   "node": "M1"
+  },
+  {
+   "id": "fail.phase1c.false_handoff_claims",
+   "class": "Failure",
+   "label": "Fresh spec rounds rejected successful-handoff wording and no-contact UI that announced absent controls",
+   "node": "M1"
+  },
+  {
+   "id": "ver.phase1c.boundary",
+   "class": "Verification",
+   "label": "Fresh boundary verifier passed Phase 1C local-only recipient, message and delivery-state boundary",
+   "node": "M1",
+   "result": "pass",
+   "confidence": "0.98"
+  },
+  {
+   "id": "ver.phase1c.spec",
+   "class": "Verification",
+   "label": "Fresh spec verifier passed Phase 1C after four truthfulness correction rounds",
+   "node": "M1",
+   "result": "pass",
+   "confidence": "0.97"
   }
  ],
  "edges": [
@@ -8831,6 +8873,70 @@
    "at": "2026-09-03",
    "by": "codex",
    "confidence": "high"
+  },
+  {
+   "from": "art.phase1c.family_message_handoff",
+   "rel": "produced_by",
+   "to": "node.M1",
+   "at": "2026-09-04",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "dec.phase1c.family_message_boundary",
+   "rel": "respects",
+   "to": "con.favourites",
+   "at": "2026-09-04",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "dec.phase1c.family_message_boundary",
+   "rel": "enforces",
+   "to": "con.boundary",
+   "at": "2026-09-04",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "dec.phase1c.family_message_boundary",
+   "rel": "supersedes",
+   "to": "dec.round2.sos_delivery_state",
+   "at": "2026-09-04",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.phase1c.inferred_handoff",
+   "rel": "caused_by",
+   "to": "art.phase1c.family_message_handoff",
+   "at": "2026-09-04",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "fail.phase1c.false_handoff_claims",
+   "rel": "caused_by",
+   "to": "art.phase1c.family_message_handoff",
+   "at": "2026-09-04",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.phase1c.family_message_handoff",
+   "rel": "verified_by",
+   "to": "ver.phase1c.boundary",
+   "at": "2026-09-04",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "art.phase1c.family_message_handoff",
+   "rel": "verified_by",
+   "to": "ver.phase1c.spec",
+   "at": "2026-09-04",
+   "by": "codex",
+   "confidence": "high"
   }
  ],
  "events": [
@@ -9787,6 +9893,41 @@
    "detail": "Fresh Phase 1B spec verifier passed after normal-speed note and direct-control label corrections",
    "refs": [
     "art.phase1b.bilingual_reachability"
+   ],
+   "node": "M1"
+  },
+  {
+   "id": "ev.0085",
+   "type": "spec_amended",
+   "at": "2026-09-04",
+   "actor": "codex",
+   "detail": "F21 remains Mocked pending Chrome; familyMessageDelivery is permanently DISPLAYED_ONLY and every current claim says navigation attempt",
+   "refs": [
+    "dec.phase1c.family_message_boundary"
+   ],
+   "node": "M1"
+  },
+  {
+   "id": "ev.0086",
+   "type": "verifier_killed",
+   "at": "2026-09-04",
+   "actor": "codex",
+   "detail": "Phase 1C verifiers rejected inferred handoff state, invalid-recipient announcements and successful-app-open wording",
+   "refs": [
+    "fail.phase1c.inferred_handoff",
+    "fail.phase1c.false_handoff_claims"
+   ],
+   "node": "M1"
+  },
+  {
+   "id": "ev.0087",
+   "type": "verifier_passed",
+   "at": "2026-09-04",
+   "actor": "codex",
+   "detail": "Phase 1C final boundary and spec verifiers passed; Chrome SMS and WhatsApp checks remain pending",
+   "refs": [
+    "ver.phase1c.boundary",
+    "ver.phase1c.spec"
    ],
    "node": "M1"
   }

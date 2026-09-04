@@ -7,7 +7,7 @@ import type {
 
 export type RecordSource = "APP" | "CONSOLE_DEMO";
 export type RecordRiskTier = "high" | "moderate" | "elevated" | "safe";
-export type FamilyMessageDelivery = "DISPLAYED_ONLY" | "HANDED_TO_DEVICE";
+export type FamilyMessageDelivery = "DISPLAYED_ONLY";
 
 export interface AnonymiserSusInput {
   readonly appVersion: string;
@@ -305,7 +305,7 @@ function assertFavouritesConfigured(value: number): void {
 }
 
 function assertFamilyMessageDelivery(value: FamilyMessageDelivery): void {
-  if (value !== "DISPLAYED_ONLY" && value !== "HANDED_TO_DEVICE") {
+  if (value !== "DISPLAYED_ONLY") {
     throw new Error("familyMessageDelivery is not allowed");
   }
 }

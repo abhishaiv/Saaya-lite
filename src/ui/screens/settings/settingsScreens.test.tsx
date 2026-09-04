@@ -42,7 +42,7 @@ describe("M4 About screen", () => {
         <AboutScreen
           copy={copy}
           founderContact={null}
-          mockedClaims={[]}
+          mockedClaims={[copy.familyMockDisclosure]}
           onBack={() => undefined}
           realClaims={[
             copy.aboutRealMap,
@@ -72,8 +72,8 @@ describe("M4 About screen", () => {
       for (const item of futureRealItems) {
         expect(decodedHtml).not.toContain(item);
       }
-      expect(decodedHtml).not.toContain(copy.aboutMockTitle);
-      expect(decodedHtml).not.toContain(copy.aboutMockDelivery);
+      expect(decodedHtml).toContain(copy.aboutMockTitle);
+      expect(decodedHtml).toContain(copy.familyMockDisclosure);
       expect(decodedHtml).not.toContain(copy.aboutMockConsole);
       expect(decodedHtml).toContain(copy.policeNoGovtLink);
       expect(decodedHtml).toContain(copy.aboutNoAiBody);

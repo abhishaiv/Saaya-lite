@@ -178,8 +178,9 @@ The overlay covers the viewport while the page is open and is re-presented on th
 ## S7. FamilyEscalation
 
 - **`danger` red `#FF3B30`**, card border 2.0 px. This is the iOS L3 grading, where the copy is the local preview `family_title`, `family_body`.
-- **The local message preview**, rendered in a card, per `BUSINESS_RULES.md` §8. It never leaves this phone and does not claim that a favourite was contacted.
-- `DisclosureBanner`: `family_mock_disclosure` (F21), not removable.
+- **The local message preview**, rendered in a card, per `BUSINESS_RULES.md` §8. Saaya prepares it locally; it does not send, contact or observe delivery.
+- When a valid local favourite is configured, visible accessible `cta_send_sms` and `cta_send_whatsapp` anchors let her attempt a custom-scheme navigation carrying the exact displayed message. Their `sms:` and `whatsapp://` URIs are constructed only during her tap. No URI is prefetched, probed or built for invalid recipient data. If the operating system accepts the URI, she controls any review or send action in the external app; Saaya cannot know whether that happened and never promotes a tap to a successful handoff. The selectable preview and SMS attempt remain available.
+- `DisclosureBanner`: `family_mock_disclosure` is a non-removable prototype limitation. F21 is only a user-controlled device handoff, never automatic delivery.
 - `CountdownRing`, 60 s, **`danger`** (F20). `family_cancel_note` stating SOS follows.
 - `BigActionButton` = `cta_cancel_im_fine`.
 - Text button = `cta_help_now`.
@@ -291,7 +292,7 @@ rest, and it is the screen most likely to be read closely by a judge.
 | Header | Saaya Lite wordmark, then `about_version` with `versionName` and `versionCode` |
 | What this is | `about_what_title`, `about_what_body` |
 | **What is real** | `about_real_title`, then only the claims the current node has passed to the screen. Lite currently supplies map, detail, ladder, family preview and SOS. |
-| **What is mocked** | `about_mock_title` and `about_mock_delivery` only when a mock is currently rendered. The console is cut and never listed. |
+| **What is mocked** | Render the bilingual `family_mock_disclosure` while F21 awaits Chrome real-phone verification. Remove that row only after both SMS and WhatsApp checks pass; the console is cut and never listed. |
 | **What this is not** | `about_not_title`, then `police_no_govt_link` in full |
 | **No AI** | `about_noai_title`, `about_noai_body` |
 | Data | `about_data_title`, `about_data_body` |

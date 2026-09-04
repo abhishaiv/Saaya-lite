@@ -46,7 +46,7 @@ boundary is a step she can see:
 |---|---|---|
 | 1 Shadow | zone + hour arm it silently | **nothing** |
 | 2 Check-in | adaptive prompt, not a fixed timer | **nothing** |
-| 3 Family | favourites told, with context, cancel window open | contacts only |
+| 3 Family | a local message is prepared, with context and a cancel window | **nothing automatically**; she may deliberately attempt to open her own messaging app |
 | 4 SOS | PIN-protected, and she is told | precise location + identity |
 
 Full argument: [`docs/PROBLEM.md`](docs/PROBLEM.md).
@@ -58,11 +58,14 @@ The process behind it — who receives what, who acts, what closes the loop:
 Decided before building, not after. Full table: [`docs/SCOPE.md`](docs/SCOPE.md).
 
 **Real:** the Visakhapatnam risk-zone map, GPS and zone detection, automatic arming with no
-press, the adaptive check-in ladder, escalation timing, the PIN-protected SOS, both writes
-into the state view, and the web console.
+press, the adaptive check-in ladder, escalation timing, and the PIN-protected SOS.
 
-**Mocked, and labelled on screen in the product itself:** SMS and WhatsApp delivery to
-favourites. Real delivery needs India DLT registration, a months-long regulatory process.
+**Mocked, Chrome real-phone verification pending:** user-controlled SMS and WhatsApp
+controls attempt to open her own app with the local message ready for review and sending.
+
+**Limit, labelled on the family screen:** Saaya never sends the message, observes delivery,
+or uploads the favourite or message. Automated SMS or WhatsApp delivery would require a
+provider and regulatory approval, neither of which this prototype uses.
 
 **Not connected to anything:** the state view is our own Firebase project. It has **no
 connection to AP Police, Shakthi, T-Safe, 112 or ERSS**, and it is not a government product.
@@ -117,7 +120,7 @@ grep -ri "openai\|gpt\|claude\|tensorflow\|ml-kit" app/src
 # the app cannot listen, watch, or send on her behalf
 grep -E "RECORD_AUDIO|CAMERA|SEND_SMS" app/src/main/the Next.js config
 
-# her favourites cannot leave the device
+# favourites never reach a Saaya backend; a deliberate own-app navigation attempt is separately disclosed
 grep "allowBackup" app/src/main/the Next.js config     # must be false
 
 # nothing identifying is written before SOS

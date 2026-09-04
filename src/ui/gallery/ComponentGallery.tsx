@@ -26,6 +26,7 @@ import {
   type StatusPillLabels,
 } from "../components/StatusPill";
 import { ZoneChip } from "../components/ZoneChip";
+import { M4_COPY } from "../copy/strings";
 
 type ButtonPreviewState =
   | "default"
@@ -412,7 +413,10 @@ export function ComponentGallery() {
 
       <PreviewSection id="gallery-c7" title="C7 · DisclosureBanner">
         <div className="gallery-stack">
-          <DisclosureBanner content="Mock: this local message preview is not sent." kind="mock" />
+          <DisclosureBanner
+            content={M4_COPY.en.familyMockDisclosure}
+            kind="prototype-limitation"
+          />
           <DisclosureBanner
             content="Keep this page open. A web page cannot arm in the background."
             kind="prototype-limitation"

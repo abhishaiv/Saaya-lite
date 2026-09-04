@@ -414,3 +414,22 @@ data or the active session.
 **Verification:** TypeScript, lint, 192 Vitest tests, production build, grounded-source scan,
 reads closure and graph integrity passed. The fresh Phase 1B spec verifier passed after two
 recorded corrections; Chrome real-phone verification remains open.
+
+### Phase 1C — user-controlled family-message attempt          2026-09-04
+
+**Checkpointed:** Added visible bilingual SMS and WhatsApp controls that construct `sms:` and
+`whatsapp://` URIs only inside the user's direct click, using the exact message already visible
+on screen. F21 remains **Mocked** until both controls pass separate Chrome real-phone checks;
+`familyMessageDelivery` remains permanently `DISPLAYED_ONLY` and no recipient, message, tap or
+handoff state enters a Saaya payload.
+
+**Needed correcting:** Fresh verifiers killed a premature `HANDED_TO_DEVICE` state, stale
+successful-handoff claims, a no-contact accessible label that announced absent controls, and an
+unconditional disclosure that made the same false offer visibly. The final snapshot describes
+only an attempted custom-scheme navigation, suppresses all handoff UI and announcements for an
+invalid recipient, and never infers that another app opened or that a message was sent.
+
+**Verification:** TypeScript, ESLint, the optimized production build, all 199 Vitest tests, G6,
+G10 and graph integrity pass. Fresh boundary verification returned `kill=false` at 0.98 and the
+final fresh spec verification returned `kill=false` at 0.97. Chrome composer checks remain open,
+and the family-escalation narration must be recorded only after that evidence exists.

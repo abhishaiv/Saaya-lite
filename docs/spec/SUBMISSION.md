@@ -35,15 +35,16 @@ name.
 
 She opens a map of Visakhapatnam's 24 police-jurisdiction risk zones to check a route. Enter
 a flagged zone at a flagged hour and it arms itself. An adaptive check-in follows, not a
-fixed timer. Miss two and she sees the contextual local message a favourite would receive:
-the area, the hour, that zone's record, the missed checks. If she still does not answer,
-SOS opens with user-controlled dial actions. This Lite round sends no report and no safety
-data leaves her phone.
+fixed timer. Miss two and she sees the contextual local message a favourite could review:
+the area, the hour, that zone's record, the missed checks. If she can act, she may tap an SMS
+or WhatsApp control; Saaya attempts a custom-scheme navigation carrying that exact message but
+cannot know whether an app opened or whether she sent it. If she still does not answer, SOS opens with user-controlled dial actions. This Lite round sends no
+report through Saaya Lite and has no automatic safety transmission.
 
-Real: the map, zone detection, arming, the ladder, escalation, the PIN-protected SOS, both
-the four-step ladder. Mocked and labelled in the product: SMS delivery, which needs
-Indian DLT registration. Connected to no government system. No AI: every decision is a
-stated rule.
+Real: the map, zone detection, arming, the ladder and the PIN-protected SOS. User-controlled
+family-message controls are implemented but await Chrome real-phone verification. Saaya Lite
+itself never sends or observes the family message.
+Connected to no government system. No AI: every decision is a stated rule.
 
 Background arming needs a native runtime. In a browser it runs while the page is open, and
 we say so.
@@ -59,7 +60,7 @@ That is 249 words. Count before submitting.
 | 0:12-0:25 | Shakthi's 0.28% and T-Safe's 1,300, on screen, cited |
 | 0:25-0:40 | the map: zones, tap one, nearest station |
 | 0:40-0:52 | **it arms with no press.** Hands visibly off. |
-| 0:52-1:00 | check-in, missed, family told with context, SOS |
+| 0:52-1:00 | check-in, missed, local family message prepared with context, SOS |
 | 1:00-1:20 | architecture: the trust boundary, what crosses and when |
 | 1:20-1:40 | About: what is real, what is mocked, what this is not. The honesty is the claim. |
 | 1:40-1:55 | how it was built: spec frozen first, Codex against 300+ facts, adversarial verifiers |
@@ -114,8 +115,9 @@ facing violence sought any help, and about **7%** went to police.
 2. **The check-in adapts** to area and hour instead of a fixed timer.
 3. **The signal carries context by construction.** It is produced by circumstance, so it
    arrives already carrying the area, the hour, that area's record, and the missed check.
-4. **The trust boundary is a step she can see.** Nothing leaves the device in Lite. At
-   SOS, the screen says that plainly and offers only user-controlled dialler handoffs.
+4. **The trust boundary is a step she can see.** No Saaya-controlled safety transmission
+   occurs in Lite. At family escalation she may deliberately attempt to open the exact local
+   message in her own messaging app; at SOS the screen offers only user-controlled dialler handoffs.
 
 ### Why it is better
 [the comparison table from `SCOPE.md`]
@@ -123,10 +125,10 @@ facing violence sought any help, and about **7%** went to police.
 ### What works today
 [the REAL list from `SCOPE.md`, verbatim]
 
-### What is mocked
-[the MOCKED list from `SCOPE.md`, verbatim]
-- SMS and WhatsApp delivery: composed and shown, not sent. Real delivery needs India DLT
-  registration, a months-long regulatory process.
+### Prototype limits
+- There is no automated SMS or WhatsApp dispatch: after her deliberate tap Saaya Lite only
+  attempts a custom-scheme navigation carrying the exact local message. It cannot observe
+  whether an app opened or whether the message was sent.
 - There is no backend in this build. No personal, session or precise-location safety data
   leaves the device; ordinary public map-tile reads still occur. **Connected to no government system.**
 - There is no Firestore in this build. In round two the state view returns with role-based access and
@@ -170,10 +172,10 @@ We would rather be checked than believed.
 | Claim | How to verify |
 |---|---|
 | No AI anywhere | `grep -ri "openai\|gpt\|ml\|model" app/src` → [paste V7 output] |
-| Cannot listen, watch or send automatically | V8 finds no microphone, camera or contacts API call; SOS uses user-controlled `tel:` links only. |
-| Favourites never leave the device | local IndexedDB repository, no application upload path |
-| No safety data leaves the device | run the ladder in devtools: ordinary public map-tile reads may occur, but no application request carries personal, session or precise-location safety data. |
-| Local-only ladder | `HomeSessionRuntimeTest`: future write/notify intents have no Lite performer, and the screens disclose the local preview and local SOS. |
+| Cannot listen, watch or send automatically | V8 finds no microphone, camera or contacts API call; family handoff uses deliberate `sms:` / `whatsapp://` links and SOS uses user-controlled `tel:` links. |
+| Favourites never reach a Saaya backend | local IndexedDB repository and no application upload path; a deliberate tap only attempts a custom-scheme navigation and does not prove an app opened |
+| No Saaya safety-data request occurs in Lite | run the ladder in devtools: ordinary public map-tile reads may occur, but no application request carries personal, session or precise-location safety data. |
+| Local-only ladder | `HomeSessionRuntimeTest`: future write/notify intents have no Lite performer, and the screens disclose the local preview, deliberate device-handoff attempt and local SOS. |
 
 ### Known limitations
 - One city. Visakhapatnam only, because that is where the audited data is.

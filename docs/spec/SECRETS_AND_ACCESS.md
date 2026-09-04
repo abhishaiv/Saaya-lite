@@ -20,8 +20,8 @@ spec, so **STOP and report it**.
 | Google Maps API key + billing | Leaflet with OpenStreetMap Standard tiles. No key or billing account. | `MAP_SPEC.md` |
 | Any map tile key | OpenStreetMap Standard tiles are keyless. Requires attribution, which we show. | `MAP_SPEC.md` |
 | OpenAI API key | There is no model in the product. Every decision is a stated rule. | founder, 2026-08-18 |
-| SMS gateway, MSG91, Twilio, DLT registration | Delivery is composed and displayed, never dispatched, and labelled in the UI. | `SCOPE.md` |
-| WhatsApp Business API | Same. | `SCOPE.md` |
+| SMS gateway, MSG91, Twilio, DLT registration | Not used. Saaya Lite has no gateway, API key or server route; a deliberate device-handoff tap only attempts to open her own messaging app. | `SCOPE.md` |
+| WhatsApp Business API | Not used; same deliberate local device-handoff boundary. | `SCOPE.md` |
 | Release keystore + passwords | Debug signing. A debug-signed deployed site sideloads identically. | `BUILD_CONFIG.md` §3 |
 | Crash reporting, analytics, telemetry keys | We collect nothing, deliberately. | prototype posture |
 | Any government API credential | Forbidden by the brief, and we never sought one. | `COMPLIANCE.md` §5 |

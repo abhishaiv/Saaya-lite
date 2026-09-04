@@ -95,6 +95,13 @@ stations parse with a phone.
 | `onboardingRules.test.ts` | her `user_name` is optional while a real favourite name and exactly ten phone digits remain required. |
 | `familyEscalationOverlay.test.ts`, `homeSessionSurface.test.tsx`, `zoneDetailSheet.test.tsx` | render the one copy-table family-message template, compact countdown action and static risk category in English and Telugu; replace every shared placeholder and source category without a hard-coded English preview or suffix. |
 
+### Phase 1C family-message handoff
+| Test | Assertion |
+|---|---|
+| `familyMessageLinks.test.ts` | the only device destinations are encoded `sms:` and `whatsapp://` URIs; the body is the exact local message, including spaces, newlines, apostrophes and Telugu; invalid favourite data builds no URI. |
+| `familyEscalationOverlay.test.ts` | neither URI exists before a direct control action; the visible and screen-reader controls describe opening an app, both bilingual disclosures are visible, and no Firebase, queue, analytics, web fallback, automatic-open or inferred handoff-state path is present. |
+| `anonymiser.test.ts` | SUS and SOS payload construction rejects user name, favourite name, phone, message and session identity fields; neither payload can encode a family-message delivery claim. |
+
 ## Layer 2: browser integration tests - **two only**
 
 Prototype posture: these are slower to write than unit tests. Write only the three that
@@ -122,7 +129,7 @@ Run on a **real mobile browser** at the Vercel preview URL, not a desktop devtoo
 | M8a | from idle, tap the floating SOS control | SOS opens immediately, offers user-controlled `tel:112`, `tel:181`, and nearest-station dial actions when a location is known; the local-only and no-government-link disclosures stay visible, and no application request carries personal, session or precise-location data |
 | M9 | wait for check-in 1 | correct interval, states why it checked now |
 | M10 | tap I'm OK | returns to watching, reschedules |
-| M11 | let both check-ins lapse | family screen shows the exact local message preview and the mock disclosure |
+| M11 | let both check-ins lapse | family screen shows the exact local message preview, visible disclosure and user-controlled SMS/WhatsApp handoff controls; it never claims automatic delivery |
 | M12 | cancel | resolves locally; ordinary map-tile reads aside, no application request carries personal, session or precise-location data |
 | M13 | repeat and let it lapse | SOS appears instantly, states that this beta sent no report, and offers the user-controlled dial actions |
 | M14 | try to leave SOS | back, refresh and navigation do not exit; only the PIN stops it |

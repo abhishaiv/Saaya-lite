@@ -91,11 +91,13 @@ demo video.
 | `checkin2_body` **(iOS verbatim, Lite amendment)** | We still haven't heard from you. Tap I'm OK when you can, or Saaya will show a local message preview in a few minutes. | మీ నుండి ఇంకా సమాధానం రాలేదు. వీలైనప్పుడు "నేను బాగున్నాను" నొక్కండి, లేదంటే కొన్ని నిమిషాల్లో సాయ స్థానిక సందేశ ప్రివ్యూను చూపిస్తుంది. |
 | **Family escalation** | | |
 | `family_title` | What your favourite would receive | మీ ఆత్మీయుడు పొందే సందేశం |
-| `family_body` | This is the message Saaya prepared on this phone. It has not been sent. | సాయ మీ ఫోన్‌లో తయారు చేసిన సందేశం ఇది. ఇది పంపబడలేదు. |
+| `family_body` | Saaya prepared this message on this phone. Choose a messaging app below to review it and send it yourself. | సాయ ఈ సందేశాన్ని మీ ఫోన్‌లో తయారుచేసింది. దాన్ని పరిశీలించి మీరే పంపడానికి దిగువన ఉన్న మెసేజింగ్ యాప్‌ను ఎంచుకోండి. |
 | `family_cancel_note` | If you do not cancel in %1$d seconds, Saaya opens the local-only SOS screen. | %1$d సెకన్లలో మీరు రద్దు చేయకపోతే, సాయ స్థానిక SOS స్క్రీన్‌ను తెరుస్తుంది. |
 | `cta_countdown` | %1$s · %2$ds | %1$s · %2$d సెకన్లు |
-| `family_message_template` | Saaya alert - %1$s may need help.\n\n%1$s did not answer two safety check-ins.\n\nWhere: %2$s area, Visakhapatnam\nWhen: %3$s, %4$s\nArea risk: %5$s - %6$d women-safety cases on record here\nLast seen: near %7$s\n\nNearest police station: %8$s, %9$s (%10$d m away)\n\nShe has %11$d seconds to cancel this. If she does not, Saaya opens a local SOS screen. No message is sent and no location is shared.\n\nPrepared locally by Saaya Lite. This preview has not been sent. | సాయ హెచ్చరిక - %1$s కు సహాయం అవసరం కావచ్చు.\n\n%1$s రెండు భద్రతా చెక్-ఇన్‌లకు స్పందించలేదు.\n\nఎక్కడ: విశాఖపట్నంలోని %2$s ప్రాంతం\nఎప్పుడు: %3$s, %4$s\nప్రాంత ప్రమాద స్థాయి: %5$s - ఇక్కడ నమోదైన మహిళా భద్రతా కేసులు %6$d\nచివరిసారిగా కనిపించిన చోటు: %7$s సమీపంలో\n\nసమీప పోలీస్ స్టేషన్: %8$s, %9$s (%10$d మీ. దూరంలో)\n\nదీన్ని రద్దు చేయడానికి ఆమెకు %11$d సెకన్లు ఉన్నాయి. ఆమె రద్దు చేయకపోతే, సాయ స్థానిక SOS స్క్రీన్‌ను తెరుస్తుంది. ఏ సందేశమూ పంపబడదు, లొకేషన్ షేర్ చేయబడదు.\n\nసాయ లైట్ ఈ సందేశాన్ని ఈ ఫోన్‌లోనే తయారుచేసింది. ఈ ప్రివ్యూ పంపబడలేదు. |
-| `family_mock_disclosure` | Prototype: this message is composed but not actually sent. Real delivery needs Indian DLT registration. | ప్రోటోటైప్: ఈ సందేశం తయారైంది కానీ నిజంగా పంపబడలేదు. నిజమైన డెలివరీకి భారత DLT నమోదు అవసరం. |
+| `family_message_template` | Saaya alert - %1$s may need help.\n\n%1$s did not answer two safety check-ins.\n\nWhere: %2$s area, Visakhapatnam\nWhen: %3$s, %4$s\nArea risk: %5$s - %6$d women-safety cases on record here\nLast seen: near %7$s\n\nNearest police station: %8$s, %9$s (%10$d m away)\n\nShe has %11$d seconds to cancel this. If she does not, Saaya opens a local SOS screen.\n\nPrepared locally by Saaya Lite. | సాయ హెచ్చరిక - %1$s కు సహాయం అవసరం కావచ్చు.\n\n%1$s రెండు భద్రతా చెక్-ఇన్‌లకు స్పందించలేదు.\n\nఎక్కడ: విశాఖపట్నంలోని %2$s ప్రాంతం\nఎప్పుడు: %3$s, %4$s\nప్రాంత ప్రమాద స్థాయి: %5$s - ఇక్కడ నమోదైన మహిళా భద్రతా కేసులు %6$d\nచివరిసారిగా కనిపించిన చోటు: %7$s సమీపంలో\n\nసమీప పోలీస్ స్టేషన్: %8$s, %9$s (%10$d మీ. దూరంలో)\n\nదీన్ని రద్దు చేయడానికి ఆమెకు %11$d సెకన్లు ఉన్నాయి. ఆమె రద్దు చేయకపోతే, సాయ స్థానిక SOS స్క్రీన్‌ను తెరుస్తుంది.\n\nసాయ లైట్ ఈ సందేశాన్ని ఈ ఫోన్‌లోనే తయారుచేసింది. |
+| `family_mock_disclosure` | Saaya Lite does not send this message or know whether it was sent. Your tap tries to open your messaging app with the message ready. | సాయ లైట్ ఈ సందేశాన్ని పంపదు లేదా అది పంపబడిందో లేదో తెలుసుకోదు. మీ ట్యాప్‌తో సందేశం సిద్ధంగా ఉన్న మీ మెసేజింగ్ యాప్‌ను తెరవడానికి ప్రయత్నం జరుగుతుంది. |
+| `cta_send_sms` | Open text message | టెక్స్ట్ సందేశాన్ని తెరువు |
+| `cta_send_whatsapp` | Open WhatsApp | WhatsApp తెరువు |
 | `family_no_contact` | You haven't added a favourite yet. Saaya can still open an SOS. | మీరు ఇంకా ఆత్మీయులను జోడించలేదు. అయినా సాయ SOS తెరవగలదు. |
 | `cta_cancel_im_fine` | Cancel, I am fine | రద్దు చేయి, నేను బాగున్నాను |
 | **SOS** | | |
@@ -149,7 +151,6 @@ demo video.
 | `about_real_writes` | State-view writes (round two, not in Lite) | రాష్ట్ర వ్యూ రాతలు (రెండో రౌండ్, Lite లో లేవు) |
 | `about_real_console` | State-view console (round two, not in Lite) | రాష్ట్ర వ్యూ కన్సోల్ (రెండో రౌండ్, Lite లో లేదు) |
 | `about_mock_title` | What is mocked | ఏది నమూనా మాత్రమే |
-| `about_mock_delivery` | SMS and WhatsApp messages are composed and shown on screen, never sent. Real delivery needs Indian DLT registration. | SMS, WhatsApp సందేశాలు తయారై స్క్రీన్‌పై కనిపిస్తాయి, ఎప్పుడూ పంపబడవు. నిజమైన డెలివరీకి భారత DLT నమోదు అవసరం. |
 | `about_mock_console` | No state-view console is included in this Lite round. | ఈ Lite రౌండ్‌లో రాష్ట్ర వ్యూ కన్సోల్ లేదు. |
 | `about_not_title` | What this is not | ఇది ఏమి కాదు |
 | `about_noai_title` | No AI | AI లేదు |
@@ -172,7 +173,7 @@ demo video.
 | `demo_jump_family` | Jump to family escalation | ఆత్మీయుల దశకు వెళ్లు |
 | `demo_trigger_sos` | Trigger SOS | SOS ప్రారంభించు |
 | `demo_reset` | Reset session | సెషన్‌ను రీసెట్ చేయి |
-| `demo_reset_done` | Session reset. Nothing was sent. | సెషన్ రీసెట్ అయింది. ఏదీ పంపబడలేదు. |
+| `demo_reset_done` | Session reset. | సెషన్ రీసెట్ అయింది. |
 | `demo_session_live_reason` | Finish or stop the current session first | ముందుగా ప్రస్తుత సెషన్‌ను పూర్తి చేయండి లేదా ఆపండి |
 | **Common** | | |
 | `cta_continue` | Continue | కొనసాగించు |
@@ -200,7 +201,7 @@ Notification API rows below are retained as a round-two reference, not current b
 | trusted contact, emergency contact | **favourites** | The iOS app's word. They are people she chose, not an emergency list. |
 | victim, protect you, rescue | witnessed, watching over you | The brand's whole positioning. |
 | geofence, H3, coarsened, escalation ladder | plain description of what happens | She is not an engineer. |
-| alert (as a noun for the family message) | local message preview | Lite never sends the message, so the wording must not imply contact. |
+| alert (as a noun for the family message) | local message preview | Handoff is deliberate and user-controlled, so the wording must not imply automatic contact or delivery. |
 | Saaya (as the app's own name on screen) | **Saaya Lite** | Founder decision. Honest about what this is. |
 
 ## Copy reuse policy, locked 2026-08-18
@@ -242,7 +243,7 @@ its picture. These are the strings. A `contentDescription` that names an icon
 | `cd_close_sheet` | Close | మూసివేయి |
 | `cd_demo_panel` | Open prototype demo controls | ప్రోటోటైప్ డెమో నియంత్రణలు తెరువు |
 | `cd_demo_zone_picker` | Choose a zone to simulate entering | ప్రవేశించినట్టు చూపించడానికి ఒక జోన్ ఎంచుకోండి |
-| `cd_demo_reset` | Reset the demo session. Nothing is sent. | డెమో సెషన్‌ను రీసెట్ చేయి. ఏదీ పంపబడదు. |
+| `cd_demo_reset` | Reset the demo session. | డెమో సెషన్‌ను రీసెట్ చేయి. |
 
 ### Announcements (`LiveRegion`, not visible text)
 
@@ -250,7 +251,7 @@ its picture. These are the strings. A `contentDescription` that names an icon
 |---|---|---|
 | `ann_armed` | Saaya is now watching this stretch | సాయ ఇప్పుడు ఈ మార్గాన్ని గమనిస్తోంది |
 | `ann_checkin` | Saaya is checking in. Confirm you are safe. | సాయ చెక్ చేస్తోంది. మీరు క్షేమమని నిర్ధారించండి. |
-| `ann_family` | Saaya prepared a message for your favourites. It has not been sent. | సాయ మీ ఆత్మీయుల కోసం ఒక సందేశాన్ని తయారు చేసింది. అది పంపబడలేదు. |
+| `ann_family` | Saaya prepared this message on this phone. Choose a messaging app below to review it and send it yourself. | సాయ ఈ సందేశాన్ని మీ ఫోన్‌లో తయారుచేసింది. దాన్ని పరిశీలించి మీరే పంపడానికి దిగువన ఉన్న మెసేజింగ్ యాప్‌ను ఎంచుకోండి. |
 | `ann_sos` | SOS is active. This beta did not send a report. Use a call option to open your phone's dialler. | SOS యాక్టివ్. ఈ బీటా నివేదికను పంపలేదు. మీ ఫోన్ డయలర్‌ను తెరవడానికి కాల్ ఎంపికను ఉపయోగించండి. |
 | `ann_resolved` | Saaya has stopped watching | సాయ గమనించడం ఆపింది |
 
@@ -259,12 +260,12 @@ its picture. These are the strings. A `contentDescription` that names an icon
 | Key | English | తెలుగు |
 |---|---|---|
 | `err_network` | No connection. Saaya can still run the local safety flow. | కనెక్షన్ లేదు. సాయ స్థానిక భద్రతా ప్రయాణాన్ని ఇంకా నడపగలదు. |
-| `err_sync_failed` | **Cut in Lite.** No message or incident is sent in this round. | **Lite లో లేదు.** ఈ రౌండ్‌లో సందేశం లేదా ఘటన పంపబడదు. |
+| `err_sync_failed` | **Cut in Lite.** No automatic message or incident sync is available. | **Lite లో లేదు.** స్వయంచాలక సందేశం లేదా ఘటన సమకాలీకరణ అందుబాటులో లేదు. |
 | `err_zone_data` | Saaya Lite could not load Visakhapatnam data. Reloading the page should fix this. | సాయ లైట్ విశాఖపట్నం డేటాను లోడ్ చేయలేకపోయింది. పేజీని మళ్లీ లోడ్ చేస్తే సరిపోతుంది. |
 | `err_no_station` | No police station within 20 km. | 20 కి.మీ. లోపు పోలీస్ స్టేషన్ లేదు. |
 | `warn_keep_open_title` | Saaya only watches while this page is open | ఈ పేజీ తెరిచి ఉన్నప్పుడు మాత్రమే సాయ గమనిస్తుంది |
 | `warn_keep_open_body` | Keep this tab open while you are on the stretch. If you close it, Saaya stops watching. | మీరు ఆ మార్గంలో ఉన్నంత సేపు ఈ ట్యాబ్ తెరిచి ఉంచండి. మూసివేస్తే సాయ గమనించడం ఆగిపోతుంది. |
-| `warn_page_stopped` | Your browser stopped Saaya while you were travelling. Nothing was sent. | మీరు ప్రయాణిస్తున్నప్పుడు మీ బ్రౌజర్ సాయను ఆపింది. ఏదీ పంపబడలేదు. |
+| `warn_page_stopped` | Your browser stopped Saaya while you were travelling. | మీరు ప్రయాణిస్తున్నప్పుడు మీ బ్రౌజర్ సాయను ఆపింది. |
 | `warn_notif_denied` | **Cut in Lite.** Check-ins are in-page while the tab is open. | **Lite లో లేదు.** ట్యాబ్ తెరిచి ఉన్నప్పుడు చెక్-ఇన్‌లు పేజీలోనే కనిపిస్తాయి. |
 | `loc_searching` | Finding you | మిమ్మల్ని కనుగొంటున్నాం |
 | `loc_slow` | This is taking longer than usual. Check that location is on. | ఇది మామూలు కంటే ఎక్కువ సమయం తీసుకుంటోంది. లొకేషన్ ఆన్‌లో ఉందో చూడండి. |

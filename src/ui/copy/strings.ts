@@ -8,7 +8,6 @@ export type M4Copy = Readonly<{
   aboutDataBody: string;
   aboutDataTitle: string;
   aboutMockConsole: string;
-  aboutMockDelivery: string;
   aboutMockTitle: string;
   aboutNoAiBody: string;
   aboutNoAiTitle: string;
@@ -26,6 +25,7 @@ export type M4Copy = Readonly<{
   aboutVersion: string;
   aboutWhatBody: string;
   aboutWhatTitle: string;
+  annFamily: string;
   appName: string;
   cdBack: string;
   cdCancelEscalation: string;
@@ -55,6 +55,8 @@ export type M4Copy = Readonly<{
   ctaArmManually: string;
   ctaImHome: string;
   ctaOpenDemo: string;
+  ctaSendSms: string;
+  ctaSendWhatsapp: string;
   ctaSos: string;
   ctaSus: string;
   demoJumpFamily: string;
@@ -175,7 +177,6 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     aboutDataBody: "Visakhapatnam records, calibrated against NCRB 2023 city data. Every demo record is synthetic.",
     aboutDataTitle: "Data",
     aboutMockConsole: "No state-view console is included in this Lite round.",
-    aboutMockDelivery: "SMS and WhatsApp messages are composed and shown on screen, never sent. Real delivery needs Indian DLT registration.",
     aboutMockTitle: "What is mocked",
     aboutNoAiBody: "Every decision this app makes is a fixed rule you could read. There is no model in it.",
     aboutNoAiTitle: "No AI",
@@ -193,6 +194,7 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     aboutVersion: "Version %1$s (%2$d)",
     aboutWhatBody: "Saaya Lite is a prototype built for Build What Moves India. It shows the tier missing below India's emergency apps: the one that works before anything has happened.",
     aboutWhatTitle: "What this is",
+    annFamily: "Saaya prepared this message on this phone. Choose a messaging app below to review it and send it yourself.",
     appName: "Saaya Lite",
     cdBack: "Go back",
     cdCancelEscalation: "Cancel this preview. It stays on your phone.",
@@ -202,7 +204,7 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     cdHelpNow: "Start an emergency SOS immediately",
     cdImOk: "Confirm you are safe",
     cdPinBox: "PIN digit %1$d of 4",
-    cdDemoReset: "Reset the demo session. Nothing is sent.",
+    cdDemoReset: "Reset the demo session.",
     cdDemoZonePicker: "Choose a zone to simulate entering",
     cdMap: "Map of Visakhapatnam risk areas",
     cdRecentre: "Centre the map on your location",
@@ -222,6 +224,8 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     ctaArmManually: "Start Shadow",
     ctaImHome: "I am home",
     ctaOpenDemo: "Open the demo",
+    ctaSendSms: "Open text message",
+    ctaSendWhatsapp: "Open WhatsApp",
     ctaSos: "SOS",
     ctaSus: "SUS",
     demoJumpFamily: "Jump to family escalation",
@@ -231,7 +235,7 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     demoPickZone: "Simulate entering a zone",
     demoPickZoneHint: "Choose any of the 24 Visakhapatnam zones.",
     demoReset: "Reset session",
-    demoResetDone: "Session reset. Nothing was sent.",
+    demoResetDone: "Session reset.",
     demoSessionLiveReason: "Finish or stop the current session first",
     demoSpeedNoteFast: "Timers run %1$dx faster. The full ladder takes %2$d seconds instead of %3$d.",
     demoSpeedNoteNormal: "Timers run at normal speed (%1$dx). The full ladder takes %3$d seconds.",
@@ -242,7 +246,7 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     errPinWrong: "Wrong PIN. %1$d attempts left.",
     errPinWeak: "Pick something less obvious.",
     errZoneData: "Saaya Lite could not load Visakhapatnam data. Reloading the page should fix this.",
-    familyBody: "This is the message Saaya prepared on this phone. It has not been sent.",
+    familyBody: "Saaya prepared this message on this phone. Choose a messaging app below to review it and send it yourself.",
     familyCancelNote: "If you do not cancel in %1$d seconds, Saaya opens the local-only SOS screen.",
     familyMessageTemplate: `Saaya alert - %1$s may need help.
 
@@ -255,10 +259,10 @@ Last seen: near %7$s
 
 Nearest police station: %8$s, %9$s (%10$d m away)
 
-She has %11$d seconds to cancel this. If she does not, Saaya opens a local SOS screen. No message is sent and no location is shared.
+She has %11$d seconds to cancel this. If she does not, Saaya opens a local SOS screen.
 
-Prepared locally by Saaya Lite. This preview has not been sent.`,
-    familyMockDisclosure: "Prototype: this message is composed but not actually sent. Real delivery needs Indian DLT registration.",
+Prepared locally by Saaya Lite.`,
+    familyMockDisclosure: "Saaya Lite does not send this message or know whether it was sent. Your tap tries to open your messaging app with the message ready.",
     familyNoContact: "You haven't added a favourite yet. Saaya can still open an SOS.",
     familySubjectFallback: "Someone using Saaya Lite",
     familyTitle: "What your favourite would receive",
@@ -334,7 +338,7 @@ Prepared locally by Saaya Lite. This preview has not been sent.`,
     sosTitle: "SOS active",
     warnKeepOpenBody: "Keep this tab open while you are on the stretch. If you close it, Saaya stops watching.",
     warnLocationDenied: "Saaya cannot wake on its own without location.",
-    warnPageStopped: "Your browser stopped Saaya while you were travelling. Nothing was sent.",
+    warnPageStopped: "Your browser stopped Saaya while you were travelling.",
     zoneDataSource: "Visakhapatnam records, calibrated against NCRB 2023 city data.",
     zoneDistanceKm: "%1$s km away",
     zoneDistanceM: "%1$d m away",
@@ -353,7 +357,6 @@ Prepared locally by Saaya Lite. This preview has not been sent.`,
     aboutDataBody: "విశాఖపట్నం రికార్డులు, NCRB 2023 నగర డేటా ఆధారంగా. ప్రతి డెమో రికార్డు కృత్రిమమైనది.",
     aboutDataTitle: "డేటా",
     aboutMockConsole: "ఈ Lite రౌండ్‌లో రాష్ట్ర వ్యూ కన్సోల్ లేదు.",
-    aboutMockDelivery: "SMS, WhatsApp సందేశాలు తయారై స్క్రీన్‌పై కనిపిస్తాయి, ఎప్పుడూ పంపబడవు. నిజమైన డెలివరీకి భారత DLT నమోదు అవసరం.",
     aboutMockTitle: "ఏది నమూనా మాత్రమే",
     aboutNoAiBody: "ఈ యాప్ తీసుకునే ప్రతి నిర్ణయం మీరు చదవగలిగే స్థిర నియమం. ఇందులో ఏ మోడల్ లేదు.",
     aboutNoAiTitle: "AI లేదు",
@@ -371,6 +374,7 @@ Prepared locally by Saaya Lite. This preview has not been sent.`,
     aboutVersion: "వెర్షన్ %1$s (%2$d)",
     aboutWhatBody: "సాయ లైట్ అనేది Build What Moves India కోసం తయారుచేసిన ప్రోటోటైప్. భారత అత్యవసర యాప్‌ల కింద లేని ఒక దశను ఇది చూపిస్తుంది: ఏదీ జరగకముందే పనిచేసేది.",
     aboutWhatTitle: "ఇది ఏమిటి",
+    annFamily: "సాయ ఈ సందేశాన్ని మీ ఫోన్‌లో తయారుచేసింది. దాన్ని పరిశీలించి మీరే పంపడానికి దిగువన ఉన్న మెసేజింగ్ యాప్‌ను ఎంచుకోండి.",
     appName: "సాయ లైట్",
     cdBack: "వెనక్కి వెళ్ళు",
     cdCancelEscalation: "ఈ ప్రివ్యూను రద్దు చేయి. ఇది మీ ఫోన్‌లోనే ఉంటుంది.",
@@ -380,7 +384,7 @@ Prepared locally by Saaya Lite. This preview has not been sent.`,
     cdHelpNow: "వెంటనే అత్యవసర SOS ప్రారంభించు",
     cdImOk: "మీరు క్షేమంగా ఉన్నారని నిర్ధారించండి",
     cdPinBox: "4 లో %1$d వ PIN అంకె",
-    cdDemoReset: "డెమో సెషన్‌ను రీసెట్ చేయి. ఏదీ పంపబడదు.",
+    cdDemoReset: "డెమో సెషన్‌ను రీసెట్ చేయి.",
     cdDemoZonePicker: "ప్రవేశించినట్టు చూపించడానికి ఒక జోన్ ఎంచుకోండి",
     cdMap: "విశాఖపట్నం ప్రమాద ప్రాంతాల మ్యాప్",
     cdRecentre: "మీ స్థానం మీద మ్యాప్ కేంద్రీకరించు",
@@ -400,6 +404,8 @@ Prepared locally by Saaya Lite. This preview has not been sent.`,
     ctaArmManually: "షాడో ప్రారంభించు",
     ctaImHome: "నేను ఇంటికి చేరాను",
     ctaOpenDemo: "డెమో తెరువు",
+    ctaSendSms: "టెక్స్ట్ సందేశాన్ని తెరువు",
+    ctaSendWhatsapp: "WhatsApp తెరువు",
     ctaSos: "SOS",
     ctaSus: "SUS",
     demoJumpFamily: "ఆత్మీయుల దశకు వెళ్లు",
@@ -409,7 +415,7 @@ Prepared locally by Saaya Lite. This preview has not been sent.`,
     demoPickZone: "ఒక జోన్‌లోకి ప్రవేశించినట్టు చూపించు",
     demoPickZoneHint: "విశాఖపట్నంలోని 24 జోన్లలో ఏదైనా ఎంచుకోండి.",
     demoReset: "సెషన్‌ను రీసెట్ చేయి",
-    demoResetDone: "సెషన్ రీసెట్ అయింది. ఏదీ పంపబడలేదు.",
+    demoResetDone: "సెషన్ రీసెట్ అయింది.",
     demoSessionLiveReason: "ముందుగా ప్రస్తుత సెషన్‌ను పూర్తి చేయండి లేదా ఆపండి",
     demoSpeedNoteFast: "టైమర్లు %1$d రెట్లు వేగంగా నడుస్తాయి. పూర్తి నిచ్చెన %3$d సెకన్లకు బదులు %2$d సెకన్లు పడుతుంది.",
     demoSpeedNoteNormal: "టైమర్లు సాధారణ వేగంతో (%1$dx) నడుస్తాయి. పూర్తి నిచ్చెనకు %3$d సెకన్లు పడతాయి.",
@@ -420,7 +426,7 @@ Prepared locally by Saaya Lite. This preview has not been sent.`,
     errPinWrong: "తప్పు PIN. %1$d ప్రయత్నాలు మిగిలాయి.",
     errPinWeak: "కొంచెం ఊహించలేని దాన్ని ఎంచుకోండి.",
     errZoneData: "సాయ లైట్ విశాఖపట్నం డేటాను లోడ్ చేయలేకపోయింది. పేజీని మళ్లీ లోడ్ చేస్తే సరిపోతుంది.",
-    familyBody: "సాయ మీ ఫోన్‌లో తయారు చేసిన సందేశం ఇది. ఇది పంపబడలేదు.",
+    familyBody: "సాయ ఈ సందేశాన్ని మీ ఫోన్‌లో తయారుచేసింది. దాన్ని పరిశీలించి మీరే పంపడానికి దిగువన ఉన్న మెసేజింగ్ యాప్‌ను ఎంచుకోండి.",
     familyCancelNote: "%1$d సెకన్లలో మీరు రద్దు చేయకపోతే, సాయ స్థానిక SOS స్క్రీన్‌ను తెరుస్తుంది.",
     familyMessageTemplate: `సాయ హెచ్చరిక - %1$s కు సహాయం అవసరం కావచ్చు.
 
@@ -433,10 +439,10 @@ Prepared locally by Saaya Lite. This preview has not been sent.`,
 
 సమీప పోలీస్ స్టేషన్: %8$s, %9$s (%10$d మీ. దూరంలో)
 
-దీన్ని రద్దు చేయడానికి ఆమెకు %11$d సెకన్లు ఉన్నాయి. ఆమె రద్దు చేయకపోతే, సాయ స్థానిక SOS స్క్రీన్‌ను తెరుస్తుంది. ఏ సందేశమూ పంపబడదు, లొకేషన్ షేర్ చేయబడదు.
+దీన్ని రద్దు చేయడానికి ఆమెకు %11$d సెకన్లు ఉన్నాయి. ఆమె రద్దు చేయకపోతే, సాయ స్థానిక SOS స్క్రీన్‌ను తెరుస్తుంది.
 
-సాయ లైట్ ఈ సందేశాన్ని ఈ ఫోన్‌లోనే తయారుచేసింది. ఈ ప్రివ్యూ పంపబడలేదు.`,
-    familyMockDisclosure: "ప్రోటోటైప్: ఈ సందేశం తయారైంది కానీ నిజంగా పంపబడలేదు. నిజమైన డెలివరీకి భారత DLT నమోదు అవసరం.",
+సాయ లైట్ ఈ సందేశాన్ని ఈ ఫోన్‌లోనే తయారుచేసింది.`,
+    familyMockDisclosure: "సాయ లైట్ ఈ సందేశాన్ని పంపదు లేదా అది పంపబడిందో లేదో తెలుసుకోదు. మీ ట్యాప్‌తో సందేశం సిద్ధంగా ఉన్న మీ మెసేజింగ్ యాప్‌ను తెరవడానికి ప్రయత్నం జరుగుతుంది.",
     familyNoContact: "మీరు ఇంకా ఆత్మీయులను జోడించలేదు. అయినా సాయ SOS తెరవగలదు.",
     familySubjectFallback: "సాయ లైట్ ఉపయోగిస్తున్న వ్యక్తి",
     familyTitle: "మీ ఆత్మీయుడు పొందే సందేశం",
@@ -512,7 +518,7 @@ Prepared locally by Saaya Lite. This preview has not been sent.`,
     sosTitle: "SOS యాక్టివ్",
     warnKeepOpenBody: "మీరు ఆ మార్గంలో ఉన్నంత సేపు ఈ ట్యాబ్ తెరిచి ఉంచండి. మూసివేస్తే సాయ గమనించడం ఆగిపోతుంది.",
     warnLocationDenied: "లొకేషన్ లేకుండా సాయ దానంతట అదే మేల్కొనదు.",
-    warnPageStopped: "మీరు ప్రయాణిస్తున్నప్పుడు మీ బ్రౌజర్ సాయను ఆపింది. ఏదీ పంపబడలేదు.",
+    warnPageStopped: "మీరు ప్రయాణిస్తున్నప్పుడు మీ బ్రౌజర్ సాయను ఆపింది.",
     zoneDataSource: "విశాఖపట్నం రికార్డులు, NCRB 2023 నగర డేటా ఆధారంగా.",
     zoneDistanceKm: "%1$s కి.మీ. దూరంలో",
     zoneDistanceM: "%1$d మీ. దూరంలో",

@@ -100,6 +100,22 @@ describe("anonymiser trust boundary", () => {
     expect(payload).not.toHaveProperty("user_name");
     expect(payload.location.lat).toBe(17.7242); // GROUNDED-EXEMPT: assertion against the fixture.
 
+    const { status: _status, ...sosInput } = payload;
+    for (const localOnlyField of [
+      "favouriteName",
+      "favouritePhone",
+      "message",
+      "sessionId",
+      "user_name",
+    ]) {
+      expect(() =>
+        createSosIncidentPayload({
+          ...sosInput,
+          [localOnlyField]: "not-allowed",
+        } as never),
+      ).toThrow(new RegExp(localOnlyField));
+    }
+
     const stale = { ...payload } as Record<string, unknown>;
     delete stale.status;
     stale.contactsNotified = 1; // GROUNDED-EXEMPT: stale schema-key rejection fixture.
@@ -109,6 +125,11 @@ describe("anonymiser trust boundary", () => {
 
     delete stale.contactsNotified;
     stale.familyMessageDelivery = "DELIVERED";
+    expect(() =>
+      createSosIncidentPayload(stale as never),
+    ).toThrow(/familyMessageDelivery is not allowed/);
+
+    stale.familyMessageDelivery = "HANDED_TO_DEVICE";
     expect(() =>
       createSosIncidentPayload(stale as never),
     ).toThrow(/familyMessageDelivery is not allowed/);

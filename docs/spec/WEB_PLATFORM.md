@@ -47,7 +47,7 @@ Saying exactly where the browser stops is a better architecture answer than pret
 | `an absolute deadline in IndexedDB` | `setTimeout` + an **absolute deadline in IndexedDB** | on visibility change, recompute from the deadline. Never trust the timer to have run. |
 | System notifications | **Not used in Lite** | Check-ins are in-page while the page is open. Lite neither asks for notification permission nor calls `showNotification`. |
 | Full-screen intent | an in-page full-screen overlay | a browser cannot wake a locked phone. Disclosed. |
-| `allowBackup=false` | nothing leaves the device by default | favourites and the PIN hash live in IndexedDB and are never uploaded |
+| `allowBackup=false` | local data is not exported by default | favourites and the PIN hash live in IndexedDB and never reach a Saaya backend; a deliberate own-app message handoff is separate |
 | Battery optimisation | Page Visibility + a stale-heartbeat check | if the tab was frozen, say so honestly on return |
 
 ## Permissions

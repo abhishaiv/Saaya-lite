@@ -43,6 +43,7 @@ export interface HomeSessionSurfaceProps {
   readonly onPinAccepted: () => void;
   readonly pageStoppedWarning: boolean;
   readonly policeStations: readonly PoliceStation[];
+  readonly sessionId: string | null;
 }
 
 type MinimizedRung = "CHECKIN_1" | "CHECKIN_2" | "FAMILY_ESCALATED";
@@ -70,6 +71,7 @@ export function HomeSessionSurface({
   onPinAccepted,
   pageStoppedWarning,
   policeStations,
+  sessionId,
 }: HomeSessionSurfaceProps) {
   const [minimizedRung, setMinimizedRung] = useState<MinimizedRung | null>(
     null,
@@ -215,6 +217,7 @@ export function HomeSessionSurface({
           onHelpNow={onHelpNow}
           onMinimize={() => setMinimizedRung(state)}
           policeStations={policeStations}
+          sessionId={sessionId}
         />
       ) : null}
 
