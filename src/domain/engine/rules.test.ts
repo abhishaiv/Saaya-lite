@@ -1,23 +1,26 @@
 import { describe, expect, it } from "vitest";
 
 import { shouldAutoArm } from "./armingEvaluator";
-import { checkInDelaySec } from "./intervalCalculator";
 import {
   DEFAULT_RULES,
   DAWN_START_HOUR,
   DEMO_ARM_HOUR,
   DEMO_ARM_TIME,
+  DEMO_DIVISOR,
+  DEMO_RULES,
   HOURS_PER_DAY,
   MINUTES_PER_HOUR,
   NIGHT_DEEP_START_HOUR,
   NIGHT_EARLY_START_HOUR,
   NIGHT_LATE_START_HOUR,
+  NORMAL_DEMO_DIVISOR,
   PIN_LENGTH,
   WESTERN_DIGIT_MIN,
   displayRisk,
   displayRiskLabel,
   hourBandForLocalTime,
   isWeakPin,
+  scaledSeconds,
 } from "./rules";
 import type { HourBand, RiskTier } from "../model/session";
 
@@ -73,9 +76,11 @@ describe("frozen business rules", () => {
         false,
       );
     });
-    expect(DEMO_ARM_TIME.hourBand).toBe(
-      hourBandForLocalTime(DEMO_ARM_HOUR, 0),
-    );
+    expect(DEMO_ARM_HOUR).toBe(4);
+    expect(DEMO_ARM_TIME).toEqual({
+      hourBand: hourBandForLocalTime(DEMO_ARM_HOUR, 0),
+      hourOfDay: DEMO_ARM_HOUR,
+    });
     expect(DEMO_ARM_TIME.hourBand).toBe("NIGHT_DEEP");
   });
 
@@ -87,24 +92,37 @@ describe("frozen business rules", () => {
     });
   });
 
-  it("selects the specified automatic and manual intervals", () => {
-    expect(
-      checkInDelaySec(DEFAULT_RULES, "AUTO_ZONE", "HIGH", "NIGHT_DEEP"),
-    ).toBe(5 * SECONDS_PER_MINUTE);
-    expect(
-      checkInDelaySec(
-        DEFAULT_RULES,
-        "AUTO_ZONE",
-        "MODERATE",
-        "NIGHT_DEEP",
-      ),
-    ).toBe(12 * SECONDS_PER_MINUTE);
-
-    ALL_BANDS.forEach((band) => {
-      expect(checkInDelaySec(DEFAULT_RULES, "MANUAL", null, band)).toBe(
-        10 * SECONDS_PER_MINUTE,
-      );
+  it("freezes the normal three-check-in ladder timing profile", () => {
+    expect(DEFAULT_RULES.ladder).toEqual({
+      cadenceSec: 5 * MINUTES_PER_HOUR,
+      window1Sec: 2 * MINUTES_PER_HOUR,
+      window2Sec: 1 * MINUTES_PER_HOUR,
+      window3Sec: SECONDS_PER_MINUTE,
+      okResetSec: 5 * MINUTES_PER_HOUR,
     });
+  });
+
+  it("compresses only the demo windows and OK reset, keeping the cadence", () => {
+    expect(DEMO_RULES.ladder).toEqual({
+      cadenceSec: 5 * MINUTES_PER_HOUR,
+      window1Sec: 10,
+      window2Sec: 10,
+      window3Sec: 10,
+      okResetSec: 10,
+    });
+  });
+
+  it("runs both profiles unscaled since the divisor was retired", () => {
+    expect(DEMO_DIVISOR).toBe(1);
+    expect(NORMAL_DEMO_DIVISOR).toBe(1);
+    expect(DEFAULT_RULES.demoDivisor).toBe(1);
+    expect(DEMO_RULES.demoDivisor).toBe(1);
+    expect(scaledSeconds(SECONDS_PER_MINUTE, DEMO_RULES)).toBe(
+      SECONDS_PER_MINUTE,
+    );
+    expect(scaledSeconds(SECONDS_PER_MINUTE, DEFAULT_RULES)).toBe(
+      SECONDS_PER_MINUTE,
+    );
   });
 
   it("modulates, labels and clamps display risk", () => {

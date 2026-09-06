@@ -15,7 +15,7 @@ import { installConsumeBackGuard } from "../../platform/sosBackGuard";
 export type LadderCardRung =
   | "CHECKIN_1"
   | "CHECKIN_2"
-  | "FAMILY_ESCALATED";
+  | "CHECKIN_3";
 
 export type LadderCardPhase =
   | "entering"
@@ -28,7 +28,7 @@ export type LadderCardBackPolicy = "consume" | "delegate";
 type LadderCardRungContract =
   | { rung: "CHECKIN_1"; backPolicy?: "delegate" }
   | { rung: "CHECKIN_2"; backPolicy?: "consume" }
-  | { rung: "FAMILY_ESCALATED"; backPolicy?: "consume" };
+  | { rung: "CHECKIN_3"; backPolicy?: "consume" };
 
 type LadderCardSharedProps = {
   id?: string;
@@ -54,7 +54,7 @@ export const LADDER_CARD_BACK_POLICY: Readonly<
 > = {
   CHECKIN_1: "delegate",
   CHECKIN_2: "consume",
-  FAMILY_ESCALATED: "consume",
+  CHECKIN_3: "consume",
 };
 
 const rungPresentation: Readonly<
@@ -68,8 +68,8 @@ const rungPresentation: Readonly<
     className: "ladder-card--checkin-two",
     icon: "verified_user",
   },
-  FAMILY_ESCALATED: {
-    className: "ladder-card--family",
+  CHECKIN_3: {
+    className: "ladder-card--checkin-three",
     icon: "gpp_maybe",
   },
 };
@@ -253,7 +253,7 @@ export function LadderCard(props: LadderCardProps) {
           --ladder-card-border-width: var(--border-checkin-2);
         }
 
-        .ladder-card--family {
+        .ladder-card--checkin-three {
           --ladder-card-accent: var(--accent-family);
           --ladder-card-border-width: var(--border-family);
         }

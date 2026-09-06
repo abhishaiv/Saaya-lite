@@ -16,6 +16,7 @@ import {
   DEFAULT_RULES,
   DEMO_ARM_TIME,
   DEMO_RULES,
+  MINUTES_PER_HOUR,
 } from "../../../domain/engine/rules";
 import type { Command, SessionState } from "../../../domain/model/session";
 import type { HeatmapHotspot } from "../../../domain/model/heatmapHotspot";
@@ -32,10 +33,12 @@ import { formatSessionArmTime } from "../../../platform/indiaTime";
 import {
   clearDemoArmedSession,
   isDemoArmedSession,
-  loadDemoSpeedEnabled,
   markDemoArmedSession,
-  saveDemoSpeedEnabled,
 } from "../../../platform/demoModeStore";
+import type {
+  FamilyAlertStatus,
+} from "../../../platform/familyAlertChannel";
+import { requestFamilyAlert } from "../../../platform/familyAlertChannel";
 import type { LeafletMapController, TileAvailability } from "../../../platform/leafletMap";
 import type { LiveLocationFix, LocationStatus } from "../../../platform/locationWatch";
 import { PageLocationRuntime } from "../../../platform/pageLocationRuntime";
@@ -54,12 +57,7 @@ import { formatCopy, M4_COPY, type SaayaLocale } from "../../copy/strings";
 import { HomeEngineBridge, type HomeEngineView } from "./homeEngineBridge";
 import { HomeMap } from "./HomeMap";
 import { DemoPanel } from "./DemoPanel";
-import {
-  eventsToFamilyEscalation,
-  eventsToSos,
-  nextMissedCheckInEvent,
-  simulatedZoneEntryEvent,
-} from "./demoControls";
+import { startDemoEventSequence } from "./demoControls";
 import { AppSessionStatus } from "./AppSessionStatus";
 import {
   HomeSessionSurface,
@@ -118,10 +116,15 @@ export function HomeScreen({
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [locationHelpOpen, setLocationHelpOpen] = useState(false);
-  const [demoSpeedEnabled, setDemoSpeedEnabled] = useState(false);
   const [demoSessionActive, setDemoSessionActive] = useState(false);
-  const demoSpeedEnabledRef = useRef(false);
+  const [familyAlertStatus, setFamilyAlertStatus] =
+    useState<FamilyAlertStatus | null>(null);
+  const [okAcknowledgement, setOkAcknowledgement] =
+    useState<ArmAcknowledgement | null>(null);
+  const [demoStopAcknowledgement, setDemoStopAcknowledgement] =
+    useState<ArmAcknowledgement | null>(null);
   const demoArmInFlightRef = useRef(false);
+  const familyAlertAbortRef = useRef<AbortController | null>(null);
   const [engineView, setEngineView] = useState<HomeEngineView>({
     activeZoneId: null,
     armMode: "MANUAL",
@@ -135,6 +138,12 @@ export function HomeScreen({
   const locationRuntimeRef = useRef<PageLocationRuntime | null>(null);
   const commandListenerRef = useRef<
     (commands: readonly Command[], view: HomeEngineView) => void
+  >(() => undefined);
+  const alertPerformerRef = useRef<
+    (
+      command: { kind: "RequestFamilyAlert" } | { kind: "CancelFamilyAlert" },
+      sessionId: string | null,
+    ) => void
   >(() => undefined);
   const engineRef = useRef<HomeEngineBridge | null>(null);
 
@@ -155,6 +164,36 @@ export function HomeScreen({
   }
 
   const zones = useMemo(() => mapZones.map(({ zone }) => zone), [mapZones]);
+  // The first-miss alert performer: server-mediated, carrying only the
+  // session-stable operation id and locale. Its failure is reported as a
+  // truthful status and must never delay or suppress the ladder.
+  alertPerformerRef.current = (command, sessionId) => {
+    if (command.kind === "CancelFamilyAlert") {
+      familyAlertAbortRef.current?.abort();
+      familyAlertAbortRef.current = null;
+      // I'm OK invalidates the pending request; a provider-accepted message
+      // already sent cannot be recalled, so only the in-flight state clears.
+      setFamilyAlertStatus((current) => (current === "sending" ? null : current));
+      return;
+    }
+    if (sessionId === null) return;
+    familyAlertAbortRef.current?.abort();
+    const controller = new AbortController();
+    familyAlertAbortRef.current = controller;
+    setFamilyAlertStatus("sending");
+    void requestFamilyAlert(
+      {
+        demo: demoSessionActive,
+        locale: localeRef.current,
+        operationId: `${sessionId}:family-alert`,
+      },
+      controller.signal,
+    ).then((outcome) => {
+      if (familyAlertAbortRef.current !== controller) return;
+      familyAlertAbortRef.current = null;
+      setFamilyAlertStatus(outcome);
+    });
+  };
   const selectedZone = useMemo(
     () =>
       selectedZoneId === null
@@ -176,6 +215,19 @@ export function HomeScreen({
         : zoneDetails.find(({ id }) => id === engineView.activeZoneId) ?? null,
     [engineView.activeZoneId, zoneDetails],
   );
+  // The demo's synthetic entry zone: the first HIGH-risk row of the frozen
+  // data, armed at the frozen demo hour. No picker or permission precedes Start.
+  const demoZoneDetail = useMemo(
+    () => zoneDetails.find(({ zone }) => zone.riskTier === RiskTier.HIGH) ?? null,
+    [zoneDetails],
+  );
+  const activeLadder = (demoSessionActive ? DEMO_RULES : DEFAULT_RULES).ladder;
+  const checkInWindowSec =
+    engineView.state === "CHECKIN_1"
+      ? activeLadder.window1Sec
+      : engineView.state === "CHECKIN_2"
+        ? activeLadder.window2Sec
+        : activeLadder.window3Sec;
   const checkInReason = useMemo(() => {
     if (
       engineView.state !== "CHECKIN_1" ||
@@ -203,18 +255,11 @@ export function HomeScreen({
   useEffect(() => {
     const engine = engineRef.current;
     if (engine === null) return;
-    const persistedDemoMode = loadDemoSpeedEnabled();
-    if (persistedDemoMode) {
-      engine.setRules(DEMO_RULES);
-      demoSpeedEnabledRef.current = true;
-      setDemoSpeedEnabled(true);
-    }
-    const activeRules = persistedDemoMode ? DEMO_RULES : DEFAULT_RULES;
     const sessions = new IndexedDbSessionRepository();
     const wakeLock = new WakeLockController(browserWakeLockApi());
     const runtime = new PageLocationRuntime(
       heatmapHotspots,
-      activeRules,
+      DEFAULT_RULES,
       engine,
       {
         onInterrupted(reason) {
@@ -279,8 +324,11 @@ export function HomeScreen({
           clearDemoArmedSession(sessionId);
         }
         setDemoSessionActive(false);
+        familyAlertAbortRef.current?.abort();
+        familyAlertAbortRef.current = null;
+        setFamilyAlertStatus(null);
       }
-      // The labelled demo picker simulates the already-proven zone entry. Starting
+      // The labelled Start Demo simulates the already-proven zone entry. Starting
       // a real watch here would immediately revoke that simulated AUTO_ZONE session
       // on a browser where location was deliberately denied during onboarding.
       // Timers and every subsequent engine transition still run through the same
@@ -292,6 +340,17 @@ export function HomeScreen({
           ? commands.filter((command) => command.kind !== "StartLocationWatch")
           : commands;
       sessionRuntime.handle(runtimeCommands, view.state);
+      for (const command of commands) {
+        if (
+          command.kind === "RequestFamilyAlert" ||
+          command.kind === "CancelFamilyAlert"
+        ) {
+          alertPerformerRef.current(
+            command,
+            engine.persistedSession()?.sessionId ?? null,
+          );
+        }
+      }
     };
     locationRuntimeRef.current = runtime;
     let disposed = false;
@@ -304,6 +363,12 @@ export function HomeScreen({
             persisted.sessionId,
           );
           setDemoSessionActive(recoveredDemoSession);
+          // A recovered demo session must keep its accelerated profile; its
+          // persisted deadlines were set on demo timings.
+          if (recoveredDemoSession) {
+            engine.setRules(DEMO_RULES);
+            runtime.setRules(DEMO_RULES);
+          }
           const zone =
             zones.find((candidate) => candidate.stationId === persisted.zoneId) ??
             null;
@@ -379,6 +444,13 @@ export function HomeScreen({
   }, [engineView.state]);
 
   useEffect(() => {
+    // The quiet OK acknowledgement belongs to SHADOW only; the next check-in
+    // or SOS replaces it, and a fresh arm clears the demo stop note.
+    if (engineView.state !== "SHADOW") setOkAcknowledgement(null);
+    if (engineView.state !== "IDLE") setDemoStopAcknowledgement(null);
+  }, [engineView.state]);
+
+  useEffect(() => {
     if (
       !demoPanelOpen ||
       engineView.state === "IDLE" ||
@@ -443,17 +515,18 @@ export function HomeScreen({
       { kind: "OkTapped" },
       { nowEpochMs, zone: activeZone },
     );
-  }, [currentZone, engineView.activeZoneId, zones]);
-  const handleFamilyCancel = useCallback(() => {
-    const nowEpochMs = browserClock.nowEpochMs();
-    const activeZone =
-      zones.find(({ stationId }) => stationId === engineView.activeZoneId) ??
-      currentZone;
-    engineRef.current?.dispatch(
-      { kind: "CancelTapped" },
-      { nowEpochMs, zone: activeZone },
-    );
-  }, [currentZone, engineView.activeZoneId, zones]);
+    // I'm OK resets the ladder; the quiet acknowledgement states the exact
+    // wait until the next scheduled check-in on the active timing profile.
+    const okResetSec = activeLadder.okResetSec;
+    const duration =
+      okResetSec >= MINUTES_PER_HOUR
+        ? formatCopy(copy.durationMinutes, Math.round(okResetSec / MINUTES_PER_HOUR))
+        : formatCopy(copy.durationSeconds, okResetSec);
+    setOkAcknowledgement({
+      body: formatCopy(copy.okThanksBody, duration),
+      title: copy.okThanksTitle,
+    });
+  }, [activeLadder.okResetSec, copy, currentZone, engineView.activeZoneId, zones]);
   const handleHelpNow = useCallback(() => {
     const nowEpochMs = browserClock.nowEpochMs();
     const activeZone =
@@ -469,11 +542,20 @@ export function HomeScreen({
     const activeZone =
       zones.find(({ stationId }) => stationId === engineView.activeZoneId) ??
       currentZone;
+    const stoppedDemo = demoSessionActive;
     engineRef.current?.dispatch(
       { kind: "PinAccepted" },
       { nowEpochMs, zone: activeZone },
     );
-  }, [currentZone, engineView.activeZoneId, zones]);
+    // The correct PIN is the only exit from SOS; a stopped demo says so on the
+    // quiet screen instead of implying anything reached a police system.
+    if (stoppedDemo) {
+      setDemoStopAcknowledgement({
+        body: copy.policeDemoRowStopped,
+        title: copy.policeDemoStatusStopped,
+      });
+    }
+  }, [copy, currentZone, demoSessionActive, engineView.activeZoneId, zones]);
   const handleLocationHelpOpen = useCallback(() => {
     setSelectedZoneId(null);
     setDemoPanelOpen(false);
@@ -482,89 +564,51 @@ export function HomeScreen({
   const handleLocationRetry = useCallback(() => {
     locationRuntimeRef.current?.startAfterConsent();
   }, []);
-  const dispatchDemoEvents = useCallback(
-    (events: readonly Parameters<HomeEngineBridge["dispatch"]>[0][]) => {
-      const engine = engineRef.current;
-      if (engine === null) return;
-      for (const event of events) {
-        const activeZone =
-          zones.find(
-            ({ stationId }) => stationId === engine.view().activeZoneId,
-          ) ?? currentZone;
-        engine.dispatch(event, {
-          nowEpochMs: browserClock.nowEpochMs(),
-          zone: activeZone,
-        });
-      }
-      const persisted = engine.persistedSession();
-      if (persisted !== null) {
-        markDemoArmedSession(persisted.sessionId);
-        setDemoSessionActive(true);
-      }
-    },
-    [currentZone, zones],
-  );
-  const handleDemoSpeedChanged = useCallback((enabled: boolean) => {
-    const rules = enabled ? DEMO_RULES : DEFAULT_RULES;
-    engineRef.current?.setRules(rules);
-    locationRuntimeRef.current?.setRules(rules);
-    demoSpeedEnabledRef.current = enabled;
-    saveDemoSpeedEnabled(enabled);
-    setDemoSpeedEnabled(enabled);
-  }, []);
-  const handleDemoZoneSelected = useCallback(
-    (zoneId: string) => {
-      const detail = zoneDetails.find(({ id }) => id === zoneId);
-      if (detail === undefined) return;
-      const event = simulatedZoneEntryEvent(detail.zone);
-      if (event === null) {
-        setDemoPanelOpen(false);
-        setSelectedZoneId(zoneId);
-        return;
-      }
-      const engine = engineRef.current;
-      if (engine === null) return;
-      demoArmInFlightRef.current = true;
-      try {
+  const handleStartDemo = useCallback(() => {
+    const engine = engineRef.current;
+    if (engine === null) return;
+    const state = engine.view().state;
+    if (state !== "IDLE" && state !== "RESOLVED") return;
+    if (demoZoneDetail === null) return;
+    setPageStoppedWarning(false);
+    setOkAcknowledgement(null);
+    setDemoStopAcknowledgement(null);
+    setFamilyAlertStatus(null);
+    // The demo runs the shared engine on the accelerated profile; nothing
+    // about its transitions or PIN path differs from a live session.
+    engine.setRules(DEMO_RULES);
+    locationRuntimeRef.current?.setRules(DEMO_RULES);
+    demoArmInFlightRef.current = true;
+    try {
+      for (const event of startDemoEventSequence(demoZoneDetail.zone.stationId)) {
         engine.dispatch(event, {
           hourBand: DEMO_ARM_TIME.hourBand,
           nowEpochMs: browserClock.nowEpochMs(),
-          zone: detail.zone,
+          zone: demoZoneDetail.zone,
         });
-        // Hand the map back after a simulated entry rather than leaving the
-        // picker beneath any live safety surface it may produce.
-        setDemoPanelOpen(false);
-        const persisted = engine.persistedSession();
-        if (persisted !== null) {
-          markDemoArmedSession(persisted.sessionId);
-          setDemoSessionActive(true);
-        }
-      } finally {
-        demoArmInFlightRef.current = false;
       }
-    },
-    [zoneDetails],
-  );
-  const handleDemoMissCheckIn = useCallback(() => {
-    const engine = engineRef.current;
-    if (engine === null) return;
-    const event = nextMissedCheckInEvent(engine.view().state);
-    if (event !== null) dispatchDemoEvents([event]);
-  }, [dispatchDemoEvents]);
-  const handleDemoJumpFamily = useCallback(() => {
-    const state = engineRef.current?.view().state ?? "IDLE";
-    dispatchDemoEvents(eventsToFamilyEscalation(state));
-  }, [dispatchDemoEvents]);
-  const handleDemoTriggerSos = useCallback(() => {
-    const state = engineRef.current?.view().state ?? "IDLE";
-    dispatchDemoEvents(eventsToSos(state));
-  }, [dispatchDemoEvents]);
+    } finally {
+      demoArmInFlightRef.current = false;
+    }
+    const persisted = engine.persistedSession();
+    if (persisted !== null) {
+      markDemoArmedSession(persisted.sessionId);
+      setDemoSessionActive(true);
+    }
+    // Hand the map back so check-in 1 is the immediate, single foreground card.
+    setDemoPanelOpen(false);
+  }, [demoZoneDetail]);
   const handleDemoReset = useCallback(() => {
     engineRef.current?.resetForDemo();
     setSelectedZoneId(null);
     setArmAcknowledgement(null);
     setArmBannerVisible(false);
     setPageStoppedWarning(false);
+    setOkAcknowledgement(null);
+    setDemoStopAcknowledgement(null);
+    familyAlertAbortRef.current?.abort();
+    familyAlertAbortRef.current = null;
+    setFamilyAlertStatus(null);
   }, []);
 
   const mapCopy = useMemo(
@@ -662,16 +706,18 @@ export function HomeScreen({
         armAcknowledgement={armAcknowledgement}
         armBannerVisible={armBannerVisible}
         checkInReason={checkInReason}
+        checkInWindowSec={checkInWindowSec}
         copy={copy}
-        demoModeActive={demoSpeedEnabled || demoSessionActive}
-        demoSpeedEnabled={demoSpeedEnabled}
+        demoModeActive={demoSessionActive}
+        demoStopAcknowledgement={demoStopAcknowledgement}
         currentPoint={location}
         engineView={engineView}
+        familyAlertStatus={familyAlertStatus}
         locale={locale}
         locationStatus={locationStatus}
+        okAcknowledgement={okAcknowledgement}
         onArmBannerHidden={() => setArmBannerVisible(false)}
         onCheckInOk={handleCheckInOk}
-        onFamilyCancel={handleFamilyCancel}
         onHelpNow={handleHelpNow}
         onLocationHelpOpen={handleLocationHelpOpen}
         onManualArm={handleManualArm}
@@ -680,7 +726,6 @@ export function HomeScreen({
         onPinAccepted={handlePinAccepted}
         pageStoppedWarning={pageStoppedWarning}
         policeStations={policeStations}
-        sessionId={engineRef.current?.persistedSession()?.sessionId ?? null}
       />
 
       <div className="home-screen__settings">
@@ -721,15 +766,9 @@ export function HomeScreen({
       {demoPanelOpen ? (
         <DemoPanel
           copy={copy}
-          demoSpeedEnabled={demoSpeedEnabled}
-          demoZones={demoZones}
           onClose={() => setDemoPanelOpen(false)}
-          onDemoSpeedChanged={handleDemoSpeedChanged}
-          onJumpFamily={handleDemoJumpFamily}
-          onMissCheckIn={handleDemoMissCheckIn}
+          onStartDemo={handleStartDemo}
           onReset={handleDemoReset}
-          onTriggerSos={handleDemoTriggerSos}
-          onZoneSelected={handleDemoZoneSelected}
           sessionState={engineView.state}
         />
       ) : null}
@@ -803,7 +842,7 @@ function hasForegroundSafetySurface(state: SessionState): boolean {
   return (
     state === "CHECKIN_1" ||
     state === "CHECKIN_2" ||
-    state === "FAMILY_ESCALATED" ||
+    state === "CHECKIN_3" ||
     state === "SOS_ACTIVE"
   );
 }

@@ -44,7 +44,7 @@ type SaayaButtonPreviewVariant =
   | "Destructive"
   | "TextOnly";
 
-type LadderRung = "CHECKIN_1" | "CHECKIN_2" | "FAMILY_ESCALATED";
+type LadderRung = "CHECKIN_1" | "CHECKIN_2" | "CHECKIN_3";
 
 const BUTTON_PREVIEW_STATES: readonly ButtonPreviewState[] = [
   "default",
@@ -67,7 +67,7 @@ const SAAYA_BUTTON_VARIANTS: readonly SaayaButtonPreviewVariant[] = [
 const LADDER_RUNGS: readonly LadderRung[] = [
   "CHECKIN_1",
   "CHECKIN_2",
-  "FAMILY_ESCALATED",
+  "CHECKIN_3",
 ];
 
 const LADDER_PHASES: readonly LadderCardPhase[] = [
@@ -83,6 +83,7 @@ const STATUS_LABELS: StatusPillLabels = {
   shadowManual: "Watching, you turned this on",
   checkIn1: "Checking in",
   checkIn2: "Still there?",
+  checkIn3: "Last check-in",
   family: "Preparing a message",
   sos: "SOS active",
 };
@@ -230,7 +231,7 @@ function LadderFixture({
     phase,
     primary,
     secondary,
-    title: rung === "FAMILY_ESCALATED" ? "What your favourite would receive" : "Are you safe?",
+    title: rung === "CHECKIN_3" ? "One more check-in" : "Are you safe?",
   } as const;
 
   return (
@@ -240,7 +241,7 @@ function LadderFixture({
       ) : rung === "CHECKIN_2" ? (
         <LadderCard {...shared} rung="CHECKIN_2" />
       ) : (
-        <LadderCard {...shared} rung="FAMILY_ESCALATED" />
+        <LadderCard {...shared} rung="CHECKIN_3" />
       )}
       {phase === "deadline-passed" ? (
         <p className="gallery-removed-state">Card removed; ladder continues underneath.</p>
@@ -353,11 +354,11 @@ export function ComponentGallery() {
               variant="card"
             />
           </PreviewCell>
-          <PreviewCell label="FAMILY_ESCALATED · zero">
+          <PreviewCell label="CHECKIN_3 · zero">
             <CountdownRing
               ariaLabel="Family escalation countdown"
               formatAnnouncement={(seconds) => `${seconds} seconds remaining`}
-              rung="FAMILY_ESCALATED"
+              rung="CHECKIN_3"
               seconds={0}
               totalSeconds={GALLERY_COUNTDOWN_TOTAL}
               variant="card"
@@ -393,8 +394,8 @@ export function ComponentGallery() {
           <PreviewCell className="gallery-status-frame" label="CHECKIN_2">
             <StatusPill labels={STATUS_LABELS} state="CHECKIN_2" />
           </PreviewCell>
-          <PreviewCell className="gallery-status-frame" label="FAMILY_ESCALATED">
-            <StatusPill labels={STATUS_LABELS} state="FAMILY_ESCALATED" />
+          <PreviewCell className="gallery-status-frame" label="CHECKIN_3">
+            <StatusPill labels={STATUS_LABELS} state="CHECKIN_3" />
           </PreviewCell>
           <PreviewCell className="gallery-status-frame" label="SOS_ACTIVE">
             <StatusPill labels={STATUS_LABELS} state="SOS_ACTIVE" />

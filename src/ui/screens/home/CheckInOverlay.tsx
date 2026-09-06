@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from "react";
 
-import { CHECK_IN_1_SEC, CHECK_IN_2_SEC, DEMO_DIVISOR } from "../../../domain/engine/rules";
 import { CountdownRing } from "../../components/CountdownRing";
 import { BigActionButton } from "../../components/BigActionButton";
 import { LadderCard } from "../../components/LadderCard";
 import { SaayaButton } from "../../components/SaayaButton";
+import type { FamilyAlertStatus } from "../../../platform/familyAlertChannel";
 import { formatCopy, type M4Copy } from "../../copy/strings";
 
 const COUNTDOWN_TICK_MS = 1000; // fact: motion.1000ms
@@ -14,28 +14,29 @@ const COUNTDOWN_TICK_MS = 1000; // fact: motion.1000ms
 export interface CheckInOverlayProps {
   readonly copy: M4Copy;
   readonly deadlineEpochMs: number | null;
-  readonly demoSpeedEnabled: boolean;
+  /** Window length for the visible ring; the engine's absolute deadline governs. */
+  readonly windowSec: number;
+  /** Truthful first-miss alert state; null before any alert has been requested. */
+  readonly familyAlertStatus: FamilyAlertStatus | null;
   readonly onHelpNow: () => void;
   readonly onMinimize: () => void;
   readonly onOk: () => void;
   readonly reason: string | null;
-  readonly state: "CHECKIN_1" | "CHECKIN_2";
+  readonly state: "CHECKIN_1" | "CHECKIN_2" | "CHECKIN_3";
 }
 
-/** M1 step 2: the two answerable, in-page rungs of the safety ladder. */
+/** M1 step 2: the three answerable, in-page rungs of the safety ladder. */
 export function CheckInOverlay({
   copy,
   deadlineEpochMs,
-  demoSpeedEnabled,
+  windowSec,
+  familyAlertStatus,
   onHelpNow,
   onMinimize,
   onOk,
   reason,
   state,
 }: CheckInOverlayProps) {
-  const totalSeconds =
-    (state === "CHECKIN_1" ? CHECK_IN_1_SEC : CHECK_IN_2_SEC) /
-    (demoSpeedEnabled ? DEMO_DIVISOR : 1); // fact: demo.normal.divisor
   const [nowEpochMs, setNowEpochMs] = useState(() => Date.now());
 
   useEffect(() => {
@@ -47,10 +48,20 @@ export function CheckInOverlay({
     return () => globalThis.clearInterval(interval);
   }, [deadlineEpochMs, state]);
 
-  const seconds = remainingSeconds(deadlineEpochMs, nowEpochMs, totalSeconds);
+  const seconds = remainingSeconds(deadlineEpochMs, nowEpochMs, windowSec);
   const isFirst = state === "CHECKIN_1";
-  const title = isFirst ? copy.checkin1Title : copy.checkin2Title;
-  const body = isFirst ? copy.checkin1Body : copy.checkin2Body;
+  const isSecond = state === "CHECKIN_2";
+  const title = isFirst
+    ? copy.checkin1Title
+    : isSecond
+      ? copy.checkin2Title
+      : copy.checkin3Title;
+  const body = isFirst
+    ? copy.checkin1Body
+    : isSecond
+      ? copy.checkin2Body
+      : copy.checkin3Body;
+  const alertStatusLine = familyAlertLine(copy, familyAlertStatus);
   const message = (
     <div className="checkin-overlay__message">
       <CountdownRing
@@ -58,12 +69,20 @@ export function CheckInOverlay({
         formatAnnouncement={(value) => formatCountdownLabel(copy.cdCountdown, value)}
         rung={state}
         seconds={seconds}
-        totalSeconds={totalSeconds}
+        totalSeconds={windowSec}
         variant="card"
       />
       <p>{body}</p>
       {reason === null ? null : <p>{reason}</p>}
       {isFirst ? <p>{copy.checkinPersistNote}</p> : null}
+      {alertStatusLine === null ? null : (
+        <p className="checkin-overlay__alert-status" role="status">
+          {alertStatusLine}
+        </p>
+      )}
+      {familyAlertStatus === "accepted" ? (
+        <p className="checkin-overlay__alert-note">{copy.alertCancelNote}</p>
+      ) : null}
       <style jsx>{`
         .checkin-overlay__message {
           display: grid;
@@ -73,6 +92,14 @@ export function CheckInOverlay({
 
         .checkin-overlay__message p {
           margin: 0;
+        }
+
+        .checkin-overlay__alert-status,
+        .checkin-overlay__alert-note {
+          font-size: var(--type-caption-size);
+          line-height: var(--type-caption-line-height);
+          color: var(--color-text-on-card);
+          text-align: center;
         }
       `}</style>
     </div>
@@ -85,7 +112,7 @@ export function CheckInOverlay({
       phase="visible"
       primary={
         <BigActionButton
-          accent={isFirst ? "brand" : "amber"}
+          accent={isFirst ? "brand" : isSecond ? "amber" : "danger"}
           aria-label={copy.cdImOk}
           countdownLabel={formatCopy(copy.ctaCountdown, copy.ctaImOk, seconds)}
           countdownSeconds={seconds}
@@ -110,6 +137,25 @@ export function CheckInOverlay({
       title={title}
     />
   );
+}
+
+export function familyAlertLine(
+  copy: M4Copy,
+  status: FamilyAlertStatus | null,
+): string | null {
+  if (status === null) return null;
+  switch (status) {
+    case "sending":
+      return copy.alertStatusSending;
+    case "accepted":
+      return copy.alertStatusAccepted;
+    case "failed":
+      return copy.alertStatusFailed;
+    case "unknown":
+      return copy.alertStatusUnknown;
+    case "notready":
+      return copy.alertStatusNotReady;
+  }
 }
 
 function remainingSeconds(

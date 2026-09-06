@@ -5,6 +5,9 @@ export type SessionState =
   | "SHADOW"
   | "CHECKIN_1"
   | "CHECKIN_2"
+  | "CHECKIN_3"
+  // Legacy persisted state only (pre-2026-09-06 two-rung ladder). No transition
+  // enters it; recovery maps a saved FAMILY_ESCALATED session to CHECKIN_3.
   | "FAMILY_ESCALATED"
   | "SOS_ACTIVE"
   | "RESOLVED";
@@ -16,7 +19,7 @@ export type Outcome =
   | "DISARMED";
 export type ArmMode = "AUTO_ZONE" | "MANUAL";
 export type Urgency = "GENTLE" | "URGENT" | "CRITICAL";
-export type TimerId = "CHECKIN" | "CD1" | "CD2" | "CANCEL";
+export type TimerId = "CHECKIN" | "CD1" | "CD2" | "CD3";
 export type HourBand =
   | "NIGHT_DEEP"
   | "DAWN"
@@ -41,7 +44,6 @@ export type SessionEvent =
   | { kind: "CountdownExpired"; timer: TimerId }
   | { kind: "OkTapped" }
   | { kind: "HelpNowTapped" }
-  | { kind: "CancelTapped" }
   | { kind: "PinAccepted" }
   | { kind: "PermissionRevoked"; permission: string }
   | { kind: "AppKilledRestart"; persisted: PersistedSession };
@@ -51,16 +53,20 @@ export type SessionEvent =
 export type Command =
   | {
       kind: "ShowCheckIn";
-      step: 1 | 2;
+      step: 1 | 2 | 3;
       countdownSec: number;
       urgency: Urgency;
     }
   | { kind: "HideCheckIn" }
   | { kind: "ShowArmBanner"; zoneId: string; band: HourBand }
-  | { kind: "ShowFamilyScreen" }
   | { kind: "ShowSos" }
-  | { kind: "NotifyFamily" }
-  | { kind: "CancelFamilyNotification" }
+  // First-miss family-alert intents (founder 2026-09-06). Intent only: no
+  // recipient, message text or contact rides in the command. RequestFamilyAlert
+  // asks the runtime to attempt the configured first-miss messaging;
+  // CancelFamilyAlert cancels any still-pending request when I'm OK resolves
+  // the episode. A provider-accepted message cannot be recalled.
+  | { kind: "RequestFamilyAlert" }
+  | { kind: "CancelFamilyAlert" }
   | { kind: "WriteSusEvent" }
   | { kind: "PatchSusOutcome"; outcome: Exclude<SusOutcome, "PENDING"> }
   | { kind: "WriteSosIncident"; trigger: SosTrigger }
@@ -90,17 +96,23 @@ export interface PersistedSession {
   outcome?: Outcome;
 }
 
+// The explicit timing profile (founder decision 2026-09-06). cadenceSec runs
+// from arming to check-in 1; okResetSec runs from I'm OK to the next check-in 1.
+export interface LadderTiming {
+  cadenceSec: number;
+  window1Sec: number;
+  window2Sec: number;
+  window3Sec: number;
+  okResetSec: number;
+}
+
 export interface Rules {
-  checkIn1Sec: number;
-  checkIn2Sec: number;
-  cancelWindowSec: number;
+  ladder: LadderTiming;
   enterDwellSec: number;
   exitDwellSec: number;
   manualDisarmCooldownMin: number;
   okCooldownMin: number;
-  manualIntervalMin: number;
-  demoDivisor: number;
-  intervals: Record<string, number>;
+  demoDivisor: number; // retained for dwell scaling only; both profiles use 1 since 2026-09-06
   armingMatrix: Record<string, boolean>;
   samplingShadowSec: number;
   samplingSosSec: number;

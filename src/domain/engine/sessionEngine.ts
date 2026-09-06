@@ -1,6 +1,4 @@
 import { shouldAutoArm } from "./armingEvaluator";
-import { checkInDelaySec } from "./intervalCalculator";
-import { scaledSeconds } from "./rules";
 import type {
   Command,
   EngineContext,
@@ -63,8 +61,13 @@ export function onEvent(
       return fromCheckInOne(event, ctx);
     case "CHECKIN_2":
       return fromCheckInTwo(event, ctx);
+    case "CHECKIN_3":
+      return fromCheckInThree(event, ctx);
     case "FAMILY_ESCALATED":
-      return fromFamilyEscalated(event, ctx);
+      // Legacy persisted state only. Recovery normalizes it to CHECKIN_3 before
+      // dispatch, so reaching this live would be an engine bug; stay put rather
+      // than guess a transition.
+      return unchanged(state);
     case "RESOLVED":
       return unchanged(state);
   }
@@ -76,7 +79,7 @@ function fromIdle(event: SessionEvent, ctx: EngineContext): EngineResult {
   }
 
   if (event.kind === "ManualArm") {
-    const delaySec = checkInDelaySec(ctx.rules, "MANUAL", null, null);
+    const delaySec = ctx.rules.ladder.cadenceSec;
     return {
       state: "SHADOW",
       commands: [
@@ -109,12 +112,7 @@ function fromIdle(event: SessionEvent, ctx: EngineContext): EngineResult {
     return unchanged("IDLE");
   }
 
-  const delaySec = checkInDelaySec(
-    ctx.rules,
-    "AUTO_ZONE",
-    tier,
-    ctx.hourBand,
-  );
+  const delaySec = ctx.rules.ladder.cadenceSec;
   return {
     state: "SHADOW",
     commands: [
@@ -132,7 +130,7 @@ function fromIdle(event: SessionEvent, ctx: EngineContext): EngineResult {
 
 function fromShadow(event: SessionEvent, ctx: EngineContext): EngineResult {
   if (event.kind === "CheckInTimerFired") {
-    const countdownSec = scaledSeconds(ctx.rules.checkIn1Sec, ctx.rules);
+    const countdownSec = ctx.rules.ladder.window1Sec;
     return {
       state: "CHECKIN_1",
       commands: [
@@ -163,15 +161,21 @@ function fromShadow(event: SessionEvent, ctx: EngineContext): EngineResult {
 }
 
 function fromCheckInOne(event: SessionEvent, ctx: EngineContext): EngineResult {
-  if (event.kind === "OkTapped") return resolveOk("CD1", ctx);
+  // No family alert has been requested yet at step 1, so an OK here has
+  // nothing to cancel.
+  if (event.kind === "OkTapped") return resolveOk("CD1", ctx, false);
 
   if (event.kind === "CountdownExpired" && event.timer === "CD1") {
-    const countdownSec = scaledSeconds(ctx.rules.checkIn2Sec, ctx.rules);
+    // The first miss is the automatic family-alert trigger (founder 2026-09-06).
+    // RequestFamilyAlert is an intent: the runtime may perform it as a real
+    // server-mediated alert, and its failure must never suppress the ladder.
+    const countdownSec = ctx.rules.ladder.window2Sec;
     return {
       state: "CHECKIN_2",
       commands: [
         { kind: "ShowCheckIn", step: 2, countdownSec, urgency: "URGENT" },
         { kind: "PlayUrgentAlert" },
+        { kind: "RequestFamilyAlert" },
         { kind: "ScheduleTimer", id: "CD2", delaySec: countdownSec },
       ],
     };
@@ -189,17 +193,18 @@ function fromCheckInOne(event: SessionEvent, ctx: EngineContext): EngineResult {
 }
 
 function fromCheckInTwo(event: SessionEvent, ctx: EngineContext): EngineResult {
-  if (event.kind === "OkTapped") return resolveOk("CD2", ctx);
+  if (event.kind === "OkTapped") return resolveOk("CD2", ctx, true);
 
   if (event.kind === "CountdownExpired" && event.timer === "CD2") {
-    const delaySec = scaledSeconds(ctx.rules.cancelWindowSec, ctx.rules);
+    const countdownSec = ctx.rules.ladder.window3Sec;
     return {
-      state: "FAMILY_ESCALATED",
+      state: "CHECKIN_3",
       commands: [
+        // Successor of the old FAMILY_ESCALATED position: two unanswered
+        // check-ins, so only AUTO_ZONE carries the anonymous civic intent.
         ...(ctx.armMode === "AUTO_ZONE" ? ([{ kind: "WriteSusEvent" }] as const) : []),
-        { kind: "NotifyFamily" },
-        { kind: "ShowFamilyScreen" },
-        { kind: "ScheduleTimer", id: "CANCEL", delaySec },
+        { kind: "ShowCheckIn", step: 3, countdownSec, urgency: "CRITICAL" },
+        { kind: "ScheduleTimer", id: "CD3", delaySec: countdownSec },
       ],
     };
   }
@@ -215,46 +220,39 @@ function fromCheckInTwo(event: SessionEvent, ctx: EngineContext): EngineResult {
   return unchanged("CHECKIN_2");
 }
 
-function fromFamilyEscalated(
-  event: SessionEvent,
-  ctx: EngineContext,
-): EngineResult {
-  if (event.kind === "CancelTapped") {
-    const civicOutcome =
-      ctx.armMode === "AUTO_ZONE" && ctx.susEventWritten
-        ? ([{ kind: "PatchSusOutcome", outcome: "CANCELLED_BY_USER" }] as const)
-        : [];
-    return resolved("CANCELLED", [
-      { kind: "CancelTimer", id: "CANCEL" },
-      ...civicOutcome,
-      { kind: "CancelFamilyNotification" },
-      { kind: "StopLocationWatch" },
-      { kind: "ReleaseWakeLock" },
-    ]);
+function fromCheckInThree(event: SessionEvent, ctx: EngineContext): EngineResult {
+  if (event.kind === "OkTapped") return resolveOk("CD3", ctx, true);
+
+  if (event.kind === "CountdownExpired" && event.timer === "CD3") {
+    return enterSos("LADDER_LAPSE", ctx, true);
   }
 
-  if (event.kind === "CountdownExpired" && event.timer === "CANCEL") {
-    return enterSos("LADDER_LAPSE", ctx);
+  if (event.kind === "ManualDisarm") {
+    return resolved("DISARMED", manualDisarmCommands("CD3", true, ctx));
   }
 
   if (event.kind === "HelpNowTapped") {
-    return enterSos("MANUAL_HELP_BUTTON", ctx);
+    return enterSos("MANUAL_HELP_BUTTON", ctx, true);
   }
 
-  return unchanged("FAMILY_ESCALATED");
+  return unchanged("CHECKIN_3");
 }
 
-function resolveOk(timer: TimerId, ctx: EngineContext): EngineResult {
-  const tier = ctx.zone?.riskTier as RiskTier | undefined;
-  const delaySec = checkInDelaySec(
-    ctx.rules,
-    ctx.armMode,
-    tier ?? null,
-    ctx.armedHourBand,
-  );
+function resolveOk(
+  timer: TimerId,
+  ctx: EngineContext,
+  hasPendingFamilyAlert: boolean,
+): EngineResult {
+  const delaySec = ctx.rules.ladder.okResetSec;
   const commands: Command[] = [
     { kind: "CancelTimer", id: timer },
     { kind: "HideCheckIn" },
+    // I'm OK resets the consecutive-miss episode and invalidates any
+    // still-pending family-alert request. A provider-accepted message
+    // cannot be recalled; the runtime decides what is still pending.
+    ...(hasPendingFamilyAlert
+      ? ([{ kind: "CancelFamilyAlert" }] as const)
+      : []),
     { kind: "ScheduleTimer", id: "CHECKIN", delaySec },
   ];
   if (ctx.zone !== null) {
@@ -307,7 +305,6 @@ function enterSos(
     commands.push({ kind: "PatchSusOutcome", outcome: "ESCALATED_TO_SOS" });
   }
   commands.push(
-    { kind: "NotifyFamily" },
     { kind: "ShowSos" },
     {
       kind: "SetLocationSampling",
@@ -334,7 +331,7 @@ function resolvePermissionLoss(
     { kind: "CancelTimer", id: "CHECKIN" },
     { kind: "CancelTimer", id: "CD1" },
     { kind: "CancelTimer", id: "CD2" },
-    { kind: "CancelTimer", id: "CANCEL" },
+    { kind: "CancelTimer", id: "CD3" },
     { kind: "HideCheckIn" },
     { kind: "StopLocationWatch" },
     { kind: "ReleaseWakeLock" },
@@ -344,9 +341,19 @@ function resolvePermissionLoss(
 }
 
 function recoverSession(
-  persisted: PersistedSession,
+  persistedRaw: PersistedSession,
   ctx: EngineContext,
 ): EngineResult {
+  // Explicit legacy migration (founder 2026-09-06): a session saved under the
+  // pre-2026-09-06 two-rung ladder in FAMILY_ESCALATED represented "two
+  // check-ins missed, one final window before SOS", which is CHECKIN_3 now.
+  // Its persisted 60 s cancel-window deadline is reused as the final window.
+  // A saved state is never silently reinterpreted or reset beyond this mapping.
+  const persisted: PersistedSession =
+    persistedRaw.state === "FAMILY_ESCALATED"
+      ? { ...persistedRaw, state: "CHECKIN_3" }
+      : persistedRaw;
+
   validatePersistedSession(persisted);
   if (persisted.state === "IDLE") return unchanged("IDLE");
   if (persisted.state === "RESOLVED") {
@@ -437,11 +444,16 @@ function recoverSession(
   }
 
   return {
-    state: "FAMILY_ESCALATED",
+    state: "CHECKIN_3",
     commands: [
       ...resumeCommands,
-      { kind: "ShowFamilyScreen" },
-      { kind: "ScheduleTimer", id: "CANCEL", delaySec: remainingSec },
+      {
+        kind: "ShowCheckIn",
+        step: 3,
+        countdownSec: remainingSec,
+        urgency: "CRITICAL",
+      },
+      { kind: "ScheduleTimer", id: "CD3", delaySec: remainingSec },
     ],
   };
 }
@@ -482,8 +494,8 @@ function recoveryExpiryEvent(state: SessionState): SessionEvent {
   if (state === "CHECKIN_2") {
     return { kind: "CountdownExpired", timer: "CD2" };
   }
-  if (state === "FAMILY_ESCALATED") {
-    return { kind: "CountdownExpired", timer: "CANCEL" };
+  if (state === "CHECKIN_3") {
+    return { kind: "CountdownExpired", timer: "CD3" };
   }
   throw new Error("Only a timed state can expire during recovery");
 }

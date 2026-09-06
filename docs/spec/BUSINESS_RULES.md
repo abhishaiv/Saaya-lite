@@ -46,26 +46,16 @@ every zone.
 | Re-arm cooldown after `RESOLVED_OK` in the same zone | **20 min** | She answered. Give her space. |
 | Zone containment test | Haversine point-in-circle | A visible hotspot circle is authoritative: `distance(center, fix) <= radius`, with the boundary inside. The historical polygon is used only once at data load to classify a frozen anchor to its parent locality. |
 
-## 4. Check-in intervals (F15)
+## 4. Check-in cadence (F15, superseded 2026-09-06)
 
-Time from arming (or from the last `OK`) until check-in 1 appears.
+**Founder decision 2026-09-06:** the time from arming (or from the last `I'm OK`) until
+check-in 1 appears is a flat **5 minutes** for every arm mode. The previous tier/band
+interval table (5/8/10/12 min, MANUAL 10 min) is superseded; its facts carry
+`superseded_by` in `graph/spec_graph.json`. The arming matrix in section 2 is unchanged.
 
-| Risk tier | NIGHT_DEEP | NIGHT_LATE / DAWN | NIGHT_EARLY |
-|---|---|---|---|
-| **HIGH** | **5 min** | 8 min | 10 min |
-| **ELEVATED** | **8 min** | 10 min | n/a |
-| **MODERATE** | **12 min** | n/a | n/a |
-| **MANUAL** (any zone or none) | **10 min**, always | | |
-
-Cells marked n/a cannot start a new `AUTO_ZONE` session, because the arming matrix does not
-arm there. An already-active `AUTO_ZONE` session freezes the hour band captured when it
-armed as `armedHourBand`, and uses that band for every later check-in reschedule until the
-session reaches `RESOLVED`. Crossing into a current-band n/a cell never disarms or interrupts
-that session. After resolution, a new arming attempt evaluates the current hour band normally.
-`MANUAL` sessions never use `armedHourBand` and remain fixed at 10 minutes in every band.
-
-**Note there is no `DAY` column.** `DAY` runs 07:00 to 20:00 and never arms an `AUTO_ZONE`
-session in any tier. This is the rule the demo control has to respect.
+`armedHourBand` is still captured and persisted for `AUTO_ZONE` sessions (it still governs
+the arming matrix, the arm banner's frozen hour and the future civic record), but it no
+longer governs a reschedule interval.
 
 ### The demo control freezes the hour, and freezes it everywhere
 
@@ -105,34 +95,41 @@ presentation, which is where it belongs.
 This is the concrete difference from T-Safe's fixed 15-minute timer, so it must be
 visible in the UI: the check-in screen states why it checked when it did.
 
-## 5. The escalation ladder timings
+## 5. The escalation ladder timings (superseded 2026-09-06)
+
+**Founder decision 2026-09-06:** three check-ins, then SOS. The separate family-escalation
+screen and its cancel window are gone; the first miss is the automatic family-alert trigger.
+
+Normal profile:
 
 | Step | Timer | Value | On expiry |
 |---|---|---|---|
-| 1 | Check-in 1 countdown | **90 s** | go to step 2 |
-| 2 | Check-in 2 countdown, urgent | **60 s** | go to step 3 |
-| 3 | Family cancel window (F20) | **60 s** | go to step 4 (SOS) |
-| 4 | SOS | no timer, runs until PIN | |
+| cadence | arming / `I'm OK` -> check-in 1 | **5 min** | check-in 1 opens |
+| 1 | Check-in 1 countdown, gentle | **2 min** | request the family alert, go to step 2 |
+| 2 | Check-in 2 countdown, urgent | **1 min** | go to step 3 |
+| 3 | Check-in 3 countdown, final | **60 s (provisional)** | go to SOS (`LADDER_LAPSE`) |
+| SOS | no timer | runs until PIN | |
 
-Total from check-in 1 appearing to SOS: **210 s (3 min 30 s)**.
+Total from check-in 1 appearing to SOS: **240 s (4 min)**. The 60 s final window is
+provisional; the normal-mode final expiry remains pending until the founder specifies it.
+`I'm OK` on any rung resets to the 5-minute cadence and cancels any still-pending family-alert
+request. A provider-accepted message cannot be recalled.
 
-Check-in 2 differs from check-in 1 through the stronger in-page overlay. Lite has no sound,
-haptic or system-notification performer. The historical sound and vibration design is a
-round-two reference in `INTERACTION_SPEC.md`; it is not a current user-visible claim.
+Lite has no sound, haptic or system-notification performer. The historical sound and
+vibration design is a round-two reference in `INTERACTION_SPEC.md`; it is not a current
+user-visible claim.
 
-## 6. Demo speed (D1)
+## 6. Demo timing (D1, superseded 2026-09-06)
 
-A 210-second ladder does not fit a 3-minute video. A single global divisor scales **only**
-the four timers above and the two dwell values.
+The demo uses the same shared ladder with an explicit demo profile instead of a divisor.
+From Start Demo: check-in 1 opens **immediately** (0 s); each check-in window is **10 s**, so
+the first miss fires the family alert at 10 s, check-in 3 opens at 20 s and SOS begins at
+**30 s**. `I'm OK` in a demo run schedules the next check-in 1 after **10 s**. Every other
+rule (PIN, SOS entry, recovery) is identical to normal mode.
 
-| Mode | Divisor | Ladder total |
-|---|---|---|
-| `NORMAL` | 1 | 210 s |
-| `DEMO` | **6** | 35 s (15 / 10 / 10) |
-
-`DEMO` is toggled from the demo panel, is **visibly labelled on screen while active**, and
-the label appears in every screenshot. It never changes any rule other than these timers.
-Lite has no Firestore writer.
+`DEMO` is visibly labelled on screen while active and the label appears in every screenshot.
+The old 6x divisor is superseded; the divisor mechanism survives only for dwell scaling and
+is fixed at 1 in both profiles.
 
 ## 7. PIN (F5, F24)
 
@@ -149,43 +146,46 @@ Lite has no Firestore writer.
 
 The last row matters: someone holding her phone must not be able to reset their way out.
 
-## 8. Escalation payload to family (F19)
+## 8. First-miss family alert (F19, superseded 2026-09-06)
 
-Composed on device and displayed exactly as it could be sent. At `FAMILY_ESCALATED`, she may
-choose a user-controlled device handoff to her own SMS or WhatsApp app. Saaya Lite never sends,
-contacts, delivers or observes delivery itself.
+**Founder decision 2026-09-06:** the first missed check-in triggers an **automatic** family
+alert through a real messaging provider. A handoff link, local preview or simulated receipt
+does not satisfy this. The old compose-and-handoff payload below is superseded; its copy
+facts stay in the graph only as history.
 
-```
-Saaya alert - {name} may need help.
+The browser sends an **opaque operation handle** (a per-episode id) to a minimal server
+route. The server alone owns the opted-in recipient (environment-configured allowlist), the
+approved message template and the provider credentials (`WHATSAPP_ACCESS_TOKEN`,
+`WHATSAPP_PHONE_NUMBER_ID`, never `NEXT_PUBLIC_`). No arbitrary recipient or message body is
+accepted. The route deduplicates per episode, bounds total sends, cancels still-pending
+requests when `I'm OK` resolves the episode, and reports only truthful states: sending,
+provider accepted, failed, unknown. Provider acceptance is **never** presented as delivered;
+delivery is shown only from authenticated provider evidence or recorded as human-observed
+test evidence. Messaging failure never stops or suppresses the ladder.
 
-{name} did not answer two safety check-ins.
+Approved demo alert text (opted-in test recipient): "Saaya Lite demo: a scheduled check-in
+wasn't answered. This is a test alert; no emergency has been reported." A normal alert
+calmly requests contact without diagnosing danger: "A scheduled Saaya Lite check-in wasn't
+answered. Please try contacting them to check in." No name or location is inserted
+automatically.
 
-Where: {zoneName} area, Visakhapatnam
-When: {HH:mm}, {day}
-Area risk: {riskLevel} - {womenSafetyCases} women-safety cases on record here
-Last seen: near {areasCoveredFirstItem}
+### Narrow privacy amendment (binding)
 
-Nearest police station: {stationName}, {phone} ({distanceM} m away)
+Automatic pre-SOS messaging exposes the destination number and message to the messaging
+relay and provider. That supersedes the old absolute claim that all contacts and messages
+stay on the phone. The exact boundary, which all copy must state:
 
-She has {cancelWindowSec} seconds to cancel this. If she does not, Saaya opens a local SOS
-screen.
+- A selected opted-in recipient and the minimal approved alert message may be processed by
+  the messaging relay/provider after the first miss.
+- No full address book, raw contacts list, PIN, real cab GPS or unnecessary identity enters
+  this path.
+- The anonymous SUS civic record and police path remain separate and contain no family
+  number, message or messaging operation identifier.
+- The messaging request is not stored in public Firestore and is not sent to analytics.
+- No claim of total anonymity from hosting/messaging providers, and no promise they retain
+  no metadata.
 
-Prepared locally by Saaya Lite.
-```
-
-The visible F21 disclosure is **not removable**: Saaya Lite does not send or know whether the
-message was sent; her tap only attempts to open her messaging app with the message ready. The
-handoff URI is constructed only during that tap. There is no prefetch, probe, automatic open,
-provider, server route, delivery receipt or inferred handoff state.
-
-`{name}` is **her** name, from `user_name` in the settings store, not the contact's. If it
-is unset, substitute `family_subject_fallback` rather than leaving a gap or omitting the
-line: the recipient still needs to know the alert is about a person and not a test.
-
-**Her name, favourite and composed message never enter a Saaya backend.** They remain local
-until she deliberately taps a handoff control. Her own messaging app may then receive the
-recipient and exact displayed message; Saaya Lite receives no delivery status. Lite has neither
-a SUS event nor an SOS incident writer.
+Her favourites and PIN still never enter a Saaya backend and never ride in an engine command.
 
 ## 9. Nearest station (F8)
 

@@ -10,7 +10,7 @@ export type CountdownRingProps = Readonly<{
   (
     | {
         variant: "card";
-        rung: "CHECKIN_1" | "CHECKIN_2" | "FAMILY_ESCALATED";
+        rung: "CHECKIN_1" | "CHECKIN_2" | "CHECKIN_3";
       }
     | {
         variant: "sos";
@@ -117,7 +117,7 @@ export function CountdownRing({
           --countdown-ring-accent: var(--accent-checkin-2);
         }
 
-        .countdown-ring[data-rung="FAMILY_ESCALATED"] {
+        .countdown-ring[data-rung="CHECKIN_3"] {
           --countdown-ring-accent: var(--accent-family);
         }
 

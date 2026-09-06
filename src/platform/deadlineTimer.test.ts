@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { FakeSessionRepository } from "../data/repository/sessionRepository";
-import { CHECK_IN_2_SEC } from "../domain/engine/rules";
+import { LADDER_WINDOW_1_SEC } from "../domain/engine/rules";
 import type { PersistedSession, TimerId } from "../domain/model/session";
 import { secondsToEpochMs } from "./clock";
 import { AbsoluteDeadlineTimer } from "./deadlineTimer";
@@ -65,9 +65,9 @@ describe("absolute deadline timer", () => {
     const persisted = await timer.schedule(
       persistedSession(),
       "CD1",
-      CHECK_IN_2_SEC,
+      LADDER_WINDOW_1_SEC,
     );
-    const expectedDeadline = secondsToEpochMs(CHECK_IN_2_SEC);
+    const expectedDeadline = secondsToEpochMs(LADDER_WINDOW_1_SEC);
     expect(persisted.deadlineEpochMs).toBe(expectedDeadline);
     expect(repository.current?.deadlineEpochMs).toBe(expectedDeadline);
     expect(scheduler.delayMs).toBe(expectedDeadline);
@@ -88,10 +88,10 @@ describe("absolute deadline timer", () => {
       clock,
       scheduler,
     );
-    await timer.schedule(persistedSession(), "CD1", CHECK_IN_2_SEC);
+    await timer.schedule(persistedSession(), "CD1", LADDER_WINDOW_1_SEC);
 
     scheduler.fire();
     expect(fired).toEqual([]);
-    expect(scheduler.delayMs).toBe(secondsToEpochMs(CHECK_IN_2_SEC));
+    expect(scheduler.delayMs).toBe(secondsToEpochMs(LADDER_WINDOW_1_SEC));
   });
 });

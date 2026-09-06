@@ -1,59 +1,17 @@
-import type { SessionEvent, SessionState } from "../../../domain/model/session";
-import { RiskTier, type Zone } from "../../../domain/model/zone";
+import type { SessionEvent } from "../../../domain/model/session";
 
-export function simulatedZoneEntryEvent(zone: Zone): SessionEvent | null {
-  if (zone.riskTier === RiskTier.SAFE) return null;
-  return { kind: "ZoneEntered", zoneId: zone.stationId };
-}
-
-export function nextMissedCheckInEvent(
-  state: SessionState,
-): SessionEvent | null {
-  if (state === "SHADOW") return { kind: "CheckInTimerFired" };
-  if (state === "CHECKIN_1") {
-    return { kind: "CountdownExpired", timer: "CD1" };
-  }
-  if (state === "CHECKIN_2") {
-    return { kind: "CountdownExpired", timer: "CD2" };
-  }
-  return null;
-}
-
-export function eventsToFamilyEscalation(
-  state: SessionState,
-): readonly SessionEvent[] {
-  switch (state) {
-    case "IDLE":
-    case "RESOLVED":
-      return [
-        { kind: "ManualArm" },
-        { kind: "CheckInTimerFired" },
-        { kind: "CountdownExpired", timer: "CD1" },
-        { kind: "CountdownExpired", timer: "CD2" },
-      ];
-    case "SHADOW":
-      return [
-        { kind: "CheckInTimerFired" },
-        { kind: "CountdownExpired", timer: "CD1" },
-        { kind: "CountdownExpired", timer: "CD2" },
-      ];
-    case "CHECKIN_1":
-      return [
-        { kind: "CountdownExpired", timer: "CD1" },
-        { kind: "CountdownExpired", timer: "CD2" },
-      ];
-    case "CHECKIN_2":
-      return [{ kind: "CountdownExpired", timer: "CD2" }];
-    case "FAMILY_ESCALATED":
-    case "SOS_ACTIVE":
-      return [];
-  }
-}
-
-export function eventsToSos(state: SessionState): readonly SessionEvent[] {
-  if (state === "SOS_ACTIVE") return [];
-  if (state === "IDLE" || state === "RESOLVED") {
-    return [{ kind: "ManualArm" }, { kind: "HelpNowTapped" }];
-  }
-  return [{ kind: "HelpNowTapped" }];
+/**
+ * The Start Demo sequence (founder decision 2026-09-06): a simulated entry
+ * into the demo's synthetic HIGH zone at the frozen demo hour arms a real
+ * AUTO_ZONE session on the shared engine, then the check-in timer fires
+ * immediately so check-in 1 opens at Start (fact: demo.start.checkin1.sec).
+ * Every later transition, countdown, alert intent and PIN resolution runs
+ * through the same shared path as a live session; there is no separate fake
+ * sequence.
+ */
+export function startDemoEventSequence(zoneId: string): readonly SessionEvent[] {
+  return [
+    { kind: "ZoneEntered", zoneId },
+    { kind: "CheckInTimerFired" },
+  ];
 }

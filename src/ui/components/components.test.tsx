@@ -30,13 +30,14 @@ const STATUS_LABELS: StatusPillLabels = {
   shadowManual: "Watching, you turned this on",
   checkIn1: "Checking in",
   checkIn2: "Still there?",
+  checkIn3: "Last check-in",
   family: "Preparing a message",
   sos: "SOS active",
 };
 
 function noop() {}
 
-function ladderMarkup(rung: "CHECKIN_1" | "CHECKIN_2" | "FAMILY_ESCALATED") {
+function ladderMarkup(rung: "CHECKIN_1" | "CHECKIN_2" | "CHECKIN_3") {
   const shared = {
     message: "Message",
     phase: "visible" as const,
@@ -53,7 +54,7 @@ function ladderMarkup(rung: "CHECKIN_1" | "CHECKIN_2" | "FAMILY_ESCALATED") {
     return renderToStaticMarkup(<LadderCard {...shared} rung="CHECKIN_2" />);
   }
 
-  return renderToStaticMarkup(<LadderCard {...shared} rung="FAMILY_ESCALATED" />);
+  return renderToStaticMarkup(<LadderCard {...shared} rung="CHECKIN_3" />);
 }
 
 describe("C1 and C2 action controls", () => {
@@ -101,15 +102,19 @@ describe("C3 and C4 ladder surfaces", () => {
     expect(LADDER_CARD_BACK_POLICY).toEqual({
       CHECKIN_1: "delegate",
       CHECKIN_2: "consume",
-      FAMILY_ESCALATED: "consume",
+      CHECKIN_3: "consume",
     });
 
-    for (const rung of ["CHECKIN_1", "CHECKIN_2", "FAMILY_ESCALATED"] as const) {
+    for (const rung of ["CHECKIN_1", "CHECKIN_2", "CHECKIN_3"] as const) {
       const markup = ladderMarkup(rung);
       expect(markup).toContain('role="dialog"');
       expect(markup).toContain('data-scrim-dismisses="false"');
       expect(markup).toContain('data-swipe-dismisses="false"');
     }
+
+    expect(ladderMarkup("CHECKIN_1")).toContain('data-back-policy="delegate"');
+    expect(ladderMarkup("CHECKIN_2")).toContain('data-back-policy="consume"');
+    expect(ladderMarkup("CHECKIN_3")).toContain('data-back-policy="consume"');
 
     const minimizable = renderToStaticMarkup(
       <LadderCard
@@ -178,14 +183,44 @@ describe("C5 to C8 status and spatial components", () => {
       renderToStaticMarkup(<StatusPill armMode="MANUAL" labels={STATUS_LABELS} state="SHADOW" />),
       renderToStaticMarkup(<StatusPill labels={STATUS_LABELS} state="CHECKIN_1" />),
       renderToStaticMarkup(<StatusPill labels={STATUS_LABELS} state="CHECKIN_2" />),
-      renderToStaticMarkup(<StatusPill labels={STATUS_LABELS} state="FAMILY_ESCALATED" />),
+      renderToStaticMarkup(<StatusPill labels={STATUS_LABELS} state="CHECKIN_3" />),
       renderToStaticMarkup(<StatusPill labels={STATUS_LABELS} state="SOS_ACTIVE" />),
     ].join("\n");
 
-    for (const label of Object.values(STATUS_LABELS)) {
+    const renderedLabels = [
+      STATUS_LABELS.idle,
+      STATUS_LABELS.shadowAuto,
+      STATUS_LABELS.shadowManual,
+      STATUS_LABELS.checkIn1,
+      STATUS_LABELS.checkIn2,
+      STATUS_LABELS.checkIn3,
+      STATUS_LABELS.sos,
+    ];
+    for (const label of renderedLabels) {
       expect(examples).toContain(label);
     }
     expect(examples).not.toContain("text-transform:uppercase");
+  });
+
+  it("gives the final rung and its legacy persisted state the CHECKIN_3 presentation", () => {
+    const checkin3 = renderToStaticMarkup(
+      <StatusPill labels={STATUS_LABELS} state="CHECKIN_3" />,
+    );
+    const legacy = renderToStaticMarkup(
+      <StatusPill labels={STATUS_LABELS} state="FAMILY_ESCALATED" />,
+    );
+
+    expect(checkin3).toContain('data-state="CHECKIN_3"');
+    expect(checkin3).toContain("status-pill--danger");
+    expect(checkin3).toContain(STATUS_LABELS.checkIn3);
+    expect(checkin3).not.toContain(STATUS_LABELS.family);
+
+    // A pre-2026-09-06 persisted FAMILY_ESCALATED row still renders the
+    // renamed final-rung presentation instead of the old family label.
+    expect(legacy).toContain('data-state="FAMILY_ESCALATED"');
+    expect(legacy).toContain("status-pill--danger");
+    expect(legacy).toContain(STATUS_LABELS.checkIn3);
+    expect(legacy).not.toContain(STATUS_LABELS.family);
   });
 
   it("uses audited zone colour except for SAFE", () => {

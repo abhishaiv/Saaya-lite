@@ -21,10 +21,17 @@ export type M4Copy = Readonly<{
   aboutRealSos: string;
   aboutRealTitle: string;
   aboutRealWrites: string;
+  aboutPrivacyBoundary: string;
   aboutTitle: string;
   aboutVersion: string;
   aboutWhatBody: string;
   aboutWhatTitle: string;
+  alertCancelNote: string;
+  alertStatusAccepted: string;
+  alertStatusFailed: string;
+  alertStatusNotReady: string;
+  alertStatusSending: string;
+  alertStatusUnknown: string;
   annFamily: string;
   appName: string;
   cdBack: string;
@@ -55,6 +62,7 @@ export type M4Copy = Readonly<{
   ctaArmManually: string;
   ctaImHome: string;
   ctaOpenDemo: string;
+  ctaStartDemo: string;
   ctaSendSms: string;
   ctaSendWhatsapp: string;
   ctaSos: string;
@@ -66,8 +74,13 @@ export type M4Copy = Readonly<{
   demoPickZone: string;
   demoPickZoneHint: string;
   demoReset: string;
+  demoResetBlockedSos: string;
   demoResetDone: string;
+  durationMinutes: string;
+  durationSeconds: string;
   demoSessionLiveReason: string;
+  demoStartDisclosure: string;
+  demoTimingNote: string;
   demoSpeedNoteFast: string;
   demoSpeedNoteNormal: string;
   demoSpeedToggle: string;
@@ -94,7 +107,11 @@ export type M4Copy = Readonly<{
   checkin1Title: string;
   checkin2Body: string;
   checkin2Title: string;
+  checkin3Body: string;
+  checkin3Title: string;
   checkinPersistNote: string;
+  okThanksBody: string;
+  okThanksTitle: string;
   locHelpBody: string;
   locHelpNote: string;
   locHelpTitle: string;
@@ -123,6 +140,15 @@ export type M4Copy = Readonly<{
   onbWelcomeTitle: string;
   pinNoRecovery: string;
   pinTitle: string;
+  policeDemoLabel: string;
+  policeDemoLocalNote: string;
+  policeDemoRowArmed: string;
+  policeDemoRowMissed: string;
+  policeDemoRowSos: string;
+  policeDemoRowStopped: string;
+  policeDemoStatusActive: string;
+  policeDemoStatusStopped: string;
+  policeDemoZone: string;
   policeNoGovtLink: string;
   errNoStation: string;
   riskBandElevated: string;
@@ -147,6 +173,7 @@ export type M4Copy = Readonly<{
   setTitle: string;
   statusCheckin1: string;
   statusCheckin2: string;
+  statusCheckin3: string;
   statusFamily: string;
   statusIdle: string;
   statusShadowAuto: string;
@@ -184,17 +211,24 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     aboutRealArm: "Automatic arming, with nothing pressed",
     aboutRealConsole: "State-view console (round two, not in Lite)",
     aboutRealDetail: "Zone detail and the nearest station",
-    aboutRealFamily: "Family escalation, composed with context",
-    aboutRealLadder: "The four-step check-in ladder, on real timings",
+    aboutRealFamily: "The automatic family alert after a missed check-in",
+    aboutRealLadder: "The three-check-in ladder, on real timings",
     aboutRealMap: "The Visakhapatnam map, 24 zones from real records",
     aboutRealSos: "PIN-protected SOS",
     aboutRealTitle: "What is real",
     aboutRealWrites: "State-view writes (round two, not in Lite)",
+    aboutPrivacyBoundary: "Privacy boundary: after a missed check-in, Saaya sends the alert text to the chosen recipient through a messaging provider, so the provider sees that number and that text. Before that, nothing identifying leaves the phone, and no identifying record goes to any police path at any time in this prototype.",
     aboutTitle: "About",
     aboutVersion: "Version %1$s (%2$d)",
     aboutWhatBody: "Saaya Lite is a prototype built for Build What Moves India. It shows the tier missing below India's emergency apps: the one that works before anything has happened.",
     aboutWhatTitle: "What this is",
     annFamily: "Saaya prepared this message on this phone. Choose a messaging app below to review it and send it yourself.",
+    alertCancelNote: "I'm OK stops the next check-in timer. A message already sent cannot be recalled.",
+    alertStatusAccepted: "WhatsApp accepted the alert for delivery.",
+    alertStatusFailed: "The WhatsApp alert could not be sent.",
+    alertStatusNotReady: "The WhatsApp connection is not ready.",
+    alertStatusSending: "Sending the check-in alert...",
+    alertStatusUnknown: "The alert's send status is unknown.",
     appName: "Saaya Lite",
     cdBack: "Go back",
     cdCancelEscalation: "Cancel this preview. It stays on your phone.",
@@ -224,19 +258,25 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     ctaArmManually: "Start Shadow",
     ctaImHome: "I am home",
     ctaOpenDemo: "Open the demo",
+    ctaStartDemo: "Start Demo",
     ctaSendSms: "Open text message",
     ctaSendWhatsapp: "Open WhatsApp",
     ctaSos: "SOS",
     ctaSus: "SUS",
     demoJumpFamily: "Jump to family escalation",
     demoMissCheckin: "Simulate a missed check-in",
-    demoModeActive: "Demo speed is on. Timers are 6x faster than the real product.",
+    demoModeActive: "Demo mode is on. Timers are accelerated for this recording.",
     demoPanelHeader: "These are prototype controls for demonstrating the journey. They are not product features.",
     demoPickZone: "Simulate entering a zone",
     demoPickZoneHint: "Choose any of the 24 Visakhapatnam zones.",
     demoReset: "Reset session",
+    demoResetBlockedSos: "Demo reset is unavailable during SOS. Enter the correct PIN to stop.",
     demoResetDone: "Session reset.",
+    durationMinutes: "%1$d minutes",
+    durationSeconds: "%1$d seconds",
     demoSessionLiveReason: "Finish or stop the current session first",
+    demoStartDisclosure: "This demo simulates entering a flagged area at night. Three check-ins appear, ten seconds apart. If the first is missed, Saaya sends a real WhatsApp alert to the chosen test recipient. I'm OK resets it. SOS stops only with your PIN.",
+    demoTimingNote: "Demo timing is accelerated. Normal check-ins run on a five-minute cadence.",
     demoSpeedNoteFast: "Timers run %1$dx faster. The full ladder takes %2$d seconds instead of %3$d.",
     demoSpeedNoteNormal: "Timers run at normal speed (%1$dx). The full ladder takes %3$d seconds.",
     demoSpeedToggle: "Demo speed",
@@ -274,9 +314,13 @@ Prepared locally by Saaya Lite.`,
     checkin1Body: "All good? Tap I'm OK and we'll keep quietly watching over you.",
     checkin1Reason: "You are in %1$s, a %2$s area, at %3$s.",
     checkin1Title: "Just checking in",
-    checkin2Body: "We still haven't heard from you. Tap I'm OK when you can, or Saaya will show a local message preview in a few minutes.",
+    checkin2Body: "Tap I'm OK when you can.",
     checkin2Title: "Quick reminder",
+    checkin3Body: "Tap I'm OK to continue. If you don't respond, SOS starts when this timer ends.",
+    checkin3Title: "One more check-in",
     checkinPersistNote: "Swiping this away does not stop the timer.",
+    okThanksBody: "The next check-in is scheduled %1$s from now.",
+    okThanksTitle: "Thanks for checking in",
     locHelpBody: "In your browser, open the site settings for this page and allow Location. Then come back and tap Try again.",
     locHelpNote: "Where this setting lives depends on your browser.",
     locHelpTitle: "Turn location back on",
@@ -305,6 +349,15 @@ Prepared locally by Saaya Lite.`,
     onbWelcomeTitle: "You do not have to press anything",
     pinNoRecovery: "There is no way around this PIN. If there were, anyone holding your phone could use it.",
     pinTitle: "Enter your PIN to stop",
+    policeDemoLabel: "Demo - synthetic incident",
+    policeDemoLocalNote: "Local demo preview. Not sent to any police system.",
+    policeDemoRowArmed: "Watch began",
+    policeDemoRowMissed: "Check-in %1$d missed",
+    policeDemoRowSos: "SOS began",
+    policeDemoRowStopped: "Stopped after correct PIN",
+    policeDemoStatusActive: "Active",
+    policeDemoStatusStopped: "Stopped",
+    policeDemoZone: "Area",
     policeNoGovtLink: "Saaya Lite is a prototype. It is not connected to AP Police, Shakthi, T-Safe, 112 or ERSS, and it is not a government product.",
     errNoStation: "No police station within 20 km.",
     riskBandElevated: "Elevated",
@@ -329,6 +382,7 @@ Prepared locally by Saaya Lite.`,
     setTitle: "Settings",
     statusCheckin1: "Checking in",
     statusCheckin2: "Still there?",
+    statusCheckin3: "Last check-in",
     statusFamily: "Preparing a message",
     statusIdle: "Not watching",
     statusShadowAuto: "Watching this stretch",
@@ -364,17 +418,24 @@ Prepared locally by Saaya Lite.`,
     aboutRealArm: "ఏదీ నొక్కకుండా ఆటోమేటిక్ ఆర్మింగ్",
     aboutRealConsole: "రాష్ట్ర వ్యూ కన్సోల్ (రెండో రౌండ్, Lite లో లేదు)",
     aboutRealDetail: "జోన్ వివరాలు, సమీప స్టేషన్",
-    aboutRealFamily: "సందర్భంతో తయారైన ఆత్మీయుల హెచ్చరిక",
-    aboutRealLadder: "నాలుగు దశల చెక్-ఇన్ నిచ్చెన, నిజమైన సమయాలతో",
+    aboutRealFamily: "చెక్-ఇన్ మిస్ అయిన తర్వాత ఆటోమేటిక్ ఆత్మీయుల హెచ్చరిక",
+    aboutRealLadder: "మూడు చెక్-ఇన్‌ల నిచ్చెన, నిజమైన సమయాలతో",
     aboutRealMap: "విశాఖపట్నం మ్యాప్, నిజమైన రికార్డుల నుండి 24 జోన్లు",
     aboutRealSos: "PIN రక్షణ ఉన్న SOS",
     aboutRealTitle: "ఏది నిజం",
     aboutRealWrites: "రాష్ట్ర వ్యూ రాతలు (రెండో రౌండ్, Lite లో లేవు)",
+    aboutPrivacyBoundary: "గోప్యతా హద్దు: చెక్-ఇన్ మిస్ అయిన తర్వాత, సాయ ఎంచుకున్న వ్యక్తికి హెచ్చరిక టెక్స్ట్‌ను మెసేజింగ్ ప్రొవైడర్ ద్వారా పంపుతుంది, కాబట్టి ఆ నంబర్, ఆ టెక్స్ట్ ప్రొవైడర్‌కు కనిపిస్తాయి. అంతకు ముందు ఫోన్ నుండి గుర్తించే సమాచారం ఏమీ బయటకు వెళ్లదు; ఈ ప్రోటోటైప్‌లో ఎప్పుడూ గుర్తించే పోలీస్ రికార్డు ఏ పోలీస్ వ్యవస్థకీ వెళ్లదు.",
     aboutTitle: "గురించి",
     aboutVersion: "వెర్షన్ %1$s (%2$d)",
     aboutWhatBody: "సాయ లైట్ అనేది Build What Moves India కోసం తయారుచేసిన ప్రోటోటైప్. భారత అత్యవసర యాప్‌ల కింద లేని ఒక దశను ఇది చూపిస్తుంది: ఏదీ జరగకముందే పనిచేసేది.",
     aboutWhatTitle: "ఇది ఏమిటి",
     annFamily: "సాయ ఈ సందేశాన్ని మీ ఫోన్‌లో తయారుచేసింది. దాన్ని పరిశీలించి మీరే పంపడానికి దిగువన ఉన్న మెసేజింగ్ యాప్‌ను ఎంచుకోండి.",
+    alertCancelNote: "\"నేను బాగున్నాను\" తదుపరి చెక్-ఇన్ టైమర్‌ను ఆపుతుంది. ఇప్పటికే పంపిన సందేశాన్ని వెనక్కి తీసుకోలేము.",
+    alertStatusAccepted: "డెలివరీ కోసం WhatsApp హెచ్చరికను అంగీకరించింది.",
+    alertStatusFailed: "WhatsApp హెచ్చరికను పంపలేకపోయాము.",
+    alertStatusNotReady: "WhatsApp కనెక్షన్ సిద్ధంగా లేదు.",
+    alertStatusSending: "చెక్-ఇన్ హెచ్చరిక పంపుతున్నాం...",
+    alertStatusUnknown: "హెచ్చరిక పంపినదా లేదా అనేది తెలియలేదు.",
     appName: "సాయ లైట్",
     cdBack: "వెనక్కి వెళ్ళు",
     cdCancelEscalation: "ఈ ప్రివ్యూను రద్దు చేయి. ఇది మీ ఫోన్‌లోనే ఉంటుంది.",
@@ -404,19 +465,25 @@ Prepared locally by Saaya Lite.`,
     ctaArmManually: "షాడో ప్రారంభించు",
     ctaImHome: "నేను ఇంటికి చేరాను",
     ctaOpenDemo: "డెమో తెరువు",
+    ctaStartDemo: "డెమో మొదలుపెట్టు",
     ctaSendSms: "టెక్స్ట్ సందేశాన్ని తెరువు",
     ctaSendWhatsapp: "WhatsApp తెరువు",
     ctaSos: "SOS",
     ctaSus: "SUS",
     demoJumpFamily: "ఆత్మీయుల దశకు వెళ్లు",
     demoMissCheckin: "చెక్-ఇన్ మిస్ అయినట్టు చూపించు",
-    demoModeActive: "డెమో వేగం ఆన్‌లో ఉంది. టైమర్లు అసలు ఉత్పత్తి కంటే 6 రెట్లు వేగంగా ఉన్నాయి.",
+    demoModeActive: "డెమో మోడ్ ఆన్‌లో ఉంది. ఈ రికార్డింగ్ కోసం టైమర్లు వేగవంతం చేయబడ్డాయి.",
     demoPanelHeader: "ఇవి ప్రయాణాన్ని చూపించడానికి ప్రోటోటైప్ నియంత్రణలు. ఇవి ఉత్పత్తి ఫీచర్లు కావు.",
     demoPickZone: "ఒక జోన్‌లోకి ప్రవేశించినట్టు చూపించు",
     demoPickZoneHint: "విశాఖపట్నంలోని 24 జోన్లలో ఏదైనా ఎంచుకోండి.",
     demoReset: "సెషన్‌ను రీసెట్ చేయి",
+    demoResetBlockedSos: "SOS సమయంలో డెమో రీసెట్ అందుబాటులో లేదు. ఆపడానికి సరైన PIN నమోదు చేయండి.",
     demoResetDone: "సెషన్ రీసెట్ అయింది.",
+    durationMinutes: "%1$d నిమిషాలు",
+    durationSeconds: "%1$d సెకన్లు",
     demoSessionLiveReason: "ముందుగా ప్రస్తుత సెషన్‌ను పూర్తి చేయండి లేదా ఆపండి",
+    demoStartDisclosure: "ఈ డెమో రాత్రిపూట గుర్తించబడిన ప్రాంతంలోకి ప్రవేశించినట్టు చూపిస్తుంది. మూడు చెక్-ఇన్‌లు పది సెకన్ల విరామంలో వస్తాయి. మొదటిది మిస్ అయితే, సాయ ఎంచుకున్న టెస్ట్ గ్రహీతకు నిజమైన WhatsApp హెచ్చరిక పంపుతుంది. \"నేను బాగున్నాను\" దీన్ని రీసెట్ చేస్తుంది. SOS మీ PIN తోనే ఆగుతుంది.",
+    demoTimingNote: "డెమో సమయం వేగవంతం చేయబడింది. సాధారణ చెక్-ఇన్‌లు ఐదు నిమిషాల క్యాడెన్స్‌లో నడుస్తాయి.",
     demoSpeedNoteFast: "టైమర్లు %1$d రెట్లు వేగంగా నడుస్తాయి. పూర్తి నిచ్చెన %3$d సెకన్లకు బదులు %2$d సెకన్లు పడుతుంది.",
     demoSpeedNoteNormal: "టైమర్లు సాధారణ వేగంతో (%1$dx) నడుస్తాయి. పూర్తి నిచ్చెనకు %3$d సెకన్లు పడతాయి.",
     demoSpeedToggle: "డెమో వేగం",
@@ -454,9 +521,13 @@ Prepared locally by Saaya Lite.`,
     checkin1Body: "అంతా బాగుందా? \"నేను బాగున్నాను\" నొక్కండి, మేము నిశ్శబ్దంగా మిమ్మల్ని గమనిస్తూ ఉంటాం.",
     checkin1Reason: "మీరు %3$s కి %2$s ప్రాంతమైన %1$s లో ఉన్నారు.",
     checkin1Title: "ఒకసారి చూస్తున్నాం",
-    checkin2Body: "మీ నుండి ఇంకా సమాధానం రాలేదు. వీలైనప్పుడు \"నేను బాగున్నాను\" నొక్కండి, లేదంటే కొన్ని నిమిషాల్లో సాయ స్థానిక సందేశ ప్రివ్యూను చూపిస్తుంది.",
+    checkin2Body: "వీలైనప్పుడు \"నేను బాగున్నాను\" నొక్కండి.",
     checkin2Title: "ఒక చిన్న గుర్తు",
+    checkin3Body: "కొనసాగడానికి \"నేను బాగున్నాను\" నొక్కండి. మీరు స్పందించకపోతే, ఈ టైమర్ అయిన తర్వాత SOS ప్రారంభమవుతుంది.",
+    checkin3Title: "ఇంకో చెక్-ఇన్",
     checkinPersistNote: "దీన్ని తీసివేయడం వల్ల టైమర్ ఆగదు.",
+    okThanksBody: "తదుపరి చెక్-ఇన్ ఇప్పటి నుండి %1$s లో షెడ్యూల్ అయింది.",
+    okThanksTitle: "చెక్-ఇన్ చేసినందుకు ధన్యవాదాలు",
     locHelpBody: "మీ బ్రౌజర్‌లో ఈ పేజీ సైట్ సెట్టింగ్‌లు తెరిచి, లొకేషన్‌ను అనుమతించండి. తర్వాత తిరిగి వచ్చి \"మళ్లీ ప్రయత్నించు\" నొక్కండి.",
     locHelpNote: "ఈ సెట్టింగ్ ఎక్కడ ఉంటుందో మీ బ్రౌజర్‌ను బట్టి మారుతుంది.",
     locHelpTitle: "లొకేషన్ మళ్లీ ఆన్ చేయండి",
@@ -485,6 +556,15 @@ Prepared locally by Saaya Lite.`,
     onbWelcomeTitle: "మీరు ఏదీ నొక్కాల్సిన అవసరం లేదు",
     pinNoRecovery: "ఈ PIN ని దాటవేసే మార్గం లేదు. ఉంటే, మీ ఫోన్ పట్టుకున్న ఎవరైనా దాన్ని వాడగలరు.",
     pinTitle: "ఆపడానికి మీ PIN నమోదు చేయండి",
+    policeDemoLabel: "డెమో - కృత్రిమ ఘటన",
+    policeDemoLocalNote: "స్థానిక డెమో ప్రివ్యూ. ఏ పోలీస్ వ్యవస్థకీ పంపబడలేదు.",
+    policeDemoRowArmed: "వాచ్ ప్రారంభమైంది",
+    policeDemoRowMissed: "చెక్-ఇన్ %1$d మిస్ అయింది",
+    policeDemoRowSos: "SOS ప్రారంభమైంది",
+    policeDemoRowStopped: "సరైన PIN తర్వాత ఆగిపోయింది",
+    policeDemoStatusActive: "యాక్టివ్",
+    policeDemoStatusStopped: "ఆగిపోయింది",
+    policeDemoZone: "ప్రాంతం",
     policeNoGovtLink: "సాయ లైట్ ఒక ప్రోటోటైప్. ఇది AP పోలీస్, శక్తి, T-Safe, 112 లేదా ERSS తో అనుసంధానించబడలేదు, ఇది ప్రభుత్వ ఉత్పత్తి కాదు.",
     errNoStation: "20 కి.మీ. లోపు పోలీస్ స్టేషన్ లేదు.",
     riskBandElevated: "ఎక్కువ",
@@ -509,6 +589,7 @@ Prepared locally by Saaya Lite.`,
     setTitle: "సెట్టింగ్‌లు",
     statusCheckin1: "చెక్-ఇన్ చేస్తోంది",
     statusCheckin2: "ఇంకా అక్కడ ఉన్నారా?",
+    statusCheckin3: "చివరి చెక్-ఇన్",
     statusFamily: "సందేశం సిద్ధం చేస్తోంది",
     statusIdle: "గమనించడం లేదు",
     statusShadowAuto: "ఈ మార్గాన్ని గమనిస్తోంది",

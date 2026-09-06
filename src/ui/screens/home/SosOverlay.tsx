@@ -26,8 +26,22 @@ const PIN_MAX_LOCKOUT_SEC = PIN_MAX_LOCKOUT_MIN * MINUTES_PER_HOUR;
 const INDIA_EMERGENCY_NUMBER = "112"; // fact: data.emergency.number.in
 const WOMEN_SUPPORT_NUMBER = "181"; // fact: data.emergency.number.women_support
 
+/**
+ * The demo's synthetic police-dispatch preview. Every field is local copy;
+ * nothing here is or implies an actual police record, dispatch or receipt.
+ */
+export interface SosDemoIncident {
+  readonly label: string;
+  readonly localNote: string;
+  /** Ordered incident rows, rendered verbatim. */
+  readonly rows: readonly string[];
+  readonly statusActive: string;
+  readonly zoneRow: string | null;
+}
+
 export interface SosOverlayProps {
   readonly copy: M4Copy;
+  readonly demoIncident: SosDemoIncident | null;
   readonly nearestStation: PoliceStation | null;
   readonly onPinAccepted: () => void;
 }
@@ -35,6 +49,7 @@ export interface SosOverlayProps {
 /** M1 step 4: a sticky, non-animated SOS surface with its local PIN gate. */
 export function SosOverlay({
   copy,
+  demoIncident,
   nearestStation,
   onPinAccepted,
 }: SosOverlayProps) {
@@ -165,6 +180,28 @@ export function SosOverlay({
               content={copy.policeNoGovtLink}
               kind="prototype-limitation"
             />
+            {demoIncident === null ? null : (
+              <section
+                aria-label={demoIncident.label}
+                className="sos-overlay__demo"
+              >
+                <h2>{demoIncident.label}</h2>
+                <ul>
+                  {demoIncident.rows.map((row) => (
+                    <li key={row}>{row}</li>
+                  ))}
+                </ul>
+                {demoIncident.zoneRow === null ? null : (
+                  <p>{demoIncident.zoneRow}</p>
+                )}
+                <p className="sos-overlay__demo-status">
+                  {demoIncident.statusActive}
+                </p>
+                <p className="sos-overlay__demo-note">
+                  {demoIncident.localNote}
+                </p>
+              </section>
+            )}
             <div className="sos-overlay__dials">
               <DialAction copy={copy} number={INDIA_EMERGENCY_NUMBER} />
               <DialAction copy={copy} number={WOMEN_SUPPORT_NUMBER} />
@@ -288,6 +325,49 @@ export function SosOverlay({
         :global(.sos-overlay__call:focus-visible) {
           outline: 2px solid var(--color-brand-light);
           outline-offset: 2px;
+        }
+
+        .sos-overlay__demo {
+          display: grid;
+          justify-items: center;
+          gap: var(--space-4);
+          inline-size: 100%; /* GROUNDED-EXEMPT: the preview card fills the already padded overlay column. */
+          padding: var(--space-12) var(--space-14);
+          border: var(--border-hairline) solid var(--color-text-primary);
+          border-radius: var(--radius-control);
+          font-size: var(--type-body-size);
+          line-height: var(--type-body-line-height);
+          text-align: center;
+        }
+
+        .sos-overlay__demo h2 {
+          margin: 0;
+          font-size: var(--type-label-size);
+          font-weight: var(--weight-bold);
+          letter-spacing: var(--type-label-tracking);
+          line-height: var(--type-label-line-height);
+        }
+
+        .sos-overlay__demo ul {
+          display: grid;
+          gap: var(--space-4);
+          margin: 0;
+          padding: 0;
+          list-style: none;
+        }
+
+        .sos-overlay__demo p {
+          margin: 0;
+        }
+
+        .sos-overlay__demo-status {
+          font-weight: var(--weight-semibold);
+        }
+
+        .sos-overlay__demo-note {
+          color: var(--color-text-on-card);
+          font-size: var(--type-caption-size);
+          line-height: var(--type-caption-line-height);
         }
       `}</style>
     </section>

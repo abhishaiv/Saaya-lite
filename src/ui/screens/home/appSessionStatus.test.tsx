@@ -24,7 +24,7 @@ describe("M4 app-shell session status", () => {
       ["SHADOW", M4_COPY.en.statusShadowAuto],
       ["CHECKIN_1", M4_COPY.en.statusCheckin1],
       ["CHECKIN_2", M4_COPY.en.statusCheckin2],
-      ["FAMILY_ESCALATED", M4_COPY.en.statusFamily],
+      ["CHECKIN_3", M4_COPY.en.statusCheckin3],
       ["SOS_ACTIVE", M4_COPY.en.statusSos],
     ] as const;
 

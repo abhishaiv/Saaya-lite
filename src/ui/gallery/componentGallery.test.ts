@@ -38,7 +38,7 @@ describe("T1.3 component gallery", () => {
     for (const phase of ["entering", "visible", "answered", "deadline-passed"]) {
       expect(gallerySource).toContain(`"${phase}"`);
     }
-    for (const rung of ["CHECKIN_1", "CHECKIN_2", "FAMILY_ESCALATED"]) {
+    for (const rung of ["CHECKIN_1", "CHECKIN_2", "CHECKIN_3"]) {
       expect(gallerySource).toContain(`"${rung}"`);
     }
   });

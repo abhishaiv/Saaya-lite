@@ -4,8 +4,8 @@ import { bundledZoneData } from "../data/zone/zoneLoader";
 import { FakeSessionRepository } from "../data/repository/sessionRepository";
 import { onEvent } from "../domain/engine/sessionEngine";
 import {
-  CANCEL_WINDOW_SEC,
-  CHECK_IN_2_SEC,
+  LADDER_WINDOW_2_SEC,
+  LADDER_WINDOW_3_SEC,
   DEFAULT_RULES,
 } from "../domain/engine/rules";
 import type {
@@ -177,7 +177,7 @@ describe("tab recovery", () => {
     const recovery = new EngineRecoveryBridge();
     const location = new FakeLocation();
     const wakeLock = new FakeWakeLock();
-    const deadlineEpochMs = secondsToEpochMs(CHECK_IN_2_SEC);
+    const deadlineEpochMs = secondsToEpochMs(LADDER_WINDOW_2_SEC);
     sessions.current = autoSession("CHECKIN_2", deadlineEpochMs);
     sessions.heartbeat = { ownerId: "stopped-page", lastSeenEpochMs: clock.now };
     let pageStoppedWarnings = 0;
@@ -210,7 +210,7 @@ describe("tab recovery", () => {
     expect(recovery.result?.commands).toContainEqual({
       kind: "ShowCheckIn",
       step: 2,
-      countdownSec: CHECK_IN_2_SEC / 2, // GROUNDED-EXEMPT: remaining half of the frozen countdown.
+      countdownSec: LADDER_WINDOW_2_SEC / 2, // GROUNDED-EXEMPT: remaining half of the frozen countdown.
       urgency: "URGENT",
     });
     expect(location.paused).toBe(1);
@@ -219,14 +219,16 @@ describe("tab recovery", () => {
     expect(pageStoppedWarnings).toBe(1);
   });
 
-  it("advances an overdue family window to sticky SOS without a false nothing-sent warning", async () => {
+  it("advances an overdue legacy FAMILY_ESCALATED session to sticky SOS without a false nothing-sent warning", async () => {
     const clock = new FakeClock();
     const visibility = new FakeVisibility();
     const sessions = new FakeSessionRepository();
     const recovery = new EngineRecoveryBridge();
     const location = new FakeLocation();
     const wakeLock = new FakeWakeLock();
-    const deadlineEpochMs = secondsToEpochMs(CANCEL_WINDOW_SEC);
+    // The legacy pre-2026-09-06 family window is the final ladder rung; its
+    // saved deadline is reused as the CHECKIN_3 window during recovery.
+    const deadlineEpochMs = secondsToEpochMs(LADDER_WINDOW_3_SEC);
     sessions.current = autoSession("FAMILY_ESCALATED", deadlineEpochMs);
     sessions.heartbeat = { ownerId: "page", lastSeenEpochMs: 0 };
     clock.now = deadlineEpochMs;
@@ -253,6 +255,10 @@ describe("tab recovery", () => {
 
     expect(recovery.result?.state).toBe("SOS_ACTIVE");
     expect(recovery.result?.commands).toContainEqual({ kind: "ShowSos" });
+    expect(recovery.result?.commands).toContainEqual({
+      kind: "WriteSosIncident",
+      trigger: "LADDER_LAPSE",
+    });
     expect(pageStoppedWarnings).toBe(0);
     expect(wakeLock.armed.at(-1)).toBe(true);
   });

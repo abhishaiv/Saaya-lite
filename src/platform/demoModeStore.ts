@@ -4,9 +4,7 @@ export interface DemoModeStorage {
   setItem(key: string, value: string): void;
 }
 
-const DEMO_MODE_KEY = "saaya.demo-speed";
 const DEMO_SESSION_PREFIX = "saaya.demo-session:";
-const ENABLED_VALUE = "enabled";
 const MARKED_VALUE = "marked";
 
 function browserStorage(): DemoModeStorage | null {
@@ -15,29 +13,6 @@ function browserStorage(): DemoModeStorage | null {
     return window.localStorage;
   } catch {
     return null;
-  }
-}
-
-/** Demo labelling must survive the same reload that recovers its session. */
-export function loadDemoSpeedEnabled(
-  storage: DemoModeStorage | null = browserStorage(),
-): boolean {
-  try {
-    return storage?.getItem(DEMO_MODE_KEY) === ENABLED_VALUE;
-  } catch {
-    return false;
-  }
-}
-
-export function saveDemoSpeedEnabled(
-  enabled: boolean,
-  storage: DemoModeStorage | null = browserStorage(),
-): void {
-  try {
-    if (enabled) storage?.setItem(DEMO_MODE_KEY, ENABLED_VALUE);
-    else storage?.removeItem(DEMO_MODE_KEY);
-  } catch {
-    // Storage denial must not break the in-memory, visibly labelled demo.
   }
 }
 

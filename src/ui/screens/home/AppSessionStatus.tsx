@@ -20,6 +20,7 @@ export function AppSessionStatus({
   const labels: StatusPillLabels = {
     checkIn1: copy.statusCheckin1,
     checkIn2: copy.statusCheckin2,
+    checkIn3: copy.statusCheckin3,
     family: copy.statusFamily,
     idle: copy.statusIdle,
     shadowAuto: copy.statusShadowAuto,

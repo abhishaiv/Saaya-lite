@@ -98,15 +98,15 @@ export class SafetyDeliveryPipeline {
   }
 
   private async enqueueSus(context: SafetyDeliveryContext): Promise<boolean> {
-    if (context.session.state !== "FAMILY_ESCALATED") {
-      throw new Error("A civic record may be created only at FAMILY_ESCALATED");
+    if (context.session.state !== "CHECKIN_3") {
+      throw new Error("A civic record may be created only at CHECKIN_3");
     }
     // fact: boundary.civicSignal.arm_mode. MANUAL sessions have no verified
     // zone/hour evidence, so their family window stays local.
     if (context.session.armMode !== "AUTO_ZONE") return false;
     const timing = civicTiming(context.session);
     if (context.session.zoneId === null || context.zone === null) {
-      throw new Error("FAMILY_ESCALATED requires the active zone for its civic record");
+      throw new Error("CHECKIN_3 requires the active zone for its civic record");
     }
     if (context.zone.stationId !== context.session.zoneId) {
       throw new Error("Civic record zone does not match the active session zone");
@@ -284,8 +284,8 @@ function traceTypeForCommand(command: Command): readonly SosTimelineType[] {
   if (command.kind === "ShowCheckIn" && command.step === 2) {
     return ["CHECKIN_1_MISSED", "CHECKIN_2_SHOWN"];
   }
-  if (command.kind === "ShowFamilyScreen") {
-    return ["CHECKIN_2_MISSED", "FAMILY_MESSAGE_SHOWN"];
+  if (command.kind === "ShowCheckIn" && command.step === 3) {
+    return ["CHECKIN_2_MISSED", "CHECKIN_3_SHOWN"];
   }
   if (command.kind === "WriteSosIncident") return ["SOS_TRIGGERED"];
   if (command.kind === "PatchSosStatus") return ["SOS_STOPPED"];

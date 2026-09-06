@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 
 import { selectHighestRiskZone } from "./armingEvaluator";
-import { checkInDelaySec } from "./intervalCalculator";
 import { DEFAULT_RULES, DEMO_RULES } from "./rules";
 import { onEvent } from "./sessionEngine";
 import { RiskTier, type Zone, type ZoneColorHex } from "../model/zone";
@@ -72,6 +71,23 @@ function context(overrides: Partial<EngineContext> = {}): EngineContext {
   };
 }
 
+function makePersisted(
+  state: PersistedSession["state"],
+  overrides: Partial<PersistedSession> = {},
+): PersistedSession {
+  return {
+    sessionId: "session",
+    state,
+    armMode: "AUTO_ZONE",
+    zoneId: HIGH_ZONE.stationId,
+    armedAtEpochMs: 0,
+    armedHourBand: "NIGHT_DEEP",
+    deadlineEpochMs: null,
+    susEventWritten: false,
+    ...overrides,
+  };
+}
+
 function backendCommands(commands: readonly Command[]): Command[] {
   return commands.filter((command) =>
     ["WriteSusEvent", "PatchSusOutcome", "WriteSosIncident", "PatchSosStatus"].includes(
@@ -80,9 +96,9 @@ function backendCommands(commands: readonly Command[]): Command[] {
   );
 }
 
-function notificationCommands(commands: readonly Command[]): Command[] {
+function familyAlertCommands(commands: readonly Command[]): Command[] {
   return commands.filter((command) =>
-    ["NotifyFamily", "CancelFamilyNotification"].includes(command.kind),
+    ["RequestFamilyAlert", "CancelFamilyAlert"].includes(command.kind),
   );
 }
 
@@ -106,6 +122,26 @@ describe("pure session engine", () => {
     ]);
   });
 
+  it("arms manually at the flat cadence without a zone", () => {
+    const result = onEvent(
+      "IDLE",
+      { kind: "ManualArm" },
+      context({ zone: null, armedHourBand: null, armedAtEpochMs: null }),
+    );
+
+    expect(result.state).toBe("SHADOW");
+    expect(result.commands).toEqual([
+      {
+        kind: "ScheduleTimer",
+        id: "CHECKIN",
+        delaySec: 5 * SECONDS_PER_MINUTE,
+      },
+      { kind: "StartLocationWatch" },
+      { kind: "SetLocationSampling", intervalSec: DEFAULT_RULES.samplingShadowSec },
+      { kind: "RequestWakeLock" },
+    ]);
+  });
+
   it("keeps a safe zone silent and idle", () => {
     const safe = makeZone("safe-zone", RiskTier.SAFE);
     const result = onEvent(
@@ -115,55 +151,105 @@ describe("pure session engine", () => {
     );
 
     expect(result).toEqual({ state: "IDLE", commands: [] });
-    expect(notificationCommands(result.commands)).toEqual([]);
+    expect(familyAlertCommands(result.commands)).toEqual([]);
   });
 
-  it("drives the full ladder at the exact frozen timings", () => {
+  it("drives the full three-rung ladder at the exact frozen timings", () => {
     const first = onEvent("SHADOW", { kind: "CheckInTimerFired" }, context());
     const second = onEvent(
       first.state,
       { kind: "CountdownExpired", timer: "CD1" },
       context(),
     );
-    const family = onEvent(
+    const third = onEvent(
       second.state,
       { kind: "CountdownExpired", timer: "CD2" },
       context(),
     );
     const sos = onEvent(
-      family.state,
-      { kind: "CountdownExpired", timer: "CANCEL" },
+      third.state,
+      { kind: "CountdownExpired", timer: "CD3" },
       context({ susEventWritten: true }),
     );
 
     expect(first.state).toBe("CHECKIN_1");
-    expect(first.commands).toContainEqual({
-      kind: "ScheduleTimer",
-      id: "CD1",
-      delaySec: 90,
-    });
+    expect(first.commands).toEqual([
+      {
+        kind: "ShowCheckIn",
+        step: 1,
+        countdownSec: 2 * SECONDS_PER_MINUTE,
+        urgency: "GENTLE",
+      },
+      {
+        kind: "ScheduleTimer",
+        id: "CD1",
+        delaySec: 2 * SECONDS_PER_MINUTE,
+      },
+    ]);
     expect(second.state).toBe("CHECKIN_2");
-    expect(second.commands).toContainEqual({
-      kind: "ScheduleTimer",
-      id: "CD2",
-      delaySec: 60,
-    });
-    expect(family.state).toBe("FAMILY_ESCALATED");
-    expect(family.commands).toContainEqual({
-      kind: "ScheduleTimer",
-      id: "CANCEL",
-      delaySec: 60,
-    });
+    expect(second.commands).toEqual([
+      {
+        kind: "ShowCheckIn",
+        step: 2,
+        countdownSec: SECONDS_PER_MINUTE,
+        urgency: "URGENT",
+      },
+      { kind: "PlayUrgentAlert" },
+      { kind: "RequestFamilyAlert" },
+      { kind: "ScheduleTimer", id: "CD2", delaySec: SECONDS_PER_MINUTE },
+    ]);
+    expect(third.state).toBe("CHECKIN_3");
+    expect(third.commands).toEqual([
+      { kind: "WriteSusEvent" },
+      {
+        kind: "ShowCheckIn",
+        step: 3,
+        countdownSec: SECONDS_PER_MINUTE,
+        urgency: "CRITICAL",
+      },
+      { kind: "ScheduleTimer", id: "CD3", delaySec: SECONDS_PER_MINUTE },
+    ]);
     expect(sos.state).toBe("SOS_ACTIVE");
-    expect(backendCommands([...first.commands, ...second.commands])).toEqual([]);
-    expect(backendCommands(family.commands)).toEqual([{ kind: "WriteSusEvent" }]);
-    expect(backendCommands(sos.commands)).toContainEqual({
+    expect(sos.commands).toContainEqual({ kind: "HideCheckIn" });
+    expect(sos.commands).toContainEqual({
       kind: "WriteSosIncident",
       trigger: "LADDER_LAPSE",
     });
+    expect(sos.commands).toContainEqual({
+      kind: "PatchSusOutcome",
+      outcome: "ESCALATED_TO_SOS",
+    });
+    expect(sos.commands).toContainEqual({ kind: "ShowSos" });
+    expect(sos.commands).toContainEqual({ kind: "RequirePinToStop" });
   });
 
-  it("writes nothing before family escalation and details only at SOS", () => {
+  it("requests the family alert exactly once, at the first miss", () => {
+    const first = onEvent("SHADOW", { kind: "CheckInTimerFired" }, context());
+    const second = onEvent(
+      first.state,
+      { kind: "CountdownExpired", timer: "CD1" },
+      context(),
+    );
+    const third = onEvent(
+      second.state,
+      { kind: "CountdownExpired", timer: "CD2" },
+      context(),
+    );
+    const sos = onEvent(
+      third.state,
+      { kind: "CountdownExpired", timer: "CD3" },
+      context({ susEventWritten: true }),
+    );
+
+    expect(familyAlertCommands(first.commands)).toEqual([]);
+    expect(familyAlertCommands(second.commands)).toEqual([
+      { kind: "RequestFamilyAlert" },
+    ]);
+    expect(familyAlertCommands(third.commands)).toEqual([]);
+    expect(familyAlertCommands(sos.commands)).toEqual([]);
+  });
+
+  it("writes nothing before the third rung and details only at SOS", () => {
     const arm = onEvent(
       "IDLE",
       { kind: "ZoneEntered", zoneId: HIGH_ZONE.stationId },
@@ -179,23 +265,23 @@ describe("pure session engine", () => {
       { kind: "CountdownExpired", timer: "CD1" },
       context(),
     );
-    const family = onEvent(
+    const third = onEvent(
       second.state,
       { kind: "CountdownExpired", timer: "CD2" },
       context(),
     );
     const sos = onEvent(
-      family.state,
-      { kind: "CountdownExpired", timer: "CANCEL" },
+      third.state,
+      { kind: "CountdownExpired", timer: "CD3" },
       context({ susEventWritten: true }),
     );
 
     expect(
       backendCommands([...arm.commands, ...first.commands, ...second.commands]),
     ).toEqual([]);
-    expect(backendCommands(family.commands)).toEqual([{ kind: "WriteSusEvent" }]);
+    expect(backendCommands(third.commands)).toEqual([{ kind: "WriteSusEvent" }]);
     expect(
-      family.commands.some((command) => command.kind === "WriteSosIncident"),
+      third.commands.some((command) => command.kind === "WriteSosIncident"),
     ).toBe(false);
     expect(sos.commands).toContainEqual({
       kind: "WriteSosIncident",
@@ -203,53 +289,78 @@ describe("pure session engine", () => {
     });
   });
 
-  it("keeps a manual family escalation local until SOS", () => {
-    const first = onEvent(
-      "SHADOW",
-      { kind: "CheckInTimerFired" },
-      context({ armMode: "MANUAL", armedHourBand: null, zone: null }),
-    );
+  it("keeps a manual ladder local through the third rung", () => {
+    const manual = (overrides: Partial<EngineContext> = {}): EngineContext =>
+      context({ armMode: "MANUAL", armedHourBand: null, zone: null, ...overrides });
+    const first = onEvent("SHADOW", { kind: "CheckInTimerFired" }, manual());
     const second = onEvent(
       first.state,
       { kind: "CountdownExpired", timer: "CD1" },
-      context({ armMode: "MANUAL", armedHourBand: null, zone: null }),
+      manual(),
     );
-    const family = onEvent(
+    const third = onEvent(
       second.state,
       { kind: "CountdownExpired", timer: "CD2" },
-      context({ armMode: "MANUAL", armedHourBand: null, zone: null }),
+      manual(),
+    );
+    const sos = onEvent(
+      third.state,
+      { kind: "CountdownExpired", timer: "CD3" },
+      manual({ susEventWritten: true }),
     );
 
-    expect(family.state).toBe("FAMILY_ESCALATED");
-    expect(backendCommands(family.commands)).toEqual([]);
-  });
-
-  it.each([
-    ["CHECKIN_1", "CD1"],
-    ["CHECKIN_2", "CD2"],
-  ] as const)("answers OK from %s and reschedules", (state, timer) => {
-    const result = onEvent(state, { kind: "OkTapped" }, context());
-
-    expect(result.state).toBe("SHADOW");
-    expect(result.commands).toEqual([
-      { kind: "CancelTimer", id: timer },
-      { kind: "HideCheckIn" },
-      {
-        kind: "ScheduleTimer",
-        id: "CHECKIN",
-        delaySec: 5 * SECONDS_PER_MINUTE,
-      },
-      {
-        kind: "StartCooldown",
-        zoneId: HIGH_ZONE.stationId,
-        minutes: 20,
-      },
+    expect(third.state).toBe("CHECKIN_3");
+    expect(backendCommands(third.commands)).toEqual([]);
+    expect(sos.state).toBe("SOS_ACTIVE");
+    expect(backendCommands(sos.commands)).toEqual([
+      { kind: "WriteSosIncident", trigger: "LADDER_LAPSE" },
     ]);
   });
 
   it.each([
+    ["CHECKIN_1", "CD1", false],
+    ["CHECKIN_2", "CD2", true],
+    ["CHECKIN_3", "CD3", true],
+  ] as const)(
+    "answers OK from %s and reschedules the episode",
+    (state, timer, hasPendingFamilyAlert) => {
+      const result = onEvent(state, { kind: "OkTapped" }, context());
+
+      const expected: Command[] = [
+        { kind: "CancelTimer", id: timer },
+        { kind: "HideCheckIn" },
+        ...(hasPendingFamilyAlert
+          ? ([{ kind: "CancelFamilyAlert" }] as const)
+          : []),
+        {
+          kind: "ScheduleTimer",
+          id: "CHECKIN",
+          delaySec: 5 * SECONDS_PER_MINUTE,
+        },
+        {
+          kind: "StartCooldown",
+          zoneId: HIGH_ZONE.stationId,
+          minutes: 20,
+        },
+      ];
+      expect(result.state).toBe("SHADOW");
+      expect(result.commands).toEqual(expected);
+    },
+  );
+
+  it("omits the cooldown when OK resolves outside a zone", () => {
+    const result = onEvent("CHECKIN_3", { kind: "OkTapped" }, context({ zone: null }));
+
+    expect(result.state).toBe("SHADOW");
+    expect(
+      result.commands.some((command) => command.kind === "StartCooldown"),
+    ).toBe(false);
+  });
+
+  it.each([
     ["CHECKIN_1", "CD1"],
     ["CHECKIN_2", "CD2"],
+    ["CHECKIN_3", "CD3"],
   ] as const)("manually disarms %s with exact local cleanup", (state, timer) => {
     const result = onEvent(state, { kind: "ManualDisarm" }, context());
 
@@ -269,45 +380,47 @@ describe("pure session engine", () => {
       ],
     });
     expect(backendCommands(result.commands)).toEqual([]);
-    expect(notificationCommands(result.commands)).toEqual([]);
+    expect(familyAlertCommands(result.commands)).toEqual([]);
     expect(result.commands.some((command) => command.kind === "RequirePinToStop")).toBe(
       false,
     );
   });
 
-  it("cancels family escalation and patches only the anonymous event", () => {
-    const result = onEvent(
-      "FAMILY_ESCALATED",
-      { kind: "CancelTapped" },
-      context({ susEventWritten: true }),
-    );
+  it("disarms from Shadow without hiding a check-in", () => {
+    const result = onEvent("SHADOW", { kind: "ManualDisarm" }, context());
 
-    expect(result.state).toBe("RESOLVED");
-    expect(result.outcome).toBe("CANCELLED");
-    expect(result.commands).toContainEqual({
-      kind: "PatchSusOutcome",
-      outcome: "CANCELLED_BY_USER",
+    expect(result).toEqual({
+      state: "RESOLVED",
+      outcome: "DISARMED",
+      commands: [
+        { kind: "CancelTimer", id: "CHECKIN" },
+        { kind: "StopLocationWatch" },
+        { kind: "ReleaseWakeLock" },
+        {
+          kind: "StartCooldown",
+          zoneId: HIGH_ZONE.stationId,
+          minutes: 45,
+        },
+      ],
     });
-    expect(result.commands).toContainEqual({ kind: "StopLocationWatch" });
-    expect(result.commands).toContainEqual({ kind: "ReleaseWakeLock" });
   });
 
-  it("keeps manual family cancellation local", () => {
-    const result = onEvent(
-      "FAMILY_ESCALATED",
-      { kind: "CancelTapped" },
-      context({ armMode: "MANUAL", armedHourBand: null, susEventWritten: true, zone: null }),
-    );
-
-    expect(result.state).toBe("RESOLVED");
-    expect(result.outcome).toBe("CANCELLED");
-    expect(backendCommands(result.commands)).toEqual([]);
+  it("ignores expiry events for superseded rung timers", () => {
+    expect(
+      onEvent("CHECKIN_2", { kind: "CountdownExpired", timer: "CD1" }, context()),
+    ).toEqual({ state: "CHECKIN_2", commands: [] });
+    expect(
+      onEvent("CHECKIN_3", { kind: "CountdownExpired", timer: "CD2" }, context()),
+    ).toEqual({ state: "CHECKIN_3", commands: [] });
+    expect(
+      onEvent("CHECKIN_1", { kind: "CountdownExpired", timer: "CD2" }, context()),
+    ).toEqual({ state: "CHECKIN_1", commands: [] });
   });
 
-  it("does not claim the civic write completed when a family timer reaches SOS", () => {
+  it("does not claim the civic write completed when the final rung reaches SOS", () => {
     const result = onEvent(
-      "FAMILY_ESCALATED",
-      { kind: "CountdownExpired", timer: "CANCEL" },
+      "CHECKIN_3",
+      { kind: "CountdownExpired", timer: "CD3" },
       context({ susEventWritten: false }),
     );
 
@@ -319,6 +432,19 @@ describe("pure session engine", () => {
       kind: "PatchSusOutcome",
       outcome: "ESCALATED_TO_SOS",
     });
+  });
+
+  it("leaves a live FAMILY_ESCALATED dispatch unchanged", () => {
+    // FAMILY_ESCALATED is a legacy persisted state only; a live dispatch is an
+    // engine bug and the engine defends by staying put.
+    const ctx = context();
+    expect(onEvent("FAMILY_ESCALATED", { kind: "OkTapped" }, ctx)).toEqual({
+      state: "FAMILY_ESCALATED",
+      commands: [],
+    });
+    expect(
+      onEvent("FAMILY_ESCALATED", { kind: "CountdownExpired", timer: "CD3" }, ctx),
+    ).toEqual({ state: "FAMILY_ESCALATED", commands: [] });
   });
 
   it("enters SOS directly from Shadow without fabricating a civic signal", () => {
@@ -335,6 +461,23 @@ describe("pure session engine", () => {
       trigger: "MANUAL_HELP_BUTTON",
     });
   });
+
+  it.each(["CHECKIN_1", "CHECKIN_2", "CHECKIN_3"] as const)(
+    "enters SOS from %s via the help button",
+    (state) => {
+      const result = onEvent(state, { kind: "HelpNowTapped" }, context());
+
+      expect(result.state).toBe("SOS_ACTIVE");
+      expect(result.commands).toContainEqual({ kind: "HideCheckIn" });
+      expect(result.commands).toContainEqual({
+        kind: "WriteSosIncident",
+        trigger: "MANUAL_HELP_BUTTON",
+      });
+      expect(result.commands).toContainEqual({ kind: "ShowSos" });
+      expect(result.commands).toContainEqual({ kind: "RequirePinToStop" });
+      expect(result.commands).not.toContainEqual({ kind: "WriteSusEvent" });
+    },
+  );
 
   it("lets an idle user raise SOS directly and starts the browser-facing watch", () => {
     const result = onEvent(
@@ -358,7 +501,7 @@ describe("pure session engine", () => {
       "SHADOW",
       "CHECKIN_1",
       "CHECKIN_2",
-      "FAMILY_ESCALATED",
+      "CHECKIN_3",
     ] as const;
 
     for (const state of states) {
@@ -377,27 +520,43 @@ describe("pure session engine", () => {
     }
   });
 
+  it.each(["SHADOW", "CHECKIN_1", "CHECKIN_2", "CHECKIN_3"] as const)(
+    "disarms an automatic session on revoked location from %s",
+    (state) => {
+      const result = onEvent(
+        state,
+        { kind: "PermissionRevoked", permission: "geolocation" },
+        context(),
+      );
+
+      expect(result).toEqual({
+        state: "RESOLVED",
+        outcome: "DISARMED",
+        commands: [
+          { kind: "CancelTimer", id: "CHECKIN" },
+          { kind: "CancelTimer", id: "CD1" },
+          { kind: "CancelTimer", id: "CD2" },
+          { kind: "CancelTimer", id: "CD3" },
+          { kind: "HideCheckIn" },
+          { kind: "StopLocationWatch" },
+          { kind: "ReleaseWakeLock" },
+          { kind: "ShowPermissionWarning", permission: "geolocation" },
+        ],
+      });
+    },
+  );
+
   it("keeps SOS sticky for every event except a valid PIN", () => {
-    const persisted: PersistedSession = {
-      sessionId: "session",
-      state: "SOS_ACTIVE",
-      armMode: "AUTO_ZONE",
-      zoneId: HIGH_ZONE.stationId,
-      armedAtEpochMs: 0,
-      armedHourBand: "NIGHT_DEEP",
-      deadlineEpochMs: null,
-      susEventWritten: true,
-    };
+    const persisted = makePersisted("SOS_ACTIVE", { susEventWritten: true });
     const ignored: readonly SessionEvent[] = [
       { kind: "ZoneEntered", zoneId: HIGH_ZONE.stationId },
       { kind: "ZoneExited", zoneId: HIGH_ZONE.stationId },
       { kind: "ManualArm" },
       { kind: "ManualDisarm" },
       { kind: "CheckInTimerFired" },
-      { kind: "CountdownExpired", timer: "CANCEL" },
+      { kind: "CountdownExpired", timer: "CD3" },
       { kind: "OkTapped" },
       { kind: "HelpNowTapped" },
-      { kind: "CancelTapped" },
       { kind: "PermissionRevoked", permission: "geolocation" },
       { kind: "AppKilledRestart", persisted },
     ];
@@ -411,7 +570,7 @@ describe("pure session engine", () => {
         "SOS_ACTIVE",
         {
           kind: "AppKilledRestart",
-          persisted: { ...persisted, state: "IDLE" },
+          persisted: makePersisted("IDLE"),
         },
         context(),
       ),
@@ -438,7 +597,7 @@ describe("pure session engine", () => {
     });
   });
 
-  it("does not resolve on a zone exit during check-in two", () => {
+  it("does not resolve on a zone exit during a check-in rung", () => {
     expect(
       onEvent(
         "CHECKIN_2",
@@ -446,6 +605,13 @@ describe("pure session engine", () => {
         context(),
       ),
     ).toEqual({ state: "CHECKIN_2", commands: [] });
+    expect(
+      onEvent(
+        "CHECKIN_3",
+        { kind: "ZoneExited", zoneId: HIGH_ZONE.stationId },
+        context(),
+      ),
+    ).toEqual({ state: "CHECKIN_3", commands: [] });
   });
 
   it("does not bind a manually armed session to a zone exit", () => {
@@ -501,7 +667,7 @@ describe("pure session engine", () => {
     expect(result).toEqual({ state: "IDLE", commands: [] });
   });
 
-  it("scales the demo ladder to thirty-five seconds without changing writes", () => {
+  it("compresses the demo ladder to ten-second windows without changing writes", () => {
     const normal = context({ rules: DEFAULT_RULES });
     const demo = context({ rules: DEMO_RULES });
 
@@ -512,17 +678,17 @@ describe("pure session engine", () => {
         { kind: "CountdownExpired", timer: "CD1" },
         ctx,
       );
-      const family = onEvent(
+      const third = onEvent(
         "CHECKIN_2",
         { kind: "CountdownExpired", timer: "CD2" },
         ctx,
       );
       const sos = onEvent(
-        "FAMILY_ESCALATED",
-        { kind: "CountdownExpired", timer: "CANCEL" },
+        "CHECKIN_3",
+        { kind: "CountdownExpired", timer: "CD3" },
         { ...ctx, susEventWritten: true },
       );
-      const all = [first, second, family, sos];
+      const all = [first, second, third, sos];
       return {
         delays: all.flatMap((result) =>
           result.commands.flatMap((command) =>
@@ -535,11 +701,23 @@ describe("pure session engine", () => {
 
     const normalRun = run(normal);
     const demoRun = run(demo);
-    expect(demoRun.delays.reduce((sum, delay) => sum + delay, 0)).toBe(35);
+    expect(normalRun.delays).toEqual([
+      2 * SECONDS_PER_MINUTE,
+      SECONDS_PER_MINUTE,
+      SECONDS_PER_MINUTE,
+    ]);
+    expect(demoRun.delays).toEqual([10, 10, 10]);
     expect(demoRun.writes).toEqual(normalRun.writes);
+
+    const ok = onEvent("CHECKIN_2", { kind: "OkTapped" }, demo);
+    expect(ok.commands).toContainEqual({
+      kind: "ScheduleTimer",
+      id: "CHECKIN",
+      delaySec: 10,
+    });
   });
 
-  it("reschedules from the frozen arm band after the current band changes", () => {
+  it("reschedules at the flat cadence after the current band changes", () => {
     const moderate = makeZone("moderate", RiskTier.MODERATE);
     const result = onEvent(
       "CHECKIN_1",
@@ -555,7 +733,7 @@ describe("pure session engine", () => {
     expect(result.commands).toContainEqual({
       kind: "ScheduleTimer",
       id: "CHECKIN",
-      delaySec: 12 * SECONDS_PER_MINUTE,
+      delaySec: 5 * SECONDS_PER_MINUTE,
     });
   });
 
@@ -574,20 +752,14 @@ describe("pure session engine", () => {
     expect(result).toEqual({ state: "SHADOW", commands: [] });
   });
 
-  it("recovers with the persisted frozen band and absolute deadline", () => {
+  it("recovers the remaining check-in window from the absolute deadline", () => {
     const moderate = makeZone("moderate", RiskTier.MODERATE);
     const deadlineEpochMs =
       12 * SECONDS_PER_MINUTE * EPOCH_MS_PER_SECOND;
-    const persisted: PersistedSession = {
-      sessionId: "session",
-      state: "SHADOW",
-      armMode: "AUTO_ZONE",
+    const persisted = makePersisted("SHADOW", {
       zoneId: moderate.stationId,
-      armedAtEpochMs: 0,
-      armedHourBand: "NIGHT_DEEP",
       deadlineEpochMs,
-      susEventWritten: false,
-    };
+    });
     const result = onEvent(
       "IDLE",
       { kind: "AppKilledRestart", persisted },
@@ -607,23 +779,97 @@ describe("pure session engine", () => {
     });
   });
 
-  it("hydrates recovery before validating the ambient active context", () => {
-    const automaticIntervalSec = checkInDelaySec(
-      DEFAULT_RULES,
-      "AUTO_ZONE",
-      "HIGH",
-      "NIGHT_DEEP",
+  it.each([
+    ["CHECKIN_1", "CD1", 1, "GENTLE"],
+    ["CHECKIN_2", "CD2", 2, "URGENT"],
+    ["CHECKIN_3", "CD3", 3, "CRITICAL"],
+  ] as const)("recovers %s with its persisted remaining window", (state, timer, step, urgency) => {
+    const persisted = makePersisted(state, { deadlineEpochMs: 45 * EPOCH_MS_PER_SECOND });
+    const result = onEvent(
+      "IDLE",
+      { kind: "AppKilledRestart", persisted },
+      context({ armedHourBand: null, armedAtEpochMs: null }),
     );
-    const persisted: PersistedSession = {
-      sessionId: "session",
-      state: "SHADOW",
-      armMode: "AUTO_ZONE",
-      zoneId: HIGH_ZONE.stationId,
-      armedAtEpochMs: 0,
-      armedHourBand: "NIGHT_DEEP",
-      deadlineEpochMs: automaticIntervalSec * EPOCH_MS_PER_SECOND,
-      susEventWritten: false,
-    };
+
+    expect(result.state).toBe(state);
+    expect(result.commands).toContainEqual({
+      kind: "ShowCheckIn",
+      step,
+      countdownSec: 45,
+      urgency,
+    });
+    expect(result.commands).toContainEqual({
+      kind: "ScheduleTimer",
+      id: timer,
+      delaySec: 45,
+    });
+  });
+
+  it.each([
+    ["SHADOW", "CHECKIN_1", null],
+    ["CHECKIN_1", "CHECKIN_2", null],
+    ["CHECKIN_2", "CHECKIN_3", { kind: "WriteSusEvent" }],
+    [
+      "CHECKIN_3",
+      "SOS_ACTIVE",
+      { kind: "WriteSosIncident", trigger: "LADDER_LAPSE" },
+    ],
+  ] as const)("advances an overdue recovered %s through its expiry event", (from, to, marker) => {
+    const persisted = makePersisted(from, { deadlineEpochMs: 0 });
+    const result = onEvent(
+      "IDLE",
+      { kind: "AppKilledRestart", persisted },
+      context({ nowEpochMs: 1, armedHourBand: null, armedAtEpochMs: null }),
+    );
+
+    expect(result.state).toBe(to);
+    if (marker !== null) expect(result.commands).toContainEqual(marker);
+  });
+
+  it("migrates a legacy FAMILY_ESCALATED snapshot to the final rung", () => {
+    const persisted = makePersisted("FAMILY_ESCALATED", {
+      deadlineEpochMs: 45 * EPOCH_MS_PER_SECOND,
+    });
+    const result = onEvent(
+      "IDLE",
+      { kind: "AppKilledRestart", persisted },
+      context({ armedHourBand: null, armedAtEpochMs: null }),
+    );
+
+    expect(result.state).toBe("CHECKIN_3");
+    expect(result.commands).toContainEqual({
+      kind: "ShowCheckIn",
+      step: 3,
+      countdownSec: 45,
+      urgency: "CRITICAL",
+    });
+    expect(result.commands).toContainEqual({
+      kind: "ScheduleTimer",
+      id: "CD3",
+      delaySec: 45,
+    });
+  });
+
+  it("sends a lapsed legacy FAMILY_ESCALATED snapshot straight to SOS", () => {
+    const persisted = makePersisted("FAMILY_ESCALATED", { deadlineEpochMs: 0 });
+    const result = onEvent(
+      "IDLE",
+      { kind: "AppKilledRestart", persisted },
+      context({ nowEpochMs: 1, armedHourBand: null, armedAtEpochMs: null }),
+    );
+
+    expect(result.state).toBe("SOS_ACTIVE");
+    expect(result.commands).toContainEqual({
+      kind: "WriteSosIncident",
+      trigger: "LADDER_LAPSE",
+    });
+  });
+
+  it("hydrates recovery before validating the ambient active context", () => {
+    const cadenceSec = DEFAULT_RULES.ladder.cadenceSec;
+    const persisted = makePersisted("SHADOW", {
+      deadlineEpochMs: cadenceSec * EPOCH_MS_PER_SECOND,
+    });
 
     const result = onEvent(
       "SHADOW",
@@ -635,22 +881,15 @@ describe("pure session engine", () => {
     expect(result.commands).toContainEqual({
       kind: "ScheduleTimer",
       id: "CHECKIN",
-      delaySec: automaticIntervalSec,
+      delaySec: cadenceSec,
     });
   });
 
   it("cleans up live effects when recovery restores an inactive snapshot", () => {
-    const persisted: PersistedSession = {
-      sessionId: "session",
-      state: "RESOLVED",
-      armMode: "AUTO_ZONE",
-      zoneId: HIGH_ZONE.stationId,
-      armedAtEpochMs: 0,
-      armedHourBand: "NIGHT_DEEP",
-      deadlineEpochMs: null,
+    const persisted = makePersisted("RESOLVED", {
       susEventWritten: true,
       outcome: "CANCELLED",
-    };
+    });
 
     const result = onEvent(
       "SHADOW",
@@ -666,16 +905,7 @@ describe("pure session engine", () => {
   });
 
   it("fires an overdue recovered Shadow deadline immediately", () => {
-    const persisted: PersistedSession = {
-      sessionId: "session",
-      state: "SHADOW",
-      armMode: "AUTO_ZONE",
-      zoneId: HIGH_ZONE.stationId,
-      armedAtEpochMs: 0,
-      armedHourBand: "NIGHT_DEEP",
-      deadlineEpochMs: 0,
-      susEventWritten: false,
-    };
+    const persisted = makePersisted("SHADOW", { deadlineEpochMs: 0 });
     const result = onEvent(
       "IDLE",
       { kind: "AppKilledRestart", persisted },
@@ -686,7 +916,7 @@ describe("pure session engine", () => {
     expect(result.commands).toContainEqual({
       kind: "ShowCheckIn",
       step: 1,
-      countdownSec: 90,
+      countdownSec: 2 * SECONDS_PER_MINUTE,
       urgency: "GENTLE",
     });
   });
@@ -707,7 +937,7 @@ describe("pure session engine", () => {
     expect(result).toEqual({ state: "IDLE", commands: [] });
   });
 
-  it("keeps manual sessions at ten minutes in every current band", () => {
+  it("keeps manual sessions on the flat cadence in every current band", () => {
     const bands: readonly HourBand[] = [
       "NIGHT_DEEP",
       "DAWN",
@@ -725,7 +955,7 @@ describe("pure session engine", () => {
       expect(result.commands).toContainEqual({
         kind: "ScheduleTimer",
         id: "CHECKIN",
-        delaySec: 10 * SECONDS_PER_MINUTE,
+        delaySec: 5 * SECONDS_PER_MINUTE,
       });
     });
   });
@@ -739,20 +969,11 @@ describe("pure session engine", () => {
 
     expect(result).toEqual({ state: "SHADOW", commands: [] });
     expect(backendCommands(result.commands)).toEqual([]);
-    expect(notificationCommands(result.commands)).toEqual([]);
+    expect(familyAlertCommands(result.commands)).toEqual([]);
   });
 
   it("rejects invalid recovered automatic data without inventing a fallback", () => {
-    const persisted: PersistedSession = {
-      sessionId: "session",
-      state: "SHADOW",
-      armMode: "AUTO_ZONE",
-      zoneId: HIGH_ZONE.stationId,
-      armedAtEpochMs: 0,
-      armedHourBand: null,
-      deadlineEpochMs: 0,
-      susEventWritten: false,
-    };
+    const persisted = makePersisted("SHADOW", { armedHourBand: null, deadlineEpochMs: 0 });
 
     expect(() =>
       onEvent(

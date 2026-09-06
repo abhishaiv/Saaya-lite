@@ -37,7 +37,7 @@ const AUTO_SESSION: PersistedSession = {
   armMode: "AUTO_ZONE",
   deadlineEpochMs: null,
   sessionId: "auto-session",
-  state: "FAMILY_ESCALATED",
+  state: "CHECKIN_3",
   susEventWritten: false,
   zoneId: ZONE.stationId,
 };
@@ -94,7 +94,7 @@ function context(
 }
 
 describe("safety delivery pipeline", () => {
-  it("creates the anonymous civic payload only at family escalation", async () => {
+  it("creates the anonymous civic payload only at the third rung", async () => {
     const { pipeline, queue, trace } = createPipeline();
     const delivery = context(AUTO_SESSION);
 
@@ -103,14 +103,17 @@ describe("safety delivery pipeline", () => {
       delivery,
     );
     await pipeline.apply(
-      { kind: "ShowCheckIn", countdownSec: 90, step: 1, urgency: "GENTLE" },
+      { kind: "ShowCheckIn", countdownSec: 120, step: 1, urgency: "GENTLE" },
       delivery,
     );
     await pipeline.apply(
       { kind: "ShowCheckIn", countdownSec: 60, step: 2, urgency: "URGENT" },
       delivery,
     );
-    await pipeline.apply({ kind: "ShowFamilyScreen" }, delivery);
+    await pipeline.apply(
+      { kind: "ShowCheckIn", countdownSec: 60, step: 3, urgency: "CRITICAL" },
+      delivery,
+    );
     expect(await queue.getAll()).toEqual([]);
 
     const result = await pipeline.apply({ kind: "WriteSusEvent" }, delivery);
@@ -139,20 +142,23 @@ describe("safety delivery pipeline", () => {
       { atEpochMs: NOW, type: "CHECKIN_1_MISSED" },
       { atEpochMs: NOW, type: "CHECKIN_2_SHOWN" },
       { atEpochMs: NOW, type: "CHECKIN_2_MISSED" },
-      { atEpochMs: NOW, type: "FAMILY_MESSAGE_SHOWN" },
+      { atEpochMs: NOW, type: "CHECKIN_3_SHOWN" },
     ]);
   });
 
-  it("keeps manual family escalation local without a civic record", async () => {
+  it("keeps a manual third rung local without a civic record", async () => {
     const { pipeline, queue, trace } = createPipeline();
     const manualFamily: PersistedSession = {
       ...MANUAL_SESSION,
-      state: "FAMILY_ESCALATED",
+      state: "CHECKIN_3",
       zoneId: ZONE.stationId,
     };
 
     const delivery = context(manualFamily);
-    await pipeline.apply({ kind: "ShowFamilyScreen" }, delivery);
+    await pipeline.apply(
+      { kind: "ShowCheckIn", countdownSec: 60, step: 3, urgency: "CRITICAL" },
+      delivery,
+    );
     await expect(
       pipeline.apply({ kind: "WriteSusEvent" }, delivery),
     ).resolves.toEqual({ sosEnqueued: false, susEnqueued: false });
@@ -160,7 +166,7 @@ describe("safety delivery pipeline", () => {
     expect(await queue.getAll()).toEqual([]);
     expect(await trace.load(manualFamily.sessionId)).toEqual([
       { atEpochMs: NOW, type: "CHECKIN_2_MISSED" },
-      { atEpochMs: NOW, type: "FAMILY_MESSAGE_SHOWN" },
+      { atEpochMs: NOW, type: "CHECKIN_3_SHOWN" },
     ]);
   });
 
@@ -172,7 +178,7 @@ describe("safety delivery pipeline", () => {
         { kind: "WriteSusEvent" },
         context({ ...AUTO_SESSION, state: "SHADOW" }),
       ),
-    ).rejects.toThrow("A civic record may be created only at FAMILY_ESCALATED");
+    ).rejects.toThrow("A civic record may be created only at CHECKIN_3");
     await expect(
       pipeline.apply(
         { kind: "WriteSosIncident", trigger: "MANUAL_HELP_BUTTON" },

@@ -75,12 +75,16 @@ export class HomeEngineBridge implements RuntimeSessionBridge {
     this.rules = rules;
   }
 
-  resetForDemo(): void {
+  resetForDemo(): boolean {
+    // The demo reset must never bypass the PIN: refusing while SOS is active
+    // keeps the only exit from SOS on the PIN path (plan §B, 2026-09-06).
+    if (this.memory.state === "SOS_ACTIVE") return false;
     const cleanup: Command[] = [
       { kind: "CancelTimer", id: "CHECKIN" },
       { kind: "CancelTimer", id: "CD1" },
       { kind: "CancelTimer", id: "CD2" },
-      { kind: "CancelTimer", id: "CANCEL" },
+      { kind: "CancelTimer", id: "CD3" },
+      { kind: "CancelFamilyAlert" },
       { kind: "HideCheckIn" },
       { kind: "StopLocationWatch" },
       { kind: "ReleaseWakeLock" },
@@ -101,6 +105,7 @@ export class HomeEngineBridge implements RuntimeSessionBridge {
       susEventWritten: false,
     };
     this.callbacks.onView(this.currentView("CANCELLED"));
+    return true;
   }
 
   persistedSession(): PersistedSession | null {

@@ -5,14 +5,7 @@ import {
   DEMO_ARM_TIME,
   hourBandForLocalTime,
 } from "../../../domain/engine/rules";
-import { bundledZoneRepository } from "../../../data/repository/zoneRepository";
-import { RiskTier } from "../../../domain/model/zone";
-import {
-  eventsToFamilyEscalation,
-  eventsToSos,
-  nextMissedCheckInEvent,
-  simulatedZoneEntryEvent,
-} from "./demoControls";
+import { startDemoEventSequence } from "./demoControls";
 
 describe("M4 demo engine controls", () => {
   it("derives the simulated zone-entry band from the single frozen demo hour", () => {
@@ -24,48 +17,23 @@ describe("M4 demo engine controls", () => {
     expect(DEMO_ARM_TIME.hourOfDay).toBe(DEMO_ARM_HOUR);
   });
 
-  it("advances one missed check-in through the real timer events", () => {
-    expect(nextMissedCheckInEvent("SHADOW")).toEqual({
-      kind: "CheckInTimerFired",
-    });
-    expect(nextMissedCheckInEvent("CHECKIN_1")).toEqual({
-      kind: "CountdownExpired",
-      timer: "CD1",
-    });
-    expect(nextMissedCheckInEvent("CHECKIN_2")).toEqual({
-      kind: "CountdownExpired",
-      timer: "CD2",
-    });
-    expect(nextMissedCheckInEvent("IDLE")).toBeNull();
+  it("reduces Start Demo to exactly the two shared-engine arming events", () => {
+    const sequence = startDemoEventSequence("zone-station-1");
+
+    expect(sequence).toEqual([
+      { kind: "ZoneEntered", zoneId: "zone-station-1" },
+      { kind: "CheckInTimerFired" },
+    ]);
+    expect(sequence).toHaveLength(2);
   });
 
-  it("never turns a SAFE picker selection into an arming event", () => {
-    const zones = bundledZoneRepository
-      .snapshot()
-      .zoneDetails.map(({ zone }) => zone);
-    const safeZone = zones.find(({ riskTier }) => riskTier === RiskTier.SAFE);
-    const armedZone = zones.find(({ riskTier }) => riskTier !== RiskTier.SAFE);
+  it("carries the chosen zone id into the simulated entry and nothing else", () => {
+    const sequence = startDemoEventSequence("another-zone");
 
-    expect(safeZone).toBeDefined();
-    expect(armedZone).toBeDefined();
-    if (safeZone === undefined || armedZone === undefined) return;
-
-    expect(simulatedZoneEntryEvent(safeZone)).toBeNull();
-    expect(simulatedZoneEntryEvent(armedZone)).toEqual({
-      kind: "ZoneEntered",
-      zoneId: armedZone.stationId,
-    });
-  });
-
-  it("reaches family and SOS by dispatching only canonical engine events", () => {
-    expect(eventsToFamilyEscalation("CHECKIN_1")).toEqual([
-      { kind: "CountdownExpired", timer: "CD1" },
-      { kind: "CountdownExpired", timer: "CD2" },
-    ]);
-    expect(eventsToSos("IDLE")).toEqual([
-      { kind: "ManualArm" },
-      { kind: "HelpNowTapped" },
-    ]);
-    expect(eventsToSos("SOS_ACTIVE")).toEqual([]);
+    expect(sequence[0]).toEqual({ kind: "ZoneEntered", zoneId: "another-zone" });
+    expect(sequence[1]).toEqual({ kind: "CheckInTimerFired" });
+    expect(
+      sequence.filter((event) => event.kind === "ZoneEntered"),
+    ).toHaveLength(1);
   });
 });

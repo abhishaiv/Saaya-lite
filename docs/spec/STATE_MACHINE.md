@@ -24,15 +24,46 @@ same representation that crosses into IndexedDB, so nothing is converted at the 
 |---|---|---|
 | `IDLE` | Not watching. Map browsable. | nothing |
 | `SHADOW` | Armed and watching. She did nothing to start it. | **nothing** |
-| `CHECKIN_1` | Gentle check-in showing, 90 s countdown. | **nothing** |
-| `CHECKIN_2` | Urgent check-in showing, 60 s countdown. | **nothing** |
-| `FAMILY_ESCALATED` | Local family-message preview, 60 s cancel window open. | nothing |
+| `CHECKIN_1` | Gentle check-in showing, window 1 countdown. | **nothing** |
+| `CHECKIN_2` | Urgent check-in showing, window 2 countdown. | see the first-miss alert in the round-two policy below |
+| `CHECKIN_3` | Final check-in showing, window 3 countdown. | nothing further at this step |
+| `FAMILY_ESCALATED` | **Legacy persisted state only.** No transition enters it since 2026-09-06; recovery maps a saved session in this state to `CHECKIN_3`. | nothing |
 | `SOS_ACTIVE` | Local-only SOS with user-controlled dial actions. | nothing from Saaya |
 | `RESOLVED` | Terminal for this session. | nothing further |
 
-**Lite has no delivery boundary in round one: no transition writes to Firestore, a queue or
-contacts.** The pure engine retains future delivery intents for M2, but the runtime has no
-consumer for them and the UI never claims they were performed.
+### Round-two demo-day policy (founder decision 2026-09-06)
+
+The ladder is **three check-ins in every mode**; the separate family-escalation screen and its
+cancel window are gone. The first missed check-in is the automatic family-alert trigger, and
+the third miss enters SOS. `RequestFamilyAlert` is an engine intent to attempt the configured
+first-miss family messaging; the runtime may perform it as a server-mediated WhatsApp alert
+to a server-configured, opted-in recipient. It is never a claim of delivery: the UI may show
+only evidenced states (sending, provider accepted, failed, unknown), and provider acceptance
+is never presented as delivered. Messaging failure must not stop or suppress the ladder.
+
+Timing is an explicit profile on `Rules.ladder` — normal: 5-minute cadence from arming or
+`I'm OK`, then windows 2 min, 1 min, 60 s (the 60 s final window is provisional; the
+normal-mode final expiry remains pending until specified); demo: check-in 1 opens immediately
+on Start, windows 10 s each, and `I'm OK` resets after 10 s. The old tier/band interval table
+and the 10-minute manual interval are superseded by the flat 5-minute cadence; the arming
+matrix itself is unchanged.
+
+`I'm OK` on any rung resets the consecutive-miss episode, invalidates the rung's obsolete
+deadline and cancels any still-pending family-alert request with `CancelFamilyAlert`. A
+message the provider already accepted cannot be recalled and no copy may claim otherwise.
+Duplicate expiry events, double Starts and repeated taps must not produce duplicate episodes
+or duplicate alerts.
+
+**Legacy persisted sessions.** A session saved under the pre-2026-09-06 two-rung ladder is
+migrated explicitly at recovery: `CHECKIN_1` and `CHECKIN_2` keep their saved meaning and
+absolute deadline; a saved `FAMILY_ESCALATED` session is mapped to `CHECKIN_3`, reusing its
+persisted cancel-window deadline (also 60 s), because both represent "two check-ins missed,
+one final window before SOS". The engine never reinterprets a saved state silently and never
+resets a live countdown.
+
+Except for the first-miss family alert above, Lite still has no delivery boundary: no
+transition writes to Firestore, a queue or contacts, `susEventWritten` stays false, and the
+UI never claims an unperformed intent.
 
 ## Events
 
@@ -46,7 +77,6 @@ consumer for them and the UI never claims they were performed.
 | `CountdownExpired(step)` | an absolute deadline in IndexedDB |
 | `OkTapped` | user |
 | `HelpNowTapped` | user |
-| `CancelTapped` | user |
 | `PinAccepted` | user, after PIN verify |
 | `AppKilledRestart` | page recovery after a frozen or closed tab, see recovery |
 
@@ -64,55 +94,59 @@ The state is never parameterised; the outcome rides alongside it.
 |---|---|---|---|---|
 | `IDLE` | `ZoneEntered` | arming matrix says yes AND no cooldown active | `SHADOW` | capture `armedHourBand=current hourBand`, `ScheduleTimer(CHECKIN, interval)`, persist its absolute deadline, show arm banner, start the location watch and request the wake lock |
 | `IDLE` | `ZoneEntered` | matrix says no, or cooldown | `IDLE` | none, and **do not notify her**. Silence is correct here. |
-| `IDLE` | `ManualArm` | - | `SHADOW` | keep `armedHourBand=null`, `ScheduleTimer(CHECKIN, 10 min)`, persist its absolute deadline, start the location watch and request the wake lock |
+| `IDLE` | `ManualArm` | - | `SHADOW` | keep `armedHourBand=null`, `ScheduleTimer(CHECKIN, ladder cadence)`, persist its absolute deadline, start the location watch and request the wake lock |
 | `IDLE` | `HelpNowTapped` | - | `SOS_ACTIVE` | begin the location watch and wake lock, then see SOS entry below. A direct SOS is available at any point after onboarding. |
-| `SHADOW` | `CheckInTimerFired` | - | `CHECKIN_1` | `ShowCheckIn(90, GENTLE)`, `ScheduleTimer(CD1, 90)` |
+| `SHADOW` | `CheckInTimerFired` | - | `CHECKIN_1` | `ShowCheckIn(step 1, window1, GENTLE)`, `ScheduleTimer(CD1, window1)` |
 | `SHADOW` | `ZoneExited` | armMode = AUTO_ZONE | `RESOLVED(DISARMED)` | `CancelTimer(CHECKIN)`, stop the local watch, release the wake lock, log `ZONE_EXIT` |
 | `SHADOW` | `ZoneExited` | armMode = MANUAL | `SHADOW` | none. Manual arming is not zone-bound. |
 | `SHADOW` | `ManualDisarm` | - | `RESOLVED(DISARMED)` | cancel timers, stop the local watch, release the wake lock, start 45 min cooldown for this zone |
 | `SHADOW` | `HelpNowTapped` | - | `SOS_ACTIVE` | see SOS entry below |
-| `CHECKIN_1` | `OkTapped` | - | `SHADOW` | `CancelTimer(CD1)`, `ScheduleTimer(CHECKIN, interval from armedHourBand)`, persist its absolute deadline, 20 min cooldown |
-| `CHECKIN_1` | `CountdownExpired(1)` | - | `CHECKIN_2` | `ShowCheckIn(60, URGENT)`, `ScheduleTimer(CD2, 60)`. The frozen `PlayUrgentAlert` intent has no Lite performer. |
+| `CHECKIN_1` | `OkTapped` | - | `SHADOW` | `CancelTimer(CD1)`, `ScheduleTimer(CHECKIN, okReset)`, persist its absolute deadline, 20 min cooldown |
+| `CHECKIN_1` | `CountdownExpired(1)` | - | `CHECKIN_2` | `ShowCheckIn(step 2, window2, URGENT)`, `PlayUrgentAlert` (no Lite performer), **`RequestFamilyAlert`** — the first miss is the automatic family-alert trigger, `ScheduleTimer(CD2, window2)` |
 | `CHECKIN_1` | `HelpNowTapped` | - | `SOS_ACTIVE` | see SOS entry |
 | `CHECKIN_1` | `ManualDisarm` | - | `RESOLVED(DISARMED)` | `CancelTimer(CD1)`, `HideCheckIn`, stop the local watch, release the wake lock, start 45 min cooldown for this zone |
-| `CHECKIN_2` | `OkTapped` | - | `SHADOW` | as above |
-| `CHECKIN_2` | `CountdownExpired(2)` | `armMode = AUTO_ZONE` | `FAMILY_ESCALATED` | `WriteSusEvent`, `NotifyFamily`, `ShowFamilyScreen`, `ScheduleTimer(CANCEL, 60)`; Lite ignores automatic delivery intents, while the screen may offer a separate user-controlled local device handoff |
-| `CHECKIN_2` | `CountdownExpired(2)` | `armMode = MANUAL` | `FAMILY_ESCALATED` | `NotifyFamily`, `ShowFamilyScreen`, `ScheduleTimer(CANCEL, 60)`; no civic-record intent is emitted; the same separate user-controlled local device handoff may be shown |
+| `CHECKIN_2` | `OkTapped` | - | `SHADOW` | as above, plus `CancelFamilyAlert` for any still-pending request |
+| `CHECKIN_2` | `CountdownExpired(2)` | `armMode = AUTO_ZONE` | `CHECKIN_3` | `WriteSusEvent` (unperformed intent, `susEventWritten` stays false), `ShowCheckIn(step 3, window3, CRITICAL)`, `ScheduleTimer(CD3, window3)` |
+| `CHECKIN_2` | `CountdownExpired(2)` | `armMode = MANUAL` | `CHECKIN_3` | `ShowCheckIn(step 3, window3, CRITICAL)`, `ScheduleTimer(CD3, window3)`; no civic-record intent is emitted |
 | `CHECKIN_2` | `HelpNowTapped` | - | `SOS_ACTIVE` | see SOS entry |
 | `CHECKIN_2` | `ManualDisarm` | - | `RESOLVED(DISARMED)` | `CancelTimer(CD2)`, `HideCheckIn`, stop the local watch, release the wake lock, start 45 min cooldown for this zone |
-| `FAMILY_ESCALATED` | `CancelTapped` | `AUTO_ZONE` civic record was durably queued | `RESOLVED(CANCELLED)` | `CancelTimer(CANCEL)`, `PatchSusOutcome(CANCELLED_BY_USER)`, local cleanup; Lite ignores the automatic delivery intent |
-| `FAMILY_ESCALATED` | `CancelTapped` | otherwise | `RESOLVED(CANCELLED)` | `CancelTimer(CANCEL)`, local cleanup; no civic outcome patch |
-| `FAMILY_ESCALATED` | `CountdownExpired(cancel)` | - | `SOS_ACTIVE` | `ShowSos`, `RequirePinToStop`; future incident intents are ignored in Lite |
-| `FAMILY_ESCALATED` | `HelpNowTapped` | - | `SOS_ACTIVE` | as above but `trigger=MANUAL_HELP_BUTTON` |
+| `CHECKIN_3` | `OkTapped` | - | `SHADOW` | as `CHECKIN_2`, plus `CancelFamilyAlert` |
+| `CHECKIN_3` | `CountdownExpired(3)` | - | `SOS_ACTIVE` | see SOS entry, `trigger=LADDER_LAPSE` |
+| `CHECKIN_3` | `HelpNowTapped` | - | `SOS_ACTIVE` | see SOS entry, `trigger=MANUAL_HELP_BUTTON` |
+| `CHECKIN_3` | `ManualDisarm` | - | `RESOLVED(DISARMED)` | `CancelTimer(CD3)`, `HideCheckIn`, stop the local watch, release the wake lock, start 45 min cooldown for this zone |
 | `SOS_ACTIVE` | `PinAccepted` | - | `RESOLVED(ESCALATED_SOS)` | local cleanup and stop the local watch. The future incident-patch intent is ignored in Lite. |
 | `SOS_ACTIVE` | anything else | - | `SOS_ACTIVE` | **ignore.** Only a correct PIN leaves SOS. |
 | any | `AppKilledRestart` | - | see recovery | |
 
 **Every other (state, event) pair is a no-op.** Log it at debug level and do not crash.
 
-Manual disarm from either check-in writes no SUS event or SOS incident, notifies nobody,
+Manual disarm from any check-in writes no SUS event or SOS incident, notifies nobody,
 requires no PIN, and records only the local `DISARMED` outcome. Only an active SOS is
 PIN-protected.
 
 For every active `AUTO_ZONE` session, `armedHourBand` is non-null and remains the band
-captured on the `IDLE -> SHADOW` transition. It governs every later `CHECKIN` reschedule;
-the current wall-clock band does not replace it. For every `MANUAL` session,
-`armedHourBand` is null and the fixed 10-minute interval applies. `armedAt` remains the
-original session-arm time after “I’m OK”. Merely changing hour bands emits no command, write,
-notification or interruption.
+captured on the `IDLE -> SHADOW` transition; the current wall-clock band does not replace it.
+For every `MANUAL` session, `armedHourBand` is null. Since 2026-09-06 the check-in cadence is
+the flat 5-minute `ladder.cadence.min` for every arm mode, so the band no longer governs a
+reschedule interval; it is retained for the arming matrix, display and the future civic
+record. `armedAt` remains the original session-arm time after “I’m OK”. Merely changing hour
+bands emits no command, write, notification or interruption.
 
 ### Round-two civic-record scope
 
-**Founder decision 2026-09-02:** only an `AUTO_ZONE` session emits the anonymous civic
-signal at `FAMILY_ESCALATED`. Its verified containment, frozen zone and frozen hour band are
-the evidence that makes that coarse signal meaningful. A `MANUAL` session stays local through
-`FAMILY_ESCALATED`: it emits no civic record and does not infer a zone or hour band. Either
-arm mode may create the detailed incident only after it reaches `SOS_ACTIVE`.
+**Founder decision 2026-09-02, re-anchored 2026-09-06:** only an `AUTO_ZONE` session emits the
+anonymous civic signal, now at the `CHECKIN_2 -> CHECKIN_3` transition (the successor of the
+old `FAMILY_ESCALATED` position: two unanswered check-ins). Its verified containment, frozen
+zone and frozen hour band are the evidence that makes that coarse signal meaningful. A
+`MANUAL` session stays local through the whole ladder: it emits no civic record and does not
+infer a zone or hour band. Either arm mode may create the detailed incident only after it
+reaches `SOS_ACTIVE`.
 
-`NotifyFamily` is an engine intent to compose and show the family-message preview. It is not
-a claim that the message was sent: a browser tap does not prove an installed messaging app
-opened, so the web app keeps `familyMessageDelivery` as `DISPLAYED_ONLY`. Device verification
-is human evidence, never a payload state; the app never records delivery.
+`RequestFamilyAlert` is an engine intent to attempt the configured first-miss family
+messaging. It is not a claim that the message was sent or delivered: HTTP acceptance by the
+provider is never presented as delivery, and the UI shows only evidenced states (sending,
+provider accepted, failed, unknown). The old `NotifyFamily`/`ShowFamilyScreen`
+preview-and-handoff path was superseded on 2026-09-06 and no transition enters it.
 
 ## SOS entry, common block
 
@@ -135,8 +169,8 @@ A hidden tab is throttled and a closed tab stops entirely. On the next visibilit
 |---|---|
 | `IDLE` or `RESOLVED` | nothing |
 | `SHADOW` | restart the location watch and restore the next check-in from persisted `deadlineEpochMs`. Never recompute it from `armedAt` or current rules. If already overdue, fire `CheckInTimerFired` immediately. |
-| `CHECKIN_1` / `CHECKIN_2` | recompute remaining countdown from the persisted deadline. **If the deadline already passed while dead, advance the ladder immediately.** Do not silently reset the countdown. |
-| `FAMILY_ESCALATED` | recompute the cancel window. If it lapsed while dead, **go straight to SOS.** |
+| `CHECKIN_1` / `CHECKIN_2` / `CHECKIN_3` | recompute remaining countdown from the persisted deadline. **If the deadline already passed while dead, advance the ladder immediately, in order and without duplicate effects.** Do not silently reset the countdown. |
+| `FAMILY_ESCALATED` (legacy two-rung session) | **explicit migration:** treat it as `CHECKIN_3`, reusing the persisted 60 s cancel-window deadline as the final window. If it lapsed while dead, **go straight to SOS.** Never re-interpret or reset the saved countdown. |
 | `SOS_ACTIVE` | resume SOS, keep requiring the PIN, and re-present the in-page SOS overlay when the page is visible. |
 
 The rule underneath: **a frozen or closed tab must never rescue her from the ladder.** A
@@ -149,14 +183,15 @@ the common case rather than the rare one, which makes the rule more important, n
 |---|---|
 | Zone exit while in `CHECKIN_2` | Ladder continues. Leaving the zone does not prove she is safe, and she still has not answered. |
 | Two overlapping zones | Use the **highest** `risk_tier`. On a tie, the higher `risk_score`. |
-| Airplane mode at escalation | The local ladder remains visible. Lite has no queue or future-send claim. |
-| No contact configured | Ladder still runs. Family step shows "no contact set, add one" and proceeds to SOS on lapse. Never block the ladder on missing config. |
+| Airplane mode at escalation | The local ladder remains visible and keeps running. A first-miss alert that cannot be attempted or fails shows a truthful failed/unknown state and never suppresses the countdown. |
+| No messaging recipient configured | Ladder still runs. The alert status shows the connection is not configured/not ready, and the ladder proceeds to SOS on lapse. Never block the ladder on missing config. |
 | Location revoked mid-session, `AUTO_ZONE` | Move to `RESOLVED(DISARMED)`, persistent warning. It armed on containment and can no longer tell whether she is contained. Never pretend to watch when blind. |
 | Location revoked mid-session, `MANUAL` | **The session continues.** She asked to be watched, and the ladder is timers rather than coordinates, so it needs no fix to run. Show the same persistent warning; a current fix can still choose the nearest local dial action, but Lite sends no payload. Disarming here would take the fallback from exactly the user who would not grant location in the first place. |
 | The browser froze or closed the tab | Detect on load by comparing `deadlineEpochMs` with now. Show an honest "Saaya was stopped by your browser" notice, then apply the recovery table above. Never silently restart the countdown. |
 | She uninstalls mid-SOS | Out of scope. Do not attempt to prevent. |
 | Clock change or DST | Countdowns are absolute `deadlineEpochMs`, so a wall-clock change moves them with it. That is accepted: epoch millis are UTC and IST has no DST. Hour bands are derived from wall clock in Asia/Kolkata. Never use `performance.now()` for a deadline: it does not survive a frozen tab. |
-| Demo mode toggled mid-session | Applies to the **next** timer only. Never retroactively shortens a running countdown. |
+| Demo started while a real session is active | **Forbidden.** Start Demo is available only from `IDLE`/`RESOLVED`; it never replaces a real active session, and demo data stays scoped to the recording run. A demo session uses the demo timing profile from its own Start onward. |
+| Demo reset during `SOS_ACTIVE` | **Forbidden.** The demo reset must not bypass the PIN. It is disabled while SOS is active; after the PIN resolves the episode, Start Demo may begin a fresh recording run. |
 | Active `AUTO_ZONE` session crosses hour bands | Keep `armedHourBand` frozen until `RESOLVED`. A current-band n/a cell cannot disarm it; a later new session still evaluates the current band normally. |
 
 ## Test hooks required
@@ -169,17 +204,23 @@ ladder in milliseconds with a fake clock. **No test may use a real timer or `awa
 ## Full type definitions
 
 Copy these exactly. Do not add cases, do not rename. **This is the type contract**; where it
-and any other document differ, this one wins.
+and any other document differ, this one wins. *(Amended by the founder decision of
+2026-09-06 — the three-check-in ladder — which is recorded above under "Round-two demo-day
+policy". `CHECKIN_3`/`CD3` replaced `FAMILY_ESCALATED`/`CANCEL` in the active ladder, and
+`FAMILY_ESCALATED` survives as a legacy persisted state only.)*
 
 ```typescript
 export type SessionState =
-  | "IDLE" | "SHADOW" | "CHECKIN_1" | "CHECKIN_2"
-  | "FAMILY_ESCALATED" | "SOS_ACTIVE" | "RESOLVED";
+  | "IDLE" | "SHADOW" | "CHECKIN_1" | "CHECKIN_2" | "CHECKIN_3"
+  // Legacy persisted state only (pre-2026-09-06 two-rung ladder). No transition enters it;
+  // recovery maps a saved FAMILY_ESCALATED session to CHECKIN_3.
+  | "FAMILY_ESCALATED"
+  | "SOS_ACTIVE" | "RESOLVED";
 
 export type Outcome   = "RESOLVED_OK" | "CANCELLED" | "ESCALATED_SOS" | "DISARMED";
 export type ArmMode   = "AUTO_ZONE" | "MANUAL";
 export type Urgency   = "GENTLE" | "URGENT" | "CRITICAL";
-export type TimerId   = "CHECKIN" | "CD1" | "CD2" | "CANCEL";
+export type TimerId   = "CHECKIN" | "CD1" | "CD2" | "CD3";
 export type HourBand  = "NIGHT_DEEP" | "DAWN" | "DAY" | "NIGHT_EARLY" | "NIGHT_LATE";
 export type RiskTier  = "HIGH" | "ELEVATED" | "MODERATE" | "SAFE";
 export type SosTrigger = "LADDER_LAPSE" | "MANUAL_HELP_BUTTON";
@@ -195,7 +236,6 @@ export type SessionEvent =
   | { kind: "CountdownExpired"; timer: TimerId }
   | { kind: "OkTapped" }
   | { kind: "HelpNowTapped" }
-  | { kind: "CancelTapped" }
   | { kind: "PinAccepted" }
   | { kind: "PermissionRevoked"; permission: string }
   | { kind: "AppKilledRestart"; persisted: PersistedSession };
@@ -206,13 +246,17 @@ export type SessionEvent =
 // needs a zone lookup; pulling either into EngineContext would enlarge the pure engine and
 // the trust surface at once. That rule outranks convenience.
 export type Command =
-  | { kind: "ShowCheckIn"; step: 1 | 2; countdownSec: number; urgency: Urgency }
+  | { kind: "ShowCheckIn"; step: 1 | 2 | 3; countdownSec: number; urgency: Urgency }
   | { kind: "HideCheckIn" }
   | { kind: "ShowArmBanner"; zoneId: string; band: HourBand }
-  | { kind: "ShowFamilyScreen" }
   | { kind: "ShowSos" }
-  | { kind: "NotifyFamily" }
-  | { kind: "CancelFamilyNotification" }
+  // First-miss family-alert intents (founder 2026-09-06). Intent only: no recipient,
+  // message text or contact rides in the command. RequestFamilyAlert asks the runtime to
+  // attempt the configured first-miss messaging; CancelFamilyAlert cancels any
+  // still-pending request when I'm OK resolves the episode. A provider-accepted message
+  // cannot be recalled.
+  | { kind: "RequestFamilyAlert" }
+  | { kind: "CancelFamilyAlert" }
   | { kind: "WriteSusEvent" }
   | { kind: "PatchSusOutcome"; outcome: SusOutcome }
   | { kind: "WriteSosIncident"; trigger: SosTrigger }
@@ -253,17 +297,26 @@ export interface PersistedSession {
 // The frozen constants the engine reads. Every value comes from BUSINESS_RULES.md and has
 // a fact in graph/spec_graph.json. Tests inject a variant to drive the ladder in
 // milliseconds instead of minutes.
+// The explicit timing profile (founder 2026-09-06) replaces the old divisor-scaled
+// per-timer constants and the tier/band interval table. cadenceSec runs from arming to
+// check-in 1; okResetSec runs from I'm OK to the next check-in 1. Normal:
+// 300/120/60/60/300. Demo: 0-delay entry by direct CheckInTimerFired dispatch, then
+// 10 s windows and a 10 s OK reset.
+export interface LadderTiming {
+  cadenceSec: number;
+  window1Sec: number;
+  window2Sec: number;
+  window3Sec: number;
+  okResetSec: number;
+}
+
 export interface Rules {
-  checkIn1Sec: number;
-  checkIn2Sec: number;
-  cancelWindowSec: number;
+  ladder: LadderTiming;
   enterDwellSec: number;
   exitDwellSec: number;
   manualDisarmCooldownMin: number;
   okCooldownMin: number;
-  manualIntervalMin: number;
-  demoDivisor: number;
-  intervals: Record<string, number>;      // `${RiskTier}:${HourBand}` -> minutes
+  demoDivisor: number;   // retained for dwell scaling only; both profiles use 1 since 2026-09-06
   armingMatrix: Record<string, boolean>;  // `${RiskTier}:${HourBand}` -> arms?
   samplingShadowSec: number;
   samplingSosSec: number;

@@ -2,10 +2,20 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
 import type { SessionState } from "../../../domain/model/session";
-import { CHECK_IN_1_SEC } from "../../../domain/engine/rules";
+import { DEMO_WINDOW_SEC } from "../../../domain/engine/rules";
 import { formatCopy, M4_COPY } from "../../copy/strings";
 import { HomeSessionSurface } from "./HomeSessionSurface";
 import type { HomeEngineView } from "./homeEngineBridge";
+
+/** renderToStaticMarkup escapes the same five characters in text and attributes. */
+function markupText(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#x27;");
+}
 
 function view(state: SessionState, armMode: HomeEngineView["armMode"]): HomeEngineView {
   return {
@@ -29,16 +39,18 @@ function render(
       armAcknowledgement={null}
       armBannerVisible={false}
       checkInReason={null}
+      checkInWindowSec={DEMO_WINDOW_SEC}
       copy={M4_COPY.en}
       currentPoint={null}
       demoModeActive={false}
-      demoSpeedEnabled={false}
+      demoStopAcknowledgement={null}
       engineView={view(state, "MANUAL")}
+      familyAlertStatus={null}
       locale="en"
       locationStatus="CURRENT"
+      okAcknowledgement={null}
       onArmBannerHidden={() => undefined}
       onCheckInOk={() => undefined}
-      onFamilyCancel={() => undefined}
       onHelpNow={() => undefined}
       onLocationHelpOpen={() => undefined}
       onManualArm={() => undefined}
@@ -47,7 +59,6 @@ function render(
       onPinAccepted={() => undefined}
       pageStoppedWarning={false}
       policeStations={[]}
-      sessionId={null}
       {...options}
     />,
   );
@@ -68,6 +79,14 @@ describe("M4 Home session surface", () => {
     expect(html).toContain(`aria-label="${M4_COPY.en.ctaSos}"`);
     expect(html).not.toContain("saaya-bottom-sheet");
     expect(html).not.toContain(M4_COPY.en.warnKeepOpenBody);
+  });
+
+  it("treats a resolved session as the quiet IDLE screen again", () => {
+    const html = render("RESOLVED");
+
+    expect(html).toContain(`>${M4_COPY.en.ctaSus}<`);
+    expect(html).toContain('data-home-action="demo"');
+    expect(html).not.toContain(M4_COPY.en.ctaEndSus);
   });
 
   it("shows automatic SHADOW with its transient acknowledgement and a compact end action", () => {
@@ -112,10 +131,14 @@ describe("M4 Home session surface", () => {
   });
 
   it("labels active Demo state on the compact dock without a full-width disclosure", () => {
-    const html = render("IDLE", { demoModeActive: true });
+    const idle = render("IDLE", { demoModeActive: true });
 
-    expect(html).toContain('data-demo-active="true"');
-    expect(html).not.toContain(M4_COPY.en.demoModeActive);
+    expect(idle).toContain('data-demo-active="true"');
+    expect(idle).not.toContain(M4_COPY.en.demoModeActive);
+
+    const live = render("SHADOW", { demoModeActive: true });
+    expect(live).toContain("home-session-demo-badge");
+    expect(live).toContain(`>${M4_COPY.en.ctaDemo}<`);
   });
 
   it("keeps SUS as the shared term while translating the surrounding Telugu action", () => {
@@ -135,22 +158,18 @@ describe("M4 Home session surface", () => {
     });
 
     expect(html).toContain(
-      formatCopy(
-        M4_COPY.te.ctaCountdown,
-        M4_COPY.te.ctaImOk,
-        CHECK_IN_1_SEC,
-      ),
+      formatCopy(M4_COPY.te.ctaCountdown, M4_COPY.te.ctaImOk, DEMO_WINDOW_SEC),
     );
     expect(html).not.toContain(
-      `${M4_COPY.te.ctaImOk} · ${CHECK_IN_1_SEC}s`,
+      `${M4_COPY.te.ctaImOk} · ${DEMO_WINDOW_SEC}s`,
     );
   });
 
-  it("projects every escalated status without exposing a Home disarm shortcut", () => {
+  it("projects every ladder status without exposing a Home disarm shortcut", () => {
     const states: readonly SessionState[] = [
       "CHECKIN_1",
       "CHECKIN_2",
-      "FAMILY_ESCALATED",
+      "CHECKIN_3",
       "SOS_ACTIVE",
     ];
 
@@ -162,8 +181,71 @@ describe("M4 Home session surface", () => {
 
     expect(render("CHECKIN_1")).toContain(M4_COPY.en.checkin1Title);
     expect(render("CHECKIN_2")).toContain(M4_COPY.en.checkin2Title);
+    expect(render("CHECKIN_3")).toContain(M4_COPY.en.checkin3Title);
     expect(render("SOS_ACTIVE")).toContain(M4_COPY.en.sosTitle);
     expect(render("CHECKIN_1")).toContain('data-swipe-dismisses="visual-only"');
-    expect(render("FAMILY_ESCALATED")).toContain('data-swipe-dismisses="visual-only"');
+    expect(render("CHECKIN_3")).toContain('data-swipe-dismisses="visual-only"');
+  });
+
+  it("renders the rung-three ladder card body that warns the timer ends in SOS", () => {
+    const html = render("CHECKIN_3", { checkInWindowSec: DEMO_WINDOW_SEC });
+
+    expect(html).toContain(M4_COPY.en.checkin3Title);
+    expect(html).toContain("SOS starts when this timer ends");
+    expect(html).toContain(formatCopy(M4_COPY.en.ctaCountdown, M4_COPY.en.ctaImOk, DEMO_WINDOW_SEC));
+  });
+
+  it("shows the truthful family-alert status line on the check-in card", () => {
+    expect(render("CHECKIN_1")).not.toContain(M4_COPY.en.alertStatusSending);
+
+    const sending = render("CHECKIN_1", { familyAlertStatus: "sending" });
+    expect(sending).toContain(M4_COPY.en.alertStatusSending);
+
+    const failed = render("CHECKIN_2", { familyAlertStatus: "failed" });
+    expect(failed).toContain(M4_COPY.en.alertStatusFailed);
+
+    const accepted = render("CHECKIN_2", { familyAlertStatus: "accepted" });
+    expect(accepted).toContain(M4_COPY.en.alertStatusAccepted);
+    expect(accepted).toContain(markupText(M4_COPY.en.alertCancelNote));
+  });
+
+  it("acknowledges I'm OK on the SHADOW screen after the ladder resets", () => {
+    const okAcknowledgement = {
+      title: M4_COPY.en.okThanksTitle,
+      body: formatCopy(
+        M4_COPY.en.okThanksBody,
+        formatCopy(M4_COPY.en.durationSeconds, DEMO_WINDOW_SEC),
+      ),
+    };
+    const html = render("SHADOW", { okAcknowledgement });
+
+    expect(html).toContain(M4_COPY.en.okThanksTitle);
+    expect(html).toContain(okAcknowledgement.body);
+    expect(html).toContain('role="status"');
+  });
+
+  it("acknowledges a demo PIN stop on the quiet IDLE screen", () => {
+    const demoStopAcknowledgement = {
+      title: M4_COPY.en.okThanksTitle,
+      body: M4_COPY.en.demoResetDone,
+    };
+    const html = render("IDLE", { demoStopAcknowledgement });
+
+    expect(html).toContain(M4_COPY.en.demoResetDone);
+    expect(html).toContain('role="status"');
+  });
+
+  it("renders the synthetic demo incident on the SOS view only in demo mode", () => {
+    const demo = render("SOS_ACTIVE", { demoModeActive: true });
+
+    expect(demo).toContain(M4_COPY.en.policeDemoLabel);
+    expect(demo).toContain(M4_COPY.en.policeDemoLocalNote);
+    expect(demo).toContain(formatCopy(M4_COPY.en.policeDemoRowMissed, 1));
+    expect(demo).toContain(M4_COPY.en.policeDemoStatusActive);
+
+    const live = render("SOS_ACTIVE");
+    expect(live).toContain(M4_COPY.en.sosTitle);
+    expect(live).not.toContain(M4_COPY.en.policeDemoLabel);
+    expect(live).not.toContain(M4_COPY.en.policeDemoLocalNote);
   });
 });

@@ -9,6 +9,7 @@ export type StatusPillState = Exclude<SessionState, "RESOLVED">;
 export type StatusPillLabels = Readonly<{
   checkIn1: string;
   checkIn2: string;
+  checkIn3: string;
   family: string;
   idle: string;
   shadowAuto: string;
@@ -64,10 +65,17 @@ const activePresentation: Readonly<
     icon: "verified_user",
     labelKey: "checkIn2",
   },
+  CHECKIN_3: {
+    accentClassName: "status-pill--danger",
+    icon: "gpp_maybe",
+    labelKey: "checkIn3",
+  },
+  // Legacy persisted state only; recovery normalizes it to CHECKIN_3 before
+  // the UI can observe it. Kept defensively so a stale row still renders.
   FAMILY_ESCALATED: {
     accentClassName: "status-pill--danger",
     icon: "gpp_maybe",
-    labelKey: "family",
+    labelKey: "checkIn3",
   },
   SOS_ACTIVE: {
     accentClassName: "status-pill--danger",

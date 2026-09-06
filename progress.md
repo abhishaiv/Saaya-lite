@@ -1493,3 +1493,53 @@ the only reason I caught it was that the count looked wrong.
 **Final: 43 docs, 22 nodes, 275 live facts and 31 superseded, 231 entities, 521 edges. Zero
 stale platform references, zero orphans, zero unresolved reads. CODEX_TASKS, AGENTS and
 BUILD_STATE all match the graph order exactly. All four checkers pass.**
+
+## 2026-09-06 - Round 2 demo-day build (worktree round2/demo)
+
+**Context.** Execution of ROUND2_DEMO_DAY_PLAN.md in the durable worktree
+/Users/abhishai/saaya-lite-round2 (branch round2/demo from bd95b6b). The Desktop
+checkout is untouched. Goal: a recordable end-to-end demo startable anywhere in
+Hyderabad on Chrome on iPhone - Start Demo -> three check-ins -> real first-miss
+WhatsApp alert -> SOS -> synthetic police preview -> PIN stop -> repeat.
+
+**Timing, founder-approved.** Demo: check-in 1 at 0s, misses at 10/20/30s, I'm OK
+resets with the next check-in after 10s. Normal: 5-minute cadence, windows
+2 min -> 1 min -> 60s, I'm OK resets to 5 minutes. One shared pure engine; DEMO_RULES
+selects the compressed windows and Start Demo dispatches CheckInTimerFired directly,
+so no GPS permission, movement, night-time condition or zone picker can block the
+demo.
+
+**Ladder change, shipped everywhere.** FAMILY_ESCALATED is retired as a live state:
+the ladder is SHADOW -> CHECKIN_1 -> CHECKIN_2 -> CHECKIN_3 -> SOS_ACTIVE.
+RequestFamilyAlert fires exactly once at the first miss and is cancelled on I'm OK.
+FAMILY_ESCALATED survives only as a legacy persisted state, normalized to CHECKIN_3
+at recovery. The wa.me handoff link (familyMessageLinks) was deleted - the alert is
+now a server-mediated automatic delivery, not a device handoff.
+
+**Real WhatsApp alert (server-side).** app/api/demo-alert/route.ts is the one
+messaging surface: credentials only in server env (WHATSAPP_ACCESS_TOKEN,
+WHATSAPP_PHONE_NUMBER_ID, WHATSAPP_DEMO_RECIPIENT, optional WHATSAPP_API_VERSION
+and WHATSAPP_DEMO_KEY), server-owned recipient and message, same-origin-or-key
+authorization, per-operation dedup (500 tracked) and a 50-send instance cap.
+Truthful statuses only: accepted / duplicate / failed / unknown / not_configured -
+HTTP 200 is reported as accepted, never as delivered. Client side
+(src/platform/familyAlertChannel.ts + HomeScreen alert performer) is abortable and
+never suppresses the SOS ladder. No arbitrary-recipient endpoint exists.
+
+**UI/copy.** Three-rung CheckInOverlay with calm companion copy (EN+TE complete),
+truthful family-alert status line, okThanks and demo-stop acknowledgement cards,
+DemoPanel with disclosure + timing note and reset blocked during SOS
+(demoResetBlockedSos), and the synthetic police preview in SosOverlay labelled
+"Demo - synthetic incident", local-only, never implying actual police receipt.
+
+**Gates.** Full suite 236/236 passed, tsc --noEmit clean, lint clean,
+grounded_check.py 0 ungrounded literals (2 new facts: alert.dedup.track.max=500,
+alert.sends.cap=50), reads_check.py type contract closed. Test updates were run as
+a background workflow (4 agents) covering sessionEngine, rules, deadlineTimer,
+tabRecovery, demoModeStore, demoControls, demoPanel, homeEngineBridge,
+homeSessionSurface, sosOverlay, components - all rewritten to the three-rung ladder.
+
+**Open (user-owned).** The WhatsApp credentials gate: the chat-disclosed token must
+be rotated, and the rotated token plus the opted-in founder test recipient installed
+privately in Vercel env. Until that is done the route reports not_configured
+truthfully and that gate is NOT passed.

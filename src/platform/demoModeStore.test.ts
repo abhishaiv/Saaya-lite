@@ -4,9 +4,7 @@ import type { DemoModeStorage } from "./demoModeStore";
 import {
   clearDemoArmedSession,
   isDemoArmedSession,
-  loadDemoSpeedEnabled,
   markDemoArmedSession,
-  saveDemoSpeedEnabled,
 } from "./demoModeStore";
 
 function memoryStorage(): DemoModeStorage {
@@ -23,30 +21,33 @@ function memoryStorage(): DemoModeStorage {
 }
 
 describe("demo mode storage", () => {
-  it("keeps the visible demo label active across session recovery", () => {
-    const storage = memoryStorage();
-    saveDemoSpeedEnabled(true, storage);
-    expect(loadDemoSpeedEnabled(storage)).toBe(true);
-
-    saveDemoSpeedEnabled(false, storage);
-    expect(loadDemoSpeedEnabled(storage)).toBe(false);
-  });
-
-  it("keeps demo identity session-scoped when the speed toggle changes", () => {
+  it("marks a session as demo-armed and keeps the mark session-scoped", () => {
     const storage = memoryStorage();
     const demoSessionId = "demo-session";
 
     markDemoArmedSession(demoSessionId, storage);
-    saveDemoSpeedEnabled(false, storage);
 
     expect(isDemoArmedSession(demoSessionId, storage)).toBe(true);
     expect(isDemoArmedSession("different-session", storage)).toBe(false);
-
-    clearDemoArmedSession(demoSessionId, storage);
-    expect(isDemoArmedSession(demoSessionId, storage)).toBe(false);
+    expect(isDemoArmedSession(demoSessionId, memoryStorage())).toBe(false);
   });
 
-  it("degrades to in-memory mode when browser storage is unavailable", () => {
+  it("clears the demo mark without touching other sessions", () => {
+    const storage = memoryStorage();
+    const demoSessionId = "demo-session";
+
+    markDemoArmedSession(demoSessionId, storage);
+    markDemoArmedSession("other-demo-session", storage);
+    clearDemoArmedSession(demoSessionId, storage);
+
+    expect(isDemoArmedSession(demoSessionId, storage)).toBe(false);
+    expect(isDemoArmedSession("other-demo-session", storage)).toBe(true);
+
+    clearDemoArmedSession("never-marked-session", storage);
+    expect(isDemoArmedSession("never-marked-session", storage)).toBe(false);
+  });
+
+  it("survives browser storage denial without breaking the demo", () => {
     const denied: DemoModeStorage = {
       getItem: () => {
         throw new Error("denied");
@@ -59,10 +60,8 @@ describe("demo mode storage", () => {
       },
     };
 
-    expect(loadDemoSpeedEnabled(denied)).toBe(false);
-    expect(() => saveDemoSpeedEnabled(true, denied)).not.toThrow();
-    expect(isDemoArmedSession("demo-session", denied)).toBe(false);
     expect(() => markDemoArmedSession("demo-session", denied)).not.toThrow();
+    expect(isDemoArmedSession("demo-session", denied)).toBe(false);
     expect(() => clearDemoArmedSession("demo-session", denied)).not.toThrow();
   });
 });

@@ -8,12 +8,12 @@ import type { ZoneDetail } from "../../../data/repository/zoneRepository";
 import type { PoliceStation } from "../../../domain/model/policeStation";
 import type { LatLng } from "../../../domain/model/zone";
 import type { LocationStatus } from "../../../platform/locationWatch";
+import type { FamilyAlertStatus } from "../../../platform/familyAlertChannel";
 import { ArmBanner } from "../../components/ArmBanner";
-import type { M4Copy, SaayaLocale } from "../../copy/strings";
+import { formatCopy, type M4Copy, type SaayaLocale } from "../../copy/strings";
 import type { HomeEngineView } from "./homeEngineBridge";
 import { CheckInOverlay } from "./CheckInOverlay";
-import { FamilyEscalationOverlay } from "./FamilyEscalationOverlay";
-import { SosOverlay } from "./SosOverlay";
+import { SosOverlay, type SosDemoIncident } from "./SosOverlay";
 
 export interface ArmAcknowledgement {
   readonly body: string;
@@ -24,17 +24,23 @@ export interface HomeSessionSurfaceProps {
   readonly activeZoneDetail: ZoneDetail | null;
   readonly armAcknowledgement: ArmAcknowledgement | null;
   readonly armBannerVisible: boolean;
-  readonly demoSpeedEnabled: boolean;
   readonly checkInReason: string | null;
+  /** Window length of the visible check-in ring for the current rung. */
+  readonly checkInWindowSec: number;
   readonly currentPoint: LatLng | null;
   readonly copy: M4Copy;
-  readonly demoModeActive: boolean;
+  /** Truthful first-miss alert state; null before any alert has been requested. */
+  readonly familyAlertStatus: FamilyAlertStatus | null;
   readonly engineView: HomeEngineView;
+  /** Acknowledgement card shown while SHADOW after I'm OK resets the ladder. */
+  readonly okAcknowledgement: ArmAcknowledgement | null;
+  /** Acknowledgement card shown on the quiet screen after a demo PIN stop. */
+  readonly demoStopAcknowledgement: ArmAcknowledgement | null;
   readonly locale: SaayaLocale;
   readonly locationStatus: LocationStatus;
+  readonly demoModeActive: boolean;
   readonly onArmBannerHidden: () => void;
   readonly onCheckInOk: () => void;
-  readonly onFamilyCancel: () => void;
   readonly onHelpNow: () => void;
   readonly onLocationHelpOpen: () => void;
   readonly onManualArm: () => void;
@@ -43,26 +49,27 @@ export interface HomeSessionSurfaceProps {
   readonly onPinAccepted: () => void;
   readonly pageStoppedWarning: boolean;
   readonly policeStations: readonly PoliceStation[];
-  readonly sessionId: string | null;
 }
 
-type MinimizedRung = "CHECKIN_1" | "CHECKIN_2" | "FAMILY_ESCALATED";
+type MinimizedRung = "CHECKIN_1" | "CHECKIN_2" | "CHECKIN_3";
 
 export function HomeSessionSurface({
   activeZoneDetail,
   armAcknowledgement,
   armBannerVisible,
   checkInReason,
+  checkInWindowSec,
   currentPoint,
-  demoSpeedEnabled,
   copy,
   demoModeActive,
+  demoStopAcknowledgement,
   engineView,
+  familyAlertStatus,
   locale,
   locationStatus,
+  okAcknowledgement,
   onArmBannerHidden,
   onCheckInOk,
-  onFamilyCancel,
   onHelpNow,
   onLocationHelpOpen,
   onManualArm,
@@ -71,7 +78,6 @@ export function HomeSessionSurface({
   onPinAccepted,
   pageStoppedWarning,
   policeStations,
-  sessionId,
 }: HomeSessionSurfaceProps) {
   const [minimizedRung, setMinimizedRung] = useState<MinimizedRung | null>(
     null,
@@ -97,7 +103,7 @@ export function HomeSessionSurface({
       ? copy.statusCheckin1
       : state === "CHECKIN_2"
         ? copy.statusCheckin2
-        : copy.statusFamily;
+        : copy.statusCheckin3;
 
   return (
     <>
@@ -126,6 +132,28 @@ export function HomeSessionSurface({
           {compactNotice}
         </p>
       )}
+
+      {okAcknowledgement !== null && state === "SHADOW" ? (
+        <div
+          aria-label={okAcknowledgement.title}
+          className="home-session-ack"
+          role="status"
+        >
+          <p className="home-session-ack__title">{okAcknowledgement.title}</p>
+          <p>{okAcknowledgement.body}</p>
+        </div>
+      ) : null}
+
+      {demoStopAcknowledgement !== null && state === "IDLE" ? (
+        <div
+          aria-label={demoStopAcknowledgement.title}
+          className="home-session-ack"
+          role="status"
+        >
+          <p className="home-session-ack__title">{demoStopAcknowledgement.title}</p>
+          <p>{demoStopAcknowledgement.body}</p>
+        </div>
+      ) : null}
 
       {state === "IDLE" || state === "SHADOW" || isMinimized ? (
         <div
@@ -192,11 +220,13 @@ export function HomeSessionSurface({
         </div>
       ) : null}
 
-      {(state === "CHECKIN_1" || state === "CHECKIN_2") && !isMinimized ? (
+      {(state === "CHECKIN_1" || state === "CHECKIN_2" || state === "CHECKIN_3") &&
+      !isMinimized ? (
         <CheckInOverlay
           copy={copy}
           deadlineEpochMs={engineView.deadlineEpochMs}
-          demoSpeedEnabled={demoSpeedEnabled}
+          windowSec={checkInWindowSec}
+          familyAlertStatus={familyAlertStatus}
           onHelpNow={onHelpNow}
           onMinimize={() => setMinimizedRung(state)}
           onOk={onCheckInOk}
@@ -205,25 +235,10 @@ export function HomeSessionSurface({
         />
       ) : null}
 
-      {state === "FAMILY_ESCALATED" && !isMinimized ? (
-        <FamilyEscalationOverlay
-          copy={copy}
-          currentPoint={currentPoint}
-          deadlineEpochMs={engineView.deadlineEpochMs}
-          demoSpeedEnabled={demoSpeedEnabled}
-          detail={activeZoneDetail}
-          locale={locale}
-          onCancel={onFamilyCancel}
-          onHelpNow={onHelpNow}
-          onMinimize={() => setMinimizedRung(state)}
-          policeStations={policeStations}
-          sessionId={sessionId}
-        />
-      ) : null}
-
       {state === "SOS_ACTIVE" ? (
         <SosOverlay
           copy={copy}
+          demoIncident={demoModeActive ? demoIncidentFor(copy, activeZoneDetail) : null}
           nearestStation={sosStation}
           onPinAccepted={onPinAccepted}
         />
@@ -263,6 +278,35 @@ export function HomeSessionSurface({
           text-align: start;
           text-overflow: ellipsis;
           white-space: nowrap;
+        }
+
+        .home-session-ack {
+          position: fixed;
+          z-index: 6; /* GROUNDED-EXEMPT: a quiet acknowledgement sits above the map and below any live ladder surface. */
+          inset-inline: var(--screen-padding);
+          inset-block-end: calc(
+            var(--home-action-dock-clearance) +
+              var(--minimum-touch-target) + var(--space-8)
+          );
+          display: grid;
+          gap: var(--space-4);
+          padding: var(--space-12) var(--space-14);
+          border: var(--border-hairline) solid var(--color-brand);
+          border-radius: var(--radius-control);
+          background: var(--color-card-fill);
+          color: var(--color-text-on-card);
+          font-size: var(--type-body-size);
+          line-height: var(--type-body-line-height);
+          text-align: center;
+        }
+
+        .home-session-ack p {
+          margin: 0;
+        }
+
+        .home-session-ack__title {
+          font-weight: var(--weight-semibold);
+          color: var(--color-text-primary);
         }
 
         .home-session-compact-notice:focus-visible,
@@ -342,4 +386,22 @@ export function HomeSessionSurface({
 
 function visibleSessionState(state: SessionState): Exclude<SessionState, "RESOLVED"> {
   return state === "RESOLVED" ? "IDLE" : state;
+}
+
+/** The demo's synthetic incident preview: local copy only, never a police claim. */
+function demoIncidentFor(copy: M4Copy, detail: ZoneDetail | null): SosDemoIncident {
+  return {
+    label: copy.policeDemoLabel,
+    localNote: copy.policeDemoLocalNote,
+    rows: [
+      copy.policeDemoRowArmed,
+      formatCopy(copy.policeDemoRowMissed, 1),
+      formatCopy(copy.policeDemoRowMissed, 2),
+      formatCopy(copy.policeDemoRowMissed, 3),
+      copy.policeDemoRowSos,
+    ],
+    statusActive: copy.policeDemoStatusActive,
+    zoneRow:
+      detail === null ? null : `${copy.policeDemoZone}: ${detail.label}`,
+  };
 }

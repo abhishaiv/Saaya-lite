@@ -3,7 +3,7 @@
  "kind": "knowledge_graph",
  "note": "Domain facts with provenance. Never merge with build_graph.json - different truth standards.",
  "rule": "Every numeric or colour literal in source must trace to a fact id here, or the grounded checker fails the node.",
- "count": 414,
+ "count": 423,
  "facts": [
   {
    "id": "ladder.cd1",
@@ -14,7 +14,8 @@
    "sourced_from": "founder 2026-08-18",
    "governs": "BUSINESS_RULES.md",
    "frozen": true,
-   "platform": "any"
+   "platform": "any",
+   "superseded_by": "round-2 three-check-in ladder, founder 2026-09-06"
   },
   {
    "id": "ladder.cd2",
@@ -25,7 +26,8 @@
    "sourced_from": "founder 2026-08-18",
    "governs": "BUSINESS_RULES.md",
    "frozen": true,
-   "platform": "any"
+   "platform": "any",
+   "superseded_by": "round-2 three-check-in ladder, founder 2026-09-06"
   },
   {
    "id": "ladder.cancel",
@@ -36,7 +38,8 @@
    "sourced_from": "founder 2026-08-18",
    "governs": "BUSINESS_RULES.md",
    "frozen": true,
-   "platform": "any"
+   "platform": "any",
+   "superseded_by": "round-2 three-check-in ladder, founder 2026-09-06"
   },
   {
    "id": "ladder.total",
@@ -47,7 +50,8 @@
    "sourced_from": "derived: 90+60+60",
    "governs": "BUSINESS_RULES.md",
    "frozen": true,
-   "platform": "any"
+   "platform": "any",
+   "superseded_by": "round-2 three-check-in ladder, founder 2026-09-06"
   },
   {
    "id": "demo.divisor",
@@ -58,7 +62,8 @@
    "sourced_from": "founder 2026-08-18",
    "governs": "BUSINESS_RULES.md",
    "frozen": true,
-   "platform": "any"
+   "platform": "any",
+   "superseded_by": "round-2 three-check-in ladder, founder 2026-09-06"
   },
   {
    "id": "demo.total",
@@ -69,7 +74,8 @@
    "sourced_from": "derived: 210/6",
    "governs": "BUSINESS_RULES.md",
    "frozen": true,
-   "platform": "any"
+   "platform": "any",
+   "superseded_by": "round-2 three-check-in ladder, founder 2026-09-06"
   },
   {
    "id": "interval.high.deep",
@@ -80,7 +86,8 @@
    "sourced_from": "founder 2026-08-18",
    "governs": "BUSINESS_RULES.md",
    "frozen": true,
-   "platform": "any"
+   "platform": "any",
+   "superseded_by": "round-2 three-check-in ladder, founder 2026-09-06"
   },
   {
    "id": "interval.high.late",
@@ -91,7 +98,8 @@
    "sourced_from": "founder 2026-08-18",
    "governs": "BUSINESS_RULES.md",
    "frozen": true,
-   "platform": "any"
+   "platform": "any",
+   "superseded_by": "round-2 three-check-in ladder, founder 2026-09-06"
   },
   {
    "id": "interval.high.early",
@@ -102,7 +110,8 @@
    "sourced_from": "founder 2026-08-18",
    "governs": "BUSINESS_RULES.md",
    "frozen": true,
-   "platform": "any"
+   "platform": "any",
+   "superseded_by": "round-2 three-check-in ladder, founder 2026-09-06"
   },
   {
    "id": "interval.elev.deep",
@@ -113,7 +122,8 @@
    "sourced_from": "founder 2026-08-18",
    "governs": "BUSINESS_RULES.md",
    "frozen": true,
-   "platform": "any"
+   "platform": "any",
+   "superseded_by": "round-2 three-check-in ladder, founder 2026-09-06"
   },
   {
    "id": "interval.elev.other",
@@ -124,7 +134,8 @@
    "sourced_from": "founder 2026-08-18",
    "governs": "BUSINESS_RULES.md",
    "frozen": true,
-   "platform": "any"
+   "platform": "any",
+   "superseded_by": "round-2 three-check-in ladder, founder 2026-09-06"
   },
   {
    "id": "interval.mod.deep",
@@ -135,7 +146,8 @@
    "sourced_from": "founder 2026-08-18",
    "governs": "BUSINESS_RULES.md",
    "frozen": true,
-   "platform": "any"
+   "platform": "any",
+   "superseded_by": "round-2 three-check-in ladder, founder 2026-09-06"
   },
   {
    "id": "interval.manual",
@@ -146,7 +158,8 @@
    "sourced_from": "founder 2026-08-18",
    "governs": "BUSINESS_RULES.md",
    "frozen": true,
-   "platform": "any"
+   "platform": "any",
+   "superseded_by": "round-2 three-check-in ladder, founder 2026-09-06"
   },
   {
    "id": "dwell.enter",
@@ -1217,7 +1230,7 @@
    "kind": "number",
    "value": 17.4,
    "unit": "deg",
-   "means": "minimum  latitude \u2014 Visakhapatnam district envelope, covers centroids AND polygon vertices",
+   "means": "minimum  latitude — Visakhapatnam district envelope, covers centroids AND polygon vertices",
    "sourced_from": "founder 2026-08-19, corrected at T2.1 against the audited asset",
    "governs": "DATA_MODEL.md",
    "frozen": true,
@@ -1229,7 +1242,7 @@
    "kind": "number",
    "value": 18.1,
    "unit": "deg",
-   "means": "maximum  latitude \u2014 Visakhapatnam district envelope, covers centroids AND polygon vertices",
+   "means": "maximum  latitude — Visakhapatnam district envelope, covers centroids AND polygon vertices",
    "sourced_from": "founder 2026-08-19, corrected at T2.1 against the audited asset",
    "governs": "DATA_MODEL.md",
    "frozen": true,
@@ -1241,7 +1254,7 @@
    "kind": "number",
    "value": 82.9,
    "unit": "deg",
-   "means": "minimum  longitude \u2014 Visakhapatnam district envelope, covers centroids AND polygon vertices",
+   "means": "minimum  longitude — Visakhapatnam district envelope, covers centroids AND polygon vertices",
    "sourced_from": "founder 2026-08-19, corrected at T2.1 against the audited asset",
    "governs": "DATA_MODEL.md",
    "frozen": true,
@@ -1253,7 +1266,7 @@
    "kind": "number",
    "value": 83.7,
    "unit": "deg",
-   "means": "maximum  longitude \u2014 Visakhapatnam district envelope, covers centroids AND polygon vertices",
+   "means": "maximum  longitude — Visakhapatnam district envelope, covers centroids AND polygon vertices",
    "sourced_from": "founder 2026-08-19, corrected at T2.1 against the audited asset",
    "governs": "DATA_MODEL.md",
    "frozen": true,
@@ -4608,6 +4621,127 @@
    "governs": "MAP_SPEC.md",
    "frozen": true,
    "platform": "web"
+  },
+  {
+   "id": "ladder.cadence.min",
+   "kind": "number",
+   "value": 5,
+   "unit": "min",
+   "means": "flat normal cadence from arming or I'm OK until check-in 1, every arm mode; supersedes the tier/band interval table and the 10-min manual interval",
+   "sourced_from": "founder decision 2026-09-06, ROUND2_DEMO_DAY_PLAN.md demo-day answers",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true,
+   "platform": "any"
+  },
+  {
+   "id": "ladder.window1.min",
+   "kind": "number",
+   "value": 2,
+   "unit": "min",
+   "means": "check-in 1 countdown window",
+   "sourced_from": "founder decision 2026-09-06, ROUND2_DEMO_DAY_PLAN.md demo-day answers",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true,
+   "platform": "any"
+  },
+  {
+   "id": "ladder.window2.min",
+   "kind": "number",
+   "value": 1,
+   "unit": "min",
+   "means": "check-in 2 countdown window",
+   "sourced_from": "founder decision 2026-09-06, ROUND2_DEMO_DAY_PLAN.md demo-day answers",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true,
+   "platform": "any"
+  },
+  {
+   "id": "ladder.window3.sec",
+   "kind": "number",
+   "value": 60,
+   "unit": "s",
+   "means": "check-in 3 countdown window; provisional, final normal-mode expiry remains pending until specified",
+   "sourced_from": "founder decision 2026-09-06, ROUND2_DEMO_DAY_PLAN.md demo-day answers",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true,
+   "platform": "any"
+  },
+  {
+   "id": "ladder.total.round2",
+   "kind": "number",
+   "value": 240,
+   "unit": "s",
+   "means": "check-in 1 to SOS in normal mode",
+   "sourced_from": "derived: 120+60+60 (founder 2026-09-06)",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true,
+   "platform": "any"
+  },
+  {
+   "id": "demo.checkin.window.sec",
+   "kind": "number",
+   "value": 10,
+   "unit": "s",
+   "means": "every demo check-in countdown window",
+   "sourced_from": "founder decision 2026-09-06, ROUND2_DEMO_DAY_PLAN.md demo-day answers",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true,
+   "platform": "any"
+  },
+  {
+   "id": "demo.ok.reset.sec",
+   "kind": "number",
+   "value": 10,
+   "unit": "s",
+   "means": "demo interval from I'm OK to the next check-in 1",
+   "sourced_from": "founder decision 2026-09-06, ROUND2_DEMO_DAY_PLAN.md demo-day answers",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true,
+   "platform": "any"
+  },
+  {
+   "id": "demo.sos.after.sec",
+   "kind": "number",
+   "value": 30,
+   "unit": "s",
+   "means": "demo interval from check-in 1 opening to SOS",
+   "sourced_from": "derived: 10+10+10 (founder 2026-09-06)",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true,
+   "platform": "any"
+  },
+  {
+   "id": "demo.start.checkin1.sec",
+   "kind": "number",
+   "value": 0,
+   "unit": "s",
+   "means": "check-in 1 opens immediately when Start Demo is tapped",
+   "sourced_from": "founder decision 2026-09-06, ROUND2_DEMO_DAY_PLAN.md demo-day answers",
+   "governs": "BUSINESS_RULES.md",
+   "frozen": true,
+   "platform": "any"
+  },
+  {
+   "id": "alert.dedup.track.max",
+   "kind": "number",
+   "value": 500,
+   "unit": "operations",
+   "means": "per-instance cap on remembered first-miss alert operations for deduplication and status reads",
+   "sourced_from": "ROUND2_DEMO_DAY_PLAN.md bounded-sends requirement; operational bound, founder execution 2026-09-06",
+   "governs": "app/api/demo-alert/route.ts",
+   "frozen": true,
+   "platform": "any"
+  },
+  {
+   "id": "alert.sends.cap",
+   "kind": "number",
+   "value": 50,
+   "unit": "messages",
+   "means": "per-instance outbound WhatsApp send budget before the endpoint reports failure instead of sending",
+   "sourced_from": "ROUND2_DEMO_DAY_PLAN.md bounded-sends requirement; operational bound, founder execution 2026-09-06",
+   "governs": "app/api/demo-alert/route.ts",
+   "frozen": true,
+   "platform": "any"
   }
  ]
 }
