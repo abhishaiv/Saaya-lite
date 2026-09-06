@@ -1543,3 +1543,31 @@ homeSessionSurface, sosOverlay, components - all rewritten to the three-rung lad
 be rotated, and the rotated token plus the opted-in founder test recipient installed
 privately in Vercel env. Until that is done the route reports not_configured
 truthfully and that gate is NOT passed.
+
+**Checkpoint c04fc35 committed and deployed.** Branch round2/demo pushed to
+origin; Vercel's git integration built the preview automatically:
+https://saaya-lite-ic6yvhjga-abhishai-vardhans-projects.vercel.app (Ready, 39s).
+Verified live: the page serves (200) and /api/demo-alert answers
+{"status":"not_configured"} truthfully - exactly the honest state until the
+rotated credentials land. KG records added: src.founder_round2_answers,
+doc.round2_demo_day_plan, dec.round2.three_checkin_ladder,
+dec.round2.start_demo_no_prereqs, dec.round2.server_alert_route,
+art.round2.demo_alert_route (supersedes art.phase1c.family_message_handoff);
+kg check 0 problems. DEMO_RECORDING.md written with the three takes.
+An adversarial review workflow (3 lenses, 2 refuters per finding) is running
+against the changed transition/security surface.
+
+**Currently working on.** Awaiting the adversarial review results to fix any
+confirmed findings; then the remaining-work list and the user-owned gates:
+install the rotated WhatsApp token + opted-in recipient privately in Vercel,
+and the actual iPhone Chrome rehearsal.
+
+**Verification handed off to Astra (founder instruction, 2026-09-06).** The
+adversarial review workflow was stopped at the founder's request; ChatGPT Astra
+will verify the work. ASTRA_VERIFICATION_REPORT.md written at the repo root: the
+full file-by-file change inventory, the exact gate commands (vitest 245/245, tsc,
+lint, build, grounded/reads/kg checks), the 14 acceptance items mapped to tests,
+the open gates (WhatsApp credentials - rotated token not yet installed - and the
+iPhone rehearsal), and the deployment facts. Also added the missing
+familyAlertChannel.test.ts (9 tests, including the credential-isolation scan that
+proves no WHATSAPP_* value or NEXT_PUBLIC_ reference exists anywhere in src/).

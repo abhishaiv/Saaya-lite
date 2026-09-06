@@ -313,9 +313,9 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 417,
-  "edges": 704,
-  "events": 87
+  "entities": 423,
+  "edges": 709,
+  "events": 88
  },
  "entities": [
   {
@@ -3303,6 +3303,43 @@
    "node": "M1",
    "result": "pass",
    "confidence": "0.97"
+  },
+  {
+   "id": "src.founder_round2_answers",
+   "class": "Source",
+   "label": "Founder answers of 2026-09-06, recorded in ROUND2_DEMO_DAY_PLAN.md (Desktop Saaya Lite): three-check-in ladder for both Demo and normal SUS, 0/10/20/30s demo timing, automatic WhatsApp first-miss delivery, synthetic police preview",
+   "at": "2026-09-06"
+  },
+  {
+   "id": "doc.round2_demo_day_plan",
+   "class": "Document",
+   "label": "ROUND2_DEMO_DAY_PLAN.md, the demo-first execution handoff updated 2026-09-06 from the founder's answers",
+   "at": "2026-09-06"
+  },
+  {
+   "id": "dec.round2.three_checkin_ladder",
+   "class": "Decision",
+   "label": "FAMILY_ESCALATED is retired as a live state: the ladder is SHADOW -> CHECKIN_1 -> CHECKIN_2 -> CHECKIN_3 -> SOS_ACTIVE for both Demo and normal SUS. The family alert is requested exactly once at the first miss and cancelled on I'm OK. The old persisted FAMILY_ESCALATED survives only as a legacy record, normalized to CHECKIN_3 at recovery, because a state machine gains nothing from a fourth pre-SOS state that behaves identically to the third",
+   "at": "2026-09-06"
+  },
+  {
+   "id": "dec.round2.start_demo_no_prereqs",
+   "class": "Decision",
+   "label": "Start Demo arms a fixed high-risk zone from frozen data with no GPS permission, movement, night-time band, speed toggle or zone-picker prerequisite, because the recording must be startable anywhere in Hyderabad on Chrome on iPhone; the demo mark is session-scoped in localStorage and survives reload, re-selecting DEMO_RULES on recovery",
+   "at": "2026-09-06"
+  },
+  {
+   "id": "dec.round2.server_alert_route",
+   "class": "Decision",
+   "label": "The first-miss family message moved from a wa.me device handoff to a restricted server route (app/api/demo-alert) with server-owned recipient, message and credentials, same-origin-or-key authorization, per-operation dedup and bounded sends. HTTP 200 is reported as accepted, never as delivered. A messaging failure never suppresses the ladder. No arbitrary-recipient endpoint exists; the wa.me link was deleted rather than left as a parallel path",
+   "at": "2026-09-06"
+  },
+  {
+   "id": "art.round2.demo_alert_route",
+   "class": "Artifact",
+   "label": "app/api/demo-alert/route.ts \u2014 the one server-side messaging surface of Round 2, plus src/platform/familyAlertChannel.ts, its abortable client that shows truthful sending/accepted/failed/unknown/not-ready states",
+   "at": "2026-09-06",
+   "produced_by": "node.M4"
   }
  ],
  "edges": [
@@ -8937,6 +8974,46 @@
    "at": "2026-09-04",
    "by": "codex",
    "confidence": "high"
+  },
+  {
+   "from": "dec.round2.three_checkin_ladder",
+   "rel": "sourced_from",
+   "to": "src.founder_round2_answers",
+   "at": "2026-09-06",
+   "by": "Abhishai",
+   "confidence": "high"
+  },
+  {
+   "from": "dec.round2.start_demo_no_prereqs",
+   "rel": "sourced_from",
+   "to": "src.founder_round2_answers",
+   "at": "2026-09-06",
+   "by": "Abhishai",
+   "confidence": "high"
+  },
+  {
+   "from": "dec.round2.server_alert_route",
+   "rel": "sourced_from",
+   "to": "src.founder_round2_answers",
+   "at": "2026-09-06",
+   "by": "Abhishai",
+   "confidence": "high"
+  },
+  {
+   "from": "art.round2.demo_alert_route",
+   "rel": "supersedes",
+   "to": "art.phase1c.family_message_handoff",
+   "at": "2026-09-06",
+   "by": "codex",
+   "confidence": "high"
+  },
+  {
+   "from": "dec.round2.three_checkin_ladder",
+   "rel": "supersedes",
+   "to": "dec.round2.sos_delivery_state",
+   "at": "2026-09-06",
+   "by": "codex",
+   "confidence": "high"
   }
  ],
  "events": [
@@ -9930,6 +10007,19 @@
     "ver.phase1c.spec"
    ],
    "node": "M1"
+  },
+  {
+   "id": "ev.0088",
+   "type": "decision_made",
+   "at": "2026-09-06",
+   "actor": "codex",
+   "detail": "Round 2 demo-day build committed on branch round2/demo (c04fc35): three-check-in ladder, prerequisite-free Start Demo, server-side WhatsApp alert route, synthetic police preview. Full suite 236/236, tsc/lint clean, grounded and reads checks pass. Deployed preview saaya-lite-ic6yvhjga; WhatsApp credentials gate open until the rotated token and opted-in recipient are installed privately in Vercel",
+   "refs": [
+    "dec.round2.three_checkin_ladder",
+    "dec.round2.start_demo_no_prereqs",
+    "dec.round2.server_alert_route",
+    "art.round2.demo_alert_route"
+   ]
   }
  ]
 }
