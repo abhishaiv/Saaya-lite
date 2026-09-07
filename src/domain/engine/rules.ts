@@ -10,6 +10,7 @@ export const LADDER_WINDOW_1_SEC = 2 * MINUTES_PER_HOUR; // fact: ladder.window1
 export const LADDER_WINDOW_2_SEC = 1 * MINUTES_PER_HOUR; // fact: ladder.window2.min
 export const LADDER_WINDOW_3_SEC = 60; // fact: ladder.window3.sec — PROVISIONAL normal expiry; founder decision pending.
 export const DEMO_WINDOW_SEC = 10; // fact: demo.checkin.window.sec
+export const DEMO_GAP_SEC = 2; // fact: demo.checkin.gap.sec
 export const DEMO_OK_RESET_SEC = 10; // fact: demo.ok.reset.sec
 export const ENTER_DWELL_SEC = 60;
 export const EXIT_DWELL_SEC = 180;
@@ -102,6 +103,7 @@ export const DEMO_RULES: Rules = {
   ladder: {
     ...DEFAULT_RULES.ladder,
     window1Sec: DEMO_WINDOW_SEC,
+    interCheckInGapSec: DEMO_GAP_SEC,
     window2Sec: DEMO_WINDOW_SEC,
     window3Sec: DEMO_WINDOW_SEC,
     okResetSec: DEMO_OK_RESET_SEC,

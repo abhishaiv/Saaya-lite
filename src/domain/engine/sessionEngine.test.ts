@@ -706,7 +706,11 @@ describe("pure session engine", () => {
       SECONDS_PER_MINUTE,
       SECONDS_PER_MINUTE,
     ]);
-    expect(demoRun.delays).toEqual([10, 10, 10]);
+    expect(demoRun.delays).toEqual([
+      DEMO_RULES.ladder.window1Sec,
+      DEMO_RULES.ladder.window2Sec + DEMO_RULES.ladder.interCheckInGapSec!,
+      DEMO_RULES.ladder.window3Sec + DEMO_RULES.ladder.interCheckInGapSec!,
+    ]);
     expect(demoRun.writes).toEqual(normalRun.writes);
 
     const ok = onEvent("CHECKIN_2", { kind: "OkTapped" }, demo);

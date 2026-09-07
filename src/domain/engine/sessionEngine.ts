@@ -176,7 +176,7 @@ function fromCheckInOne(event: SessionEvent, ctx: EngineContext): EngineResult {
         { kind: "ShowCheckIn", step: 2, countdownSec, urgency: "URGENT" },
         { kind: "PlayUrgentAlert" },
         { kind: "RequestFamilyAlert" },
-        { kind: "ScheduleTimer", id: "CD2", delaySec: countdownSec },
+        { kind: "ScheduleTimer", id: "CD2", delaySec: countdownSec + (ctx.rules.ladder.interCheckInGapSec ?? 0) },
       ],
     };
   }
@@ -204,7 +204,7 @@ function fromCheckInTwo(event: SessionEvent, ctx: EngineContext): EngineResult {
         // check-ins, so only AUTO_ZONE carries the anonymous civic intent.
         ...(ctx.armMode === "AUTO_ZONE" ? ([{ kind: "WriteSusEvent" }] as const) : []),
         { kind: "ShowCheckIn", step: 3, countdownSec, urgency: "CRITICAL" },
-        { kind: "ScheduleTimer", id: "CD3", delaySec: countdownSec },
+        { kind: "ScheduleTimer", id: "CD3", delaySec: countdownSec + (ctx.rules.ladder.interCheckInGapSec ?? 0) },
       ],
     };
   }

@@ -315,7 +315,7 @@
  "counts": {
   "entities": 424,
   "edges": 710,
-  "events": 90
+  "events": 91
  },
  "entities": [
   {
@@ -10049,6 +10049,14 @@
    "at": "2026-09-07",
    "actor": "codex",
    "detail": "Fresh demo verifier passed after startup-recovery race correction; provider and actual phone gates remain open",
+   "node": "M1"
+  },
+  {
+   "id": "ev.0091",
+   "type": "spec_amended",
+   "at": "2026-09-07",
+   "actor": "codex",
+   "detail": "Founder requested visible demo timing and two-second inter-prompt gaps; normal timing unchanged; schedule and gap fact recorded in DEMO_TIMING.md",
    "node": "M1"
   }
  ]

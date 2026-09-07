@@ -3,7 +3,8 @@
 import type { SessionState } from "../../../domain/model/session";
 import { SaayaBottomSheet } from "../../components/SaayaBottomSheet";
 import { SaayaButton } from "../../components/SaayaButton";
-import type { M4Copy } from "../../copy/strings";
+import { formatCopy, type M4Copy } from "../../copy/strings";
+import { DEMO_GAP_SEC, DEMO_WINDOW_SEC } from "../../../domain/engine/rules";
 import { MaterialSymbol } from "../../icons/MaterialSymbol";
 
 export interface DemoPanelProps {
@@ -57,7 +58,7 @@ export function DemoPanel({
         </header>
 
         <p className="demo-panel__disclosure">{copy.demoStartDisclosure}</p>
-        <p className="demo-panel__note">{copy.demoTimingNote}</p>
+        <p className="demo-panel__note">{formatCopy(copy.demoTimingNote, DEMO_WINDOW_SEC, DEMO_GAP_SEC)}</p>
 
         {idle ? null : (
           <p className="demo-panel__live-reason" role="status">

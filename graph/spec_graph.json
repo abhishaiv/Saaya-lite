@@ -3,8 +3,19 @@
  "kind": "knowledge_graph",
  "note": "Domain facts with provenance. Never merge with build_graph.json - different truth standards.",
  "rule": "Every numeric or colour literal in source must trace to a fact id here, or the grounded checker fails the node.",
- "count": 423,
+ "count": 426,
  "facts": [
+  {
+   "id": "demo.checkin.gap.sec",
+   "kind": "number",
+   "value": 2,
+   "unit": "s",
+   "means": "pause before demo check-ins two and three; excluded from each ten-second answer window",
+   "sourced_from": "DEMO_TIMING.md:4",
+   "governs": "DEMO_TIMING.md",
+   "frozen": true,
+   "platform": "any"
+  },
   {
    "id": "ladder.cd1",
    "kind": "number",

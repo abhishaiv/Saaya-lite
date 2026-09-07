@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { CountdownRing } from "../../components/CountdownRing";
 import { BigActionButton } from "../../components/BigActionButton";
 import { LadderCard } from "../../components/LadderCard";
+import { DEMO_GAP_SEC, DEMO_WINDOW_SEC } from "../../../domain/engine/rules";
 import { SaayaButton } from "../../components/SaayaButton";
 import type { FamilyAlertStatus } from "../../../platform/familyAlertChannel";
 import { formatCopy, type M4Copy } from "../../copy/strings";
@@ -53,6 +54,34 @@ export function CheckInOverlay({
   const seconds = remainingSeconds(deadlineEpochMs, nowEpochMs, windowSec);
   const isFirst = state === "CHECKIN_1";
   const isSecond = state === "CHECKIN_2";
+  // The absolute expiry includes the pre-prompt gap; never start a fresh gap on reload.
+  if (demo && !isFirst && seconds > windowSec) return (
+    <div className="checkin-overlay__gap">
+      <p role="status">{formatCopy(copy.demoTimingNote, DEMO_WINDOW_SEC, DEMO_GAP_SEC)}</p>
+      <SaayaButton data-home-action="sos" accent="danger" onClick={onHelpNow} variant="accent" workingLabel={copy.stateWorking}>
+        {copy.ctaSos}
+      </SaayaButton>
+      <style jsx>{`
+        .checkin-overlay__gap {
+          position: fixed;
+          z-index: 9; /* GROUNDED-EXEMPT: existing foreground safety-surface stack. */
+          inset-inline: var(--screen-padding);
+          inset-block-end: calc(env(safe-area-inset-bottom) + var(--space-12));
+          display: grid;
+          gap: var(--space-8);
+          padding: var(--space-12);
+          border-radius: var(--radius-control);
+          background: var(--color-card-fill);
+        }
+        .checkin-overlay__gap p {
+          margin: 0;
+          color: var(--color-text-secondary);
+          font-size: var(--type-caption-size);
+          line-height: var(--type-caption-line-height);
+        }
+      `}</style>
+    </div>
+  );
   const title = isFirst
     ? copy.checkin1Title
     : isSecond
@@ -67,6 +96,7 @@ export function CheckInOverlay({
   const message = (
     <div className="checkin-overlay__message">
       <p>{demo ? `${copy.ctaDemo} · ` : ""}{isFirst ? "1" : isSecond ? "2" : "3"} / 3</p>
+      {demo ? <p className="checkin-overlay__alert-note">{formatCopy(copy.demoTimingNote, DEMO_WINDOW_SEC, DEMO_GAP_SEC)}</p> : null}
       <CountdownRing
         ariaLabel={formatCountdownLabel(copy.cdCountdown, seconds)}
         formatAnnouncement={(value) => formatCountdownLabel(copy.cdCountdown, value)}

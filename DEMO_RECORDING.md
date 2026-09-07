@@ -1,5 +1,9 @@
 # Saaya Lite — corrected demo recording checkpoint
 
+Timing update: see DEMO_TIMING.md. Demo prompts appear at 0/12/24 seconds;
+misses occur at 10/22/34 seconds. Visible windows remain 10 seconds, with two-second
+gaps before prompts two and three. Earlier deployed evidence below predates this update.
+
 Verified HTTPS preview: https://saaya-lite-q96k091la-abhishai-vardhans-projects.vercel.app/?demo=1
 Deployed code: `b0d6ae7b5bc2745aaac6cf0ec728925d2ae87788`, Vercel Ready, 2026-09-07.
 Chrome opens the separate demo-PIN setup. Entry HTTP 200; alert GET HTTP 503 with
@@ -53,8 +57,8 @@ to make a retry send. There is no in-memory fallback when storage is unavailable
 ## Take 1 — all missed
 
 - Start Demo, leave all three prompts unanswered.
-- At 0s: “Just checking in”; at 10s: first-miss alert request and “Quick reminder”;
-  at 20s: “One more check-in”; at 30s: SOS.
+- At 0s: “Just checking in”; at 10s: first-miss alert request; at 12s: “Quick reminder”;
+  at 24s: “One more check-in”; at 34s: SOS.
 - Show “Demo — synthetic incident”, actual missed rows and local-only disclosure.
 - Film actual arrival on the recipient phone. **Accepted does not mean delivered.**
   If status is not-ready, failed or unknown, do not claim the delivery take passed.

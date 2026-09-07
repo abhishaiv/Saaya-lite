@@ -437,3 +437,5 @@ and the family-escalation narration must be recorded only after that evidence ex
 ## 2026-09-07 — demo-day verification checkpoint
 
 Corrected GLM's deadline/recovery, demo-profile and PIN isolation, startup race, synthetic timeline and authorization/dedup defects; 253 tests, build, typecheck, lint, explicit G6 on 154 files and fresh final verifier pass. See DEMO_VERIFICATION.md and DEMO_RECORDING.md. Known limitations: live durable store/provider setup, rotated credentials/consent, actual Chrome iPhone plus recipient receipt, final normal expiry and native Telugu review remain open; no production promotion. Bare G6 scanned zero files and was not meaningful evidence. Pinned dependency warnings remain; no closed-list upgrade was invented.
+
+2026-09-07: Added parameterized demo-speed disclosure and two-second inter-prompt gaps (DEMO_TIMING.md); normal unchanged. 254 tests, build, tsc, lint, G6/G10 and focused spec review pass. Physical-phone/provider gates remain open. React review kept gap visibility derived from the absolute deadline; no independent timer.

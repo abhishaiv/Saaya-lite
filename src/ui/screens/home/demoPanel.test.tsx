@@ -2,7 +2,8 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
 import type { SessionState } from "../../../domain/model/session";
-import { M4_COPY, type SaayaLocale } from "../../copy/strings";
+import { formatCopy, M4_COPY, type SaayaLocale } from "../../copy/strings";
+import { DEMO_GAP_SEC, DEMO_WINDOW_SEC } from "../../../domain/engine/rules";
 import { DemoPanel } from "./DemoPanel";
 
 /** renderToStaticMarkup escapes the same five characters in text and attributes. */
@@ -43,7 +44,7 @@ describe("M4 bilingual demo panel", () => {
 
       expect(html).toContain(M4_COPY[locale].demoPanelHeader);
       expect(html).toContain(markupText(M4_COPY[locale].demoStartDisclosure));
-      expect(html).toContain(M4_COPY[locale].demoTimingNote);
+      expect(html).toContain(formatCopy(M4_COPY[locale].demoTimingNote, DEMO_WINDOW_SEC, DEMO_GAP_SEC));
       expect(html).toContain(M4_COPY[locale].ctaStartDemo);
       expect(html).toContain(M4_COPY[locale].demoReset);
     }

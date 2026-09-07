@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import type { SessionState } from "../../../domain/model/session";
 import { nearestStation } from "../../../domain/engine/nearestStation";
+import { DEMO_GAP_SEC, DEMO_WINDOW_SEC } from "../../../domain/engine/rules";
 import type { ZoneDetail } from "../../../data/repository/zoneRepository";
 import type { PoliceStation } from "../../../domain/model/policeStation";
 import type { LatLng } from "../../../domain/model/zone";
@@ -165,7 +166,7 @@ export function HomeSessionSurface({
         >
           {demoModeActive && state !== "IDLE" ? (
             <span className="home-session-demo-badge" role="status">
-              {copy.ctaDemo}
+              {formatCopy(copy.demoTimingNote, DEMO_WINDOW_SEC, DEMO_GAP_SEC)}
             </span>
           ) : null}
           {isMinimized ? (
@@ -365,6 +366,7 @@ export function HomeSessionSurface({
         }
 
         .home-session-demo-badge {
+          grid-column: 1 / -1;
           display: inline-flex;
           min-block-size: var(--minimum-touch-target);
           align-items: center;
@@ -374,9 +376,9 @@ export function HomeSessionSurface({
           border-radius: var(--radius-control);
           background: var(--color-card-fill);
           color: var(--color-amber);
-          font-size: var(--type-body-size);
+          font-size: var(--type-caption-size);
           font-weight: var(--weight-semibold);
-          line-height: var(--type-body-line-height);
+          line-height: var(--type-caption-line-height);
         }
 
         .home-session-action--sos {

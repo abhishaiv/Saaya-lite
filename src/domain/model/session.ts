@@ -99,6 +99,7 @@ export interface PersistedSession {
 // The explicit timing profile (founder decision the founder-approved demo-day policy). cadenceSec runs
 // from arming to check-in 1; okResetSec runs from I'm OK to the next check-in 1.
 export interface LadderTiming {
+  interCheckInGapSec?: number;
   cadenceSec: number;
   window1Sec: number;
   window2Sec: number;

@@ -1,8 +1,8 @@
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import type { SessionState } from "../../../domain/model/session";
-import { DEMO_WINDOW_SEC } from "../../../domain/engine/rules";
+import { DEMO_GAP_SEC, DEMO_WINDOW_SEC } from "../../../domain/engine/rules";
 import { formatCopy, M4_COPY } from "../../copy/strings";
 import { HomeSessionSurface } from "./HomeSessionSurface";
 import type { HomeEngineView } from "./homeEngineBridge";
@@ -138,7 +138,7 @@ describe("M4 Home session surface", () => {
 
     const live = render("SHADOW", { demoModeActive: true });
     expect(live).toContain("home-session-demo-badge");
-    expect(live).toContain(`>${M4_COPY.en.ctaDemo}<`);
+    expect(live).toContain(formatCopy(M4_COPY.en.demoTimingNote, DEMO_WINDOW_SEC, DEMO_GAP_SEC));
   });
 
   it("keeps SUS as the shared term while translating the surrounding Telugu action", () => {
@@ -250,5 +250,24 @@ describe("M4 Home session surface", () => {
     const immediate = render("SOS_ACTIVE", { demoModeActive: true, demoMissedCheckins: 0 });
     expect(immediate).not.toContain(formatCopy(M4_COPY.en.policeDemoRowMissed, 1));
     expect(immediate).toContain(M4_COPY.en.policeDemoRowSos);
+  });
+
+  it("leaves a real pause between demo cards while keeping timing disclosure and SOS visible", () => {
+    const clock = vi.spyOn(Date, "now").mockReturnValue(0);
+    try {
+      for (const state of ["CHECKIN_2", "CHECKIN_3"] as const) {
+        clock.mockReturnValue(0);
+        const options = { demoModeActive: true, engineView: {
+          ...view(state, "MANUAL"), deadlineEpochMs: (DEMO_WINDOW_SEC + DEMO_GAP_SEC) * 1000,
+        } };
+        const title = state === "CHECKIN_2" ? M4_COPY.en.checkin2Title : M4_COPY.en.checkin3Title;
+        const gap = render(state, options);
+        expect(gap).not.toContain(title);
+        expect(gap).toContain('data-home-action="sos"');
+        expect(gap).toContain(formatCopy(M4_COPY.en.demoTimingNote, DEMO_WINDOW_SEC, DEMO_GAP_SEC));
+        clock.mockReturnValue(DEMO_GAP_SEC * 1000);
+        expect(render(state, options)).toContain(title);
+      }
+    } finally { clock.mockRestore(); }
   });
 });

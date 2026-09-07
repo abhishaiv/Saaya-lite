@@ -128,7 +128,7 @@ describe("M4 browser session command runtime", () => {
     setup.scheduler.fire();
     await setup.runtime.waitForIdle();
     expect(setup.bridge.view().state).toBe("CHECKIN_2");
-    expect(setup.bridge.view().deadlineEpochMs).toBe(deadline + DEMO_RULES.ladder.window2Sec * 1000);
+    expect(setup.bridge.view().deadlineEpochMs).toBe(deadline + (DEMO_RULES.ladder.window2Sec + DEMO_RULES.ladder.interCheckInGapSec!) * 1000);
   });
 
   it("an already queued stale callback cannot expire a fresh OK deadline", async () => {
@@ -151,7 +151,7 @@ describe("M4 browser session command runtime", () => {
     setup.bridge.dispatch({ kind: "ManualArm" }, { nowEpochMs: 0, zone: null });
     setup.bridge.dispatch({ kind: "CheckInTimerFired" }, { nowEpochMs: 0, zone: null });
     const saved = setup.bridge.persistedSession()!;
-    const end = (DEMO_RULES.ladder.window1Sec + DEMO_RULES.ladder.window2Sec + DEMO_RULES.ladder.window3Sec) * 1000;
+    const end = (DEMO_RULES.ladder.window1Sec + DEMO_RULES.ladder.window2Sec + DEMO_RULES.ladder.window3Sec + 2 * DEMO_RULES.ladder.interCheckInGapSec!) * 1000;
     setup.commands.length = 0;
     setup.bridge.recover(saved, { nowEpochMs: end, zone: null });
     await setup.runtime.waitForIdle();

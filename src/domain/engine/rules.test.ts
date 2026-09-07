@@ -7,6 +7,7 @@ import {
   DEMO_ARM_HOUR,
   DEMO_ARM_TIME,
   DEMO_DIVISOR,
+  DEMO_GAP_SEC,
   DEMO_RULES,
   HOURS_PER_DAY,
   MINUTES_PER_HOUR,
@@ -105,6 +106,7 @@ describe("frozen business rules", () => {
   it("compresses only the demo windows and OK reset, keeping the cadence", () => {
     expect(DEMO_RULES.ladder).toEqual({
       cadenceSec: 5 * MINUTES_PER_HOUR,
+      interCheckInGapSec: DEMO_GAP_SEC,
       window1Sec: 10,
       window2Sec: 10,
       window3Sec: 10,
