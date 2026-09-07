@@ -315,7 +315,7 @@
  "counts": {
   "entities": 424,
   "edges": 710,
-  "events": 91
+  "events": 92
  },
  "entities": [
   {
@@ -10057,6 +10057,14 @@
    "at": "2026-09-07",
    "actor": "codex",
    "detail": "Founder requested visible demo timing and two-second inter-prompt gaps; normal timing unchanged; schedule and gap fact recorded in DEMO_TIMING.md",
+   "node": "M1"
+  },
+  {
+   "id": "ev.0092",
+   "type": "decision_made",
+   "at": "2026-09-07",
+   "actor": "codex",
+   "detail": "Founder-authorized focused design pass: readable filled buttons, SOS calls and PIN stop before secondary content; unchanged safety logic.",
    "node": "M1"
   }
  ]

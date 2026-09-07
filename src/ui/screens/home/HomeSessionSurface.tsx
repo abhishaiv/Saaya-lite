@@ -351,6 +351,7 @@ export function HomeSessionSurface({
 
         .home-session-action--sus {
           background: var(--color-brand);
+          color: var(--color-background);
         }
 
         .home-session-action--demo,
@@ -383,6 +384,7 @@ export function HomeSessionSurface({
 
         .home-session-action--sos {
           background: var(--color-danger);
+          color: var(--color-background);
         }
       `}</style>
     </>

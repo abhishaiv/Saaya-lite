@@ -84,7 +84,7 @@ export function BigActionButton({
       <style jsx>{`
         .big-action-button {
           --big-action-button-fill: var(--color-brand);
-          --big-action-button-text: var(--color-text-primary);
+          --big-action-button-text: var(--color-background);
 
           appearance: none;
           display: inline-flex;

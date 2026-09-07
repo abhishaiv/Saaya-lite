@@ -1,5 +1,7 @@
 # Saaya Lite - Codex Contribution Log
 
+2026-09-07 — Founder-requested focused design pass: dark labels on filled buttons; SOS call and PIN-stop actions precede the synthetic record, with both disclosures retained; dark SOS content surfaces and safe-area padding. Chrome mobile-size SOS fixture and shared-control gallery checked (temporary fixture removed). Fresh Terra high static review passed; 254 tests passed. No engine, copy, provider, map or PIN logic changed. Physical-phone verification remains open; this checkpoint is not a production deployment.
+
 **This file is a submission deliverable, not a courtesy.** Saaya Lite contains no OpenAI
 model in the product, so Codex building it is the sole basis for the hackathon's "built
 with Codex or powered by an OpenAI model" requirement. The E9 write-up quotes this file.

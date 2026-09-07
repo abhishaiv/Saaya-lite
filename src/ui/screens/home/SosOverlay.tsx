@@ -190,6 +190,25 @@ export function SosOverlay({
               content={copy.sosLocalOnly}
               kind="prototype-limitation"
             />
+            <div className="sos-overlay__dials">
+              <DialAction copy={copy} number={INDIA_EMERGENCY_NUMBER} />
+              <DialAction copy={copy} number={WOMEN_SUPPORT_NUMBER} />
+              {nearestStation === null ? null : (
+                <DialAction
+                  copy={copy}
+                  number={nearestStation.phone}
+                  label={nearestStation.name}
+                />
+              )}
+            </div>
+            <BigActionButton
+              accent="danger"
+              className="sos-overlay__stop"
+              aria-label={copy.cdStopSos}
+              label={copy.ctaStopSos}
+              onClick={() => setView("PIN")}
+              workingLabel={copy.stateWorking}
+            />
             <DisclosureBanner
               content={copy.policeNoGovtLink}
               kind="prototype-limitation"
@@ -216,24 +235,6 @@ export function SosOverlay({
                 </p>
               </section>
             )}
-            <div className="sos-overlay__dials">
-              <DialAction copy={copy} number={INDIA_EMERGENCY_NUMBER} />
-              <DialAction copy={copy} number={WOMEN_SUPPORT_NUMBER} />
-              {nearestStation === null ? null : (
-                <DialAction
-                  copy={copy}
-                  number={nearestStation.phone}
-                  label={nearestStation.name}
-                />
-              )}
-            </div>
-            <BigActionButton
-              accent="danger"
-              aria-label={copy.cdStopSos}
-              label={copy.ctaStopSos}
-              onClick={() => setView("PIN")}
-              workingLabel={copy.stateWorking}
-            />
           </>
         ) : (
           <div className="sos-overlay__pin">
@@ -279,6 +280,8 @@ export function SosOverlay({
           overflow-y: auto;
           place-items: center;
           padding: var(--screen-padding);
+          padding-block-start: calc(var(--screen-padding) + env(safe-area-inset-top));
+          padding-block-end: calc(var(--screen-padding) + env(safe-area-inset-bottom));
           background: var(--color-danger);
           color: var(--color-text-primary);
           animation: none;
@@ -321,11 +324,17 @@ export function SosOverlay({
           justify-content: center;
           border: var(--border-hairline) solid var(--color-text-primary);
           border-radius: var(--radius-control);
+          background: var(--color-card-fill);
           color: var(--color-text-primary);
           font-size: var(--type-body-size);
           font-weight: var(--weight-semibold);
           line-height: var(--type-body-line-height);
           text-decoration: none;
+        }
+
+        :global(.sos-overlay__stop .big-action-button__surface) {
+          background: var(--color-card-fill);
+          color: var(--color-text-primary);
         }
 
         .sos-overlay__error,
@@ -352,6 +361,7 @@ export function SosOverlay({
           padding: var(--space-12) var(--space-14);
           border: var(--border-hairline) solid var(--color-text-primary);
           border-radius: var(--radius-control);
+          background: var(--color-card-fill);
           font-size: var(--type-body-size);
           line-height: var(--type-body-line-height);
           text-align: center;

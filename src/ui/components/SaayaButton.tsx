@@ -107,7 +107,7 @@ export function SaayaButton(props: SaayaButtonProps) {
       <style jsx>{`
         .saaya-button {
           --saaya-button-fill: var(--color-brand);
-          --saaya-button-text: var(--color-text-primary);
+          --saaya-button-text: var(--color-background);
           --saaya-button-border: transparent;
           --saaya-button-border-width: 0;
           --saaya-button-visual-height: 56px;
