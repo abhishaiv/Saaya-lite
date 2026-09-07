@@ -30,6 +30,8 @@ export interface SessionRecoveryBridge {
 export interface TabLifecycleCallbacks {
   onPageStopped(): void;
   onRecoveryError(error: unknown): void;
+  onRecoveryStarted?(): void;
+  onRecoveryCompleted?(): void;
 }
 
 export class TabLifecycleController {
@@ -96,12 +98,14 @@ export class TabLifecycleController {
   }
 
   private async recoverVisiblePage(firstLoad: boolean): Promise<void> {
+    this.callbacks.onRecoveryStarted?.();
     const nowEpochMs = this.clock.nowEpochMs();
     const [persisted, heartbeat] = await Promise.all([
       this.sessions.loadCurrent(),
       this.sessions.loadHeartbeat(),
     ]);
     if (persisted === null || !isActive(persisted.state)) {
+      this.callbacks.onRecoveryCompleted?.();
       if (!firstLoad && this.recovery.mayResumeLocation()) {
         this.location.resumePreviouslyConsented();
       }
@@ -126,6 +130,7 @@ export class TabLifecycleController {
     }
 
     const recovered = await this.recovery.recover(persisted, nowEpochMs);
+    this.callbacks.onRecoveryCompleted?.();
     const active = isActive(recovered.state);
     await this.wakeLock.setArmed(active);
     if (active && this.recovery.mayResumeLocation()) {

@@ -1,67 +1,81 @@
-# DEMO_RECORDING.md — Saaya Lite Round 2 demo-day recording guide
+# Saaya Lite — corrected demo recording checkpoint
 
-Deployed preview: https://saaya-lite-ic6yvhjga-abhishai-vardhans-projects.vercel.app
-(branch `round2/demo`, commit c04fc35, deployed 2026-09-06, status Ready.)
+Branch: `codex/demo-verification`, based on GLM's `9015488`.
+The original round2/demo preview is historical, not evidence for these corrections.
+Use the verified preview URL reported with this checkpoint and append `/?demo=1`.
+Production `saaya-lite.vercel.app` stays unchanged.
 
-## Before recording
+## Start and PIN
 
-1. **WhatsApp credentials are NOT installed yet.** The route truthfully answers
-   `{"status":"not_configured"}` until WHATSAPP_ACCESS_TOKEN, WHATSAPP_PHONE_NUMBER_ID
-   and WHATSAPP_DEMO_RECIPIENT are set (privately, Vercel env, Preview environment)
-   with a ROTATED token — the previously chat-disclosed token must not be used.
-   The alert line under the first check-in card will read "not ready" until then.
-   Every other part of the take (timers, ladder, SOS, police preview, PIN stop)
-   works without it.
-2. Use Chrome on the recording iPhone, HTTPS page foreground for the whole take.
-   Demo timing: check-in 1 appears immediately at Start, misses at 10s / 20s / 30s,
-   I'm OK resets and the next check-in comes 10s later.
-3. Keep a demo PIN set through the real four-digit validation path. No bypass exists.
-4. Optional: second phone (the opted-in recipient's) to film the WhatsApp arrival.
-   Opening WhatsApp on the recording iPhone itself may suspend the page.
+1. Open `/?demo=1` in Chrome on the recording iPhone. Keep Chrome foreground.
+2. Set a non-obvious four-digit **demo PIN**, or enter your existing demo PIN.
+   This is local-only and separate from the normal safety PIN. Remember it for SOS stop.
+   No favourite, contact, GPS, movement, hour band or zone picker is required.
+3. Read the disclosure, then tap **Start Demo**. Check-in 1 appears immediately.
+4. Wrong PIN never stops SOS. Reset/exit cannot bypass SOS: enter the correct PIN.
+   Start Demo again after stopping. Demo cannot reset an active normal session.
 
-## The demo path (shared by all takes)
+## Private WhatsApp setup — STILL OPEN
 
-Home → Demo button → the sheet discloses the automatic first-miss message and the
-compressed timing → **Start Demo** (no GPS permission, movement, zone picker or
-night-time condition is required — the demo arms a fixed high-risk zone internally) →
-badge shows Demo, check-in card appears with a 10-second ring → the first miss fires
-the real WhatsApp alert (status line under the card shows sending → accepted/not
-ready, never "delivered") → check-in 2 → check-in 3 → SOS with the synthetic police
-incident preview labelled "Demo — synthetic incident" → PIN → quiet screen with the
-stopped acknowledgement → Start Demo again for the next take.
+The demo runs without messaging setup, but that is **not** a successful delivery take.
+Without setup the first miss shows not-ready; the SOS countdown still runs.
 
-## Take 1 — all missed (the full ladder)
+Configure privately in Vercel's Preview environment, never tracked files or URLs:
 
-- Start Demo, do not tap I'm OK at any rung.
-- Show check-in 1/3 (10s), the alert status line after the first miss,
-  check-in 2/3 (10s), check-in 3/3 (10s).
-- At 30s total: SOS. Show the labelled synthetic police preview —
-  armed row, three missed rows, SOS row, zone row, "local only" note.
-- Enter the PIN. The quiet screen shows the stopped acknowledgement.
-- Reset is deliberately unavailable during SOS (wrong-PIN must not stop it);
-  the panel says so if tried.
+- `WHATSAPP_ACCESS_TOKEN`: rotated replacement, never the chat-disclosed token.
+- `WHATSAPP_PHONE_NUMBER_ID`: verify the provided account/number with Meta.
+- `WHATSAPP_DEMO_RECIPIENT`: consenting test recipient in provider-compatible format.
+- `WHATSAPP_DEMO_KEY`: a strong random private operator key, at least 32 characters.
+- `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`: approved durable store.
+- `WHATSAPP_DEMO_ENABLED=confirmed`, `WHATSAPP_DEMO_RECIPIENT_CONFIRMED=confirmed`,
+  `WHATSAPP_DEMO_TEMPLATE_CONFIRMED=confirmed`: only after the corresponding checks.
+- Optional `WHATSAPP_API_VERSION`; current code pin is `v23.0`.
+
+The endpoint sends a fixed synthetic **free-form text**, not a template. Confirm that
+this is allowed for the recipient's current WhatsApp session before enabling it.
+A template-required session is an open compatibility gate, not something a flag fixes.
+Account type and consent have not been verified here. No service was provisioned.
+
+After redeploy, the founder opens `/demo-access` on the same HTTPS preview and privately
+enters the operator key. It travels in the HTTPS body, not a URL, and yields an HttpOnly,
+SameSite=Strict signed cookie lasting eight hours. Never record or share this key.
+Return to `/?demo=1` before filming.
+
+The durable namespace caps reservations at 50. A repeated operation keeps its ID,
+including after an ambiguous result, and cannot send twice. Do not clear reservations
+to make a retry send. There is no in-memory fallback when storage is unavailable.
+
+## Take 1 — all missed
+
+- Start Demo, leave all three prompts unanswered.
+- At 0s: “Just checking in”; at 10s: first-miss alert request and “Quick reminder”;
+  at 20s: “One more check-in”; at 30s: SOS.
+- Show “Demo — synthetic incident”, actual missed rows and local-only disclosure.
+- Film actual arrival on the recipient phone. **Accepted does not mean delivered.**
+  If status is not-ready, failed or unknown, do not claim the delivery take passed.
+- Stop with the demo PIN. Never tap a real emergency-call link during testing.
 
 ## Take 2 — I'm OK recovery
 
-- Start Demo, wait for check-in 1/3, then tap **I'm OK**.
-- The acknowledgement card appears; the alert attempt is cancelled while in flight.
-- The next check-in arrives after 10s (5 minutes in a real watch).
-- Tap I'm OK again. Ladder resets cleanly: no stacked warnings, no duplicate alert
-  (a message already accepted upstream cannot be recalled and is never claimed as
-  recalled — the rung-2 alert simply does not fire on the reset ladder).
+- Start Demo, tap **I'm OK**. SHADOW resumes; next check-in is ten seconds later.
+- Miss that next first check-in to confirm a new episode can request its own one alert.
+- OK cancels pending client work, not messages already submitted to the provider.
+  Interrupted requests can remain unknown; Saaya never claims recall or family receipt.
+- Use PIN stop if SOS begins, then repeat.
 
 ## Take 3 — immediate SOS
 
-- Start Demo (or use the live SUS button from idle) and press **SOS** right away.
-- SOS is the same path the ladder reaches: same overlay, same police preview,
-  same PIN requirement. Wrong PIN does not stop it; only the correct PIN does.
+- Start Demo, then tap **SOS** immediately. Do not use normal SUS for this take.
+- Synthetic preview must not invent missed check-ins that did not occur.
+- Try one wrong PIN: SOS remains. Enter the correct demo PIN: it stops.
+- Rehearse reloading an active demo SOS: its demo identity and PIN protection must survive.
 
-## Truthful wording for the recording
+## Evidence and remaining work
 
-- The alert is reported as **accepted** (provider took it), never "delivered".
-  Delivery evidence is the second phone's WhatsApp screen, if the recipient is
-  configured; otherwise say plainly that the connection is not ready.
-- The police preview is **synthetic and local-only**. No police component is
-  contacted. Do not imply receipt or dispatch by any real service.
-- Demo reset is refused during SOS on purpose: a demo exit must never bypass an
-  active SOS.
+See `DEMO_VERIFICATION.md` for file/line findings and automated/desktop evidence.
+Actual iPhone, recipient receipt, token rotation, account compatibility, durable-store
+integration and native Telugu review remain open. Normal cadence is five minutes,
+with 120/60/provisional-60-second windows; final normal expiry needs founder approval.
+No police receipt/dispatch, reliable locked-phone monitoring or broader Round 2 completion
+is implied. The messaging provider receives the configured recipient: do not claim
+nothing identifying leaves the device through the family-messaging path.

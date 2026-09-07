@@ -13,6 +13,7 @@ const COUNTDOWN_TICK_MS = 1000; // fact: motion.1000ms
 
 export interface CheckInOverlayProps {
   readonly copy: M4Copy;
+  readonly demo?: boolean;
   readonly deadlineEpochMs: number | null;
   /** Window length for the visible ring; the engine's absolute deadline governs. */
   readonly windowSec: number;
@@ -28,6 +29,7 @@ export interface CheckInOverlayProps {
 /** M1 step 2: the three answerable, in-page rungs of the safety ladder. */
 export function CheckInOverlay({
   copy,
+  demo = false,
   deadlineEpochMs,
   windowSec,
   familyAlertStatus,
@@ -64,6 +66,7 @@ export function CheckInOverlay({
   const alertStatusLine = familyAlertLine(copy, familyAlertStatus);
   const message = (
     <div className="checkin-overlay__message">
+      <p>{demo ? `${copy.ctaDemo} · ` : ""}{isFirst ? "1" : isSecond ? "2" : "3"} / 3</p>
       <CountdownRing
         ariaLabel={formatCountdownLabel(copy.cdCountdown, seconds)}
         formatAnnouncement={(value) => formatCountdownLabel(copy.cdCountdown, value)}

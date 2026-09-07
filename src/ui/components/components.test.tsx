@@ -75,7 +75,7 @@ describe("C1 and C2 action controls", () => {
     const running = renderToStaticMarkup(
       <BigActionButton
         accent="brand"
-        countdownLabel="I'm OK · 42s"
+        countdownLabel="I'm OK · 42s" // GROUNDED-EXEMPT: static copy specimen, not a scheduled timer.
         countdownSeconds={42} // GROUNDED-EXEMPT: component-spec illustration, not a product timer.
         label="I'm OK"
         workingLabel="Working"
@@ -161,7 +161,7 @@ describe("C3 and C4 ladder surfaces", () => {
           formatAnnouncement={(remaining) => `${remaining} seconds remaining`}
           rung="CHECKIN_1"
           seconds={seconds}
-          totalSeconds={90}
+          totalSeconds={90} // GROUNDED-EXEMPT: synthetic component denominator for rendering tests, not engine policy.
           variant="card"
         />,
       );

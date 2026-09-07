@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { FakeSessionRepository } from "../data/repository/sessionRepository";
-import { DEFAULT_RULES } from "../domain/engine/rules";
+import { DEFAULT_RULES, DEMO_RULES } from "../domain/engine/rules";
 import type { Command } from "../domain/model/session";
 import { HomeEngineBridge } from "../ui/screens/home/homeEngineBridge";
 import type { Clock, Scheduler } from "./clock";
@@ -67,12 +67,11 @@ class FakeWakeLock implements HomeWakeLockLifecycle {
   }
 }
 
-function harness() {
+function harness(wakeLock = new FakeWakeLock()) {
   const clock = new FakeClock();
   const scheduler = new FakeScheduler();
   const sessions = new FakeSessionRepository();
   const location = new FakeLocation();
-  const wakeLock = new FakeWakeLock();
   const commands: Command[] = [];
   const errors: unknown[] = [];
   let runtime: HomeSessionRuntime | null = null;
@@ -114,6 +113,77 @@ function harness() {
 }
 
 describe("M4 browser session command runtime", () => {
+  it("starts the demo deadline immediately even if Wake Lock never settles", async () => {
+    const wake = new FakeWakeLock();
+    wake.setArmed = () => new Promise(() => undefined);
+    const setup = harness(wake);
+    setup.bridge.setRules(DEMO_RULES);
+    setup.bridge.dispatch({ kind: "ManualArm" }, { nowEpochMs: 0, zone: null });
+    setup.bridge.dispatch({ kind: "CheckInTimerFired" }, { nowEpochMs: 0, zone: null });
+    const deadline = DEMO_RULES.ladder.window1Sec * 1000;
+    expect(setup.bridge.view().deadlineEpochMs).toBe(deadline);
+    await setup.runtime.waitForIdle();
+    expect(setup.sessions.current?.deadlineEpochMs).toBe(deadline);
+    setup.clock.now = deadline;
+    setup.scheduler.fire();
+    await setup.runtime.waitForIdle();
+    expect(setup.bridge.view().state).toBe("CHECKIN_2");
+    expect(setup.bridge.view().deadlineEpochMs).toBe(deadline + DEMO_RULES.ladder.window2Sec * 1000);
+  });
+
+  it("an already queued stale callback cannot expire a fresh OK deadline", async () => {
+    const setup = harness();
+    setup.bridge.setRules(DEMO_RULES);
+    setup.bridge.dispatch({ kind: "ManualArm" }, { nowEpochMs: 0, zone: null });
+    setup.bridge.dispatch({ kind: "CheckInTimerFired" }, { nowEpochMs: 0, zone: null });
+    const staleCallback = setup.scheduler.callback;
+    setup.clock.now = DEMO_RULES.ladder.window1Sec * 1000;
+    setup.bridge.dispatch({ kind: "OkTapped" }, { nowEpochMs: setup.clock.now, zone: null });
+    staleCallback?.();
+    await setup.runtime.waitForIdle();
+    expect(setup.bridge.view().state).toBe("SHADOW");
+    expect(setup.sessions.current?.deadlineEpochMs).toBe(setup.clock.now + DEMO_RULES.ladder.okResetSec * 1000);
+  });
+
+  it("catches up all elapsed demo windows once without restarting their clocks", async () => {
+    const setup = harness();
+    setup.bridge.setRules(DEMO_RULES);
+    setup.bridge.dispatch({ kind: "ManualArm" }, { nowEpochMs: 0, zone: null });
+    setup.bridge.dispatch({ kind: "CheckInTimerFired" }, { nowEpochMs: 0, zone: null });
+    const saved = setup.bridge.persistedSession()!;
+    const end = (DEMO_RULES.ladder.window1Sec + DEMO_RULES.ladder.window2Sec + DEMO_RULES.ladder.window3Sec) * 1000;
+    setup.commands.length = 0;
+    setup.bridge.recover(saved, { nowEpochMs: end, zone: null });
+    await setup.runtime.waitForIdle();
+    expect(setup.bridge.view().state).toBe("SOS_ACTIVE");
+    expect(setup.commands.filter(({kind}) => kind === "RequestFamilyAlert")).toHaveLength(1);
+    expect(setup.commands.filter(({kind}) => kind === "WriteSosIncident")).toHaveLength(1);
+    expect(setup.commands.filter(({kind}) => kind === "ShowCheckIn")).toHaveLength(0);
+    expect(setup.sessions.current?.deadlineEpochMs).toBeNull();
+    setup.commands.length = 0;
+    setup.bridge.recover(setup.sessions.current!, { nowEpochMs: end, zone: null });
+    expect(setup.commands.filter(({kind}) => kind === "RequestFamilyAlert")).toHaveLength(0);
+  });
+
+  it("keeps first-miss identity stable on recovery and changes it after OK", async () => {
+    const setup = harness();
+    setup.bridge.setRules(DEMO_RULES);
+    setup.bridge.dispatch({ kind: "ManualArm" }, { nowEpochMs: 0, zone: null });
+    setup.bridge.dispatch({ kind: "CheckInTimerFired" }, { nowEpochMs: 0, zone: null });
+    const saved = setup.bridge.persistedSession()!;
+    setup.clock.now = saved.deadlineEpochMs!;
+    setup.scheduler.fire();
+    const first = setup.bridge.familyAlertOperationId();
+    setup.bridge.recover(saved, { nowEpochMs: setup.clock.now, zone: null });
+    expect(setup.bridge.familyAlertOperationId()).toBe(first);
+    setup.bridge.dispatch({ kind: "OkTapped" }, { nowEpochMs: setup.clock.now, zone: null });
+    setup.clock.now = setup.bridge.view().deadlineEpochMs!;
+    setup.scheduler.fire();
+    setup.clock.now = setup.bridge.view().deadlineEpochMs!;
+    setup.scheduler.fire();
+    expect(setup.bridge.familyAlertOperationId()).not.toBe(first);
+    await setup.runtime.waitForIdle();
+  });
   it("persists an absolute deadline and advances the pure engine when it expires", async () => {
     const setup = harness();
 

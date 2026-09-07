@@ -23,6 +23,7 @@ function render(locale: SaayaLocale, sessionState: SessionState) {
       onReset={() => undefined}
       onStartDemo={() => undefined}
       sessionState={sessionState}
+      isDemoSession
     />,
   );
 }

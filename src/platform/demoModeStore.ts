@@ -25,11 +25,20 @@ export function markDemoArmedSession(
   sessionId: string,
   storage: DemoModeStorage | null = browserStorage(),
 ): void {
+  if (storage === null) throw new Error("Demo storage unavailable");
+  storage.setItem(demoSessionKey(sessionId), MARKED_VALUE);
+}
+
+export function saveDemoMisses(sessionId: string, misses: number): void {
+  try { browserStorage()?.setItem(`${demoSessionKey(sessionId)}:misses`, String(misses)); }
+  catch { /* A preview metadata failure must never suppress the safety ladder. */ }
+}
+
+export function loadDemoMisses(sessionId: string): number {
   try {
-    storage?.setItem(demoSessionKey(sessionId), MARKED_VALUE);
-  } catch {
-    // Storage denial must not break the active, visibly labelled demo.
-  }
+    const value = Number(browserStorage()?.getItem(`${demoSessionKey(sessionId)}:misses`));
+    return Number.isInteger(value) && value >= 0 && value <= 3 ? value : 0;
+  } catch { return 0; }
 }
 
 export function isDemoArmedSession(

@@ -75,42 +75,27 @@ export class HomeSessionRuntime {
         command.kind === "ScheduleTimer",
     );
 
-    this.enqueue(async () => {
-      for (const command of commands) {
-        await this.applyEffect(command);
-      }
-      this.location.synchronizeSessionState();
-
-      const persisted = this.session.persistedSession();
-      const currentState = this.session.snapshot().state;
-      if (
-        resultingState === "RESOLVED" ||
-        persisted === null ||
-        currentState === "IDLE"
-      ) {
-        await this.sessions.clearCurrent();
-        return;
-      }
-
-      // A synchronous browser failure can dispatch a new engine event while a
-      // command batch is being applied. The newer batch owns persistence.
-      if (currentState !== resultingState) return;
-
-      if (schedule === undefined) {
-        await this.sessions.saveCurrent(persisted);
-        return;
-      }
-
-      const updated = await this.deadlineTimer.schedule(
-        persisted,
-        schedule.id,
-        schedule.delaySec,
-      );
-      const current = this.session.persistedSession();
-      if (current?.sessionId === updated.sessionId) {
-        this.session.setDeadlineEpochMs(updated.deadlineEpochMs);
-      }
-    });
+    const persisted = this.session.persistedSession();
+    const terminal = resultingState === "RESOLVED" || persisted === null;
+    // Capture the immutable transition before a newer event or async effect.
+    // Browser wake-lock/persistence latency must never extend a safety deadline.
+    if (terminal || resultingState === "SOS_ACTIVE" ||
+        commands.some((command) => command.kind === "CancelTimer")) {
+      this.deadlineTimer.cancel();
+    }
+    if (!terminal && schedule !== undefined) {
+      this.deadlineTimer.restoreHint(persisted, schedule.id);
+    }
+    if (commands.length > 0) {
+      this.enqueue(async () => {
+        if (terminal) await this.sessions.clearCurrent();
+        else await this.sessions.saveCurrent(persisted);
+      });
+    }
+    for (const command of commands) {
+      void this.applyEffect(command).catch(this.callbacks.onError);
+    }
+    this.location.synchronizeSessionState();
   }
 
   restoreDeadline(session: PersistedSession, timerId: TimerId): void {
@@ -129,8 +114,8 @@ export class HomeSessionRuntime {
   private async applyEffect(command: Command): Promise<void> {
     switch (command.kind) {
       case "CancelTimer":
-        this.deadlineTimer.cancel();
-        this.session.setDeadlineEpochMs(null);
+        // The replacement hint was installed atomically above. Never clear it
+        // here, or an OK CancelTimer would erase its own new CHECKIN deadline.
         return;
       case "StartLocationWatch":
         this.location.startAfterConsent();
@@ -154,14 +139,14 @@ export class HomeSessionRuntime {
   }
 
   private fire(timerId: TimerId): void {
-    this.session.setDeadlineEpochMs(null);
+    const deadlineEpochMs = this.session.persistedSession()?.deadlineEpochMs;
     const event: SessionEvent =
       timerId === "CHECKIN"
         ? { kind: "CheckInTimerFired" }
         : { kind: "CountdownExpired", timer: timerId };
     const snapshot = this.session.snapshot();
     this.session.dispatch(event, {
-      nowEpochMs: this.clock.nowEpochMs(),
+      nowEpochMs: deadlineEpochMs ?? this.clock.nowEpochMs(),
       zone: this.zoneById(snapshot),
     });
   }

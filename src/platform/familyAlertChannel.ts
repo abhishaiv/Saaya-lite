@@ -11,7 +11,7 @@ export type FamilyAlertStatus =
 export type FamilyAlertOutcome = Exclude<FamilyAlertStatus, "sending">;
 
 export interface FamilyAlertRequest {
-  /** Stable per-session idempotency key; the server deduplicates on it. */
+  /** Stable per-episode idempotency key; the server deduplicates on it. */
   readonly operationId: string;
   /** Server-owned localized message selection. */
   readonly locale: SaayaLocale;
@@ -22,7 +22,7 @@ export interface FamilyAlertRequest {
 const DEMO_ALERT_ENDPOINT = "/api/demo-alert"; // GROUNDED-EXEMPT: first-party app route name.
 
 export interface FamilyAlertChannelResponse {
-  readonly status: "accepted" | "duplicate" | "not_configured" | "failed";
+  readonly status: "accepted" | "duplicate" | "not_configured" | "failed" | "unknown" | "sending";
 }
 
 /**
@@ -57,12 +57,13 @@ export async function requestFamilyAlert(
     body = null;
   }
 
-  if (body !== null && (body.status === "accepted" || body.status === "duplicate")) {
+  if (body !== null && body.status === "accepted") {
     return "accepted";
   }
   if (body !== null && body.status === "not_configured") {
     return "notready";
   }
+  if (body?.status === "unknown" || body?.status === "sending" || body?.status === "duplicate") return "unknown";
   if (response.ok) {
     // An undocumented success body is still a settled outcome we cannot verify.
     return "unknown";

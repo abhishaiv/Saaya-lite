@@ -1,4 +1,5 @@
 import { onEvent } from "../../../domain/engine/sessionEngine";
+import { DEFAULT_RULES, DEMO_RULES } from "../../../domain/engine/rules";
 import type {
   ArmMode,
   Command,
@@ -41,6 +42,13 @@ interface HomeEngineMemory {
 }
 
 export class HomeEngineBridge implements RuntimeSessionBridge {
+  private alertEpisodeEpochMs: number | null = null;
+  private liveCooldowns: Record<string, number> | null = null;
+
+  familyAlertOperationId(): string | null {
+    return this.memory.sessionId === null || this.alertEpisodeEpochMs === null
+      ? null : `${this.memory.sessionId}:${this.alertEpisodeEpochMs}:family-alert`;
+  }
   private memory: HomeEngineMemory = {
     activeZoneId: null,
     armedAtEpochMs: null,
@@ -72,10 +80,18 @@ export class HomeEngineBridge implements RuntimeSessionBridge {
   }
 
   setRules(rules: Rules): void {
+    if (rules === DEMO_RULES && this.rules !== DEMO_RULES) {
+      this.liveCooldowns = { ...this.memory.cooldowns };
+      this.memory.cooldowns = {};
+    } else if (rules === DEFAULT_RULES && this.rules === DEMO_RULES) {
+      this.memory.cooldowns = this.liveCooldowns ?? {};
+      this.liveCooldowns = null;
+    }
     this.rules = rules;
   }
 
   resetForDemo(): boolean {
+    if (this.memory.state === "IDLE") return true;
     // The demo reset must never bypass the PIN: refusing while SOS is active
     // keeps the only exit from SOS on the PIN path (plan §B, 2026-09-06).
     if (this.memory.state === "SOS_ACTIVE") return false;
@@ -98,7 +114,7 @@ export class HomeEngineBridge implements RuntimeSessionBridge {
       armedAtEpochMs: null,
       armedHourBand: null,
       armMode: "MANUAL",
-      cooldowns: {},
+      cooldowns: this.memory.cooldowns,
       deadlineEpochMs: null,
       sessionId: null,
       state: "IDLE",
@@ -180,6 +196,14 @@ export class HomeEngineBridge implements RuntimeSessionBridge {
       susEventWritten: this.memory.susEventWritten,
       zone: input.zone,
     });
+    if (result.commands.some((command) => command.kind === "RequestFamilyAlert")) {
+      if (event.kind === "AppKilledRestart") {
+        const millisPerSecond = 1000; // GROUNDED-EXEMPT: SI conversion for a private episode identity.
+        this.alertEpisodeEpochMs = event.persisted.deadlineEpochMs === null ? null :
+          event.persisted.deadlineEpochMs + (event.persisted.state === "SHADOW"
+            ? this.rules.ladder.window1Sec * millisPerSecond : 0);
+      } else this.alertEpisodeEpochMs = this.memory.deadlineEpochMs;
+    }
 
     if (
       (result.state === "SHADOW" || result.state === "SOS_ACTIVE") &&
@@ -199,12 +223,14 @@ export class HomeEngineBridge implements RuntimeSessionBridge {
       };
     } else {
       this.memory.state = result.state;
-      if (
-        event.kind === "CheckInTimerFired" ||
-        event.kind === "CountdownExpired"
-      ) {
-        this.memory.deadlineEpochMs = null;
-      }
+    }
+
+    const scheduled = result.commands.find((command) => command.kind === "ScheduleTimer");
+    if (scheduled?.kind === "ScheduleTimer") {
+      const millisPerSecond = 1000; // GROUNDED-EXEMPT: SI conversion of the approved timing profile.
+      this.memory.deadlineEpochMs = input.nowEpochMs + scheduled.delaySec * millisPerSecond;
+    } else if (result.state === "SOS_ACTIVE" || result.state === "RESOLVED") {
+      this.memory.deadlineEpochMs = null;
     }
 
     for (const command of result.commands) {

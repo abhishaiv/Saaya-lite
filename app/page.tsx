@@ -21,6 +21,7 @@ export default function HomePage({ searchParams }: HomePageProps) {
     bundledZoneRepository.snapshot();
   return (
     <AppGate
+      forceDemoEntry={searchParams?.demo === "1"}
       buildVersion={{ name: versionName, code: Number(versionCodeText) }}
       demoZones={demoZones}
       founderContact={process.env.SAAYA_FOUNDER_CONTACT?.trim() || null}

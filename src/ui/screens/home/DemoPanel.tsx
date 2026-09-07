@@ -12,6 +12,7 @@ export interface DemoPanelProps {
   readonly onStartDemo: () => void;
   readonly onReset: () => void;
   readonly sessionState: SessionState;
+  readonly isDemoSession?: boolean;
 }
 
 export function DemoPanel({
@@ -20,11 +21,12 @@ export function DemoPanel({
   onStartDemo,
   onReset,
   sessionState,
+  isDemoSession = false,
 }: DemoPanelProps) {
   const idle = sessionState === "IDLE" || sessionState === "RESOLVED";
   // Reset must never bypass the PIN: the bridge refuses during SOS_ACTIVE and
   // the button states that instead of appearing broken.
-  const resetBlocked = sessionState === "SOS_ACTIVE";
+  const resetBlocked = sessionState === "SOS_ACTIVE" || !isDemoSession;
 
   return (
     <SaayaBottomSheet
@@ -85,7 +87,7 @@ export function DemoPanel({
           </SaayaButton>
         </div>
 
-        {resetBlocked ? (
+        {sessionState === "SOS_ACTIVE" ? (
           <p className="demo-panel__reset-status" role="status">
             {copy.demoResetBlockedSos}
           </p>

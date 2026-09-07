@@ -916,7 +916,7 @@ describe("pure session engine", () => {
     expect(result.commands).toContainEqual({
       kind: "ShowCheckIn",
       step: 1,
-      countdownSec: 2 * SECONDS_PER_MINUTE,
+      countdownSec: 2 * SECONDS_PER_MINUTE - 1 / EPOCH_MS_PER_SECOND,
       urgency: "GENTLE",
     });
   });

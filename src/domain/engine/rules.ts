@@ -2,13 +2,13 @@ import type { HourBand, RiskTier, Rules } from "../model/session";
 
 export const MINUTES_PER_HOUR = 60; // GROUNDED-EXEMPT: structural clock-domain size
 
-// Timing profile of the three-check-in ladder (founder decision 2026-09-06).
+// Timing profile of the three-check-in ladder (founder decision the founder-approved demo-day policy).
 // The old 90/60/60 s two-rung values and the 6x demo divisor are superseded;
 // see ladder.* and demo.* facts in graph/spec_graph.json.
 export const LADDER_CADENCE_SEC = 5 * MINUTES_PER_HOUR; // fact: ladder.cadence.min
 export const LADDER_WINDOW_1_SEC = 2 * MINUTES_PER_HOUR; // fact: ladder.window1.min
 export const LADDER_WINDOW_2_SEC = 1 * MINUTES_PER_HOUR; // fact: ladder.window2.min
-export const LADDER_WINDOW_3_SEC = 60; // fact: ladder.window3.sec
+export const LADDER_WINDOW_3_SEC = 60; // fact: ladder.window3.sec — PROVISIONAL normal expiry; founder decision pending.
 export const DEMO_WINDOW_SEC = 10; // fact: demo.checkin.window.sec
 export const DEMO_OK_RESET_SEC = 10; // fact: demo.ok.reset.sec
 export const ENTER_DWELL_SEC = 60;
@@ -23,7 +23,7 @@ export const MAX_CONTAINMENT_ACCURACY_M = 100; // fact: loc.accuracy.reject
 export const MIN_ENTRY_FIXES = 5; // fact: candidate.dwell.min_fixes
 export const LAST_KNOWN_CENTERING_MAX_AGE_MIN = 5; // fact: loc.last_known.centering.max_age
 export const FIRST_FIX_SLOW_AFTER_SEC = 60; // fact: loc.first_fix.slow_after
-export const DEMO_DIVISOR = 1; // fact: demo.normal.divisor (divisor scaling superseded 2026-09-06; dwells run unscaled in both profiles)
+export const DEMO_DIVISOR = 1; // fact: demo.normal.divisor (divisor scaling superseded the founder-approved demo-day policy; dwells run unscaled in both profiles)
 export const NORMAL_DEMO_DIVISOR = 1; // fact: demo.normal.divisor
 export const DEMO_ARM_HOUR = 4; // fact: demo.arm.hour
 export const EARTH_RADIUS_M = 6_371_008.8; // fact: const.earth

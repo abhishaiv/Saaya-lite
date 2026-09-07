@@ -1,4 +1,5 @@
 import { renderToStaticMarkup } from "react-dom/server";
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 import { M4_COPY, formatCopy } from "../../copy/strings";
@@ -22,6 +23,20 @@ function demoIncident(): SosDemoIncident {
 }
 
 describe("M1 direct SOS surface", () => {
+  it("uses the separate demo PIN store only for a labelled demo incident", () => {
+    const source = readFileSync(
+      new URL("./SosOverlay.tsx", import.meta.url),
+      "utf8",
+    );
+
+    expect(source).toContain('import { DemoPinStore } from "../../../platform/demoPinStore";');
+    expect(source).toContain(
+      "const pinVerifier = demoIncident === null ? repository : demoPinStore;",
+    );
+    expect(source).toContain(".catch(() => {");
+    expect(source).toContain("setIsChecking(false);");
+  });
+
   it("keeps the user-controlled emergency dial action and prototype disclosure visible", () => {
     const html = renderToStaticMarkup(
       <SosOverlay

@@ -433,3 +433,7 @@ invalid recipient, and never infers that another app opened or that a message wa
 G10 and graph integrity pass. Fresh boundary verification returned `kill=false` at 0.98 and the
 final fresh spec verification returned `kill=false` at 0.97. Chrome composer checks remain open,
 and the family-escalation narration must be recorded only after that evidence exists.
+
+## 2026-09-07 — demo-day verification checkpoint
+
+Corrected GLM's deadline/recovery, demo-profile and PIN isolation, startup race, synthetic timeline and authorization/dedup defects; 253 tests, build, typecheck, lint, explicit G6 on 154 files and fresh final verifier pass. See DEMO_VERIFICATION.md and DEMO_RECORDING.md. Known limitations: live durable store/provider setup, rotated credentials/consent, actual Chrome iPhone plus recipient receipt, final normal expiry and native Telugu review remain open; no production promotion. Bare G6 scanned zero files and was not meaningful evidence. Pinned dependency warnings remain; no closed-list upgrade was invented.

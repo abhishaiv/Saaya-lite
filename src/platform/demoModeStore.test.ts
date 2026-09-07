@@ -47,7 +47,7 @@ describe("demo mode storage", () => {
     expect(isDemoArmedSession("never-marked-session", storage)).toBe(false);
   });
 
-  it("survives browser storage denial without breaking the demo", () => {
+  it("refuses to arm without a durable demo marker instead of recovering as normal", () => {
     const denied: DemoModeStorage = {
       getItem: () => {
         throw new Error("denied");
@@ -60,7 +60,7 @@ describe("demo mode storage", () => {
       },
     };
 
-    expect(() => markDemoArmedSession("demo-session", denied)).not.toThrow();
+    expect(() => markDemoArmedSession("demo-session", denied)).toThrow("denied");
     expect(isDemoArmedSession("demo-session", denied)).toBe(false);
     expect(() => clearDemoArmedSession("demo-session", denied)).not.toThrow();
   });

@@ -1,5 +1,9 @@
 # ASTRA_VERIFICATION_REPORT.md — Round 2 demo-day build report card
 
+> Historical report for `9015488`. Independent verification found substantive
+> failures; use `DEMO_VERIFICATION.md` and current `DEMO_RECORDING.md` for corrected
+> checkpoint results and open gates, not the claims below.
+
 **Prepared for external verification.** Written 2026-09-06 by the implementation
 agent (Claude Code). Every claim below is checkable from the repository; commands
 are given. This report asserts nothing that was not run — open gates are listed

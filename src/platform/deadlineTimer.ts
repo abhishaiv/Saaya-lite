@@ -11,6 +11,7 @@ import {
 export class AbsoluteDeadlineTimer {
   private hint: unknown = null;
   private timerId: TimerId | null = null;
+  private generation = 0;
 
   constructor(
     private readonly sessions: SessionRepository,
@@ -25,10 +26,12 @@ export class AbsoluteDeadlineTimer {
     delaySec: number,
   ): Promise<PersistedSession> {
     this.cancelHint();
+    const generation = this.generation;
     const deadlineEpochMs =
       this.clock.nowEpochMs() + secondsToEpochMs(delaySec);
     const persisted = { ...session, deadlineEpochMs };
     await this.sessions.saveCurrent(persisted);
+    if (this.generation !== generation) return persisted;
     this.timerId = timerId;
     this.scheduleHint(deadlineEpochMs);
     return persisted;
@@ -47,11 +50,13 @@ export class AbsoluteDeadlineTimer {
   }
 
   private scheduleHint(deadlineEpochMs: number): void {
+    const generation = this.generation;
     const remainingEpochMs = Math.max(
       0,
       deadlineEpochMs - this.clock.nowEpochMs(),
     );
     this.hint = this.scheduler.schedule(() => {
+      if (this.generation !== generation) return;
       this.hint = null;
       if (this.clock.nowEpochMs() < deadlineEpochMs) {
         this.scheduleHint(deadlineEpochMs);
@@ -64,6 +69,7 @@ export class AbsoluteDeadlineTimer {
   }
 
   private cancelHint(): void {
+    this.generation += 1;
     if (this.hint === null) return;
     this.scheduler.cancel(this.hint);
     this.hint = null;

@@ -313,9 +313,9 @@
   "fusion_merge"
  ],
  "counts": {
-  "entities": 423,
-  "edges": 709,
-  "events": 88
+  "entities": 424,
+  "edges": 710,
+  "events": 90
  },
  "entities": [
   {
@@ -3340,6 +3340,12 @@
    "label": "app/api/demo-alert/route.ts \u2014 the one server-side messaging surface of Round 2, plus src/platform/familyAlertChannel.ts, its abortable client that shows truthful sending/accepted/failed/unknown/not-ready states",
    "at": "2026-09-06",
    "produced_by": "node.M4"
+  },
+  {
+   "id": "art.demo_verification.20260907",
+   "class": "Artifact",
+   "label": "Demo-day verification: absolute recovery, isolated demo PIN and fail-closed messaging",
+   "node": "M1"
   }
  ],
  "edges": [
@@ -9014,6 +9020,14 @@
    "at": "2026-09-06",
    "by": "codex",
    "confidence": "high"
+  },
+  {
+   "from": "art.demo_verification.20260907",
+   "rel": "produced_by",
+   "to": "node.M1",
+   "at": "2026-09-07",
+   "by": "codex",
+   "confidence": "high"
   }
  ],
  "events": [
@@ -10020,6 +10034,22 @@
     "dec.round2.server_alert_route",
     "art.round2.demo_alert_route"
    ]
+  },
+  {
+   "id": "ev.0089",
+   "type": "spec_amended",
+   "at": "2026-09-06",
+   "actor": "codex",
+   "detail": "Demo verification corrects absolute deadlines, profile isolation, scoped PIN and fail-closed durable messaging to the approved demo-day contract",
+   "node": "M1"
+  },
+  {
+   "id": "ev.0090",
+   "type": "verifier_passed",
+   "at": "2026-09-07",
+   "actor": "codex",
+   "detail": "Fresh demo verifier passed after startup-recovery race correction; provider and actual phone gates remain open",
+   "node": "M1"
   }
  ]
 }

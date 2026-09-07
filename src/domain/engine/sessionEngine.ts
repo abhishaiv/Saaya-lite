@@ -391,7 +391,30 @@ function recoverSession(
   );
   if (remainingSec <= 0) {
     const recoveredEvent = recoveryExpiryEvent(persisted.state);
-    const advanced = onEvent(persisted.state, recoveredEvent, recoveredContext);
+    const advanced = onEvent(persisted.state, recoveredEvent, {
+      ...recoveredContext,
+      nowEpochMs: persisted.deadlineEpochMs!,
+    });
+    const schedule = advanced.commands.find(
+      (command) => command.kind === "ScheduleTimer",
+    );
+    if (schedule?.kind === "ScheduleTimer") {
+      const millisPerSecond = 1000; // GROUNDED-EXEMPT: SI conversion, not a timing policy.
+      const successor = recoverSession({
+        ...persisted,
+        state: advanced.state,
+        deadlineEpochMs: persisted.deadlineEpochMs! + schedule.delaySec * millisPerSecond,
+      }, ctx);
+      // Keep semantic effects once, but show/schedule only the final live rung.
+      return {
+        ...successor,
+        commands: [
+          ...advanced.commands.filter((command) =>
+            command.kind !== "ScheduleTimer" && command.kind !== "ShowCheckIn"),
+          ...successor.commands,
+        ],
+      };
+    }
     return {
       ...advanced,
       commands: [
@@ -483,7 +506,7 @@ function remainingDeadlineSec(
     throw new Error("Recovered ladder state is missing its absolute deadline");
   }
   const epochMsPerSecond = 1000; // GROUNDED-EXEMPT: SI unit conversion
-  return Math.ceil((deadlineEpochMs - nowEpochMs) / epochMsPerSecond);
+  return (deadlineEpochMs - nowEpochMs) / epochMsPerSecond;
 }
 
 function recoveryExpiryEvent(state: SessionState): SessionEvent {

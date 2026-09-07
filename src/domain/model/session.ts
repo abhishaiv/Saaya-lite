@@ -6,7 +6,7 @@ export type SessionState =
   | "CHECKIN_1"
   | "CHECKIN_2"
   | "CHECKIN_3"
-  // Legacy persisted state only (pre-2026-09-06 two-rung ladder). No transition
+  // Legacy persisted state only (pre-the founder-approved demo-day policy two-rung ladder). No transition
   // enters it; recovery maps a saved FAMILY_ESCALATED session to CHECKIN_3.
   | "FAMILY_ESCALATED"
   | "SOS_ACTIVE"
@@ -60,7 +60,7 @@ export type Command =
   | { kind: "HideCheckIn" }
   | { kind: "ShowArmBanner"; zoneId: string; band: HourBand }
   | { kind: "ShowSos" }
-  // First-miss family-alert intents (founder 2026-09-06). Intent only: no
+  // First-miss family-alert intents (founder the founder-approved demo-day policy). Intent only: no
   // recipient, message text or contact rides in the command. RequestFamilyAlert
   // asks the runtime to attempt the configured first-miss messaging;
   // CancelFamilyAlert cancels any still-pending request when I'm OK resolves
@@ -96,7 +96,7 @@ export interface PersistedSession {
   outcome?: Outcome;
 }
 
-// The explicit timing profile (founder decision 2026-09-06). cadenceSec runs
+// The explicit timing profile (founder decision the founder-approved demo-day policy). cadenceSec runs
 // from arming to check-in 1; okResetSec runs from I'm OK to the next check-in 1.
 export interface LadderTiming {
   cadenceSec: number;
@@ -112,7 +112,7 @@ export interface Rules {
   exitDwellSec: number;
   manualDisarmCooldownMin: number;
   okCooldownMin: number;
-  demoDivisor: number; // retained for dwell scaling only; both profiles use 1 since 2026-09-06
+  demoDivisor: number; // retained for dwell scaling only; both profiles use 1 since the founder-approved demo-day policy
   armingMatrix: Record<string, boolean>;
   samplingShadowSec: number;
   samplingSosSec: number;

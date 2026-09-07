@@ -10,13 +10,13 @@ import { requestFamilyAlert, type FamilyAlertRequest } from "./familyAlertChanne
 const REQUEST: FamilyAlertRequest = {
   demo: true,
   locale: "en",
-  operationId: "11111111-2222-3333-4444-555555555555:family-alert",
+  operationId: "11111111-2222-3333-4444-555555555555:family-alert", // GROUNDED-EXEMPT: synthetic protocol fixture; no live message or product value.
 };
 
 function jsonResponse(body: unknown, ok = true): Response {
   return new Response(JSON.stringify(body), {
     headers: { "content-type": "application/json" },
-    status: ok ? 200 : 502,
+    status: ok ? 200 : 502, // GROUNDED-EXEMPT: standard HTTP response status, not product policy.
   });
 }
 
@@ -33,10 +33,10 @@ describe("family alert channel", () => {
     expect(outcome).toBe("accepted");
   });
 
-  it("treats a provider duplicate as accepted without a second send", async () => {
+  it("does not infer acceptance from a duplicate without its stored outcome", async () => {
     const fetchMock = vi.fn(async () => jsonResponse({ status: "duplicate" }));
     const outcome = await requestFamilyAlert(REQUEST, null, fetchMock as unknown as typeof fetch);
-    expect(outcome).toBe("accepted");
+    expect(outcome).toBe("unknown");
     expect(fetchMock).toHaveBeenCalledOnce();
   });
 
@@ -64,6 +64,13 @@ describe("family alert channel", () => {
     const fetchMock = vi.fn(async () => jsonResponse({ surprise: true }));
     const outcome = await requestFamilyAlert(REQUEST, null, fetchMock as unknown as typeof fetch);
     expect(outcome).toBe("unknown");
+  });
+
+  it("never turns an ambiguous acknowledgement or pending reservation into failed or delivered", async () => {
+    for (const status of ["unknown", "sending"]) {
+      const fetchMock = vi.fn(async () => jsonResponse({ status }, false));
+      expect(await requestFamilyAlert(REQUEST, null, fetchMock as unknown as typeof fetch)).toBe("unknown");
+    }
   });
 
   it("sends only operation, locale and demo flag - no contact data, no message body", async () => {

@@ -12,6 +12,7 @@ import {
   PIN_MAX_LOCKOUT_MIN,
 } from "../../../domain/engine/rules";
 import { browserClock } from "../../../platform/clock";
+import { DemoPinStore } from "../../../platform/demoPinStore";
 import { BrowserPinHasher } from "../../../platform/pinHash";
 import { installConsumeBackGuard } from "../../../platform/sosBackGuard";
 import { installSosFocusTrap } from "../../../platform/sosFocusTrap";
@@ -54,11 +55,15 @@ export function SosOverlay({
   onPinAccepted,
 }: SosOverlayProps) {
   const repositoryRef = useRef<IndexedDbOnboardingRepository | null>(null);
+  const demoPinStoreRef = useRef<DemoPinStore | null>(null);
   const overlayRef = useRef<HTMLElement | null>(null);
   if (repositoryRef.current === null) {
     repositoryRef.current = new IndexedDbOnboardingRepository(
       new BrowserPinHasher(),
     );
+  }
+  if (demoPinStoreRef.current === null) {
+    demoPinStoreRef.current = new DemoPinStore();
   }
 
   const [view, setView] = useState<"SOS" | "PIN">("SOS");
@@ -72,6 +77,7 @@ export function SosOverlay({
   );
   const [nowEpochMs, setNowEpochMs] = useState(() => browserClock.nowEpochMs());
   const repository = repositoryRef.current;
+  const demoPinStore = demoPinStoreRef.current;
   const isLocked =
     lockedUntilEpochMs !== null && nowEpochMs < lockedUntilEpochMs;
 
@@ -116,33 +122,41 @@ export function SosOverlay({
     }
 
     setIsChecking(true);
-    void repository.verifyPin(nextPin).then((accepted) => {
-      if (accepted) {
-        onPinAccepted();
-        return;
-      }
+    const pinVerifier = demoIncident === null ? repository : demoPinStore;
+    void pinVerifier
+      .verifyPin(nextPin)
+      .then((accepted) => {
+        if (accepted) {
+          onPinAccepted();
+          return;
+        }
 
-      const nextAttempts = failedAttempts + 1;
-      setPin("");
-      setIsChecking(false);
-      if (nextAttempts >= PIN_MAX_ATTEMPTS) {
-        const now = browserClock.nowEpochMs();
-        setNowEpochMs(now);
-        setLockedUntilEpochMs(
-          now + lockoutSeconds * MILLIS_PER_SECOND,
-        );
-        setLockoutSeconds((current) =>
-          Math.min(PIN_MAX_LOCKOUT_SEC, current + current),
-        );
-        setFailedAttempts(0);
-        return;
-      }
+        const nextAttempts = failedAttempts + 1;
+        setPin("");
+        setIsChecking(false);
+        if (nextAttempts >= PIN_MAX_ATTEMPTS) {
+          const now = browserClock.nowEpochMs();
+          setNowEpochMs(now);
+          setLockedUntilEpochMs(
+            now + lockoutSeconds * MILLIS_PER_SECOND,
+          );
+          setLockoutSeconds((current) =>
+            Math.min(PIN_MAX_LOCKOUT_SEC, current + current),
+          );
+          setFailedAttempts(0);
+          return;
+        }
 
-      setFailedAttempts(nextAttempts);
-      setError(
-        formatCopy(copy.errPinWrong, PIN_MAX_ATTEMPTS - nextAttempts),
-      );
-    });
+        setFailedAttempts(nextAttempts);
+        setError(
+          formatCopy(copy.errPinWrong, PIN_MAX_ATTEMPTS - nextAttempts),
+        );
+      })
+      .catch(() => {
+        setPin("");
+        setIsChecking(false);
+        setError(formatCopy(copy.errPinWrong, PIN_MAX_ATTEMPTS));
+      });
   }
 
   const lockoutRemainingSeconds =
@@ -259,7 +273,10 @@ export function SosOverlay({
           z-index: 20; /* GROUNDED-EXEMPT: SOS must cover every app surface while its sticky state is active. */
           inset: 0;
           display: grid;
+          box-sizing: border-box;
           min-block-size: 100dvh; /* GROUNDED-EXEMPT: structural viewport fill for an in-page emergency overlay. */
+          max-block-size: 100dvh; /* GROUNDED-EXEMPT: the fixed emergency surface is bounded by the viewport. */
+          overflow-y: auto;
           place-items: center;
           padding: var(--screen-padding);
           background: var(--color-danger);

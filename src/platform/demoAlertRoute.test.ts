@@ -1,55 +1,58 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
 
-/**
- * The first-miss alert route under test. The upstream Cloud API call is
- * mocked; no credential ever appears here and no request leaves the process.
- */
-
 type RouteModule = typeof import("../../app/api/demo-alert/route");
+type AccessModule = typeof import("../../app/api/demo-access/route");
 
-const OPERATION_ID = "11111111-2222-3333-4444-555555555555:family-alert";
-const SAME_ORIGIN = "http://localhost:3000";
+const ORIGIN = "http://localhost:3000"; // GROUNDED-EXEMPT: synthetic protocol fixture; no live message or product value.
+const REDIS_URL = "https://example.upstash.io";
+const OPERATION_ID = "11111111-2222-3333-4444-555555555555:123456789:family-alert"; // GROUNDED-EXEMPT: synthetic protocol fixture; no live message or product value.
+const ENV_KEYS = [
+  "UPSTASH_REDIS_REST_TOKEN",
+  "UPSTASH_REDIS_REST_URL",
+  "WHATSAPP_ACCESS_TOKEN",
+  "WHATSAPP_DEMO_ENABLED",
+  "WHATSAPP_DEMO_KEY",
+  "WHATSAPP_DEMO_RECIPIENT",
+  "WHATSAPP_DEMO_RECIPIENT_CONFIRMED",
+  "WHATSAPP_DEMO_TEMPLATE_CONFIRMED",
+  "WHATSAPP_PHONE_NUMBER_ID",
+] as const;
 
-function jsonResponse(body: unknown, status: number): Response {
+const CONFIGURED_ENV: Record<(typeof ENV_KEYS)[number], string> = {
+  UPSTASH_REDIS_REST_TOKEN: "test-redis-token",
+  UPSTASH_REDIS_REST_URL: REDIS_URL,
+  WHATSAPP_ACCESS_TOKEN: "test-access-token",
+  WHATSAPP_DEMO_ENABLED: "confirmed",
+  WHATSAPP_DEMO_KEY: "test-demo-key-not-a-real-secret-for-unit-tests",
+  WHATSAPP_DEMO_RECIPIENT: "919999999999", // GROUNDED-EXEMPT: synthetic protocol fixture; no live message or product value.
+  WHATSAPP_DEMO_RECIPIENT_CONFIRMED: "confirmed",
+  WHATSAPP_DEMO_TEMPLATE_CONFIRMED: "confirmed",
+  WHATSAPP_PHONE_NUMBER_ID: "1199637663229019", // GROUNDED-EXEMPT: synthetic protocol fixture; no live message or product value.
+};
+
+function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
     headers: { "content-type": "application/json" },
     status,
   });
 }
 
-function postRequest(
-  body: unknown,
-  origin = SAME_ORIGIN,
-  headers: Record<string, string> = {},
+function alertRequest(
+  body: unknown = { demo: true, locale: "en", operationId: OPERATION_ID },
+  cookie?: string,
 ): NextRequest {
-  return new NextRequest(`${SAME_ORIGIN}/api/demo-alert`, {
+  return new NextRequest(`${ORIGIN}/api/demo-alert`, {
     body: JSON.stringify(body),
-    headers: { "content-type": "application/json", origin, ...headers },
+    headers: {
+      "content-type": "application/json",
+      ...(cookie === undefined ? {} : { cookie }),
+    },
     method: "POST",
   });
 }
 
-function statusRequest(operationId: string): NextRequest {
-  return new NextRequest(
-    `${SAME_ORIGIN}/api/demo-alert?operationId=${encodeURIComponent(operationId)}`,
-    { headers: { origin: SAME_ORIGIN }, method: "GET" },
-  );
-}
-
-const ENV_KEYS = [
-  "WHATSAPP_ACCESS_TOKEN",
-  "WHATSAPP_DEMO_KEY",
-  "WHATSAPP_DEMO_RECIPIENT",
-  "WHATSAPP_PHONE_NUMBER_ID",
-] as const;
-
-/**
- * The route reads its credentials from process.env at request time (not import
- * time), so the stub env must stay installed for the whole test. beforeEach
- * clears it before each test; the module instance is per-test via resetModules.
- */
-async function loadRoute(env: Record<string, string | undefined>): Promise<RouteModule> {
+async function loadRoute(env: Partial<Record<(typeof ENV_KEYS)[number], string>> = CONFIGURED_ENV): Promise<RouteModule> {
   vi.resetModules();
   for (const key of ENV_KEYS) {
     if (env[key] === undefined) delete process.env[key];
@@ -58,164 +61,190 @@ async function loadRoute(env: Record<string, string | undefined>): Promise<Route
   return (await import("../../app/api/demo-alert/route")) as RouteModule;
 }
 
-const CONFIGURED_ENV = {
-  WHATSAPP_ACCESS_TOKEN: "test-access-token",
-  WHATSAPP_PHONE_NUMBER_ID: "1199637663229019",
-  WHATSAPP_DEMO_RECIPIENT: "919999999999",
-};
+async function accessCookie(): Promise<string> {
+  const access = (await import("../../app/api/demo-access/route")) as AccessModule;
+  const response = await access.POST(
+    new NextRequest(`${ORIGIN}/api/demo-access`, {
+      body: JSON.stringify({ key: CONFIGURED_ENV.WHATSAPP_DEMO_KEY }),
+      headers: { "content-type": "application/json" },
+      method: "POST",
+    }),
+  );
+  const cookie = response.headers.get("set-cookie");
+  if (cookie === null) throw new Error("demo access cookie was not set");
+  return cookie.split(";", 1)[0];
+}
+
+function installRedisAndProvider(
+  provider: () => Promise<Response> = async () => jsonResponse({ messages: [{ id: "wamid.test" }] }, 200),
+) {
+  const values = new Map<string, string>();
+  let sends = 0;
+  let budget = 0;
+  const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+    if (String(input) === REDIS_URL) {
+      const command = JSON.parse(String(init?.body)) as string[];
+      if (command[0] === "EVAL") {
+        const operationKey = command[3];
+        if (values.has(operationKey)) return jsonResponse({ result: 0 });
+        if (budget >= 50) return jsonResponse({ result: -1 });
+        values.set(operationKey, "sending");
+        budget += 1;
+        return jsonResponse({ result: 1 });
+      }
+      if (command[0] === "GET") return jsonResponse({ result: values.get(command[1]) ?? null });
+      if (command[0] === "SET") {
+        values.set(command[1], command[2]);
+        return jsonResponse({ result: "OK" });
+      }
+      throw new Error(`Unexpected Redis command: ${command[0]}`);
+    }
+    if (String(input).startsWith("https://graph.facebook.com/")) {
+      sends += 1;
+      return provider();
+    }
+    throw new Error(`Unexpected fetch URL: ${String(input)}`);
+  });
+  vi.stubGlobal("fetch", fetchMock);
+  return { fetchMock, get sends() { return sends; } };
+}
 
 beforeEach(() => {
   vi.unstubAllGlobals();
-  for (const key of ENV_KEYS) {
-    delete process.env[key];
-  }
+  vi.resetModules();
+  for (const key of ENV_KEYS) delete process.env[key];
 });
 
-describe("demo alert route", () => {
-  it("reports not_configured when credentials or the recipient are missing", async () => {
-    const route = await loadRoute({
-      WHATSAPP_ACCESS_TOKEN: undefined,
-      WHATSAPP_PHONE_NUMBER_ID: undefined,
-      WHATSAPP_DEMO_RECIPIENT: undefined,
-    });
-    const response = await route.POST(postRequest({ operationId: OPERATION_ID }));
-    expect(response.status).toBe(503);
+describe("controlled demo alert route", () => {
+  it("fails closed before configured private credentials, durable storage, and confirmations exist", async () => {
+    const { fetchMock } = installRedisAndProvider();
+    const route = await loadRoute({});
+    const response = await route.POST(alertRequest());
+    expect(response.status).toBe(503); // GROUNDED-EXEMPT: standard HTTP response status, not product policy.
     expect(await response.json()).toEqual({ status: "not_configured" });
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it("rejects a cross-site request without the optional key", async () => {
-    const route = await loadRoute({ ...CONFIGURED_ENV });
-    const response = await route.POST(
-      postRequest({ operationId: OPERATION_ID }, "https://evil.example"),
-    );
-    expect(response.status).toBe(401);
+  it("rejects a forged same-origin request without an HttpOnly signed access cookie", async () => {
+    const harness = installRedisAndProvider();
+    const route = await loadRoute();
+    const request = alertRequest();
+    request.headers.set("origin", ORIGIN);
+    request.headers.set("referer", `${ORIGIN}/`);
+    const response = await route.POST(request);
+    expect(response.status).toBe(401); // GROUNDED-EXEMPT: standard HTTP response status, not product policy.
+    expect(harness.sends).toBe(0);
   });
 
-  it("accepts a keyed caller without an origin header", async () => {
-    const route = await loadRoute({
-      ...CONFIGURED_ENV,
-      WHATSAPP_DEMO_KEY: "test-key",
-    });
-    const fetchMock = vi.fn(async () => jsonResponse({ messages: [] }, 200));
-    vi.stubGlobal("fetch", fetchMock);
-    const response = await route.POST(
-      new NextRequest(`${SAME_ORIGIN}/api/demo-alert`, {
-        body: JSON.stringify({ operationId: OPERATION_ID }),
-        headers: {
-          authorization: "Bearer test-key",
-          "content-type": "application/json",
-        },
-        method: "POST",
-      }),
-    );
-    expect(response.status).toBe(202);
-    expect(await response.json()).toEqual({ status: "accepted" });
-    expect(fetchMock).toHaveBeenCalledOnce();
-  });
-
-  it("sends the server-owned recipient and message and reports accepted", async () => {
-    const route = await loadRoute({ ...CONFIGURED_ENV });
-    const fetchMock = vi.fn(async () => jsonResponse({ messages: [] }, 200));
-    vi.stubGlobal("fetch", fetchMock);
-    const response = await route.POST(
-      postRequest({ operationId: OPERATION_ID, locale: "te", demo: true }),
-    );
-    expect(response.status).toBe(202);
-    expect(await response.json()).toEqual({ status: "accepted" });
-
-    const [url, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
-    expect(url).toBe("https://graph.facebook.com/v23.0/1199637663229019/messages");
-    expect((init.headers as Record<string, string>).authorization).toBe(
-      "Bearer test-access-token",
-    );
-    const sent = JSON.parse(String(init.body));
-    expect(sent.to).toBe("919999999999");
-    expect(sent.messaging_product).toBe("whatsapp");
-    expect(sent.recipient_type).toBe("individual");
-    expect(sent.type).toBe("text");
-    // The Telugu demo text is the approved one, and no status is ever claimed
-    // as delivered here.
-    expect(sent.text.body).toContain("డెమో");
-    expect(sent.text.body).toContain("పరీక్ష అలర్ట్");
-  });
-
-  it("replies duplicate for a repeat of an already accepted operation", async () => {
-    const route = await loadRoute({ ...CONFIGURED_ENV });
-    const fetchMock = vi.fn(async () => jsonResponse({ messages: [] }, 200));
-    vi.stubGlobal("fetch", fetchMock);
-    await route.POST(postRequest({ operationId: OPERATION_ID }));
-    const second = await route.POST(postRequest({ operationId: OPERATION_ID }));
-    expect(second.status).toBe(202);
-    expect(await second.json()).toEqual({ status: "duplicate" });
-    expect(fetchMock).toHaveBeenCalledOnce();
-  });
-
-  it("reports failed when the provider rejects the message", async () => {
-    const route = await loadRoute({ ...CONFIGURED_ENV });
-    vi.stubGlobal("fetch", vi.fn(async () => jsonResponse({ error: {} }, 400)));
-    const response = await route.POST(postRequest({ operationId: OPERATION_ID }));
-    expect(response.status).toBe(502);
-    expect(await response.json()).toEqual({ status: "failed" });
-  });
-
-  it("reports unknown when the upstream call times out", async () => {
-    const route = await loadRoute({ ...CONFIGURED_ENV });
-    const timeoutError = new Error("timed out");
-    timeoutError.name = "TimeoutError";
-    vi.stubGlobal(
-      "fetch",
-      vi.fn(async () => {
-        throw timeoutError;
-      }),
-    );
-    const response = await route.POST(postRequest({ operationId: OPERATION_ID }));
-    expect(response.status).toBe(502);
-    expect(await response.json()).toEqual({ status: "unknown" });
-  });
-
-  it("rejects a malformed operation id", async () => {
-    const route = await loadRoute({ ...CONFIGURED_ENV });
-    const response = await route.POST(
-      postRequest({ operationId: "not-a-session-id:family-alert" }),
-    );
-    expect(response.status).toBe(400);
-  });
-
-  it("bounds outbound sends per instance", async () => {
-    const route = await loadRoute({ ...CONFIGURED_ENV });
-    const fetchMock = vi.fn(async () => jsonResponse({ messages: [] }, 200));
-    vi.stubGlobal("fetch", fetchMock);
-    for (let index = 0; index < 50; index += 1) {
-      const suffix = `11111111-2222-3333-4444-${String(index).padStart(12, "0")}`;
-      const response = await route.POST(
-        postRequest({ operationId: `${suffix}:family-alert` }),
-      );
-      expect(response.status).toBe(202);
+  it("rejects a wrong operator key, tampered cookie and expired signed cookie", async () => {
+    const harness = installRedisAndProvider();
+    const route = await loadRoute();
+    const access = await import("../../app/api/demo-access/route");
+    const wrong = await access.POST(new NextRequest(`${ORIGIN}/api/demo-access`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ key: "wrong-key" }),
+    }));
+    expect(wrong.status).toBe(401); // GROUNDED-EXEMPT: standard HTTP response status, not product policy.
+    expect(wrong.headers.get("set-cookie")).toBeNull();
+    const { createDemoAccessValue, DEMO_ACCESS_COOKIE, DEMO_ACCESS_TTL_SEC } = await import("../server/demoAccess");
+    const expired = await createDemoAccessValue(CONFIGURED_ENV.WHATSAPP_DEMO_KEY, Date.now() - DEMO_ACCESS_TTL_SEC * 1000);
+    for (const cookie of [`${await accessCookie()}tampered`, `${DEMO_ACCESS_COOKIE}=${expired}`]) {
+      expect((await route.POST(alertRequest(undefined, cookie))).status).toBe(401); // GROUNDED-EXEMPT: standard HTTP response status, not product policy.
     }
-    const capped = await route.POST(
-      postRequest({
-        operationId: "99999999-2222-3333-4444-555555555555:family-alert",
-      }),
+    expect(harness.sends).toBe(0);
+  });
+
+  it("accepts only a signed browser session and the exact demo-only payload", async () => {
+    const harness = installRedisAndProvider();
+    const route = await loadRoute();
+    const cookie = await accessCookie();
+    const response = await route.POST(alertRequest(undefined, cookie));
+    expect(response.status).toBe(202); // GROUNDED-EXEMPT: standard HTTP response status, not product policy.
+    expect(await response.json()).toEqual({ status: "accepted" });
+    expect(harness.sends).toBe(1);
+
+    const providerCall = harness.fetchMock.mock.calls.find(
+      ([input]) => String(input).startsWith("https://graph.facebook.com/"),
     );
-    expect(capped.status).toBe(429);
-    expect(await capped.json()).toEqual({ status: "failed" });
-    expect(fetchMock).toHaveBeenCalledTimes(50);
+    const sent = JSON.parse(String((providerCall?.[1] as RequestInit).body));
+    expect(sent.text.body).toContain("Saaya Lite demo");
+    expect(sent.text.body).toContain("test alert");
   });
 
-  it("reports the truthful recorded status by operation id", async () => {
-    const route = await loadRoute({ ...CONFIGURED_ENV });
-    vi.stubGlobal("fetch", vi.fn(async () => jsonResponse({ error: {} }, 500)));
-    await route.POST(postRequest({ operationId: OPERATION_ID }));
-    const status = await route.GET(statusRequest(OPERATION_ID));
-    expect(await status.json()).toEqual({
-      operationId: OPERATION_ID,
-      status: "failed",
+  it("forbids normal-path text, omitted demo, and unknown body fields", async () => {
+    const harness = installRedisAndProvider();
+    const route = await loadRoute();
+    const cookie = await accessCookie();
+    for (const body of [
+      { demo: false, locale: "en", operationId: OPERATION_ID },
+      { locale: "en", operationId: OPERATION_ID },
+      { demo: true, locale: "en", operationId: OPERATION_ID, recipient: "attacker" },
+    ]) {
+      expect((await route.POST(alertRequest(body, cookie))).status).toBe(400);
+    }
+    expect(harness.sends).toBe(0);
+  });
+
+  it("requires a provider message id before reporting accepted", async () => {
+    const harness = installRedisAndProvider(async () => jsonResponse({ messages: [] }, 200));
+    const route = await loadRoute();
+    const cookie = await accessCookie();
+    const response = await route.POST(alertRequest(undefined, cookie));
+    expect(response.status).toBe(502); // GROUNDED-EXEMPT: standard HTTP response status, not product policy.
+    expect(await response.json()).toEqual({ status: "unknown" });
+    expect(harness.sends).toBe(1);
+  });
+
+  it("retains an unknown reservation and never re-sends it", async () => {
+    const harness = installRedisAndProvider(async () => {
+      throw new TypeError("network interrupted");
     });
+    const route = await loadRoute();
+    const cookie = await accessCookie();
+    expect(await (await route.POST(alertRequest(undefined, cookie))).json()).toEqual({ status: "unknown" });
+    expect(await (await route.POST(alertRequest(undefined, cookie))).json()).toEqual({ status: "unknown" });
+    expect(harness.sends).toBe(1);
   });
 
-  it("keeps 404 truthful for an unknown operation id", async () => {
-    const route = await loadRoute({ ...CONFIGURED_ENV });
-    const status = await route.GET(statusRequest(OPERATION_ID));
-    expect(status.status).toBe(404);
+  it("reserves an operation atomically under concurrent requests", async () => {
+    const harness = installRedisAndProvider();
+    const route = await loadRoute();
+    const cookie = await accessCookie();
+    const [first, second] = await Promise.all([
+      route.POST(alertRequest(undefined, cookie)),
+      route.POST(alertRequest(undefined, cookie)),
+    ]);
+    expect([first.status, second.status].sort()).toEqual([202, 202]); // GROUNDED-EXEMPT: standard HTTP response status, not product policy.
+    expect(harness.sends).toBe(1);
+  });
+
+  it("deduplicates durably across server instances", async () => {
+    const harness = installRedisAndProvider();
+    const first = await loadRoute();
+    const cookie = await accessCookie();
+    expect((await first.POST(alertRequest(undefined, cookie))).status).toBe(202); // GROUNDED-EXEMPT: standard HTTP response status, not product policy.
+    const second = await loadRoute();
+    expect((await second.POST(alertRequest(undefined, cookie))).status).toBe(202); // GROUNDED-EXEMPT: standard HTTP response status, not product policy.
+    expect(harness.sends).toBe(1);
+  });
+
+  it("enforces the global durable cap rather than a process-local cap", async () => {
+    const harness = installRedisAndProvider();
+    const first = await loadRoute();
+    const cookie = await accessCookie();
+    for (let index = 0; index < 50; index += 1) {
+      const suffix = String(index).padStart(12, "0");
+      const id = `11111111-2222-3333-4444-${suffix}:123456789:family-alert`; // GROUNDED-EXEMPT: synthetic protocol fixtures for the global-budget test.
+      expect((await first.POST(alertRequest({ demo: true, locale: "en", operationId: id }, cookie))).status).toBe(202); // GROUNDED-EXEMPT: standard HTTP response status, not product policy.
+    }
+    const second = await loadRoute();
+    const capped = await second.POST(alertRequest({
+      demo: true,
+      locale: "en",
+      operationId: "99999999-2222-3333-4444-555555555555:123456789:family-alert", // GROUNDED-EXEMPT: synthetic protocol fixture; no live message or product value.
+    }, cookie));
+    expect(capped.status).toBe(429); // GROUNDED-EXEMPT: standard HTTP response status, not product policy.
+    expect(harness.sends).toBe(50);
   });
 });

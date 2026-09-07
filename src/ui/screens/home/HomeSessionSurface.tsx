@@ -39,6 +39,7 @@ export interface HomeSessionSurfaceProps {
   readonly locale: SaayaLocale;
   readonly locationStatus: LocationStatus;
   readonly demoModeActive: boolean;
+  readonly demoMissedCheckins?: number;
   readonly onArmBannerHidden: () => void;
   readonly onCheckInOk: () => void;
   readonly onHelpNow: () => void;
@@ -62,6 +63,7 @@ export function HomeSessionSurface({
   currentPoint,
   copy,
   demoModeActive,
+  demoMissedCheckins = 0,
   demoStopAcknowledgement,
   engineView,
   familyAlertStatus,
@@ -93,7 +95,7 @@ export function HomeSessionSurface({
   const sosStation =
     sosPoint === null ? null : nearestStation(sosPoint, policeStations)?.station ?? null;
   const compactNotice =
-    locationStatus === "PERMISSION_DENIED"
+    demoModeActive ? null : locationStatus === "PERMISSION_DENIED"
       ? copy.warnLocationDenied
       : pageStoppedWarning
         ? copy.warnPageStopped
@@ -107,7 +109,7 @@ export function HomeSessionSurface({
 
   return (
     <>
-      {armAcknowledgement !== null && armBannerVisible ? (
+      {armAcknowledgement !== null && armBannerVisible && !demoModeActive ? (
         <div className="home-session-arm-banner">
           <ArmBanner
             body={armAcknowledgement.body}
@@ -224,13 +226,14 @@ export function HomeSessionSurface({
       !isMinimized ? (
         <CheckInOverlay
           copy={copy}
+          demo={demoModeActive}
           deadlineEpochMs={engineView.deadlineEpochMs}
           windowSec={checkInWindowSec}
           familyAlertStatus={familyAlertStatus}
           onHelpNow={onHelpNow}
           onMinimize={() => setMinimizedRung(state)}
           onOk={onCheckInOk}
-          reason={state === "CHECKIN_1" ? checkInReason : null}
+          reason={state === "CHECKIN_1" && !demoModeActive ? checkInReason : null}
           state={state}
         />
       ) : null}
@@ -238,7 +241,7 @@ export function HomeSessionSurface({
       {state === "SOS_ACTIVE" ? (
         <SosOverlay
           copy={copy}
-          demoIncident={demoModeActive ? demoIncidentFor(copy, activeZoneDetail) : null}
+          demoIncident={demoModeActive ? demoIncidentFor(copy, activeZoneDetail, demoMissedCheckins) : null}
           nearestStation={sosStation}
           onPinAccepted={onPinAccepted}
         />
@@ -389,15 +392,13 @@ function visibleSessionState(state: SessionState): Exclude<SessionState, "RESOLV
 }
 
 /** The demo's synthetic incident preview: local copy only, never a police claim. */
-function demoIncidentFor(copy: M4Copy, detail: ZoneDetail | null): SosDemoIncident {
+function demoIncidentFor(copy: M4Copy, detail: ZoneDetail | null, misses: number): SosDemoIncident {
   return {
     label: copy.policeDemoLabel,
     localNote: copy.policeDemoLocalNote,
     rows: [
       copy.policeDemoRowArmed,
-      formatCopy(copy.policeDemoRowMissed, 1),
-      formatCopy(copy.policeDemoRowMissed, 2),
-      formatCopy(copy.policeDemoRowMissed, 3),
+      ...Array.from({ length: misses }, (_, index) => formatCopy(copy.policeDemoRowMissed, index + 1)),
       copy.policeDemoRowSos,
     ],
     statusActive: copy.policeDemoStatusActive,

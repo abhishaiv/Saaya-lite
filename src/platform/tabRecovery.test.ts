@@ -4,6 +4,7 @@ import { bundledZoneData } from "../data/zone/zoneLoader";
 import { FakeSessionRepository } from "../data/repository/sessionRepository";
 import { onEvent } from "../domain/engine/sessionEngine";
 import {
+  LADDER_WINDOW_1_SEC,
   LADDER_WINDOW_2_SEC,
   LADDER_WINDOW_3_SEC,
   DEFAULT_RULES,
@@ -261,5 +262,30 @@ describe("tab recovery", () => {
     });
     expect(pageStoppedWarnings).toBe(0);
     expect(wakeLock.armed.at(-1)).toBe(true);
+  });
+
+  it("keeps new-session entry locked until the persisted session has been recovered", async () => {
+    const sessions = new FakeSessionRepository();
+    let releaseRead: (session: ReturnType<typeof autoSession>) => void = () => undefined;
+    sessions.loadCurrent = () => new Promise((resolve) => { releaseRead = resolve; });
+    const recovery = new EngineRecoveryBridge();
+    let ready = false;
+    const controller = new TabLifecycleController(
+      new FakeVisibility(), sessions, recovery, new FakeLocation(), new FakeWakeLock(), "page",
+      {
+        onPageStopped: () => undefined,
+        onRecoveryError: (error) => { throw error; },
+        onRecoveryStarted: () => { ready = false; },
+        onRecoveryCompleted: () => {
+          expect(recovery.result?.state).toBe("CHECKIN_1");
+          ready = true;
+        },
+      }, new FakeClock(),
+    );
+    const starting = controller.start();
+    expect(ready).toBe(false);
+    releaseRead(autoSession("CHECKIN_1", secondsToEpochMs(LADDER_WINDOW_1_SEC)));
+    await starting;
+    expect(ready).toBe(true);
   });
 });

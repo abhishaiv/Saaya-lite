@@ -1279,6 +1279,15 @@
    "cumulative_hours": 29.5,
    "status": "pending_external_verification",
    "run_id": "run.M1.2026-09-04.phase1c.001",
+   "demo_day_verification": {
+    "run_id": "run.M1.2026-09-07.demo_verify.001",
+    "branch": "codex/demo-verification",
+    "status": "implemented_pending_provider_and_phone",
+    "report": "DEMO_VERIFICATION.md",
+    "artifact": "art.demo_verification.20260907",
+    "gates_passed": ["build", "typecheck", "lint", "vitest_253", "G6_explicit_154_files", "G10_18_types", "fresh_demo_verifier_after_startup_race_fix"],
+    "pending_gates": ["rotated_token_and_provider_account_verification", "opted_in_recipient_and_compatible_message", "durable_store_integration", "Chrome_actual_iPhone_and_recipient_receipt", "normal_final_expiry_decision", "native_Telugu_review"]
+   },
    "gates_passed": [
     "G1_npm_run_build",
     "G2_tsc_no_emit_and_next_lint",

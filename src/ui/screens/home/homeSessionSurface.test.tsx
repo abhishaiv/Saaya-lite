@@ -236,7 +236,7 @@ describe("M4 Home session surface", () => {
   });
 
   it("renders the synthetic demo incident on the SOS view only in demo mode", () => {
-    const demo = render("SOS_ACTIVE", { demoModeActive: true });
+    const demo = render("SOS_ACTIVE", { demoModeActive: true, demoMissedCheckins: 3 });
 
     expect(demo).toContain(M4_COPY.en.policeDemoLabel);
     expect(demo).toContain(M4_COPY.en.policeDemoLocalNote);
@@ -247,5 +247,8 @@ describe("M4 Home session surface", () => {
     expect(live).toContain(M4_COPY.en.sosTitle);
     expect(live).not.toContain(M4_COPY.en.policeDemoLabel);
     expect(live).not.toContain(M4_COPY.en.policeDemoLocalNote);
+    const immediate = render("SOS_ACTIVE", { demoModeActive: true, demoMissedCheckins: 0 });
+    expect(immediate).not.toContain(formatCopy(M4_COPY.en.policeDemoRowMissed, 1));
+    expect(immediate).toContain(M4_COPY.en.policeDemoRowSos);
   });
 });

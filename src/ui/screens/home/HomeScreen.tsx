@@ -34,6 +34,8 @@ import {
   clearDemoArmedSession,
   isDemoArmedSession,
   markDemoArmedSession,
+  saveDemoMisses,
+  loadDemoMisses,
 } from "../../../platform/demoModeStore";
 import type {
   FamilyAlertStatus,
@@ -67,6 +69,8 @@ import { ZoneDetailSheet } from "./ZoneDetailSheet";
 import { AboutScreen } from "../settings/AboutScreen";
 import { SettingsScreen } from "../settings/SettingsScreen";
 import { LocationHelpSheet } from "../location/LocationHelpSheet";
+import { DemoSetup } from "../onboarding/DemoSetup";
+import { DemoPinStore } from "../../../platform/demoPinStore";
 
 export interface BuildVersion {
   readonly code: number;
@@ -77,6 +81,7 @@ export interface HomeScreenProps {
   readonly buildVersion: BuildVersion;
   readonly demoZones: readonly DemoZone[];
   readonly founderContact: string | null;
+  readonly forceDemoEntry?: boolean;
   readonly heatmapHotspots: readonly HeatmapHotspot[];
   readonly locale: SaayaLocale;
   readonly mapZones: readonly MapZone[];
@@ -113,6 +118,7 @@ export function HomeScreen({
   const [armBannerVisible, setArmBannerVisible] = useState(false);
   const [pageStoppedWarning, setPageStoppedWarning] = useState(false);
   const [demoPanelOpen, setDemoPanelOpen] = useState(openDemoOnMount);
+  const [demoSetupOpen, setDemoSetupOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [locationHelpOpen, setLocationHelpOpen] = useState(false);
@@ -124,6 +130,10 @@ export function HomeScreen({
   const [demoStopAcknowledgement, setDemoStopAcknowledgement] =
     useState<ArmAcknowledgement | null>(null);
   const demoArmInFlightRef = useRef(false);
+  const sessionRecoveredRef = useRef(false);
+  const demoSessionRef = useRef(false);
+  const demoMissesRef = useRef(0);
+  const [demoMissedCheckins, setDemoMissedCheckins] = useState(0);
   const familyAlertAbortRef = useRef<AbortController | null>(null);
   const [engineView, setEngineView] = useState<HomeEngineView>({
     activeZoneId: null,
@@ -159,7 +169,11 @@ export function HomeScreen({
           setEngineView(view);
         },
       },
-      createLocalSessionId,
+      () => {
+        const id = createLocalSessionId();
+        if (demoArmInFlightRef.current) markDemoArmedSession(id);
+        return id;
+      },
     );
   }
 
@@ -173,19 +187,24 @@ export function HomeScreen({
       familyAlertAbortRef.current = null;
       // I'm OK invalidates the pending request; a provider-accepted message
       // already sent cannot be recalled, so only the in-flight state clears.
-      setFamilyAlertStatus((current) => (current === "sending" ? null : current));
+      setFamilyAlertStatus((current) => (current === "sending" ? "unknown" : current));
       return;
     }
-    if (sessionId === null) return;
+    if (sessionId === null || !demoSessionRef.current) {
+      setFamilyAlertStatus("notready");
+      return;
+    }
+    const operationId = engineRef.current?.familyAlertOperationId();
+    if (operationId === null || operationId === undefined) return;
     familyAlertAbortRef.current?.abort();
     const controller = new AbortController();
     familyAlertAbortRef.current = controller;
     setFamilyAlertStatus("sending");
     void requestFamilyAlert(
       {
-        demo: demoSessionActive,
+        demo: true,
         locale: localeRef.current,
-        operationId: `${sessionId}:family-alert`,
+        operationId,
       },
       controller.signal,
     ).then((outcome) => {
@@ -319,11 +338,10 @@ export function HomeScreen({
     );
     commandListenerRef.current = (commands, view) => {
       if (view.state === "RESOLVED") {
-        const sessionId = engine.persistedSession()?.sessionId;
-        if (sessionId !== undefined) {
-          clearDemoArmedSession(sessionId);
-        }
-        setDemoSessionActive(false);
+          setDemoSessionActive(false);
+          demoSessionRef.current = false;
+          engine.setRules(DEFAULT_RULES);
+          runtime.setRules(DEFAULT_RULES);
         familyAlertAbortRef.current?.abort();
         familyAlertAbortRef.current = null;
         setFamilyAlertStatus(null);
@@ -334,12 +352,30 @@ export function HomeScreen({
       // Timers and every subsequent engine transition still run through the same
       // runtime; only this physical watch start is omitted for the mock entry.
       const runtimeCommands =
-        demoArmInFlightRef.current &&
-        view.state === "SHADOW" &&
-        view.armMode === "AUTO_ZONE"
+        demoSessionRef.current || demoArmInFlightRef.current
           ? commands.filter((command) => command.kind !== "StartLocationWatch")
           : commands;
+      if (demoSessionRef.current) {
+        const automaticSos = commands.some((command) =>
+          command.kind === "WriteSosIncident" && command.trigger === "LADDER_LAPSE");
+        if (automaticSos) demoMissesRef.current = 3;
+        else if (view.state === "CHECKIN_3") demoMissesRef.current = 2;
+        else if (view.state === "CHECKIN_2") demoMissesRef.current = 1;
+        setDemoMissedCheckins(demoMissesRef.current);
+        const id = engine.persistedSession()?.sessionId;
+        if (id !== undefined) saveDemoMisses(id, demoMissesRef.current);
+      }
       sessionRuntime.handle(runtimeCommands, view.state);
+      if (view.state === "RESOLVED") {
+        const sessionId = engine.persistedSession()?.sessionId;
+        if (sessionId !== undefined) {
+          void sessionRuntime.waitForIdle().then(async () => {
+            // Keep the marker if clearing persistence failed; an SOS recovery
+            // must never fall back to the normal PIN/profile after a crash.
+            if ((await sessions.loadCurrent())?.sessionId !== sessionId) clearDemoArmedSession(sessionId);
+          }).catch(() => setPageStoppedWarning(true));
+        }
+      }
       for (const command of commands) {
         if (
           command.kind === "RequestFamilyAlert" ||
@@ -363,12 +399,13 @@ export function HomeScreen({
             persisted.sessionId,
           );
           setDemoSessionActive(recoveredDemoSession);
+          demoSessionRef.current = recoveredDemoSession;
+          demoMissesRef.current = loadDemoMisses(persisted.sessionId);
+          setDemoMissedCheckins(demoMissesRef.current);
           // A recovered demo session must keep its accelerated profile; its
           // persisted deadlines were set on demo timings.
-          if (recoveredDemoSession) {
-            engine.setRules(DEMO_RULES);
-            runtime.setRules(DEMO_RULES);
-          }
+          engine.setRules(recoveredDemoSession ? DEMO_RULES : DEFAULT_RULES);
+          runtime.setRules(recoveredDemoSession ? DEMO_RULES : DEFAULT_RULES);
           const zone =
             zones.find((candidate) => candidate.stationId === persisted.zoneId) ??
             null;
@@ -396,7 +433,7 @@ export function HomeScreen({
             zone,
           });
         },
-        mayResumeLocation: () => true,
+        mayResumeLocation: () => !demoSessionRef.current,
       },
       runtime,
       wakeLock,
@@ -406,22 +443,35 @@ export function HomeScreen({
           setPageStoppedWarning(true);
         },
         onRecoveryError() {
+          sessionRecoveredRef.current = false;
           setPageStoppedWarning(true);
+        },
+        onRecoveryStarted() {
+          sessionRecoveredRef.current = false;
+        },
+        onRecoveryCompleted() {
+          if (!disposed) sessionRecoveredRef.current = true;
         },
       },
     );
-    void lifecycle.start().catch(() => {
-      if (!disposed) setPageStoppedWarning(true);
-    });
-    void readGeolocationPermissionState().then((permission) => {
+    void lifecycle.start().then(async () => {
+      const permission = await readGeolocationPermissionState();
       if (disposed) return;
-      if (permission === "granted") runtime.startAfterConsent();
+      if (permission === "granted" && sessionRecoveredRef.current && !demoSessionRef.current) runtime.startAfterConsent();
       if (permission === "denied") setLocationStatus("PERMISSION_DENIED");
+    }).catch(() => {
+      if (!disposed) {
+        sessionRecoveredRef.current = false;
+        setPageStoppedWarning(true);
+      }
     });
 
     return () => {
       disposed = true;
+      sessionRecoveredRef.current = false;
       commandListenerRef.current = () => undefined;
+      familyAlertAbortRef.current?.abort();
+      familyAlertAbortRef.current = null;
       sessionRuntime.dispose();
       void lifecycle.stop();
       locationRuntimeRef.current = null;
@@ -435,7 +485,7 @@ export function HomeScreen({
   }, [engineView.state]);
 
   useEffect(() => {
-    if (engineView.state !== "SOS_ACTIVE") return;
+    if (!hasForegroundSafetySurface(engineView.state)) return;
     setAboutOpen(false);
     setDemoPanelOpen(false);
     setLocationHelpOpen(false);
@@ -491,6 +541,7 @@ export function HomeScreen({
     }
   }, [engineView.state]);
   const handleManualArm = useCallback(() => {
+    if (!sessionRecoveredRef.current) return;
     setPageStoppedWarning(false);
     engineRef.current?.dispatch(
       { kind: "ManualArm" },
@@ -511,6 +562,7 @@ export function HomeScreen({
     const activeZone =
       zones.find(({ stationId }) => stationId === engineView.activeZoneId) ??
       currentZone;
+    demoMissesRef.current = 0;
     engineRef.current?.dispatch(
       { kind: "OkTapped" },
       { nowEpochMs, zone: activeZone },
@@ -564,12 +616,21 @@ export function HomeScreen({
   const handleLocationRetry = useCallback(() => {
     locationRuntimeRef.current?.startAfterConsent();
   }, []);
-  const handleStartDemo = useCallback(() => {
+  const handleStartDemo = useCallback(async () => {
     const engine = engineRef.current;
-    if (engine === null) return;
+    if (engine === null || !sessionRecoveredRef.current) return;
+    const hasDemoPin = await new DemoPinStore().hasPin();
+    if (!sessionRecoveredRef.current) return;
+    if (!hasDemoPin) {
+      if (engine.view().state !== "IDLE") return;
+      setDemoSetupOpen(true);
+      return;
+    }
     const state = engine.view().state;
     if (state !== "IDLE" && state !== "RESOLVED") return;
     if (demoZoneDetail === null) return;
+    // Discard a previous demo's cooldown, never an active real session.
+    engine.resetForDemo();
     setPageStoppedWarning(false);
     setOkAcknowledgement(null);
     setDemoStopAcknowledgement(null);
@@ -578,6 +639,10 @@ export function HomeScreen({
     // about its transitions or PIN path differs from a live session.
     engine.setRules(DEMO_RULES);
     locationRuntimeRef.current?.setRules(DEMO_RULES);
+    locationRuntimeRef.current?.stop();
+    demoSessionRef.current = true;
+    demoMissesRef.current = 0;
+    setDemoMissedCheckins(0);
     demoArmInFlightRef.current = true;
     try {
       for (const event of startDemoEventSequence(demoZoneDetail.zone.stationId)) {
@@ -587,6 +652,12 @@ export function HomeScreen({
           zone: demoZoneDetail.zone,
         });
       }
+    } catch {
+      demoSessionRef.current = false;
+      engine.setRules(DEFAULT_RULES);
+      locationRuntimeRef.current?.setRules(DEFAULT_RULES);
+      setPageStoppedWarning(true);
+      return;
     } finally {
       demoArmInFlightRef.current = false;
     }
@@ -599,7 +670,7 @@ export function HomeScreen({
     setDemoPanelOpen(false);
   }, [demoZoneDetail]);
   const handleDemoReset = useCallback(() => {
-    engineRef.current?.resetForDemo();
+    if (!demoSessionRef.current || !engineRef.current?.resetForDemo()) return;
     setSelectedZoneId(null);
     setArmAcknowledgement(null);
     setArmBannerVisible(false);
@@ -626,12 +697,19 @@ export function HomeScreen({
     [copy],
   );
   const appSessionStatus = (
-    <AppSessionStatus
+    engineView.state === "SOS_ACTIVE" ? null : <AppSessionStatus
       copy={copy}
       showIdle={false}
       view={engineView}
     />
   );
+
+  if (demoSetupOpen && engineView.state === "IDLE") {
+    return <DemoSetup copy={copy} onCompleted={() => {
+      setDemoSetupOpen(false);
+      setDemoPanelOpen(true);
+    }} />;
+  }
 
   if (aboutOpen && engineView.state !== "SOS_ACTIVE") {
     return (
@@ -709,6 +787,7 @@ export function HomeScreen({
         checkInWindowSec={checkInWindowSec}
         copy={copy}
         demoModeActive={demoSessionActive}
+        demoMissedCheckins={demoMissedCheckins}
         demoStopAcknowledgement={demoStopAcknowledgement}
         currentPoint={location}
         engineView={engineView}
@@ -770,6 +849,7 @@ export function HomeScreen({
           onStartDemo={handleStartDemo}
           onReset={handleDemoReset}
           sessionState={engineView.state}
+          isDemoSession={demoSessionActive}
         />
       ) : null}
 
