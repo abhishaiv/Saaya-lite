@@ -1,5 +1,10 @@
 # Saaya Lite — corrected demo recording checkpoint
 
+Verified HTTPS preview: https://saaya-lite-q96k091la-abhishai-vardhans-projects.vercel.app/?demo=1
+Deployed code: `b0d6ae7b5bc2745aaac6cf0ec728925d2ae87788`, Vercel Ready, 2026-09-07.
+Chrome opens the separate demo-PIN setup. Entry HTTP 200; alert GET HTTP 503 with
+`not_configured`, correctly preserving the private messaging setup gate.
+
 Branch: `codex/demo-verification`, based on GLM's `9015488`.
 The original round2/demo preview is historical, not evidence for these corrections.
 Use the verified preview URL reported with this checkpoint and append `/?demo=1`.

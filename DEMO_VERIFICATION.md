@@ -84,3 +84,11 @@ PASS means local source/test evidence, not phone/provider certification.
 
 See `DEMO_RECORDING.md` for setup/takes. Desktop and original `round2/demo` are preserved;
 corrections use `codex/demo-verification`.
+
+## Deployed checkpoint
+
+Code `b0d6ae7b5bc2745aaac6cf0ec728925d2ae87788` is Ready on the HTTPS preview in
+DEMO_RECORDING.md. GitHub Vercel status is success. Entry returned 200; alert GET
+returned 503 `not_configured`. Chrome reconnected successfully and rendered the
+dedicated demo-PIN setup without requesting location or contacts. This is entry
+verification, not the outstanding actual-iPhone/recipient-receipt rehearsal.
