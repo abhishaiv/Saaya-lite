@@ -1,9 +1,11 @@
 "use client";
 
+import type { ReactNode } from "react";
 import type { M4Copy, SaayaLocale } from "../../copy/strings";
 import { MaterialSymbol } from "../../icons/MaterialSymbol";
 
 export interface SettingsScreenProps {
+  readonly sessionStatus?: ReactNode;
   readonly copy: M4Copy;
   readonly locale: SaayaLocale;
   readonly onBack: () => void;
@@ -13,6 +15,7 @@ export interface SettingsScreenProps {
 }
 
 export function SettingsScreen({
+  sessionStatus,
   copy,
   locale,
   onBack,
@@ -23,6 +26,7 @@ export function SettingsScreen({
   return (
     <main className="settings-screen">
       <header className="settings-screen__header">
+        {sessionStatus}
         <button className="settings-screen__back" onClick={onBack} type="button">
           {copy.cdBack}
         </button>
@@ -47,8 +51,9 @@ export function SettingsScreen({
 
       <style jsx>{`
         .settings-screen {
-          min-block-size: 100dvh; /* GROUNDED-EXEMPT: full-screen Settings surface. */
+          block-size: 100dvh; /* GROUNDED-EXEMPT: one bounded viewport scroll container. */
           overflow-y: auto;
+          overscroll-behavior: contain;
           padding: env(safe-area-inset-top) var(--screen-padding)
             calc(var(--space-24) + env(safe-area-inset-bottom));
           background: var(--color-background);
@@ -60,6 +65,8 @@ export function SettingsScreen({
           z-index: 1; /* GROUNDED-EXEMPT: structural header stacking within this screen. */
           inset-block-start: 0;
           display: grid;
+          grid-template-columns: auto 1fr;
+          align-items: center;
           gap: var(--space-16);
           padding-block: var(--space-16);
           background: var(--color-background);
@@ -69,6 +76,7 @@ export function SettingsScreen({
           margin: 0;
           font-size: var(--type-title-size);
           line-height: var(--type-title-line-height);
+          text-align: end;
         }
 
         .settings-screen__back {

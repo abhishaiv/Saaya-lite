@@ -1,4 +1,16 @@
 # Saaya Lite - Design System
+## Founder-requested visual correction, 2026-09-08
+
+The request for Apple-like restraint supersedes the legacy full-red SOS surface and
+standalone warning-card styling below. SOS now uses the existing dark background,
+red heading and primary emergency call, with unchanged disclosure text and PIN protection.
+Settings/About own their session status inside opaque scrolling headers. Demo uses an
+opaque compact header and the existing brand action. Check-in cards use the screen
+gutter and existing spacing tokens, omit the redundant decorative shield, and bound
+message scrolling so both safety actions remain visible. Map attribution occupies its
+own top strip rather than overlapping sheet content. No palette, copy, timing or safety
+rule is added by this correction.
+
 Every value here is either taken from the real Saaya iOS app
 (`WomenSafetyApp/Theme/AppTheme.swift`, `Views/SUSCheckInCardView.swift`) or decided by
 the founder on 2026-08-18. **Do not invent a colour, a radius or a weight.**

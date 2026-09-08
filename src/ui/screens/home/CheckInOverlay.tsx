@@ -120,7 +120,7 @@ export function CheckInOverlay({
         .checkin-overlay__message {
           display: grid;
           justify-items: center;
-          gap: var(--space-12);
+          gap: var(--space-8);
         }
 
         .checkin-overlay__message p {

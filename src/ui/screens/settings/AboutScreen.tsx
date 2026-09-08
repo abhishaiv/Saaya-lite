@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import { formatCopy, type M4Copy } from "../../copy/strings";
 
 export interface AboutScreenProps {
+  readonly sessionStatus?: ReactNode;
   readonly copy: M4Copy;
   readonly founderContact: string | null;
   readonly mockedClaims: readonly string[];
@@ -15,6 +16,7 @@ export interface AboutScreenProps {
 }
 
 export function AboutScreen({
+  sessionStatus,
   copy,
   founderContact,
   mockedClaims,
@@ -26,6 +28,7 @@ export function AboutScreen({
   return (
     <main className="about-screen">
       <header className="about-screen__header">
+        {sessionStatus}
         <button className="about-screen__back" onClick={onBack} type="button">
           {copy.cdBack}
         </button>
@@ -88,8 +91,9 @@ export function AboutScreen({
 
       <style jsx>{`
         .about-screen {
-          min-block-size: 100dvh; /* GROUNDED-EXEMPT: full-screen About surface. */
+          block-size: 100dvh; /* GROUNDED-EXEMPT: one bounded viewport scroll container. */
           overflow-y: auto;
+          overscroll-behavior: contain;
           padding: env(safe-area-inset-top) var(--screen-padding)
             calc(var(--space-24) + env(safe-area-inset-bottom));
           background: var(--color-background);
@@ -101,6 +105,8 @@ export function AboutScreen({
           z-index: 1; /* GROUNDED-EXEMPT: structural header stacking within this screen. */
           inset-block-start: 0;
           display: grid;
+          grid-template-columns: auto 1fr;
+          align-items: center;
           gap: var(--space-16);
           padding-block: var(--space-16);
           background: var(--color-background);
@@ -110,6 +116,7 @@ export function AboutScreen({
           margin: 0;
           font-size: var(--type-title-size);
           line-height: var(--type-title-line-height);
+          text-align: end;
         }
 
         .about-screen__back {

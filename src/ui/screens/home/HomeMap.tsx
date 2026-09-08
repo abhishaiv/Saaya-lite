@@ -267,10 +267,13 @@ export function HomeMap({
           position: fixed;
           z-index: 10; /* GROUNDED-EXEMPT: licence attribution remains above every Home sheet state. */
           inset-inline-start: var(--screen-padding);
-          inset-block-end: calc(
-            var(--home-action-dock-clearance) + var(--space-4)
+          inset-block-start: calc(
+            env(safe-area-inset-top) + var(--minimum-touch-target) + var(--space-24)
           );
-          color: var(--color-text-tertiary);
+          padding: var(--space-4) var(--space-8);
+          border-radius: var(--radius-small);
+          background: var(--color-card-fill);
+          color: var(--color-text-on-card);
           font-size: calc(10 / 16 * 1rem); /* type.map.attribution / type.rem.base */
           line-height: var(--type-label-line-height);
           white-space: nowrap;

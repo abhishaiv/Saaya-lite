@@ -46,7 +46,7 @@ export function DemoPanel({
         role="dialog"
       >
         <header className="demo-panel__header">
-          <p>{copy.demoPanelHeader}</p>
+          <h2>{copy.ctaDemo}</h2>
           <button
             aria-label={copy.cdCloseSheet}
             className="demo-panel__close"
@@ -57,6 +57,7 @@ export function DemoPanel({
           </button>
         </header>
 
+        <p className="demo-panel__note">{copy.demoPanelHeader}</p>
         <p className="demo-panel__disclosure">{copy.demoStartDisclosure}</p>
         <p className="demo-panel__note">{formatCopy(copy.demoTimingNote, DEMO_WINDOW_SEC, DEMO_GAP_SEC)}</p>
 
@@ -68,7 +69,7 @@ export function DemoPanel({
 
         <div className="demo-panel__actions">
           <SaayaButton
-            accent="danger"
+            accent="brand"
             aria-label={copy.ctaStartDemo}
             disabled={!idle}
             onClick={onStartDemo}
@@ -111,16 +112,15 @@ export function DemoPanel({
           z-index: 1;
           inset-block-start: 0;
           display: flex;
-          align-items: flex-start;
+          align-items: center;
           justify-content: space-between;
           gap: var(--space-12);
-          padding: var(--space-14);
-          border-inline-start: 3px solid var(--color-amber);
-          border-radius: var(--radius-control);
-          background: rgb(from var(--color-amber) r g b / 0.1);
+          padding-block: var(--space-12);
+          border-block-end: var(--border-hairline) solid var(--color-surface-elevated);
+          background: var(--color-card-fill);
         }
 
-        .demo-panel__header p,
+        .demo-panel__header h2,
         .demo-panel__note,
         .demo-panel__live-reason,
         .demo-panel__reset-status {
@@ -136,7 +136,7 @@ export function DemoPanel({
           justify-content: center;
           inline-size: var(--minimum-touch-target);
           block-size: var(--minimum-touch-target);
-          margin: calc(var(--space-8) * -1);
+          margin: 0;
           padding: 0;
           border: 0;
           border-radius: var(--radius-small);
@@ -146,7 +146,19 @@ export function DemoPanel({
 
         .demo-panel__disclosure,
         .demo-panel__note {
+          margin: 0;
           color: var(--color-text-on-card);
+        }
+
+        .demo-panel__header h2 {
+          font-size: var(--type-headline-size);
+          line-height: var(--type-headline-line-height);
+          font-weight: var(--weight-semibold);
+        }
+
+        .demo-panel__disclosure {
+          font-size: var(--type-card-body-size);
+          line-height: var(--type-card-body-line-height);
         }
 
         .demo-panel__live-reason {

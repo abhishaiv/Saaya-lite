@@ -315,7 +315,7 @@
  "counts": {
   "entities": 424,
   "edges": 710,
-  "events": 92
+  "events": 93
  },
  "entities": [
   {
@@ -10065,6 +10065,14 @@
    "at": "2026-09-07",
    "actor": "codex",
    "detail": "Founder-authorized focused design pass: readable filled buttons, SOS calls and PIN stop before secondary content; unchanged safety logic.",
+   "node": "M1"
+  },
+  {
+   "id": "ev.0093",
+   "type": "decision_made",
+   "at": "2026-09-08",
+   "actor": "codex",
+   "detail": "Founder requested Apple-like visual restraint: opaque headers own session status, bounded check-in scrolling, separate map attribution and dark SOS hierarchy; no timing or PIN change.",
    "node": "M1"
   }
  ]

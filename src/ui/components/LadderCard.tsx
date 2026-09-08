@@ -158,6 +158,12 @@ export function LadderCard(props: LadderCardProps) {
       return;
     }
 
+    // Scrolling a long message must not become the card-dismiss gesture.
+    const message = event.target instanceof HTMLElement
+      ? event.target.closest(".ladder-card__message")
+      : null;
+    if (message !== null && message.scrollHeight > message.clientHeight) return;
+
     capturePointer(event.currentTarget, event.pointerId);
     setSwipe({
       pointerId: event.pointerId,
@@ -238,7 +244,7 @@ export function LadderCard(props: LadderCardProps) {
           display: flex;
           flex-direction: column;
           justify-content: flex-end;
-          padding-inline: var(--space-30);
+          padding-inline: var(--screen-padding);
           padding-block-end: calc(44px + env(safe-area-inset-bottom));
           pointer-events: none;
         }
@@ -269,8 +275,11 @@ export function LadderCard(props: LadderCardProps) {
           position: relative;
           display: flex;
           flex-direction: column;
+          min-block-size: 0;
+          max-block-size: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - var(--minimum-touch-target) - var(--space-48) - 44px); /* GROUNDED-EXEMPT: viewport minus map header, attribution and existing card bottom clearance. */
+          overflow: hidden;
           gap: var(--space-14);
-          padding: var(--space-22);
+          padding: var(--space-20);
           border-radius: var(--radius-card);
           background: var(--color-card-fill);
           pointer-events: auto;
@@ -290,7 +299,7 @@ export function LadderCard(props: LadderCardProps) {
         }
 
         .ladder-card__icon {
-          display: inline-flex;
+          display: none;
           align-self: center;
           inline-size: 40px;
           block-size: 40px;
@@ -309,6 +318,9 @@ export function LadderCard(props: LadderCardProps) {
         }
 
         .ladder-card__message {
+          min-block-size: 0;
+          overflow-y: auto;
+          overscroll-behavior: contain;
           margin: 0;
           color: var(--color-text-on-card);
           font-size: var(--type-card-body-size);
@@ -319,7 +331,13 @@ export function LadderCard(props: LadderCardProps) {
 
         .ladder-card__primary,
         .ladder-card__secondary {
+          flex-shrink: 0;
           align-self: stretch;
+        }
+
+        .ladder-card__icon,
+        .ladder-card__title {
+          flex-shrink: 0;
         }
 
         .ladder-card--entering .ladder-card__scrim {

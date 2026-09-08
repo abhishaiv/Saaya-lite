@@ -17,7 +17,6 @@ import { BrowserPinHasher } from "../../../platform/pinHash";
 import { installConsumeBackGuard } from "../../../platform/sosBackGuard";
 import { installSosFocusTrap } from "../../../platform/sosFocusTrap";
 import { BigActionButton } from "../../components/BigActionButton";
-import { DisclosureBanner } from "../../components/DisclosureBanner";
 import { PinEntryBox } from "../../components/PinEntryBox";
 import { formatCopy, type M4Copy } from "../../copy/strings";
 
@@ -186,10 +185,7 @@ export function SosOverlay({
         <h1>{view === "SOS" ? copy.sosTitle : copy.pinTitle}</h1>
         {view === "SOS" ? (
           <>
-            <DisclosureBanner
-              content={copy.sosLocalOnly}
-              kind="prototype-limitation"
-            />
+            <p className="sos-overlay__disclosure" role="note">{copy.sosLocalOnly}</p>
             <div className="sos-overlay__dials">
               <DialAction copy={copy} number={INDIA_EMERGENCY_NUMBER} />
               <DialAction copy={copy} number={WOMEN_SUPPORT_NUMBER} />
@@ -209,10 +205,7 @@ export function SosOverlay({
               onClick={() => setView("PIN")}
               workingLabel={copy.stateWorking}
             />
-            <DisclosureBanner
-              content={copy.policeNoGovtLink}
-              kind="prototype-limitation"
-            />
+            <p className="sos-overlay__disclosure" role="note">{copy.policeNoGovtLink}</p>
             {demoIncident === null ? null : (
               <section
                 aria-label={demoIncident.label}
@@ -278,11 +271,11 @@ export function SosOverlay({
           min-block-size: 100dvh; /* GROUNDED-EXEMPT: structural viewport fill for an in-page emergency overlay. */
           max-block-size: 100dvh; /* GROUNDED-EXEMPT: the fixed emergency surface is bounded by the viewport. */
           overflow-y: auto;
-          place-items: center;
+          place-items: start center;
           padding: var(--screen-padding);
           padding-block-start: calc(var(--screen-padding) + env(safe-area-inset-top));
           padding-block-end: calc(var(--screen-padding) + env(safe-area-inset-bottom));
-          background: var(--color-danger);
+          background: var(--color-background);
           color: var(--color-text-primary);
           animation: none;
           transition: none;
@@ -291,8 +284,8 @@ export function SosOverlay({
         .sos-overlay__surface {
           display: grid;
           inline-size: 100%; /* GROUNDED-EXEMPT: the emergency surface fills the already padded viewport. */
-          gap: var(--space-24);
-          text-align: center;
+          gap: var(--space-20);
+          text-align: start;
         }
 
         .sos-overlay h1,
@@ -301,9 +294,10 @@ export function SosOverlay({
         }
 
         .sos-overlay h1 {
-          font-size: var(--type-title-size);
+          color: var(--color-danger);
+          font-size: var(--type-display-size);
           font-weight: var(--weight-bold);
-          line-height: var(--type-title-line-height);
+          line-height: var(--type-display-line-height);
         }
 
         .sos-overlay__pin {
@@ -317,12 +311,19 @@ export function SosOverlay({
           gap: var(--space-8);
         }
 
+        .sos-overlay__disclosure {
+          color: var(--color-text-on-card);
+          font-size: var(--type-caption-size);
+          line-height: var(--type-caption-line-height);
+        }
+
         :global(.sos-overlay__call) {
           display: inline-flex;
           min-block-size: var(--minimum-touch-target);
           align-items: center;
           justify-content: center;
-          border: var(--border-hairline) solid var(--color-text-primary);
+          padding: var(--space-12) var(--space-16);
+          border: var(--border-hairline) solid var(--color-surface-elevated);
           border-radius: var(--radius-control);
           background: var(--color-card-fill);
           color: var(--color-text-primary);
@@ -335,6 +336,12 @@ export function SosOverlay({
         :global(.sos-overlay__stop .big-action-button__surface) {
           background: var(--color-card-fill);
           color: var(--color-text-primary);
+        }
+
+        :global(.sos-overlay__call:first-child) {
+          background: var(--color-danger);
+          color: var(--color-background);
+          font-weight: var(--weight-bold);
         }
 
         .sos-overlay__error,
@@ -355,24 +362,23 @@ export function SosOverlay({
 
         .sos-overlay__demo {
           display: grid;
-          justify-items: center;
+          justify-items: start;
           gap: var(--space-4);
           inline-size: 100%; /* GROUNDED-EXEMPT: the preview card fills the already padded overlay column. */
           padding: var(--space-12) var(--space-14);
-          border: var(--border-hairline) solid var(--color-text-primary);
+          border: var(--border-hairline) solid var(--color-surface-elevated);
           border-radius: var(--radius-control);
           background: var(--color-card-fill);
           font-size: var(--type-body-size);
           line-height: var(--type-body-line-height);
-          text-align: center;
+          text-align: start;
         }
 
         .sos-overlay__demo h2 {
           margin: 0;
-          font-size: var(--type-label-size);
+          font-size: var(--type-caption-size);
           font-weight: var(--weight-bold);
-          letter-spacing: var(--type-label-tracking);
-          line-height: var(--type-label-line-height);
+          line-height: var(--type-caption-line-height);
         }
 
         .sos-overlay__demo ul {

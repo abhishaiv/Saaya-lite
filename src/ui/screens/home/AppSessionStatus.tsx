@@ -3,6 +3,7 @@ import type { M4Copy } from "../../copy/strings";
 import type { HomeEngineView } from "./homeEngineBridge";
 
 export interface AppSessionStatusProps {
+  readonly inline?: boolean;
   readonly copy: M4Copy;
   readonly showIdle: boolean;
   readonly view: HomeEngineView;
@@ -10,6 +11,7 @@ export interface AppSessionStatusProps {
 
 /** App-shell session truth: active state stays visible above every route and sheet. */
 export function AppSessionStatus({
+  inline = false,
   copy,
   showIdle,
   view,
@@ -38,7 +40,7 @@ export function AppSessionStatus({
     );
 
   return (
-    <div className="app-session-status">
+    <div className="app-session-status" data-inline={inline || undefined}>
       {pill}
 
       <style jsx>{`
@@ -47,7 +49,18 @@ export function AppSessionStatus({
           z-index: 11; /* GROUNDED-EXEMPT: active session truth stays above every route and sheet. */
           inset-block: 0;
           inset-inline: var(--screen-padding);
+          inset-inline-end: calc(var(--screen-padding) + var(--minimum-touch-target) + var(--space-12));
           pointer-events: none;
+        }
+
+        .app-session-status[data-inline] {
+          position: static;
+          grid-column: 1 / -1;
+          min-inline-size: 0;
+        }
+
+        .app-session-status[data-inline] :global(.status-pill) {
+          position: static;
         }
       `}</style>
     </div>

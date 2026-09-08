@@ -1,5 +1,9 @@
 # Saaya Lite - Codex Contribution Log
 
+Layout checkpoint verification: 254 tests passed before the final spacing-only adjustment; G6 passed on 154 files, reads and KG checks passed. Final local builds stalled before compiler output under both available Node installations and were stopped. Vercel preview build is the outstanding compile gate; no production promotion authorized or claimed for this checkpoint.
+
+2026-09-08 — Corrected the prior pass's missed layout causes: translucent sticky demo header, floating status over page headers, licence attribution over sheets, and unbounded check-in content. Apple-like dark SOS hierarchy replaces the full-red wall; disclosures and PIN semantics retained. Chrome component fixtures checked at 320/390px, including scrolling About and Demo; fixtures removed before build. Fresh Terra static review passed. These are local component checks, not a new real-phone end-to-end pass.
+
 2026-09-07 — Founder-requested focused design pass: dark labels on filled buttons; SOS call and PIN-stop actions precede the synthetic record, with both disclosures retained; dark SOS content surfaces and safe-area padding. Chrome mobile-size SOS fixture and shared-control gallery checked (temporary fixture removed). Fresh Terra high static review passed; 254 tests passed. No engine, copy, provider, map or PIN logic changed. Physical-phone verification remains open; this checkpoint is not a production deployment.
 
 **This file is a submission deliverable, not a courtesy.** Saaya Lite contains no OpenAI

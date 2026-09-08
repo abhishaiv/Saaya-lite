@@ -203,6 +203,7 @@ export function SaayaBottomSheet({
         .saaya-bottom-sheet__content {
           block-size: 100%; /* GROUNDED-EXEMPT: content fills the specified sheet surface */
           overflow: auto;
+          overscroll-behavior: contain;
           transition: none;
         }
       `}</style>

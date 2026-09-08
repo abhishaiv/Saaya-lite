@@ -151,12 +151,14 @@ export function StatusPill(props: StatusPillProps) {
           inset-inline-start: 0;
           display: inline-flex;
           align-items: center;
-          block-size: var(--status-pill-height);
+          min-block-size: var(--status-pill-height);
+          max-inline-size: 100%; /* GROUNDED-EXEMPT: status stays within its owning header. */
+          padding-block: var(--space-8);
           padding-inline: var(--space-14);
           border: 1px solid
             rgb(from var(--status-pill-accent) r g b / 0.4);
           border-radius: 18px;
-          background: rgb(from var(--color-card-fill) r g b / 0.92);
+          background: var(--color-card-fill);
           color: var(--color-text-primary);
           white-space: nowrap;
           animation: none;
@@ -180,7 +182,7 @@ export function StatusPill(props: StatusPillProps) {
         }
 
         .status-pill__content {
-          white-space: nowrap;
+          white-space: normal;
           animation: none;
           transition: none;
         }

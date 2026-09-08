@@ -698,6 +698,7 @@ export function HomeScreen({
   );
   const appSessionStatus = (
     engineView.state === "SOS_ACTIVE" ? null : <AppSessionStatus
+      inline={aboutOpen || settingsOpen}
       copy={copy}
       showIdle={false}
       view={engineView}
@@ -714,8 +715,8 @@ export function HomeScreen({
   if (aboutOpen && engineView.state !== "SOS_ACTIVE") {
     return (
       <>
-        {appSessionStatus}
         <AboutScreen
+          sessionStatus={appSessionStatus}
           copy={copy}
           founderContact={founderContact}
           mockedClaims={[copy.familyMockDisclosure]}
@@ -737,8 +738,8 @@ export function HomeScreen({
   if (settingsOpen && engineView.state !== "SOS_ACTIVE") {
     return (
       <>
-        {appSessionStatus}
         <SettingsScreen
+          sessionStatus={appSessionStatus}
           copy={copy}
           locale={locale}
           onBack={() => setSettingsOpen(false)}
@@ -831,7 +832,7 @@ export function HomeScreen({
         {mapZones.length}:{demoZones.length}
       </output>
 
-      {selectedZone === null ? null : (
+      {selectedZone === null || demoPanelOpen || locationHelpOpen ? null : (
         <ZoneDetailSheet
           copy={copy}
           currentPoint={location}
