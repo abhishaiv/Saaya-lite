@@ -1493,3 +1493,78 @@ the only reason I caught it was that the count looked wrong.
 **Final: 43 docs, 22 nodes, 275 live facts and 31 superseded, 231 entities, 521 edges. Zero
 stale platform references, zero orphans, zero unresolved reads. CODEX_TASKS, AGENTS and
 BUILD_STATE all match the graph order exactly. All four checkers pass.**
+
+---
+
+## 2026-09-12 - The walk view lands on this base, and three numbers I had to correct
+
+The walk view is now on `e34d32e`, the commit `main` points at. It was not there before, at
+any layer. This entry records what moved, what I got wrong on the way, and two things that
+need a ruling.
+
+### What is now in the tree
+
+41 new files:
+
+| Where | What | Count |
+|---|---|---|
+| `src/platform/walk/` | the walk engine: projection, tiles, zones, geometry, world, character, scene, and their tests | 16 |
+| `src/ui/screens/walk/` | `WalkView`, `CharacterCustomiser`, and the screen test | 3 |
+| `src/ui/copy/riskBandLabel.ts` | the band-name lookup, extracted so the walk view and the zone sheet cannot drift apart | 1 |
+| `public/assets/character/` | the Blender-authored glTF parts | 19 |
+| `public/assets/world/` | `world_tiled.json`, the baked geometry | 1 |
+
+Eight tracked files changed ahead of the spec-doc port: `package.json` and the lock
+(`three` 0.185.0, `@types/three` 0.185.4), `materialSymbols.json` and the font subset (17 to
+19 glyphs), `strings.ts` (30 walk keys across the type, `en` and `te` blocks),
+`HomeScreen.tsx` (the toggle, the view switch, the first-switch prompt),
+`ZoneDetailSheet.tsx` (now imports the extracted band lookup instead of keeping its own copy
+of the switch), and `graph/spec_graph.json` (14 walk facts, 410 to 424).
+
+### Three numbers I had reported wrong, corrected
+
+**The bundle.** I said about 97 KB gzip, then 159 KB. Both wrong. Measured from a real
+`next build`: the walk payload is four chunks totalling **169,368 bytes gzip, 165.4 KB**,
+against the 190 KB ceiling in `perf.bundle.walk`. Headroom is 24.6 KB. The initial page load
+is 139 kB and carries no `three` at all, which is what the lazy boundary is for.
+
+**The size of the rescue.** I said 18 files. It was 41. I had compared my build mirror
+against the live worktree instead of against `e34d32e`, and the worktree held the whole bake
+layer that the committed tree never received: `src/platform/walk/`, `public/assets/world/`,
+all 19 character parts, and the `three` dependency itself. `main` had no walk view at any
+layer. It was not a view missing its screen.
+
+**Two spec files I first rewrote wrong.** `spec_graph.json` uses a one-space indent and a
+hand-mixed split between literal and escaped non-ASCII, so regenerating it reformatted 4,700
+lines to add 14 facts. It is spliced textually now and the diff is 154 lines, one of which is
+`count`. Both of these are the same mistake in different clothes: regenerating a
+hand-maintained file instead of appending to it.
+
+### Gates, all run on the merged tree
+
+| Gate | Result |
+|---|---|
+| `tsc --noEmit` | 0 errors, all 19 walk source files confirmed in the program |
+| `eslint src app` | 0 |
+| `vitest run` | 43 files, 265 tests, 0 failures |
+| `grounded_check.py` | 146 files, 0 ungrounded literals |
+| `next build` | exit 0 |
+
+### What needs a ruling
+
+**`progress.md` has three divergent copies.** This one stops at 2026-08-19. The live
+worktree's copy runs to 2026-09-12 and is 2,483 lines. My build mirror's copy is 2,758 lines
+and carries the walk-view sections. All three share their opening. I appended this entry
+rather than merging the other two, because copying either would have made claims about a tree
+that is not this one. Which copy is canonical is a founder ruling, not a merge.
+
+**`FEATURES.md` is amended, and the amendment is written as a ruling.** The frozen line "No
+live unsafe-roads display. Heat-zone markings only." becomes "...from a separate dataset",
+with Amendment 1 at the foot bounding per-road risk to arithmetic on the zone the road sits
+in. It is recorded as an explicit founder amendment because the file's own rule requires one.
+If that ruling was not given, this is the line to revert first.
+
+**One known gap, asserted rather than hidden.** The customiser shows part names in English in
+both languages: `COPY.md` has a row per axis and none per part, so `hair_buns` reads "Buns" in
+Telugu too. The screen test asserts the gap deliberately, so that adding the 16 per-part copy
+rows breaks the test before it can quietly regress.

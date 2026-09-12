@@ -3,7 +3,7 @@
  "kind": "knowledge_graph",
  "note": "Domain facts with provenance. Never merge with build_graph.json - different truth standards.",
  "rule": "Every numeric or colour literal in source must trace to a fact id here, or the grounded checker fails the node.",
- "count": 410,
+ "count": 424,
  "facts": [
   {
    "id": "ladder.cd1",
@@ -4559,6 +4559,159 @@
    "unit": "z",
    "means": "Leaflet zoomSnap, set on the map so deliberate fractional camera changes are honoured.",
    "sourced_from": "founder approval 2026-08-30: localized hotspot redesign",
+   "governs": "MAP_SPEC.md",
+   "frozen": true,
+   "platform": "web"
+  },
+  {
+   "id": "walk.risk.falloff_m",
+   "kind": "number",
+   "value": 1400,
+   "unit": "m",
+   "means": "distance from a zone's incident centre at which a road's risk has faded to the floor. Stated rule, not measured.",
+   "sourced_from": "founder 2026-09-11 walk-view ruling; bake2.py RULE falloff_m",
+   "governs": "FEATURES.md",
+   "frozen": true,
+   "platform": "web"
+  },
+  {
+   "id": "walk.risk.falloff_floor",
+   "kind": "number",
+   "value": 0.35,
+   "unit": "ratio",
+   "means": "a road keeps at least this share of its zone's risk, so no road is ever drawn safer than the zone it sits in. Raised from 0.25 to keep the floor clear of risk.threshold.low and to never understate. Stated rule, not measured.",
+   "sourced_from": "founder 2026-09-11 walk-view ruling; bake2.py RULE falloff_floor",
+   "governs": "FEATURES.md",
+   "frozen": true,
+   "platform": "web"
+  },
+  {
+   "id": "walk.risk.zone_rule",
+   "kind": "string",
+   "value": "worst zone touched",
+   "means": "a road takes the risk of the highest-density zone it passes through, not the average and not the first. String fact: documents the rule, grounds no literal.",
+   "sourced_from": "founder 2026-09-11 walk-view ruling; bake2.py RULE zone_sample_stride",
+   "governs": "FEATURES.md",
+   "frozen": true,
+   "platform": "web"
+  },
+  {
+   "id": "perf.bundle.walk",
+   "kind": "number",
+   "value": 190,
+   "unit": "KB",
+   "means": "walk-view lazy chunk ceiling, gzipped. JS only; the world tiles and the character's glTF parts are data assets and fall under perf.site.size. Does not redefine perf.bundle.",
+   "sourced_from": "measured 2026-09-11: esbuild tree-shake of three 0.185.0 for the walk import surface = 140 KB gzip / 116 KB brotli WITHOUT a glTF loader; 159 KB gzip / 132 KB brotli WITH three's GLTFLoader, which the character's Blender-authored parts require (runtime assembly chosen 2026-09-11). The loader-inclusive figure is the one that counts against the ceiling. 0.186.0 measured 142 KB; pinned to 0.185 so @types/three 0.185.4 matches the runtime minor. Ceiling set by founder ruling 2026-09-11.",
+   "governs": "WEB_PLATFORM.md",
+   "frozen": true,
+   "platform": "web"
+  },
+  {
+   "id": "walk.camera.fov",
+   "kind": "number",
+   "value": 54,
+   "unit": "deg",
+   "means": "walk view vertical field of view. Wide enough to read the street ahead, narrow enough that buildings keep their height.",
+   "sourced_from": "founder 2026-09-11 walk-view ruling; stated design value",
+   "governs": "MAP_SPEC.md",
+   "frozen": true,
+   "platform": "web"
+  },
+  {
+   "id": "walk.camera.pitch",
+   "kind": "number",
+   "value": 52,
+   "unit": "deg",
+   "means": "walk view camera angle above the horizon. High enough to see the road ahead and the zone she is in, low enough to keep a street-level feel rather than a map feel.",
+   "sourced_from": "founder 2026-09-11 walk-view ruling; stated design value",
+   "governs": "MAP_SPEC.md",
+   "frozen": true,
+   "platform": "web"
+  },
+  {
+   "id": "walk.camera.dist",
+   "kind": "number",
+   "value": 27,
+   "unit": "m",
+   "means": "walk view camera distance behind the character. Close enough that she reads as the subject, far enough that the next junction is visible.",
+   "sourced_from": "founder 2026-09-11 walk-view ruling; stated design value",
+   "governs": "MAP_SPEC.md",
+   "frozen": true,
+   "platform": "web"
+  },
+  {
+   "id": "walk.character.height",
+   "kind": "number",
+   "value": 1.7,
+   "unit": "m",
+   "means": "character height, so she scales correctly against the extruded buildings. Buildings come from real storey counts at 3.2 m per storey.",
+   "sourced_from": "founder 2026-09-11 walk-view ruling; stated design value",
+   "governs": "MAP_SPEC.md",
+   "frozen": true,
+   "platform": "web"
+  },
+  {
+   "id": "walk.speed",
+   "kind": "number",
+   "value": 1.4,
+   "unit": "m/s",
+   "means": "character walking speed, a real brisk walking pace. The world moves at the speed she is actually walking, not a game speed.",
+   "sourced_from": "founder 2026-09-11 walk-view ruling; stated design value",
+   "governs": "MAP_SPEC.md",
+   "frozen": true,
+   "platform": "web"
+  },
+  {
+   "id": "color.tile.road",
+   "kind": "color",
+   "value": "#1A1A20",
+   "unit": "hex",
+   "means": "Walk-view road surface. A neutral dark grey so the risk band is the only colour on the ground.",
+   "sourced_from": "stated design value, walk-view scene palette, 2026-09-12",
+   "governs": "MAP_SPEC.md",
+   "frozen": true,
+   "platform": "web"
+  },
+  {
+   "id": "color.tile.building",
+   "kind": "color",
+   "value": "#22222A",
+   "unit": "hex",
+   "means": "Walk-view building wall.",
+   "sourced_from": "stated design value, walk-view scene palette, 2026-09-12",
+   "governs": "MAP_SPEC.md",
+   "frozen": true,
+   "platform": "web"
+  },
+  {
+   "id": "color.tile.building.roof",
+   "kind": "color",
+   "value": "#2A2A34",
+   "unit": "hex",
+   "means": "Walk-view building roof, a shade lighter so the top face reads from the high walk camera.",
+   "sourced_from": "stated design value, walk-view scene palette, 2026-09-12",
+   "governs": "MAP_SPEC.md",
+   "frozen": true,
+   "platform": "web"
+  },
+  {
+   "id": "color.tile.green",
+   "kind": "color",
+   "value": "#14251A",
+   "unit": "hex",
+   "means": "Walk-view park and green space.",
+   "sourced_from": "stated design value, walk-view scene palette, 2026-09-12",
+   "governs": "MAP_SPEC.md",
+   "frozen": true,
+   "platform": "web"
+  },
+  {
+   "id": "color.tile.water",
+   "kind": "color",
+   "value": "#101C2E",
+   "unit": "hex",
+   "means": "Walk-view water.",
+   "sourced_from": "stated design value, walk-view scene palette, 2026-09-12",
    "governs": "MAP_SPEC.md",
    "frozen": true,
    "platform": "web"

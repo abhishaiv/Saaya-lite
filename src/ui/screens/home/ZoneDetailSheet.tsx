@@ -20,6 +20,7 @@ import {
 import { SaayaBottomSheet } from "../../components/SaayaBottomSheet";
 import { StatRow } from "../../components/StatRow";
 import { ZoneChip } from "../../components/ZoneChip";
+import { localizedRiskBand } from "../../copy/riskBandLabel";
 import { formatCopy, type M4Copy } from "../../copy/strings";
 import { MaterialSymbol } from "../../icons/MaterialSymbol";
 
@@ -30,22 +31,6 @@ export interface ZoneDetailSheetProps {
   readonly hourBand: HourBand;
   readonly onDismiss: () => void;
   readonly policeStations: readonly PoliceStation[];
-}
-
-function localizedRiskBand(
-  copy: M4Copy,
-  label: ReturnType<typeof displayRiskLabel>,
-): string {
-  switch (label) {
-    case "Low":
-      return copy.riskBandLow;
-    case "Moderate":
-      return copy.riskBandModerate;
-    case "Elevated":
-      return copy.riskBandElevated;
-    case "High":
-      return copy.riskBandHigh;
-  }
 }
 
 export function ZoneDetailSheet({

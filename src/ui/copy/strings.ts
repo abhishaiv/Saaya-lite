@@ -26,6 +26,9 @@ export type M4Copy = Readonly<{
   aboutVersion: string;
   aboutWhatBody: string;
   aboutWhatTitle: string;
+  annCustSaved: string;
+  annViewFlat: string;
+  annViewWalk: string;
   appName: string;
   cdBack: string;
   cdCancelEscalation: string;
@@ -52,6 +55,18 @@ export type M4Copy = Readonly<{
   ctaArmManually: string;
   ctaImHome: string;
   ctaOpenDemo: string;
+  custAxisAccessories: string;
+  custAxisBody: string;
+  custAxisBottom: string;
+  custAxisBrows: string;
+  custAxisEyes: string;
+  custAxisHair: string;
+  custAxisTop: string;
+  custCancel: string;
+  custReset: string;
+  custSave: string;
+  custStaysLocal: string;
+  custTitle: string;
   demoJumpFamily: string;
   demoMissCheckin: string;
   demoModeActive: string;
@@ -140,6 +155,21 @@ export type M4Copy = Readonly<{
   statusSos: string;
   sosLocalOnly: string;
   sosTitle: string;
+  viewFlat: string;
+  viewToggle: string;
+  viewWalk: string;
+  walkEditCharacter: string;
+  walkFirstBody: string;
+  walkFirstCta: string;
+  walkFirstSkip: string;
+  walkFirstTitle: string;
+  walkLegendHigh: string;
+  walkLegendLow: string;
+  walkLegendTitle: string;
+  walkLoading: string;
+  walkLocDenied: string;
+  walkOffline: string;
+  walkRiskNote: string;
   warnKeepOpenBody: string;
   warnLocationDenied: string;
   warnPageStopped: string;
@@ -181,6 +211,9 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     aboutVersion: "Version %1$s (%2$d)",
     aboutWhatBody: "Saaya Lite is a prototype built for Build What Moves India. It shows the tier missing below India's emergency apps: the one that works before anything has happened.",
     aboutWhatTitle: "What this is",
+    annCustSaved: "Character saved",
+    annViewFlat: "Map view.",
+    annViewWalk: "Walk view. You can switch back any time.",
     appName: "Saaya Lite",
     cdBack: "Go back",
     cdCancelEscalation: "Cancel this preview. It stays on your phone.",
@@ -207,6 +240,18 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     ctaArmManually: "Start Shadow",
     ctaImHome: "I am home",
     ctaOpenDemo: "Open the demo",
+    custAxisAccessories: "Accessories",
+    custAxisBody: "Body",
+    custAxisBottom: "Bottom",
+    custAxisBrows: "Eyebrows",
+    custAxisEyes: "Eyes",
+    custAxisHair: "Hair",
+    custAxisTop: "Top",
+    custCancel: "Cancel",
+    custReset: "Start again",
+    custSave: "Save",
+    custStaysLocal: "This stays on your phone.",
+    custTitle: "Your character",
     demoJumpFamily: "Jump to family escalation",
     demoMissCheckin: "Simulate a missed check-in",
     demoModeActive: "Demo speed is on. Timers are 6x faster than the real product.",
@@ -295,6 +340,21 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     statusSos: "SOS active",
     sosLocalOnly: "SOS is active. This beta does not send a report. Choose a call below to open your phone's dialler.",
     sosTitle: "SOS active",
+    viewFlat: "Map view",
+    viewToggle: "View",
+    viewWalk: "Walk view",
+    walkEditCharacter: "Change your character",
+    walkFirstBody: "This is you in the walk view. You can change any of it later.",
+    walkFirstCta: "Make one",
+    walkFirstSkip: "Use a default",
+    walkFirstTitle: "Make a character",
+    walkLegendHigh: "More records",
+    walkLegendLow: "Fewer records",
+    walkLegendTitle: "Street shading",
+    walkLoading: "Building the streets around you",
+    walkLocDenied: "The walk view needs your location. Turn it on and come back.",
+    walkOffline: "Streets will not load without a connection. Your area still shows.",
+    walkRiskNote: "Shading follows the area's records, faded from where incidents cluster. It is not a count for any one street.",
     warnKeepOpenBody: "Keep this tab open while you are on the stretch. If you close it, Saaya stops watching.",
     warnLocationDenied: "Saaya cannot wake on its own without location.",
     warnPageStopped: "Your browser stopped Saaya while you were travelling. Nothing was sent.",
@@ -334,6 +394,9 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     aboutVersion: "వెర్షన్ %1$s (%2$d)",
     aboutWhatBody: "సాయ లైట్ అనేది Build What Moves India కోసం తయారుచేసిన ప్రోటోటైప్. భారత అత్యవసర యాప్‌ల కింద లేని ఒక దశను ఇది చూపిస్తుంది: ఏదీ జరగకముందే పనిచేసేది.",
     aboutWhatTitle: "ఇది ఏమిటి",
+    annCustSaved: "పాత్ర సేవ్ అయింది",
+    annViewFlat: "మ్యాప్ వ్యూ.",
+    annViewWalk: "వాక్ వ్యూ. ఎప్పుడైనా తిరిగి మారవచ్చు.",
     appName: "సాయ లైట్",
     cdBack: "వెనక్కి వెళ్ళు",
     cdCancelEscalation: "ఈ ప్రివ్యూను రద్దు చేయి. ఇది మీ ఫోన్‌లోనే ఉంటుంది.",
@@ -360,6 +423,18 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     ctaArmManually: "షాడో ప్రారంభించు",
     ctaImHome: "నేను ఇంటికి చేరాను",
     ctaOpenDemo: "డెమో తెరువు",
+    custAxisAccessories: "ఉపకరణాలు",
+    custAxisBody: "శరీరం",
+    custAxisBottom: "కింది దుస్తులు",
+    custAxisBrows: "కనుబొమలు",
+    custAxisEyes: "కళ్లు",
+    custAxisHair: "జుట్టు",
+    custAxisTop: "పై దుస్తులు",
+    custCancel: "రద్దు చేయి",
+    custReset: "మళ్లీ మొదలుపెట్టు",
+    custSave: "సేవ్ చేయి",
+    custStaysLocal: "ఇది మీ ఫోన్‌లోనే ఉంటుంది.",
+    custTitle: "మీ పాత్ర",
     demoJumpFamily: "ఆత్మీయుల దశకు వెళ్లు",
     demoMissCheckin: "చెక్-ఇన్ మిస్ అయినట్టు చూపించు",
     demoModeActive: "డెమో వేగం ఆన్‌లో ఉంది. టైమర్లు అసలు ఉత్పత్తి కంటే 6 రెట్లు వేగంగా ఉన్నాయి.",
@@ -448,6 +523,21 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     statusSos: "SOS యాక్టివ్",
     sosLocalOnly: "SOS యాక్టివ్‌గా ఉంది. ఈ బీటా నివేదికను పంపదు. మీ ఫోన్ డయలర్‌ను తెరవడానికి దిగువన ఉన్న కాల్ ఎంపికను ఉపయోగించండి.",
     sosTitle: "SOS యాక్టివ్",
+    viewFlat: "మ్యాప్ వ్యూ",
+    viewToggle: "వ్యూ",
+    viewWalk: "వాక్ వ్యూ",
+    walkEditCharacter: "మీ పాత్రను మార్చండి",
+    walkFirstBody: "వాక్ వ్యూలో ఇది మీరే. వీటిలో ఏదైనా తర్వాత మార్చుకోవచ్చు.",
+    walkFirstCta: "తయారు చేయి",
+    walkFirstSkip: "డిఫాల్ట్ వాడు",
+    walkFirstTitle: "ఒక పాత్రను తయారు చేయండి",
+    walkLegendHigh: "ఎక్కువ రికార్డులు",
+    walkLegendLow: "తక్కువ రికార్డులు",
+    walkLegendTitle: "వీధి షేడింగ్",
+    walkLoading: "మీ చుట్టూ ఉన్న వీధులను తయారు చేస్తున్నాం",
+    walkLocDenied: "వాక్ వ్యూకు మీ లొకేషన్ కావాలి. దాన్ని ఆన్ చేసి తిరిగి రండి.",
+    walkOffline: "కనెక్షన్ లేకుండా వీధులు లోడ్ కావు. మీ ప్రాంతం ఇంకా కనిపిస్తుంది.",
+    walkRiskNote: "షేడింగ్ ఆ ప్రాంతపు రికార్డుల ఆధారంగా ఉంటుంది, ఘటనలు ఎక్కువగా జరిగిన చోటి నుంచి క్రమంగా తగ్గుతుంది. ఇది ఏ ఒక్క వీధికీ సంఖ్య కాదు.",
     warnKeepOpenBody: "మీరు ఆ మార్గంలో ఉన్నంత సేపు ఈ ట్యాబ్ తెరిచి ఉంచండి. మూసివేస్తే సాయ గమనించడం ఆగిపోతుంది.",
     warnLocationDenied: "లొకేషన్ లేకుండా సాయ దానంతట అదే మేల్కొనదు.",
     warnPageStopped: "మీరు ప్రయాణిస్తున్నప్పుడు మీ బ్రౌజర్ సాయను ఆపింది. ఏదీ పంపబడలేదు.",

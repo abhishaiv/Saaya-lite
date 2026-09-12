@@ -48,7 +48,10 @@ import {
   browserWakeLockApi,
   WakeLockController,
 } from "../../../platform/wakeLock";
-import { MapControlButton } from "../../components/MapControlButton";
+import {
+  MapControlButton,
+  MapControlButtonStack,
+} from "../../components/MapControlButton";
 import { formatCopy, M4_COPY, type SaayaLocale } from "../../copy/strings";
 import { HomeEngineBridge, type HomeEngineView } from "./homeEngineBridge";
 import { HomeMap } from "./HomeMap";
@@ -68,11 +71,32 @@ import { ZoneDetailSheet } from "./ZoneDetailSheet";
 import { AboutScreen } from "../settings/AboutScreen";
 import { SettingsScreen } from "../settings/SettingsScreen";
 import { LocationHelpSheet } from "../location/LocationHelpSheet";
+import type { CharacterSelection } from "../../../platform/walk/characterParts";
+import {
+  browserCharacterStorage,
+  characterOrDefault,
+  loadCharacterSelection,
+  needsCharacter,
+  saveCharacter,
+  type CharacterLoad,
+} from "../../../platform/walk/characterStore";
+import { CharacterCustomiser } from "../walk/CharacterCustomiser";
+import { WalkView } from "../walk/WalkView";
 
 export interface BuildVersion {
   readonly code: number;
   readonly name: string;
 }
+
+/**
+ * Which of the two views is on screen.
+ *
+ * `MAP_SPEC.md`: the walk view is "a second view, not a second product", and the flat map
+ * is what she gets by default. The choice is deliberately not persisted: a view is not a
+ * preference she set, and coming back to a map she did not ask for is worse than coming
+ * back to the one the product opens with.
+ */
+type ViewMode = "FLAT" | "WALK";
 
 export interface HomeScreenProps {
   readonly buildVersion: BuildVersion;
@@ -113,6 +137,13 @@ export function HomeScreen({
   const [locationHelpOpen, setLocationHelpOpen] = useState(false);
   const [demoSpeedEnabled, setDemoSpeedEnabled] = useState(false);
   const [demoSessionActive, setDemoSessionActive] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>("FLAT");
+  const [characterLoad, setCharacterLoad] = useState<CharacterLoad>({
+    kind: "absent",
+  });
+  const [customiserOpen, setCustomiserOpen] = useState(false);
+  const [customiserFirstRun, setCustomiserFirstRun] = useState(false);
+  const [announcement, setAnnouncement] = useState("");
   const demoSpeedEnabledRef = useRef(false);
   const demoArmInFlightRef = useRef(false);
   const [engineView, setEngineView] = useState<HomeEngineView>({
@@ -556,6 +587,54 @@ export function HomeScreen({
     setPageStoppedWarning(false);
   }, []);
 
+  // She is asked to make a character on the first switch to the walk view, and only if
+  // there is no character to load. Both of those come out of one load result, so the
+  // question cannot be asked twice, and a stored character that no longer resolves is
+  // treated as a reason to ask rather than as a character to draw.
+  useEffect(() => {
+    const storage = browserCharacterStorage();
+    if (storage === null) return;
+    let cancelled = false;
+    void loadCharacterSelection(storage).then((load) => {
+      if (!cancelled) setCharacterLoad(load);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const character = useMemo(
+    () => characterOrDefault(characterLoad),
+    [characterLoad],
+  );
+
+  const handleViewToggle = useCallback(() => {
+    const next: ViewMode = viewMode === "FLAT" ? "WALK" : "FLAT";
+    setViewMode(next);
+    setAnnouncement(next === "WALK" ? copy.annViewWalk : copy.annViewFlat);
+    if (next === "WALK" && needsCharacter(characterLoad)) {
+      setCustomiserFirstRun(true);
+      setCustomiserOpen(true);
+    }
+  }, [characterLoad, copy, viewMode]);
+
+  const handleCharacterSave = useCallback(
+    (selection: CharacterSelection) => {
+      setCharacterLoad({ kind: "loaded", selection });
+      setCustomiserOpen(false);
+      setCustomiserFirstRun(false);
+      setAnnouncement(copy.annCustSaved);
+      const storage = browserCharacterStorage();
+      if (storage === null) return;
+      void saveCharacter(storage, selection).catch(() => {
+        // The same reading as `saveDemoSpeedEnabled`: a refusal to persist must not take
+        // the choice she just made away from her in this session. It does mean the
+        // character will not survive a reload, which progress.md records.
+      });
+    },
+    [copy],
+  );
+
   const mapCopy = useMemo(
     () => ({
       ariaMap: copy.cdMap,
@@ -617,19 +696,37 @@ export function HomeScreen({
   return (
     <>
       {appSessionStatus}
-      <main className="home-screen" data-location-status={locationStatus} data-session-state={engineView.state}>
-      <HomeMap
-        copy={mapCopy}
-        location={location}
-        hotspots={heatmapHotspots}
-        mapZones={mapZones}
-        onController={handleMapController}
-        onTileAvailability={handleTileAvailability}
-        onZoneSelected={handleZoneSelected}
-        selectedZoneId={selectedZoneId}
-        sessionState={engineView.state}
-        tileAvailability={tileAvailability}
-      />
+      <main className="home-screen" data-location-status={locationStatus} data-session-state={engineView.state} data-view-mode={viewMode}>
+      {viewMode === "WALK" ? (
+        <WalkView
+          character={character}
+          copy={copy}
+          hourBand={hourBandAtEpochMs(browserClock.nowEpochMs())}
+          location={location}
+          locationStatus={locationStatus}
+          mapZones={mapZones}
+          onEditCharacter={() => {
+            setCustomiserFirstRun(false);
+            setCustomiserOpen(true);
+          }}
+          onZoneSelected={handleZoneSelected}
+          selectedZoneId={selectedZoneId}
+          sessionState={engineView.state}
+        />
+      ) : (
+        <HomeMap
+          copy={mapCopy}
+          location={location}
+          hotspots={heatmapHotspots}
+          mapZones={mapZones}
+          onController={handleMapController}
+          onTileAvailability={handleTileAvailability}
+          onZoneSelected={handleZoneSelected}
+          selectedZoneId={selectedZoneId}
+          sessionState={engineView.state}
+          tileAvailability={tileAvailability}
+        />
+      )}
 
       {engineView.state === "IDLE" || engineView.state === "RESOLVED" ? (
         <div aria-label={copy.appName} className="home-screen__brand-lockup">
@@ -677,12 +774,44 @@ export function HomeScreen({
       </div>
 
       <div className="home-screen__controls">
-        <MapControlButton
-          icon="my_location"
-          label={copy.cdRecentre}
-          onClick={() => mapControllerRef.current?.recenter()}
-        />
+        <MapControlButtonStack>
+          {/* `MAP_SPEC.md`: the toggle sits above recentre, and it is a control rather
+              than a mode switch with its own screen. Its glyph is the view she would
+              arrive at, which is also what the announcement says. */}
+          <MapControlButton
+            icon={viewMode === "WALK" ? "map" : "3d_rotation"}
+            label={copy.viewToggle}
+            onClick={handleViewToggle}
+          />
+          {/* Only in the flat map. Recentre exists because the 2D map can be panned off
+              her; the walk camera is pinned to her position and always has been, so the
+              same button here would be a control that does nothing. */}
+          {viewMode === "FLAT" ? (
+            <MapControlButton
+              icon="my_location"
+              label={copy.cdRecentre}
+              onClick={() => mapControllerRef.current?.recenter()}
+            />
+          ) : null}
+        </MapControlButtonStack>
       </div>
+
+      <p aria-live="polite" className="home-screen__announcement" role="status">
+        {announcement}
+      </p>
+
+      {customiserOpen ? (
+        <CharacterCustomiser
+          copy={copy}
+          firstRun={customiserFirstRun}
+          initial={character}
+          onCancel={() => {
+            setCustomiserOpen(false);
+            setCustomiserFirstRun(false);
+          }}
+          onSave={handleCharacterSave}
+        />
+      ) : null}
 
       <output className="home-screen__asset-count" hidden>
         {mapZones.length}:{demoZones.length}
@@ -742,6 +871,18 @@ export function HomeScreen({
           z-index: 4;
           inset-inline-end: var(--screen-padding);
           inset-block-end: var(--home-action-dock-clearance);
+        }
+
+        .home-screen__announcement {
+          position: absolute;
+          inline-size: 1px;
+          block-size: 1px;
+          margin: -1px;
+          padding: 0;
+          overflow: hidden;
+          border: 0;
+          clip-path: inset(50%);
+          white-space: nowrap;
         }
 
         .home-screen__settings {
