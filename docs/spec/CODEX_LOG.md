@@ -44,8 +44,28 @@ These are asked for elsewhere in the spec and must land in this file:
       `asia-south1`, anonymous auth only, both `com.nexaflow.saayalite` and
       `.debug` registered, `app/google-services.json` in place and gitignored)
 - [ ] T2.2: osmdroid or Google Maps, and why
-- [ ] T9.1: Telugu strings verified by the founder, yes or no
+- [x] **Walk view 2026-09-11: `three` is added to the closed dependency list**, pinned to
+      **0.185.0** with `@types/three` **0.185.4**. Bounded to `src/platform/walk/`, loaded
+      with `next/dynamic` and `ssr: false`, and it does **not** redefine `perf.bundle`. Its
+      own ceiling is the new fact `perf.bundle.walk`, 190 KB gzipped, measured against the
+      pinned version. The pin is 0.185 and not the newest because `three` ships no type
+      definitions and the newest `@types/three` is a minor behind `three`'s newest; runtime
+      and types are kept on the same minor line. Full reasoning in `BUILD_CONFIG.md` and
+      `MAP_SPEC.md`.
+- [ ] T9.1: Telugu strings verified by the founder, yes or no. **The walk view and customiser
+      strings added on 2026-09-11 are included in this and are a first pass.**
 - [ ] T9.2: raw output of V7 (the no-AI grep) and V8 (the manifest check)
+- [x] **Walk view 2026-09-11: the character is Blender-authored glTF parts, assembled at
+      runtime.** Chosen over one rig with a morph target per option (every phone would carry
+      every option) and over a fully procedural character from primitives (cannot reach the
+      reference's proportions or face, and "as close as possible" is the standing direction).
+      `three`'s `GLTFLoader` is covered by the same three bounds as `three` itself, not
+      exempted from them: same directory, same lazy chunk. It is the reason
+      `perf.bundle.walk`'s recorded measurement moved from **140 KB to 159 KB gzip**
+      (**116 KB to 132 KB brotli**), still inside the unchanged 190 KB ceiling - the fact's
+      provenance was amended rather than the value, because the ceiling did not move. Part
+      files are data assets under `perf.site.size`, not code. Full reasoning in `MAP_SPEC.md`
+      under "How the character is built".
 
 ## Entries
 
@@ -383,3 +403,35 @@ once at load; only the localized circles can begin the five-fix, 60-second, accu
 18 changed source files, reads closure and knowledge-graph integrity passed. Fresh spec, trust-
 boundary and provenance verifiers all returned no findings; the spec verifier also caught and
 closed the SVG fallback's last polygon-bounds dependency before this verdict.
+
+### Walk view spec amendment — 2026-09-11
+
+**Not a Codex task, and recorded here because the spec requires it.** This entry documents a
+change to the frozen spec pack, not work Codex performed. It is listed so the dependency
+amendment is traceable from both documents, as `BUILD_CONFIG.md` requires. The build entry
+for the walk view is written when the walk view is built.
+
+**What changed, across nine documents:**
+
+| Document | Change |
+|---|---|
+| `FEATURES.md` | **Amendment 1.** "No live unsafe-roads display" is superseded. Per-road risk returns, bounded: same dataset, same renderer, no road-level record, and the derivation stated in the UI. `SCOPE.md` shows the cut was about provenance, not the display. |
+| `graph/spec_graph.json` | **394 to 403 facts.** Three walk risk rules, `perf.bundle.walk`, and five camera and scale values. Every new value is unique in the graph, so each literal resolves to exactly one fact. |
+| `BUILD_CONFIG.md` | `three` 0.185.0 and `@types/three` 0.185.4, with the reason for the pin. |
+| `ARCHITECTURE.md` | `three` row, bounded to `src/platform/walk/`, plus `public/assets/world/` in the tree. |
+| `MOTION_SPEC.md` | The "CSS transitions and nothing else" clause is amended: the walk view's render loop is the single stated exception. The global reduced-motion rule **cannot reach WebGL**, so the walk view reads the query in JS. |
+| `MAP_SPEC.md` | The walk view: toggle, streaming, road risk, zones, character, anti-gamification, degradation order. |
+| `SCREENS.md` | S14 `WalkView` (a view, not a route) and S15 `CharacterCustomiser`. |
+| `COMPONENT_LIBRARY.md` | C13 gains the toggle as its third control; C15 `AxisPicker` and C16 `CharacterPreview`. |
+| `COPY.md` | The walk view and customiser strings, Telugu first pass. |
+| `DATA_MODEL.md` | `character` is a field on `settings`. **No new object store and no version bump**, because the upgrade handler drops every store on a mismatch. |
+
+**Two things worth flagging in the write-up.** First, five bake constants were reviewed and
+only **three** became facts; the other two are a mathematical base and a guard that was
+*measured* never to bite, so giving them fact ids would have invented product decisions that
+do not exist. Second, `perf.bundle.walk` was **measured, not guessed**: a real esbuild
+tree-shake of the walk import surface against the pinned `three`.
+
+W1 (2026-09-12): the icon subset widened from 17 to 19 glyphs for the walk view toggle (`map` `E55B`, `3d_rotation` `E84D`), which `COMPONENT_LIBRARY.md` C13 needs and the frozen subset did not carry. `ICONOGRAPHY.md` designates this a stop-and-report, so it is recorded here rather than done quietly. Recipe: the documented `pyftsubset` command re-run over `MaterialSymbolsRounded[FILL,GRAD,opsz,wght].ttf` with all 19 codepoints, all four axes kept (`FILL` 0-1, `GRAD` -50-200, `opsz` 20-48, `wght` 100-700), verified unchanged against the shipped file. Presence: 19/19 required codepoints in the shipped subset, and no codepoint in the subset that `materialSymbols.json` does not name. Output 27064 bytes, up from 24248, so 2.8 KB for two icons. **Outline equivalence was checked, not assumed:** all 17 pre-existing glyphs were compared outline-by-outline against the shipped subset with a fontTools recording pen and are byte-identical, so no icon the product already draws changed.
+
+**Upstream drift, reported rather than pinned over.** Today's upstream Material font hashes to `f1472f172c0fc4a922be22972e4752ccc54fe795ed82564ab6f6b097782f2dbc` and its codepoints file to `c18564f64d7d92dd3a6895a2c59ea69adfb56d6f553bcbbc88811c328159d715`, neither of which matches the pins recorded above for 2026-08-26. Google has revised the repository since. This is why the outline comparison matters: the codepoint assignments are stable and the artwork for the 17 shared icons is unchanged, so the drift does not affect the product. `scripts/font_check.py`'s `EXPECTED_SOURCE_SHA256` block still carries the 2026-08-26 values and needs a founder decision on whether to re-pin to today's revision or to vendor the source font. A full `font_check.py` run was not possible this session: it requires the Poppins and Noto Telugu upstreams alongside the Material one, which are unaffected by this change.

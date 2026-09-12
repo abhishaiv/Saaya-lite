@@ -10,12 +10,19 @@ Gate (no UI)
 Home
  ├─ ZoneDetailSheet (bottom sheet)
  ├─ Settings ─> About | DemoPanel
+ ├─ WalkView (a view of Home, not a route) ─> CharacterCustomiser
  └─ session overlays, driven by state, not by navigation:
       CheckIn1 (heads-up + in-app card)
       CheckIn2 (full screen, in page)
       FamilyEscalation (full screen)
       SosActive (full screen) ─> PinEntry
 ```
+
+**`WalkView` is a view, not a route.** It replaces the map surface inside Home and keeps the
+same `StatusPill`, the same bottom sheet, the same ladder and the same SOS button. It is
+toggled by a `MapControlButton`, not navigated to, so there is no back stack to get wrong and
+no way for her to end up in a view with no way out. `CharacterCustomiser` **is** a route,
+because it is a form.
 
 **Session overlays are driven by `SessionState`, never by user navigation.** She can never
 navigate away from `CHECKIN_2`, `FAMILY_ESCALATED` or `SOS_ACTIVE`. Back is consumed.
@@ -319,3 +326,64 @@ claim the app does not honour learns more from that than from the feature itself
 
 **This screen is a submission asset, not filler.** The brief scores Honesty explicitly, and
 a judge who opens About and finds the mock list already there will trust the rest.
+
+---
+
+## S14. WalkView (added 2026-09-11)
+
+**Not a route.** It replaces the map surface inside Home, keeping the `StatusPill`, the
+bottom sheet, the ladder and the SOS button exactly where they are. Full spec in
+`MAP_SPEC.md` ("The walk view").
+
+| | |
+|---|---|
+| Enter | the third `MapControlButton` (C13), or a deep link on first run only |
+| Exit | the same control. The flat map is what opens next time. |
+| Engine | `three` 0.185.0, lazy chunk, `src/platform/walk/` only |
+| Asset | `public/assets/world/world_tiled.json`, streamed per tile |
+
+**States, and each one has a way out:**
+
+| State | What she sees | Way out |
+|---|---|---|
+| loading | the ground plane in `background`, `walk_loading` | resolves on first tile, never blocks |
+| ready | the streets around her, her character, the zone tint | - |
+| no location | `walk_loc_denied`, world still renders around her last known area | turn location on and come back |
+| offline | `walk_offline`, her area still shows, streets do not stream | reconnects on its own |
+| no WebGL | `EmptyState`, and the control is **disabled rather than hidden** so the view is not a mystery | stays on the flat map |
+
+**The legend and the derivation note are part of the view, not an optional extra.**
+`walk_legend_title`, the two bands, and `walk_risk_note` render with the view. `FEATURES.md`
+Amendment 1 clause 1 requires the derivation to be stated in the UI, and clause 2 requires a
+band to be a band. Neither is a tooltip she has to find.
+
+**Session overlays render over the walk view unchanged.** While any rung is live the render
+loop is paused, so `SOS_ACTIVE` sits on a still frame. See `MOTION_SPEC.md`.
+
+**About gains no bullet for this.** The walk view adds no mock: the streets are real OSM
+geometry from the same extract, the risk is the same zone data, and the character is hers.
+Nothing in it is fabricated, so nothing is claimed in the mock list.
+
+## S15. CharacterCustomiser (added 2026-09-11)
+
+A route, because it is a form. Reached from the first switch, or from `walk_edit_character`
+in Settings afterwards.
+
+| | |
+|---|---|
+| First switch | opened automatically, **only if no character exists**. Skippable. |
+| Skipping | creates the default character and takes her into the walk view. Never leaves her in a broken view. |
+| Axes | seven: body, skin, hair, eyes, outfit, accessories, colours. **Deliberately not a fact**: the count is the length of the axis list in code, never a literal, so it needs no grounding. |
+| Control | `AxisPicker` (C15), one per axis. `CharacterPreview` (C16) above them. |
+| Save | writes to the **`settings` record**. No new object store, no IndexedDB version bump. |
+| Cancel | discards. On the first switch, cancel is `walk_first_skip` instead. |
+
+**No currency, no unlocks, no rarity, no progression.** Every option is available
+immediately. This is a form, not a shop, and the difference is the product.
+
+**`cust_stays_local` renders with the save button**, the same posture as favourites: this
+never leaves the device, and saying so costs one line.
+
+Reached from Settings, it is a normal screen with a back affordance. Reached on the first
+switch, it has no back - only `cust_save` and `walk_first_skip` - because there is nothing
+behind it to go back to.

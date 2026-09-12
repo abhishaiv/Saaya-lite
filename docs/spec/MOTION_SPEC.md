@@ -31,7 +31,13 @@ surface that visibly wobbles reads as a toy. If the overshoot is ever retuned, r
 `motion.spring.damping` first and re-derive, so the two cannot drift apart.
 
 **Do not implement a JS spring solver.** No WAAPI physics integration, no animation
-library. CSS transitions with these curves, and nothing else.
+library. Every piece of **UI chrome** - cards, sheets, banners, buttons, toasts, screens -
+moves with CSS transitions on these curves, and nothing else.
+
+**One exception, and it is bounded: the walk view's render loop.** A 3D view redraws every
+frame, which CSS cannot express and which is not a spring solver. It is scoped to
+`src/platform/walk/` and its rules are in **"The walk view"** at the foot of this file. It is
+the only exception in the product, and it changes none of the rules above it.
 
 ## Catalogue
 
@@ -86,3 +92,48 @@ because losing it would remove information rather than decoration.
 Target 60 fps on a 2 GB device. Never animate the map camera at the same time as a card
 entry. Never run more than two simultaneous spring animations. If a frame budget is at
 risk, drop the animation, never the countdown accuracy.
+
+---
+
+## The walk view
+
+**Amendment 2026-09-11.** The clause at the top of this file said "CSS transitions with these
+curves, and nothing else", which a per-frame 3D renderer cannot satisfy. Rather than leave
+that contradiction sitting in the spec, it is resolved here in the open.
+
+**What is excepted, and only this.** `src/platform/walk/` drives a `requestAnimationFrame`
+loop that redraws the 3D world. That loop is the **sole** exception in the product. It is not
+a spring solver: no physics integration, no damping simulation, no animation library, and
+`three`'s own animation helpers are not used. Camera easing, if any, is a plain lerp on the
+clock, not a solver.
+
+**What still holds, unchanged:**
+
+| Rule | In the walk view |
+|---|---|
+| The escalation accent never animates | still true. The ladder's colour is static in the 3D view exactly as over the flat map. |
+| SOS appears instantly | **the strongest form of it.** `SOS_ACTIVE` renders as a static overlay on the world, and the render loop is **paused** while any rung is live. The emergency surface is not merely un-animated; it is over a still frame. |
+| Never animate the camera at the same time as a card entry | still true. Camera motion and card entry never overlap. |
+| Never more than two simultaneous spring animations | still true. The 3D loop is not a spring, and it does not license extra UI animation. |
+| Countdowns stay `linear` | still true. The check-in ring is a UI element over the world and is unchanged. |
+
+### Reduced motion, which the global rule does not reach
+
+The `@media (prefers-reduced-motion: reduce)` block above sets `animation-duration` and
+`transition-duration`. It has **no effect on a WebGL canvas**, because nothing in a canvas is
+a CSS transition. Left at that, a user who switched motion off would still get a full-motion
+3D view - the exact thing the rule exists to prevent. So the walk view reads the same query in
+JS, live rather than once, and under it:
+
+1. **Ambient motion stops.** No idle bob, no sway, no drifting props, no camera easing.
+2. **The world still renders**, because it is information rather than decoration - the same
+   reason the countdown ring survives the global rule. It redraws on change, not on a loop.
+3. **Her position still updates**, because that is the point of the view.
+4. The `matchMedia` listener is attached on mount and removed on unmount.
+
+### Performance
+
+The walk view targets the same 60 fps and the same `perf.frame` 32 ms ceiling as everything
+else. It is a lazy chunk (`perf.bundle.walk`, 190 KB gzipped). If it cannot hold the frame
+budget, **draw distance drops before anything else does** - the same bias as the flat map,
+where tiles drop before zones do.

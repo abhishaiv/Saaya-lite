@@ -258,3 +258,62 @@ its picture. These are the strings. A `contentDescription` that names an icon
 | `loc_slow` | This is taking longer than usual. Check that location is on. | ఇది మామూలు కంటే ఎక్కువ సమయం తీసుకుంటోంది. లొకేషన్ ఆన్‌లో ఉందో చూడండి. |
 | `loc_last_known` | Last known, %1$s ago | చివరిగా తెలిసినది, %1$s క్రితం |
 | `map_offline` | Map offline, zones still work | మ్యాప్ ఆఫ్‌లైన్, జోన్‌లు ఇంకా పనిచేస్తాయి |
+
+## The walk view
+
+Added 2026-09-11. Same voice rules. **Telugu below is a first pass and needs the same native
+review as the rest of this file before E9.**
+
+Two things this section must get right. First, `FEATURES.md` Amendment 1 requires the view to
+**state that per-road risk is derived from zone data**, in the UI, in her words. Second, no
+string here may imply a count for a single street. A band is a band.
+
+### The toggle
+
+| Key | English | తెలుగు |
+|---|---|---|
+| `view_toggle` | View | వ్యూ |
+| `view_flat` | Map view | మ్యాప్ వ్యూ |
+| `view_walk` | Walk view | వాక్ వ్యూ |
+| `ann_view_walk` | Walk view. You can switch back any time. | వాక్ వ్యూ. ఎప్పుడైనా తిరిగి మారవచ్చు. |
+| `ann_view_flat` | Map view. | మ్యాప్ వ్యూ. |
+
+### In the walk view
+
+| Key | English | తెలుగు |
+|---|---|---|
+| `walk_legend_title` | Street shading | వీధి షేడింగ్ |
+| `walk_legend_low` | Fewer records | తక్కువ రికార్డులు |
+| `walk_legend_high` | More records | ఎక్కువ రికార్డులు |
+| `walk_risk_note` | Shading follows the area's records, faded from where incidents cluster. It is not a count for any one street. | షేడింగ్ ఆ ప్రాంతపు రికార్డుల ఆధారంగా ఉంటుంది, ఘటనలు ఎక్కువగా జరిగిన చోటి నుంచి క్రమంగా తగ్గుతుంది. ఇది ఏ ఒక్క వీధికీ సంఖ్య కాదు. |
+| `walk_loc_denied` | The walk view needs your location. Turn it on and come back. | వాక్ వ్యూకు మీ లొకేషన్ కావాలి. దాన్ని ఆన్ చేసి తిరిగి రండి. |
+| `walk_loading` | Building the streets around you | మీ చుట్టూ ఉన్న వీధులను తయారు చేస్తున్నాం |
+| `walk_offline` | Streets will not load without a connection. Your area still shows. | కనెక్షన్ లేకుండా వీధులు లోడ్ కావు. మీ ప్రాంతం ఇంకా కనిపిస్తుంది. |
+| `walk_edit_character` | Change your character | మీ పాత్రను మార్చండి |
+
+### First switch, and the customiser
+
+She is asked once, on the first switch, and only if no character exists. If she skips, a
+default is created and she can edit it later. **Nothing here is a reward, an unlock or a
+rarity.**
+
+| Key | English | తెలుగు |
+|---|---|---|
+| `walk_first_title` | Make a character | ఒక పాత్రను తయారు చేయండి |
+| `walk_first_body` | This is you in the walk view. You can change any of it later. | వాక్ వ్యూలో ఇది మీరే. వీటిలో ఏదైనా తర్వాత మార్చుకోవచ్చు. |
+| `walk_first_cta` | Make one | తయారు చేయి |
+| `walk_first_skip` | Use a default | డిఫాల్ట్ వాడు |
+| `cust_title` | Your character | మీ పాత్ర |
+| `cust_axis_body` | Body | శరీరం |
+| `cust_axis_skin` | Skin | చర్మం |
+| `cust_axis_hair` | Hair | జుట్టు |
+| `cust_axis_eyes` | Eyes | కళ్లు |
+| `cust_axis_outfit` | Outfit | దుస్తులు |
+| `cust_axis_accessories` | Accessories | ఉపకరణాలు |
+| `cust_axis_colours` | Colours | రంగులు |
+| `cust_none` | None | ఏదీ లేదు |
+| `cust_save` | Save | సేవ్ చేయి |
+| `cust_cancel` | Cancel | రద్దు చేయి |
+| `cust_reset` | Start again | మళ్లీ మొదలుపెట్టు |
+| `cust_stays_local` | This stays on your phone. | ఇది మీ ఫోన్‌లోనే ఉంటుంది. |
+| `ann_cust_saved` | Character saved | పాత్ర సేవ్ అయింది |

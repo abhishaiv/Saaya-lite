@@ -25,8 +25,10 @@ src/
     components/           shared components
     screens/              one directory per screen
   platform/               the browser edge: geolocation, wake lock, timers, visibility
+    walk/                 the walk renderer. three.js is imported here and nowhere else.
   util/                   clock, formatters, locale
 public/assets/            the three Vizag files, fonts, icons
+  world/                  world_tiled.json: the walk view's geometry, streamed per tile
 ```
 
 `src/platform/` is the only place a browser API may be called outside `app/`. It exists so
@@ -92,11 +94,34 @@ Runtime, pinned in `BUILD_CONFIG.md`:
 | `next`, `react`, `react-dom` | framework and UI |
 | `typescript` | language |
 | `leaflet` | map rendering with OpenStreetMap Standard tiles. **Decided, see `MAP_SPEC.md`.** |
+| `three` | the walk view's 3D renderer. **Amendment 2026-09-11, see `MAP_SPEC.md`.** Lazy-loaded, `src/platform/walk/` only. |
 | `idb` | IndexedDB wrapper: local persistence |
 
-Dev only: `@types/node`, `@types/react`, `@types/react-dom`, `@types/leaflet`, `vitest`,
+Dev only: `@types/node`, `@types/react`, `@types/react-dom`, `@types/leaflet`, `@types/three`, `vitest`,
 `eslint`, `eslint-config-next`. These are required by gates G2 and G3 and by
 `strict: true`; they ship nothing to the browser.
+
+**`three` is the first addition to this list since the web pivot**, and it is bounded on
+three sides so it cannot become a second architecture:
+
+1. **One directory.** Imported in `src/platform/walk/` and nowhere else. A `WebGLRenderer`
+   is a browser API, and `src/platform/` is already the only place those are allowed outside
+   `app/`. The rule is unchanged; the walk view just lives inside it.
+2. **One chunk.** Loaded with `next/dynamic` and `ssr: false`. It never enters the initial
+   bundle, so `perf.bundle` (200 KB, initial chunk) is untouched. Its own ceiling is
+   `perf.bundle.walk`.
+3. **No engine contact.** The walk view reads zones and writes nothing. It cannot emit a
+   command, cannot reach a repository that uploads, and cannot touch the trust boundary. A
+   SUS record still snaps to its zone with no session id, whatever view she is looking at.
+   `FEATURES.md` Amendment 1 states this in the product's own words.
+
+**`three`'s `GLTFLoader` is covered by the same three bounds, not exempted from them.** The
+character is Blender-authored glTF assembled at runtime (decided 2026-09-11, `MAP_SPEC.md`),
+so the loader is imported in the same directory, ships in the same lazy chunk, and is the
+reason `perf.bundle.walk`'s recorded measurement includes it: **159 KB gzip / 132 KB brotli
+against the 190 KB ceiling**. The character's part files are **data assets, not code** - they
+sit in `public/assets/character/` and count against `perf.site.size` with the world tiles.
+No loader, and no part, may be imported from anywhere outside `src/platform/walk/`.
 
 **Map choice is decided: Leaflet with OpenStreetMap Standard tiles.** The CARTO endpoint
 was retired on 2026-08-28 after it served a visible API-key watermark as a successful tile.

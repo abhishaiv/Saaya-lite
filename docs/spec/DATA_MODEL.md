@@ -210,8 +210,24 @@ It is still never stored in plaintext.
 | `user_name` | her own name, for the family message subject. **Device only, never uploaded.** Absent is valid. |
 | `language` | `en` \| `te` |
 | `onboarded` | Boolean |
+| `character` | the walk view's character: seven axis selections, **fixed option ids**, each resolving to a glTF part file in `public/assets/character/`. **Device only, never uploaded.** Absent is valid, and means the default. |
 
 **Never store the PIN in plaintext, never log it, never put it in a crash trace.**
+
+**`character` goes in `settings` and must not get its own object store.** Recorded
+2026-09-11 with the walk view. The upgrade handler below is destructive by design, and it
+drops and recreates **every** store on a version mismatch. A `character` store would mean
+version 2, and a version 2 would wipe `session`, `session_event`, `queued_event`, `contact`
+and `settings` on the way in - her favourites, her PIN hash, and any session in flight. The
+character is not worth that, and it is not a reason to hand-write a migration in a
+nine-evening build. It is a field on the record that is already there.
+
+**Ids, not values, and that is a correctness choice.** A stored id either names a part file
+that exists or it does not, so a character saved against an older part list fails to resolve
+and is rejected, rather than rendering as a silent default that looks like her choice but is
+not. It also keeps the record small and makes it obvious when the part set has changed.
+`MAP_SPEC.md` holds the assembly rule; the axis lists are generated from the files present,
+so the record and the art cannot drift apart.
 
 ---
 

@@ -68,6 +68,24 @@ rather than widening the subset quietly.
 | `lock.fill` | `lock` | PIN |
 | `info.circle.fill` | `info` (`E88E`) | C7 zone detail, and any inline explanation |
 
+**Added 2026-09-12: the walk view toggle.** Two icons, both with no iOS counterpart, because
+the walk view is a web-platform amendment rather than an iOS port. The subset went from 17 to
+19 glyphs for them; the recipe below was re-run and `CODEX_LOG.md` carries the evidence.
+
+**The icon shows the view she would arrive at, not the one she is in.** `MAP_SPEC.md` lists
+the pair as "View (`map` / `3d_rotation`)" without assigning a direction, and this is the
+direction that agrees with the rest of the control: an accessible name of `view_toggle` with
+`ann_view_walk` / `ann_view_flat` announced on arrival both describe the destination, and a
+button whose glyph described the current view while its announcement described the target
+would say two different things at once.
+
+| Icon | Used for |
+|---|---|
+| `3d_rotation` (`E84D`) | the toggle while the **flat map** is showing, because the walk view is where it goes |
+| `map` (`E55B`) | the toggle while the **walk view** is showing, because the flat map is where it goes |
+
+Both are utility, so both render at fill 0, per the fill rule above.
+
 ## Sizes
 
 | Context | Size |

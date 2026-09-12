@@ -201,6 +201,19 @@ button. Vertically centred in the available space, never top-aligned.
 48 x 48 px, radius 14 px, fill `cardFill` @ 92%, 24 px icon in `textPrimary`.
 Stacked vertically on the right with 12 px gaps.
 
+Three of them, in this order, top to bottom. The third is the walk view toggle added
+2026-09-11, and it is **a control, not a mode switch with its own screen** - the sheet, the
+ladder and the SOS button are unchanged around it.
+
+| # | Icon | Label | Action |
+|---|---|---|---|
+| 1 | `my_location` | Recentre | recentre the map |
+| 2 | `visibility` | What the police see | opens `PoliceView` |
+| 3 | `map` / `3d_rotation` | View | toggles flat and walk. Icon shows the view she would switch **to**. |
+
+The toggle carries `view_toggle` as its accessible label and announces on change
+(`ann_view_walk`, `ann_view_flat`). It is the only control whose icon changes with state.
+
 ---
 
 ## C14. `ArmBanner`
@@ -212,3 +225,51 @@ content stays available in the bottom sheet afterwards.
 
 Copy comes from `COPY.md` `home_arm_banner_*`, and must name the zone and the hour and say
 she did nothing.
+
+---
+
+## C15. `AxisPicker`
+
+The character customiser's one control, used seven times, once per axis. Added 2026-09-11.
+
+**A fixed list of options, horizontally scrollable. No sliders, no free colour picker, no
+numeric stepper.** Every option in the list is one the art actually supports, so every
+combination she can reach is one that renders correctly. A slider would let her build a
+character the rig cannot draw.
+
+| | |
+|---|---|
+| Row height | 56 px |
+| Swatch | 44 x 44 px, radius 14 px |
+| Gap | `dim.target.gap` 8 px, so adjacent targets stay separable |
+| Selected | 2 px `brand` ring, `dim.pin.border.width` |
+| Label | `cust_axis_*`, `caption`, above the row |
+| Optional axes | carry a `cust_none` option. Accessories is the only one that needs it. |
+
+Scrolls horizontally with snap. **The selected option is always scrolled into view on open**,
+so the row never appears empty.
+
+Keyboard and switch access: the row is a single tab stop, arrows move within it, and the
+selection is announced. It is not seven tab stops per axis.
+
+---
+
+## C16. `CharacterPreview`
+
+The character, rendered live, above the axis rows. Added 2026-09-11.
+
+| | |
+|---|---|
+| Size | 180 px tall, centred |
+| Render | the same rig the walk view uses, in `src/platform/walk/`: the glTF parts in `public/assets/character/`, assembled |
+| Motion | a slow idle turn. **Stops under `prefers-reduced-motion`** - see `MOTION_SPEC.md`. |
+| Option lists | **generated from the part files present**, not hand-written. An option with no file is a combination she could pick and the view could not draw. |
+| Fallback | if WebGL is unavailable, a static 2D portrait per axis combination is **not** provided. Show `EmptyState` with `walk_loc_denied`-style copy and let her save anyway. |
+
+The preview must be the **same** renderer as the walk view, not a second implementation. Two
+renderers is two things to keep in sync, and the one she sees while choosing is the one that
+has to be honest about what she will get.
+
+**A change to an axis swaps one part and re-assembles.** It does not reload the whole
+character, and it does not re-fetch a file already loaded for this session. Switching back to
+a previously chosen option is instant, because the part is already in memory.

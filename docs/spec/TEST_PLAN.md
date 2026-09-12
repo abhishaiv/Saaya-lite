@@ -168,31 +168,60 @@ the output into the write-up.
 
 ---
 
-## Gate G6's own regression test
+## Layer 5: the walk view (added 2026-09-11)
 
-The grounded checker is the mechanism behind a submission claim, so it gets a test like any
-other load-bearing code. Run it whenever `grounded_check.py` changes:
+**Most of this is Layer 1, and deliberately so.** The walk view's load-bearing logic is
+arithmetic on numbers, not rendering, and it runs under `vitest` in node with **no jsdom** -
+the same constraint the rest of this file works under. The GPU is not needed to prove the
+risk rule is right.
 
-```bash
-python3 scripts/grounded_check.py test/grounded_fixture.ts   # must exit 1
-python3 scripts/grounded_check.py --explain test/grounded_fixture.ts
-```
+### `walkRisk.test.ts` (pure, no browser, no GPU)
 
-The fixture covers every literal form real React code uses. It exists because the original
-pattern required a non-word, non-dot character after a number, which matched **none** of
-`16.px`, `0.75f`, `14.px` or `1_000` — so the gate was effectively inert against real TypeScript
-and would have passed anything. Found on 2026-08-19 while self-testing a different fix.
+| Test | Assertion |
+|---|---|
+| Risk is the zone's density | for a point inside one zone, risk is that zone's `total_cases / area_km2`, normalised by the stated log ramp |
+| Falloff | risk decreases with distance from the incident centre, over `walk.risk.falloff_m` |
+| **The floor holds** | a road at the far edge of a zone **never** falls below `walk.risk.falloff_floor` of its zone's value. This is the test that keeps `FEATURES.md` Amendment 1 clause 2 true: no road is drawn safer than the zone it sits in. |
+| Worst zone wins | a road crossing two zones takes the higher, per `walk.risk.zone_rule`. Not the first, not the average. |
+| Outside every zone | risk is zero, not undefined and not a crash |
+| **No count is ever produced** | the derivation returns a band position only. There is no code path that yields a count, a rate or an incident number per road. Amendment 1 clause 2, asserted rather than trusted. |
 
-| Form | Example | Must |
-|---|---|---|
-| React dimension | `16.px` | be read as 16 |
-| React type size | `14.px` | be read as 14 |
-| Decimal | `0.75`, `13` | be read as 0.75, 13 |
-| Underscored | `6_371_008.8` | be read as 6371008.8 |
-| ARGB colour | `0xffa78bfa` | normalise to `#A78BFA` |
-| Invented | `0.37`, `#123456` | be **flagged** |
-| Structural | `2` | be skipped |
-| Exempted | `7 // GROUNDED-EXEMPT: stride` | be skipped |
+### `worldTile.test.ts` (pure)
+
+The tiler's seam fix is only correct if it can be proved, and it can be, without a renderer:
+
+| Test | Assertion |
+|---|---|
+| Delta decode | a quantised delta path decodes to the same metres the encoder was given |
+| Round trip | encode then decode is lossless to the stated 0.25 m quantum |
+| **Seams join** | for a road crossing a tile boundary, the last vertex of the fragment in tile A and the first of the fragment in tile B **are the same point in world space**. This is the regression test for the bug that stored each road whole in one tile. |
+| Nothing is lost | every feature in `world_raw.json` appears in at least one tile |
+| Tile size comes from meta | the decoder reads `meta.tileM` and never assumes 1024 |
+
+### `character.test.ts` (pure)
+
+| Test | Assertion |
+|---|---|
+| Round trip | a character serialises into the `settings` record and back |
+| **Absent is valid** | a `settings` record with no `character` field loads the default rather than throwing. Existing installs have no character. |
+| Every axis selection is in range | a selection outside the fixed option list is rejected, not clamped silently |
+| **No version bump** | the character write does not open a second database, does not bump the version, and cannot reach a store other than `settings` |
+
+### Layer 2 additions (real mobile browser, G8)
+
+| Test | Assertion |
+|---|---|
+| Toggle | the third control switches flat and walk, and back, without losing sheet, ladder or SOS state |
+| **SOS over the world** | with any rung live, the render loop is **paused**. Asserted by frame count, not by eye. |
+| **Reduced motion reaches WebGL** | with `prefers-reduced-motion: reduce`, ambient motion stops and the world still renders. This is the gap the global CSS rule cannot cover, so it gets its own test. |
+| Location denied | the world renders around her last known area and the view is not blank |
+| No WebGL | the control is disabled rather than hidden, and the flat map still works |
+| Frame budget | no frame over `perf.frame` 32 ms while walking |
+
+**What is not tested, and why.** The character's visual quality and the world's look are not
+assertable. They are verified by eye against the reference, which is what the founder's
+"as close as possible" direction actually asks for, and pretending a test covers it would be
+worse than saying so.
 
 ---
 
@@ -223,3 +252,39 @@ and would have passed anything. Found on 2026-08-19 while self-testing a differe
 | Exempted | `7 // GROUNDED-EXEMPT: stride` | be skipped |
 
 ---
+
+## Gate G6's own regression test
+
+The grounded checker is the mechanism behind a submission claim, so it gets a test like any
+other load-bearing code. Run it whenever `grounded_check.py` changes:
+
+```bash
+python3 scripts/grounded_check.py test/grounded_fixture.ts   # must exit 1
+python3 scripts/grounded_check.py --explain test/grounded_fixture.ts
+```
+
+The fixture covers every literal form real React code uses. It exists because the original
+pattern required a non-word, non-dot character after a number, which matched **none** of
+`16.px`, `0.75f`, `14.px` or `1_000` — so the gate was effectively inert against real TypeScript
+and would have passed anything. Found on 2026-08-19 while self-testing a different fix.
+
+| Form | Example | Must |
+|---|---|---|
+| React dimension | `16.px` | be read as 16 |
+| React type size | `14.px` | be read as 14 |
+| Decimal | `0.75`, `13` | be read as 0.75, 13 |
+| Underscored | `6_371_008.8` | be read as 6371008.8 |
+| ARGB colour | `0xffa78bfa` | normalise to `#A78BFA` |
+| Invented | `0.37`, `#123456` | be **flagged** |
+| Structural | `2` | be skipped |
+| Exempted | `7 // GROUNDED-EXEMPT: stride` | be skipped |
+
+---
+
+## Appendix: what the walk view added to this file, 2026-09-11
+
+| Change | Detail |
+|---|---|
+| Fixed a duplicate | `## Gate G6's own regression test` appeared **twice**, with the second copy's eight fixture rows identical to the first. Removed the second copy. Pre-existing, unrelated to the walk view, found while editing. |
+| Moved to an appendix | It sat mid-document, straight after Layer 4, which read as though it were a sixth layer. It tests a build tool rather than the product, so it now sits at the foot with its own heading. |
+| Added Layer 5 | The walk view's tests. Mostly Layer 1, because its logic is arithmetic. |

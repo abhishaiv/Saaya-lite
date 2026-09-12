@@ -164,3 +164,258 @@ There are deliberately no map labels over the localized circles. The map’s str
 remain the orientation layer; tapping a circle reveals its parent locality in the existing
 detail sheet. This keeps the safety surface legible at city scale without inventing a label
 placement system that would obscure the actual hotspots.
+
+---
+
+# The walk view
+
+**Amendment 2026-09-11.** A second view of the same surface, toggled from the first. The
+flat map stays the default and stays the reference; this is an alternative she can switch to
+and switch back from at any time. Founder direction: as close as possible to a
+location-based game's feel, "maybe even better looking and feeling".
+
+**This is a second view, not a second product.** Every rule below exists to keep it that way.
+
+## The toggle
+
+A third `MapControlButton` in the right-edge stack, above recentre:
+
+1. Recentre (`my_location`)
+2. What the police see (`visibility`)
+3. **View** (`map` / `3d_rotation`) - toggles flat and walk
+
+It is a control, not a mode switch with its own screen. The sheet, the ladder, the countdown
+and the SOS button are all still there in the walk view, unchanged. She is never in a
+different app.
+
+**State is not persisted as a preference across sessions beyond the current one.** The flat
+map is what opens. See `SCREENS.md`.
+
+## Engine: three.js, lazy, one directory
+
+| | |
+|---|---|
+| Library | `three` 0.185.0, pinned in `BUILD_CONFIG.md` |
+| Types | `@types/three` 0.185.4 |
+| API key | **none** |
+| Billing | **none** |
+| Imported in | `src/platform/walk/` **only** |
+| Loading | `next/dynamic`, `ssr: false`, never in the initial chunk |
+| Ceiling | `perf.bundle.walk`, 190 KB gzipped |
+
+`three` is a browser API consumer, so it lives in `src/platform/`, which is already the only
+place a browser API may be called outside `app/`. The React screen holds a canvas ref and
+hands it to the platform module. **Do not import `three` from `src/ui/`.**
+
+The measured tree-shaken chunk for this import surface is 140 KB gzipped on 0.185.0, so the
+ceiling has real headroom for the runtime and the customiser. If it is exceeded, the fix is
+to import less of `three`, not to raise the fact.
+
+## The world asset
+
+`public/assets/world/world_tiled.json`, built by the bake in `/Users/abhishai/saaya-lite-world/`
+(`fetch.py` -> `bake2.py` -> `tile.py`). It is **derived from the same OSM extract and the
+same frozen `vizag_heatmap.geojson`** as the flat map. It is not a second dataset, which is
+what makes the per-road risk lawful - see `FEATURES.md` Amendment 1.
+
+```
+70 tiles, 13 x 10 grid, 1024 m per tile
+  roads      5682 fragments   (751 roads split across seams, 0 lost)
+  buildings 12690 fragments   (406 split, 0 lost)
+  green       220 fragments
+  water        28 fragments
+whole world  1,146 KB raw / 277 KB gzipped
+sum of per-tile gzip  296 KB   <- what she actually downloads, streamed
+median tile  1.6 KB gzipped
+```
+
+Coordinates are projected metres relative to `17.7217 N, 83.3071 E`, quantised to 0.25 m
+inside each tile's own origin and stored as signed deltas. **The tile size is read from
+`meta.tileM`, never hardcoded.** Every feature is clipped to each tile it touches, so
+fragments join seamlessly and no road ends at a seam.
+
+Building heights are the stated storey rule at **3.2 m per storey**, from real
+`building:levels` where OSM has it and a type table where it does not. Heights are therefore
+honest, not invented, and the character at `walk.character.height` scales against them
+correctly.
+
+## Streaming
+
+Tiles load around her, not all at once. She is in exactly one tile; keep that tile and the
+ring around it resident, and drop the rest.
+
+| | |
+|---|---|
+| Resident window | her tile plus the 2-tile ring around it |
+| Drop | anything outside it, with a short grace period so a boundary walk does not thrash |
+| Decode | off the render thread where the browser allows it |
+| Budget | never more than one tile decoded per frame |
+
+A tile that has not arrived is **not** a hole in the world. The ground plane renders in the
+`background` colour underneath, exactly as the flat map renders zones over `#0B0B0F` with no
+tiles. The same rule as `map.tile.timeout`: **the walk view never blocks on geometry.**
+
+## Roads, and the one thing that must not drift
+
+Road risk is the feature the founder asked for - "all the crime hotspots and unsafe roads are
+shown to us intuitively" - and it is the feature `FEATURES.md` cut. Amendment 1 restored it
+with a bound. The bound is binding here:
+
+| | |
+|---|---|
+| Source | the road's own zone: `total_cases / area_km2`, the same density the flat map colours zones with |
+| Falloff | risk fades from the zone's incident centre over `walk.risk.falloff_m` (1400 m) |
+| Floor | never below `walk.risk.falloff_floor` (0.35) of the zone's value, so no road is drawn safer than its zone |
+| Which zone | the **worst** zone the road touches - `walk.risk.zone_rule` |
+| Rendered as | a band on the road surface. **A band, never a count, never a rate, never a number of incidents.** |
+| Labelled | the view states in the UI that per-road risk is derived from zone data |
+
+**What this must never become.** No road-level claim enters `STATE_MACHINE.md`, the escalation
+ladder, or any SUS record. A SUS record still snaps to its zone and carries no session id.
+This is `FEATURES.md` Amendment 1 clause 3 and it is not negotiable in implementation.
+
+Roads are drawn as flat ribbons on the ground plane at the tile's own resolution. Class from
+`highway`, so a trunk road reads as a trunk road.
+
+## Zones in 3D
+
+The same 19 non-`SAFE` polygons, the same colours, the same rule that `SAFE` zones are never
+drawn. The existing facts are reused rather than re-chosen: `map.zone.stroke` 1.5,
+`map.zone.stroke.sel` 3, `map.zone.glow` 6, `alpha.map.zone.glow` 0.15.
+
+| Layer | Treatment |
+|---|---|
+| Fill | the zone's own colour at its own opacity, laid on the ground plane |
+| Boundary | a line at the zone edge, so the boundary is legible from a low camera |
+| Selected | stroke to `map.zone.stroke.sel`, fill opacity raised by `alpha.map.zone.selected.raise` |
+| Label | `area_name` from `zone_info_cards.json`, joined on `station_id`. **Never `station_name`** - the same rule as the flat map, for the same reason. |
+
+**No vertical extrusion of zones.** A translucent wall rising out of the ground would read as
+a fence, which is a different and worse claim than "this area is higher risk". The zone is a
+tint on the ground and a line at its edge.
+
+## The character
+
+She is the subject of the view. Height `walk.character.height` (1.7 m), walking at
+`walk.speed` (1.4 m/s), driven by live GPS at the rate `SetLocationSampling` already sets.
+
+**Her position is real; her motion is interpolated.** GPS arrives at intervals, so the
+character eases between fixes rather than teleporting. Under `prefers-reduced-motion` she
+snaps to the fix instead - see `MOTION_SPEC.md`.
+
+### How the character is built
+
+**Decision 2026-09-11: Blender-authored parts, assembled at runtime.** The character is not
+one mesh with a morph target per option, and it is not built from Three.js primitives. It is
+a small set of glTF files, one per option, loaded and assembled into a single rig when a
+character is created or loaded.
+
+**Why parts and not morph targets.** A morph target per option means every phone downloads
+every option, whether or not she chose it. With parts, a choice costs nothing to the phones
+that did not make it, and the axis lists can grow without the asset growing for anyone who
+did not use the new entry.
+
+**Why Blender and not primitives.** The reference's character reads as *cute* because of its
+proportions and its face, and that is modelling work. Primitives produce something stylised
+and legible, but "as close as possible" is the standing direction, and it is not reachable
+from spheres and capsules.
+
+**The axis option id is the part id.** `DATA_MODEL.md` records seven selections as **fixed
+option ids**, and an id resolves to a file. This is why the record stores ids rather than
+values: an id either names a part that exists or it does not, so a selection from a stale
+list is rejected instead of rendering as a silent default.
+
+| | |
+|---|---|
+| Parts | Blender, exported glTF, one file per option |
+| Loader | three's `GLTFLoader`, imported in `src/platform/walk/` only |
+| Assembly | swap the part, keep the rig. No skinning per combination, no morph targets. |
+| Shared with | the customiser's `CharacterPreview` (`COMPONENT_LIBRARY.md` C16) - **the same assembled rig**, never a second implementation |
+| Cost | data assets, not JS. They fall under `perf.site.size` alongside the world tiles, not under `perf.bundle.walk`. |
+| Bundle | the loader is **the reason `perf.bundle.walk`'s measurement includes it**: 159 KB gzip / 132 KB brotli with it, against the 190 KB ceiling. Measured 2026-09-11, recorded in `graph/spec_graph.json`. |
+
+**Every option in an axis list must have a part that exists.** An axis option with no
+corresponding file is a combination the customiser would offer and the view could not draw,
+which is exactly what the fixed-list rule in `COMPONENT_LIBRARY.md` C15 exists to prevent.
+The customiser's option lists are generated from the parts present, so the two cannot drift.
+
+### The customiser, and the first switch
+
+**The first time she switches to the walk view, and only if no character exists yet, she is
+asked to make one.** Not a modal she cannot dismiss into a broken view: if she skips, a
+default character is created and she can edit it later.
+
+Seven axes. Each is a fixed list of options, no sliders and no free colour picker, so every
+combination is one the art actually supports:
+
+| Axis | Notes |
+|---|---|
+| Body | build and height within the stated range |
+| Skin | a fixed set of tones |
+| Hair | style, and its own colour axis |
+| Eyes | shape and colour |
+| Outfit | top and bottom |
+| Accessories | glasses, bag, scarf - optional, skippable |
+| Colours | the palette applied to outfit and accessories |
+
+**Character data lives in the `settings` record, not its own object store.** `DATA_MODEL.md`
+is version 1 and its upgrade handler **deletes every object store on a version mismatch**, so
+a `character` store would wipe favourites, the PIN hash and any in-flight session. There is no
+version bump for this feature.
+
+**The customiser is a screen, not a game shop.** No currency, no unlocks, no rarity, no
+progression. Every option is available immediately.
+
+## Anti-gamification, stated because it is the risk
+
+The reference is a location-based game. **The mechanics are not.** The founder's own brand
+rules are the reason, and they survive this amendment:
+
+- **No points, no streaks, no rewards, no levels.** Nothing accumulates.
+- **No collectibles and no discoverables.** There is nothing to find in a high-risk zone.
+- **No other players.** No avatars, no leaderboards, no sharing a position. `FEATURES.md`:
+  no live location sharing exists, absent rather than disabled.
+- **No "safe route" scoring.** We do not rate a journey as good or bad. We show where risk
+  is and she decides.
+- **The character is a representation of her**, not a game avatar. Nothing about it is
+  earned or improved.
+
+If a mechanic would make a safety view rewarding to spend time in, it is out. **This is the
+line between a view she opens and a game she plays**, and the product is the former.
+
+## SOS over the world
+
+The strongest statement in the motion spec, restated here because this is where it could
+break:
+
+**While any rung of the ladder is live, the render loop is paused.** `SOS_ACTIVE` renders as
+a static overlay on a still frame. Not a dimmed world, not a slow-motion world, not a world
+still ticking behind a scrim. A still image under an instant, static emergency surface.
+
+The escalation accent never animates here either.
+
+## Performance
+
+| Budget | Value |
+|---|---|
+| Frame rate | `perf.fps` 60 on a 2 GB device |
+| No frame over | `perf.frame` 32 ms |
+| Lazy chunk | `perf.bundle.walk` 190 KB gzipped |
+| World, streamed | 296 KB gzipped across the whole world; a handful of tiles in flight at once |
+
+**Degradation order, and it is fixed:** draw distance drops first, then tile detail, then
+ambient motion. **The risk bands and her position never degrade**, for the same reason the
+flat map drops tiles before zones: the safety information is the product, the scenery is
+context.
+
+## Why not the alternatives
+
+| Option | Why not |
+|---|---|
+| Unity or Godot via WebGL export | The reference is built on Unity, but the export is tens of megabytes before any content and needs a different build pipeline. `perf.bundle.walk` and the whole nine-evening window rule it out. |
+| A 2D top-down sprite view | Much cheaper and would run anywhere, but it is a map with a sprite on it. It does not deliver the thing that was asked for. |
+| Pre-baked 3D tiles from Blender | Considered and dropped: baking every tile to a mesh makes the asset far larger and freezes the styling, while runtime extrusion from the same quantised vertices costs a fraction and lets the palette stay in code where it is testable. |
+| MapLibre GL with a 3D extrusion layer | Free and vector, and it does extrusion well. Rejected because it cannot carry a character, a walk loop or the ground-level framing that makes this a different view rather than a different renderer. |
+| One rig with a morph target per option | Every phone would download every option, chosen or not, and the asset grows with the axis lists. Parts cost nothing to the phones that did not make the choice. See "How the character is built". |
+| A fully procedural character from primitives | No Blender, smallest bundle, one renderer. Rejected because it cannot reach the reference's proportions or face, and "as close as possible" is the standing direction. |
+| Baking the world to meshes in Blender | Superseded on the same reasoning as the row above: the world is extruded at runtime from the tiled vertices, so there is no Blender mesh pipeline for the world. Blender is used for the character, where modelling is the point, and not for the world, where it is not. |

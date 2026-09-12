@@ -141,10 +141,47 @@ Without this stage there is no product, only an engine. Nobody installs an engin
 
 - **No AI or model anywhere**, in the product or behind it. Every decision is a stated rule.
 - No on-device audio, motion or threat detection. That is full Saaya.
-- No live unsafe-roads display. Heat-zone markings only.
+- No live unsafe-roads display **from a separate dataset**. Heat-zone markings stay, and the
+  walk view samples that same zone data per road. **See Amendment 1** at the foot of this
+  file for the bound on that.
 - No live location sharing to contacts. Safetipin built it and removed it because it
   becomes control in the Indian family context. Lite does not contact favourites at all: it
   only shows the local message preview that a future delivery system would use.
 - No evidence capture, no watch app, no fake call.
 - No connection to any live government system, and no government logos or branding.
 - No real personal data. Every demo contact, name and incident is synthetic.
+
+---
+
+## Amendment 1 - per-road risk in the walk view
+
+**2026-09-11, founder ruling.** This supersedes the earlier line "No live unsafe-roads
+display. Heat-zone markings only." It is a deliberate, recorded amendment, not a bypass.
+
+`SCOPE.md` states the reason that line was cut: *"Founder decision. Separate dataset and
+rendering path. Heat-zone markings stay."* The reason was **provenance**, not the display.
+A road-level view was out because it implied a second dataset about roads and a second way
+of drawing them.
+
+The walk view adds neither.
+
+| What the cut guarded against | What the walk view does |
+|---|---|
+| A separate road dataset | No new data. `public/assets/vizag_heatmap.geojson` is the only input, the same frozen file that already colours the flat map. |
+| A separate rendering path | One renderer, one tiled asset, inside the same app. There is no second map. |
+| Road-level police intelligence | Road risk is **arithmetic on the zone the road sits in**: the same jurisdiction density, faded from the incident centre. Nothing is measured per road because nothing is recorded per road. |
+
+**The bound, and it is binding.** Road risk is interpolated, not recorded, so it must never
+be presented as a road-level record:
+
+1. The walk view states in the UI that per-road risk is derived from zone data. Same rule as
+   every other mock in this build: labelled, never implied.
+2. A risk band is a band. Never a count, a rate, or a number of incidents on a street.
+3. No road-level claim enters `STATE_MACHINE.md`, the escalation ladder, or any SUS record.
+   A SUS record still snaps to its zone and carries no session id. This amendment changes
+   what she sees. It changes nothing about what leaves her phone.
+4. The falloff constants are product rules, not measurements. They carry fact ids in
+   `graph/spec_graph.json`, and the spec says plainly that they are stated.
+
+**Unchanged by this amendment:** no live police feed, no live incident reporting, no
+per-road data from any authority, and no government branding.
