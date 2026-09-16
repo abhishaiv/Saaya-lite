@@ -1644,3 +1644,65 @@ check` 403 entities, 687 edges, 0 problems.
 the ordering cannot be reached from it. The only harness that catches this class of fault is
 a browser driving the real scene, which this repo does not have. The reproduction above is a
 script, not a committed test, and that gap is recorded rather than papered over.
+
+## 2026-09-16 - Fidelity comparison against the Pokemon GO reference
+
+Question put to us: does the walk view reach the quality and feel of the reference
+video. Answer recorded here so the next session does not have to re-derive it.
+
+Reference: `/Users/abhishai/Downloads/Screen recording playing Pokemon GO on my
+iPhone IOS 11 is awesome - Nicholas Enrique Rivera (1080p).mp4`, 00:01:05.27,
+1080x1920, h264 High, 28.60 fps. Five frames pulled with ffmpeg at t = 3, 15, 30,
+45, 58 into `/tmp/walkrepro/pogo/`.
+
+Verdict: **not close.** Roughly a fifth of the way on the map, close on the
+customiser.
+
+| Axis | Reference | Ours | Gap |
+| --- | --- | --- | --- |
+| Ground | Lit, coloured city. Green parks, blue water, grey paths, navy roads with white casings | `#0B0B0F` ground, one flat `#FF9500` slab at 38% of frame | Every material is `MeshBasicMaterial`. Nothing is lit, nothing has form |
+| Camera | Steep, far back, 150-300 m of city in frame | 27 m out, 52 deg pitch, about 40 m in frame | `WALK_CAMERA_DIST_M` / `WALK_CAMERA_PITCH_DEG` in `walkFacts.ts` |
+| Character | Lit, coloured, walk cycle, soft shadow, heading marker, ~70 px | ~35 px unlit black silhouette | No lighting, no shadow, no heading marker |
+| Depth | Sky gradient with stars, water, trees, glowing landmark rings, compass, particles | None of these | No sky, no horizon, no landmarks, no compass |
+| Risk information | Visible in frame | Absent | Zones are 2000 m discs anchored at police stations; nearest anchor 169 m; frame is 40 m. Labels cannot arrive at this camera height |
+| Character builder | Polished | 7 axes, 44 pt targets, clear labels, "This stays on your phone." | Close. Missing art only |
+
+Recommended order, cheapest real win first:
+
+1. Camera to about 80 m at 62 deg. One constant. No new facts.
+2. Road ribbons from 24 m solid (`ROAD_HALF_WIDTH_M = 4` x primary multiplier 3)
+   to about 8 m with a lighter casing. Two constants.
+3. Lit materials: hemisphere plus directional light, `MeshLambertMaterial` instead
+   of `MeshBasicMaterial`, palette lifted off black. One file. This is the jump.
+4. Zone readability is structural, not a tweak: either the camera rises far enough
+   to hold a 169 m anchor (needs roughly a 450 m view) or the anchor policy changes.
+   That is a spec ruling and has not been made.
+
+No code changed in this step. Nothing was committed.
+
+### 2026-09-16 - Handover written
+
+`HANDOVER.md` added at the repo root, so the work can be resumed from a cold start
+without re-deriving anything. It records: where the work lives and why it is in a
+`/tmp` clone (git stalls on the iCloud canonical checkout), the resume commands, the
+branch contents, the black-screen race and its fix, the fidelity verdict and the five
+gaps, the three open rulings, the gate commands, the non-negotiable constraints, and
+the environment gotchas that cost time.
+
+Two things worth stating plainly in the log as well as the handover:
+
+**`/tmp/saaya-land` is volatile.** Everything that matters is pushed to
+`m4-walk-view` at `5884cf1`, so a reboot loses only the clone, not the work. Do not
+treat the `/tmp` tree as the source of truth.
+
+**A stale dev server was killed.** pid 55992 was still holding port 3111 from an
+older build mirror at `/tmp/saaya-walk`, which is not a git repo. Gone now.
+
+One correction to an earlier entry: the SCREENS.md concern was recorded in a
+pre-compaction session as "S15/S14 phantom entries". Both entries exist, at
+`docs/spec/SCREENS.md` lines 332 and 367, both added 2026-09-11. The exact objection
+could not be reconstructed from the repo, so it is logged here as needing
+re-derivation rather than as a standing ruling. It is not counted among the three
+open rulings.
+
+No source file changed in this step. `progress.md` and `HANDOVER.md` only.
