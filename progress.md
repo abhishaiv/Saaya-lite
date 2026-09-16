@@ -1568,3 +1568,79 @@ If that ruling was not given, this is the line to revert first.
 both languages: `COPY.md` has a row per axis and none per part, so `hair_buns` reads "Buns" in
 Telugu too. The screen test asserts the gap deliberately, so that adding the 16 per-part copy
 rows breaks the test before it can quietly regress.
+
+## 2026-09-16 - The black screen was a race, and the fix is six lines
+
+**Symptom.** The founder opened the preview, switched to the walk view, and got a black
+rectangle with one band of colour across it. It read as a crash. It was not one: no page
+error was thrown, the module graph was intact, and every walk asset returned 200.
+
+**What was actually happening.** The scene mounted, the character rig attached, the frame
+loop ran, and nothing moved. Measured in the browser:
+
+| reading | value |
+| --- | --- |
+| `current` / `target` | `null` / `null` |
+| resident tiles | 0 |
+| camera position | `[0, 0, 0]` |
+| ground plane scale | `[1, 1, 1]` |
+| frame loop running | `true` |
+
+`step()` opens with `if (meta === null || current === null || target === null) return;`, so
+with `current` null every frame returned immediately. The camera never left the origin, the
+ground plane never scaled, and `updateWindow` had no tiles to ask for. What was left on the
+canvas was the renderer's clear colour, plus one risk band from a road that happened to fall
+across the origin. That is the black rectangle.
+
+**The race.** `mountWalkScene` resolves as soon as the `WebGLRenderer` exists. The world is
+loaded by a floating promise inside it, so it lands later. `WalkView` calls
+`controller.update(...)` once when the mount promise resolves, and after that only when the
+`location` prop changes identity. So:
+
+1. `mountWalkScene` resolves, `meta` is still `null`.
+2. `update` arrives carrying her fix, hits the `meta === null` early return, and the fix is
+   discarded.
+3. The world lands. `meta` is set. Nothing re-delivers the fix.
+4. The loop runs forever with `current === null`.
+
+A phone that is moving eventually pushes a new fix through the prop and the world appears,
+which is why this survived earlier testing: **the view only worked for someone walking.** A
+still phone got the black rectangle. A browser with no WebGL never reaches step 1 and gets
+the offline string instead, which is a different failure and was what my first reproduction
+script actually measured.
+
+**The fix.** Keep the last view handed to `update`, and apply it when the world arrives.
+`lastView` is assigned before the `meta` check rather than after it, which is the whole
+point, and the projection moved into `applyLocation` so both callers use one path. Six lines
+of behaviour in `walkScene.ts`, 38 insertions and 5 deletions with the comments.
+
+**Verification, and how it was measured.** A scripted browser run drives onboarding, closes
+the demo sheet, taps `View`, and takes the customiser default. Sampling the 3D band of the
+frame:
+
+| | bug state | fixed |
+| --- | --- | --- |
+| distinct colours in frame | 7 | 21 |
+| background `#0B0B0F` | 90.5% | 55.0% |
+| risk band | 9.2% `#601C1B` | 38.5% `#FF9500` |
+| buildings | 0% | 6.1% |
+
+No GPS movement is injected in the fixed run. The world appears on its own.
+
+**What is not a bug, and still does not look right.** The view is now correct and still reads
+as mostly black. Three stated values combine: the ground plane is painted `color.background`
+(`#0B0B0F`), a `primary` road draws at `ROAD_HALF_WIDTH_M` 4 m times its class multiplier of
+3, so 24 m wide, and the camera sits `walk.camera.dist` 27 m out at `walk.camera.pitch` 52
+degrees, which shows roughly 40 m of ground. She was standing on a primary road inside a
+moderate zone, so a 24 m orange ribbon filled a third of the frame and the town behind it is
+`#1A1A20` on `#0B0B0F`. Every one of those is a grounded fact. None of them was changed
+without a ruling.
+
+**Gates.** `tsc --noEmit` 0. `next lint` clean. `vitest` 43 files, 265 tests. `grounded_check`
+138 files, 0 ungrounded. `next build` exit 0. `reads_check` 17 types, 0 unresolved. `kg.py
+check` 403 entities, 687 edges, 0 problems.
+
+**No test covers this.** The walk screen's test renders static markup, so no effect runs and
+the ordering cannot be reached from it. The only harness that catches this class of fault is
+a browser driving the real scene, which this repo does not have. The reproduction above is a
+script, not a committed test, and that gap is recorded rather than papered over.

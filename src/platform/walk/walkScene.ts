@@ -297,6 +297,18 @@ export async function mountWalkScene(
   let target: GroundPoint | null = null;
   let facingRadians = 0;
 
+  /**
+   * The last view handed to `update`, kept so the world's own arrival can be applied to it.
+   *
+   * The world loads in the background and `update` can arrive before it does, because
+   * `mountWalkScene` resolves as soon as the renderer exists. Before this existed, that
+   * first fix was read against a `null` `meta`, dropped, and the scene then waited for a
+   * fix that only came if she moved. A still phone drew the background and nothing else:
+   * the ground plane is the background colour, so it read as a black rectangle with one
+   * risk band across it. Recorded in progress.md.
+   */
+  let lastView: WalkSceneView | null = null;
+
   let selectedZoneId: string | null = null;
   let paused = false;
   let rafId = 0;
@@ -348,6 +360,25 @@ export async function mountWalkScene(
     // the world and never wastes depth precision on empty space beyond it.
     camera.far = planeTilesAcross() * meta.tileM;
     camera.updateProjectionMatrix();
+  }
+
+  /**
+   * Put a fix on the ground plane.
+   *
+   * Called both when a view arrives and when the world that arrived after it turns out to
+   * have been the thing missing. `current` is only ever seeded, never reset: the ease in
+   * `step` is what moves her from where she is drawn to where she now is, so a fix that
+   * lands mid-walk is a target rather than a jump.
+   */
+  function applyLocation(view: WalkSceneView): void {
+    if (meta === null || view.location === null) return;
+    const projected = toGround(
+      view.location.latitude,
+      view.location.longitude,
+      meta,
+    );
+    target = projected;
+    if (current === null) current = projected;
   }
 
   function applyResize(): void {
@@ -406,6 +437,9 @@ export async function mountWalkScene(
       world = loaded;
       meta = loaded.meta;
       applyCamera();
+      // The world is late, not early: whatever fix she gave while it loaded is the fix
+      // that applies now. Without this the scene sits at the origin until she moves.
+      if (lastView !== null) applyLocation(lastView);
       zones = buildZoneLayer(mapZones, meta, metresPerPixel());
       scene.add(zones.group);
       zones.setSelected(selectedZoneId);
@@ -666,15 +700,14 @@ export async function mountWalkScene(
         lastTimestampMs = 0;
       }
       selectedZoneId = next.selectedZoneId;
+      // Kept before the `meta` check below, which is the whole point: this view is the
+      // one the world's arrival has to apply itself to.
+      lastView = next;
       if (meta === null) {
         if (!paused) ensureFrame();
         return;
       }
-      if (next.location !== null) {
-        const projected = toGround(next.location.latitude, next.location.longitude, meta);
-        target = projected;
-        if (current === null) current = projected;
-      }
+      applyLocation(next);
       zones?.setSelected(selectedZoneId);
       // A frame is needed whether this resumed the loop or changed the selection;
       // `ensureFrame` is a no-op when the loop is already live.
