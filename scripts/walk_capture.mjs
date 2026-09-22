@@ -212,16 +212,22 @@ await context.addInitScript(seedIndexedDb);
 // not a finding, and it is recorded here so it is not rediscovered: a matched A/B beats a pair of
 // old captures, and those two were never a matched A/B.
 //
-// Not established: whether this rung is the top one (index 0, resident ring 2) or the one below
-// (index 1, resident ring 1). The two differ only in draw distance, and no measurement yet
-// separates them - so do not claim a capture shows the top rung, only that it shows detail.
+// The rung is the top one (index 0, resident ring 2, detail on). Established from the mechanism
+// rather than from a measurement: `qualityLevel` and `overBudgetScore` both start at 0 in
+// `walkScene.ts`, the score is clamped to the ladder's own range, and the fixed 16.6 ms step below
+// is under `perf.fps`'s own 16.667 ms frame - so every frame counts as under budget and nothing
+// can raise the score off the top rung. A capture at this setting always shows the top rung.
 //
 // What still holds from before: pinning the quality level inside the app was the only way to be
-// certain which rung a capture shows, and the shipped code no longer offers it. So the rung of a
-// capture is *inferred* from what renders, never known.
+// certain which rung a capture shows, and the shipped code no longer offers it. Without the flag
+// the rung is whatever the ladder settled to on the day - a device whose frames keep arriving over
+// `perf.frame` walks the score down to the floor, and the climb back needs eight consecutive
+// frames under `perf.fps`'s own frame time. So for a capture *without* the flag the rung is
+// *inferred* from what renders, never known.
 if (flagValues.has("--fast-clock")) {
   await context.addInitScript(() => {
-    // Under `perf.fps`'s own 16.667 ms frame, so the ladder climbs rather than merely holding.
+    // Under `perf.fps`'s own 16.667 ms frame, so every frame counts as under budget and the
+    // ladder stays at its top rung however slow the real frame was.
     const STEP_MS = 16.6;
     let fakeMs = 0;
     const realRaf = globalThis.requestAnimationFrame.bind(globalThis);

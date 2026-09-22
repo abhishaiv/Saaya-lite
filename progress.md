@@ -3937,7 +3937,13 @@ regenerated: **430 facts**, each byte-verbatim from one side, one-space indent o
 each fact's `was` its immediate predecessor and nothing else.
 
 **Gates on the union.** `tsc --noEmit` clean; `vitest run` 49 files / 351 tests; grounded check
-177 files / 0 ungrounded literals.
+157 files / 0 ungrounded literals, the scope being `git ls-files 'src' 'app'` filtered to
+`.ts/.tsx/.js/.mjs/.css` - sources only, not specs or assets.
+
+*Correction, same day.* This line first read "177 files". When the parallel session verified the
+merge against the pushed archive it could not reproduce 177, and neither tree can: the scope above
+gives 157, and every wider tracked scope gives 158-163. 177 was a bad record, and 157 with its
+scope stated is the number to carry.
 
 **The union captured.** Same origin, same fixed clock, scale 2, one run per tree: the union
 renders the parallel session's key unchanged - tinted ground `#DBB5DB` at 48.9% of the frame
@@ -3959,6 +3965,27 @@ chroma - a saturated lavender over pale pink - rather than by luma, and she read
 phone size, which is the failure the pair was painted to fix. The pair therefore stays as it is,
 and `#4B3A70` is recorded as the fallback if the founder reads the lavender as too close to the
 ground.
+
+**The luma convention, recorded so the two sessions stop disagreeing by convention.** `MAP_SPEC.md`
+states the facts' prose lumas are Rec. 709; the two walk test helpers use Rec. 601 and comment it
+as the standard the reference frames were sampled in, which the frame-measurement scripts bear out
+(several use 601; `classify.mjs` and `contrast.mjs` use 709). A luma quoted without its convention
+is ambiguous by 3-7 points. The pair's separation holds under both - top `#B093FF` 168 (601) / 161
+(709), bottom `#7E61C7` 117 / 111, tinted ground `#DBB5DB` 197 / 192, road `#4B3A70` 69 / 66 - and
+the readings above are Rec. 601, taken as background ÷ mark. `MAP_SPEC.md` states mark ÷
+background, so in 709 the top is 0.84 of the tinted ground (dimmer than the ground she stands on)
+and the bottom 0.58 - the same magnitudes, inverted. The relations the tests assert are
+convention-free: casing strictly between road and land, and top lighter than bottom in HSL.
+
+**The fallback, corrected, and the pair's one real risk.** The paragraph above records `#4B3A70`
+as the fallback if the lavender reads too close to the ground. That is the road's own hex and she
+stands on roads, so it is the one hex guaranteed to vanish where she is read most; the first step,
+if one is ever needed, is one darker inside her own family - `color.brandDark` `#8566D1`, about
+1.7x against the tinted ground in 709. The real risk is glare, not colour: the tinted ground is the
+common case (42.65% of the frame at scale 2 fast clock; 44-49% across captures), the top's
+separation there is ~1.2x in luma with the rest carried by chroma, and chroma is what outdoor glare
+washes out first. If a founder test outdoors ever says she vanishes, that is the case it would be;
+nothing changes until it does.
 
 **Still owed, unchanged by the merge.** The chip's open state covers about 10.5% of the frame
 against the card's 11% that the founder flagged - a ruling is still owed on whether the open or
