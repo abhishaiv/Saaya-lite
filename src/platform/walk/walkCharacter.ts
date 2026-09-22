@@ -81,14 +81,27 @@ const CHARACTER_FACING_RADIANS = 0;
 /**
  * How far a garment is lifted off the skin, in metres.
  *
- * Sized from measurement and then confirmed on the frame. The parts that need no help
- * - the hair and the accessories - carry 11 mm to 39 mm of clearance from `body_base`
- * and render cleanly; the garments carry none, their median vertex sitting exactly
- * 0.0000 m from the nearest body vertex. 8 mm cleared most of that but left the jeans
- * mottled where the body pokes through, and 14 mm renders every garment solid, so 14 mm
- * is the value the frames chose. GROUNDED-EXEMPT: a depth separation between two
- * surfaces, not a product value - the same kind of constant as `LAYER_HEIGHT_STEP_M`,
- * which separates the coplanar ground layers, and for the same reason.
+ * Sized from measurement and corrected on the frame. The parts that need no help - the
+ * hair and the accessories - carry 11 mm to 39 mm of clearance from `body_base` and
+ * render cleanly; the garments carry none, their median vertex sitting exactly 0.0000 m
+ * from the nearest body vertex, so they draw at the skin's own depth and lose the depth
+ * test fragment by fragment. Held at 0 mm that is not subtle: a no-HUD capture at the
+ * founder's origin renders her in the body's baked underwear, with the garments
+ * surviving only as violet fringes along their edges.
+ *
+ * 14 mm is the shipped value, and it was re-measured at the founder's origin on
+ * 2026-09-23 instead of inherited: across four idle phases and four walk phases the seat
+ * and legs carry no baked-underwear pixel at all - 0 in the scan window on every one of
+ * the eight captures, against 553 in the same window at 0 mm. The lift is along each
+ * vertex's own normal, so this is a stand-off, not an inflation.
+ *
+ * What 14 mm does not fix, and 22 mm does not either: the pale scalloped band across her
+ * hips. That band is the jeans' own modelled waistband, and it is the same at 14, 22 and
+ * 35 mm - which is how it was shown to be the garment rather than a stand-off artefact.
+ * Raising the standoff to chase it only holds the garments further off the body.
+ * GROUNDED-EXEMPT: a depth separation between two surfaces, not a product value - the
+ * same kind of constant as `LAYER_HEIGHT_STEP_M`, which separates the coplanar ground
+ * layers, and for the same reason.
  */
 const GARMENT_STANDOFF_M = 0.014; // GROUNDED-EXEMPT: depth separation between the skin and what she wears, not a product value.
 

@@ -4063,3 +4063,69 @@ buffer, well under the threshold these three points bracket.
 Instruments: `/tmp/walk-verify/dpr_matrix.mjs` (viewport crossed against scale, `WALK_URL` for the
 target tree) and `/tmp/walk-verify/dpr_column.py` / `dpr_scan.py` / `pnglib.py` (exact colour
 census, no image library needed).
+
+## 2026-09-23 - How big she is on screen, and the pale band across her hips
+
+### The reference avatar, measured rather than trusted
+
+The founder's item 8 is a question about size, so the composition numbers were re-read from the
+source video itself (`/tmp/walk-verify/refx/f01..f65.png`, 1080x1920 at 1 fps) instead of taken on
+trust. Of the 65 frames only **f01-f06** show the walk view with the avatar at all - the rest are
+catch screens, item screens and a phone control centre - and of those six, four flood-fill cleanly
+from her red top outward (f03 truncates at the knees, f06 climbs into the HUD), giving, as fractions
+of frame height:
+
+| frame | hair top | lowest shoe | height |
+| --- | --- | --- | --- |
+| f01 | 0.6198 | 0.7469 | 0.1271 |
+| f02 | 0.6188 | 0.7484 | 0.1297 |
+| f04 | 0.6198 | 0.7443 | 0.1245 |
+| f05 | 0.6214 | 0.7516 | 0.1302 |
+| median | **0.6199** | **0.7477** | **0.1284** |
+
+Read by eye at 6x with row ticks on f04, the hair top is ~1189 device px and the right shoe's sole
+~1429; the recorded rows - 1175 for the head, 1413 for the feet - sit *above* her hair and *through
+the top of her shoe*. They are her root/aim composition, not her drawn extent: the same quantity our
+camera solves for, and the right quantity to have solved, but not the same thing as how big she
+looks. The band that earlier notes called a "dark shoe" measurement (a luma scan reporting ~0.78 H)
+was a map feature; the map's own blue at `#22467e` is only three luma from her shoe, which is why
+the flood fill had to start from her top.
+
+### Ours, measured the same way
+
+Chromium at 390x844 DPR 2, HUD hidden, the founder's own origin, five captures across two engines,
+idle and walk: hair top 1035 device px = **0.6131**, lowest foot 1262 = **0.7476**, height 227 =
+**0.1345**.
+
+Her feet match the reference to a pixel - 0.7476 against a median 0.7477 - and her head sits 0.0068
+higher; that is the whole of the difference. So the earlier statement to the founder that she is
+"roughly a fifth" of the frame was wrong, and this entry is the correction: she occupies about
+**0.13** of frame height, 0.1345 against the reference's 0.128 - at the top of the reference's own
+range (0.1245-0.1302), which is where item 8 asks her to be. The visible foot row also settles the
+question left open in the entry above: 1262 device px is the stance foot planted ~0.24 m behind her
+root, not a camera error. The root still projects at 0.7361 and the head at 0.6121; the drawn
+figure extends below the root because the foot does.
+
+### The pale scalloped band across her hips is the jeans, not an artefact
+
+Chased, then disproved. `GARMENT_STANDOFF_M` had been raised 14 -> 22 mm because a pale scalloped
+line across her seat looked like the body's baked underwear surfacing through the jeans. It is not:
+
+- At **0 mm** the garments and the skin are exactly coplanar - `bottom_jeans` and `body_base` carry
+  the same vertex counts and the same maximum radius band by band from y 0.80 to 1.00 - and the depth
+  test resolves fragment by fragment: a capture renders her in the body's baked underwear with the
+  garments left as violet fringes along their edges. 553 near-black underwear pixels in the seat/leg
+  window (x 320-470, y 1080-1270).
+- At **14 mm** the same window carries **0**, on four idle phases and four walk phases (8 captures,
+  `/tmp/walk-verify/charfix/v14i-f*.png`, `v14w-f*.png`).
+- At **22 mm** and **35 mm** the band is unchanged - which is what makes it the garment. A stand-off
+  artefact would have been cleared by either.
+
+So the constant stays at **14 mm** and `walkCharacter.ts`'s comment now carries this basis instead of
+the 22 mm claim. The shoulder seam and the bare feet are unchanged by the stand-off too (identical at
+14, 22 and 35 mm) and stay owed as asset work, as the entry above records.
+
+Instruments: `/tmp/walk-verify/charfix/refblob.cjs` (avatar flood fill from her red top),
+`annotate.cjs` / `seatcrop.cjs` (row-ticked 6x crops), `jeansnorm.cjs`, `hipgap.cjs`, `mats.cjs`,
+`darkscan.cjs`, `nohud.mjs` (Chromium no-HUD captures), `/tmp/walk-verify/walkheading.mjs` (WebKit
+heading probe).
