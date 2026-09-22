@@ -4557,3 +4557,56 @@ bare-ground frame was never a product risk.**
 prints the renderer it actually got and the canvas buffer every run. Census: `step_metric.py`. Metal
 captures need a headed browser on macOS (ANGLE Metal is unreachable headless), so those runs open a window
 for about thirty seconds.
+
+## 2026-09-23 - The boom is the tree term: the cube reproduces, and the one variable that moves the threshold is the camera
+
+The entry above lists one open discrepancy and gives it to the parallel session. It is closed here, and the
+cube's third term - "the tree's own camera geometry" - is isolated to a single variable. All cells below
+were taken with a new driver, `/tmp/walk-verify/charfix/rastercross.mjs`, which crosses renderer against
+buffer and **reads the renderer back from the walk canvas's own context** (the live context, not a fresh
+proxy), printing `depthBits` and `SAMPLES` alongside the buffer on every run.
+
+**The cube reproduces.** 390x844 CSS, fixed 16.6 ms clock, census rows 0.42-0.70 of the capture (the same
+band, scaled by DPR): land SS 390x844 **bare `#EDE9F7` 97.91-97.98** (four runs across two instruments),
+land SS 780x1688 tint over green 90.28-90.59%, union SS 390x844 tint 89.69-90.37%, and every Metal cell
+tinted (90.07-90.44). `DEPTH_BITS` 24 and `SAMPLES` 4 in every cell on both rasterisers, so the
+depth-format branch is dead: the two rasterisers present the same format and still resolve the pair
+differently.
+
+**The tree term is the boom, and only the boom.** A git worktree at union HEAD with exactly two literals
+reverted - `WALK_CAMERA_DIST_M` 12.58 -> 13.0 and `WALK_CAMERA_LOOK_AT_M` 3.11 -> 3.21, the land tree's own
+values - reproduces land's signature in every buffer measured, all on SwiftShader:
+
+| buffer | land (13.0) | union (12.58) | union with 13.0 |
+|---|---|---|---|
+| `320x568` | tint over ground 70.02-70.05% | bare 74.61% | tint over ground 70.23% |
+| `390x844` | **bare 97.91-97.98%** | tint 89.69-90.37% | **bare 97.93%** |
+| `780x1688` | tint 90.28-90.59% | **green 89.93-90.00%** | tint 90.59% |
+
+One variable moves all three cells from one tree's pattern to the other's. The 0.42 m nearer boom that the
+founder's size ruling installed is what tips the union across the threshold relative to land; no other term
+in the two trees' walk code is needed.
+
+**The pair is closed.** The parallel session's published 90.33% / 90.24% pair ran on `charfix/devices.mjs`,
+whose line 83 forces SwiftShader - confirmed by read-back today, not assumed - against the union on 3130,
+and both PNGs show the union's own icon HUD and its violet garments. The earlier attribution of that pair
+to Metal is withdrawn for good. Its 390x844 half (90.34) is the union's own committed signature and
+reproduces today at 89.69-90.37. Its 780x1688 half (90.24, tinted) matches **no committed state**: today
+that cell reads green 8 of 8 - six runs against the live 3130 and two against a fresh worktree process at
+the same HEAD (`06184d0`, 90.00% both, deterministic to two decimals). The frames were taken at 04:15:34
+and 04:15:44, inside an hour when this tree's working copy was being edited between commits (269a1a3 03:56,
+4da2b34 04:05, 67695c8 / 7390cf3 04:18-04:23). A transient working-tree state, bounded, with nothing
+resting on it.
+
+**The product half, measured on the shipping tree.** The union under Metal at four real phone geometries -
+360x800@3, 390x844@3, 412x915@2.625, 320x568@1 - draws the full stack in every one (89.85-90.11% tint over
+green; the 320x568 cell, one of the cells that loses under SwiftShader, reads 70.84% tint over ground). So
+"no product change is owed" is measured on the tree that ships, at the sizes that ship, and not only on the
+two buffers the cube happened to cross.
+
+**Unchanged and still open:** `FOG_FAR_M = 200` against its own comment's 410 m, in both trees.
+
+**Instruments.** `/tmp/walk-verify/charfix/rastercross.mjs` - renderer and buffer read back from the page
+every run, `GL=hardware` opening a headed window on macOS, `WAIT_MS` for a settled frame, and a census
+palette that now names `color.tile.green` `#D5C9F7` as its own colour, which is what makes "untinted green"
+and "tint over green" separable readings rather than one nearest-match.
