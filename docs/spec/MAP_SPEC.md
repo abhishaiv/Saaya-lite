@@ -349,10 +349,11 @@ every 2 m: 416,608 positions.
 The shorter boom is inside a building **4.4x as often**, not less often: 11 m of ground back from
 a road centreline lands in the building on the near side of that street. It improves the
 sightline only modestly. So the amendment stands on the composition it was measured for, and not
-on a claim about rooflines it does not have. The table is the 13.2 m boom's own measurement, and the
-boom that ships is now measured against it. The correction moved the boom to 13.0 m and 0.7 deg
-steeper (2.6% less ground back) and the 2026-09-23 amendment took it to 12.58 m (a further 3.2%).
-Over the same 416,608 road positions, the three rates at the shipping 12.58 m boom are **5.19%**
+on a claim about rooflines it does not have. The table is the 13.2 m boom's own measurement; the
+correction moved the boom to 13.0 m and 0.7 deg steeper (2.6% less ground back) and the 2026-09-23
+amendment took it to 12.58 m (a further 3.2%). The note that followed it here - that the two later
+booms were "not re-measured, and not relied on" - is **superseded**: the shipping boom is now
+measured. Over the same 416,608 road positions, the three rates at the shipping 12.58 m boom are **5.19%**
 (camera inside a building tall enough to enclose it), **5.83%** (building between the camera and her
 eye) and **5.23%** (camera exactly inside a ring, her outside) - against the 13.2 m column's
 5.54 / 6.30 / 5.58. Every one is marginally better and none changed in kind; the roughly 4x penalty

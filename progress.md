@@ -4703,7 +4703,8 @@ pushed. `/tmp/saaya-land` remains byte-identical to `b4f7e21`.
 
 `MAP_SPEC.md`'s camera-collision table (5.54% / 6.30% / 5.58% at the 13.2 m boom) carried its own
 caveat for the two later booms: "not re-measured, and not relied on". The shipping boom is now
-measured, and the caveat sentence is gone.
+measured, and the caveat stays in place, quoted and marked **superseded**, with the measurement
+beside it - the same handling the floor frame and the withdrawn transient-state claim got.
 
 **The instrument reproduces the published table first.** `roadocclude.mjs` and `enclosedexact.mjs` now
 take `DIST` / `PITCH` from the environment (defaults unchanged at 13.2 / 31.4) and print the boom they
@@ -4723,7 +4724,7 @@ boom run.
 All three are marginally better and none changed in kind; the roughly 4x penalty against the old boom
 stands (5.19% against 1.26% at 27 m with the shipped pitch). Of the blocked, 98.97% clear at a boom of
 3 m or less and **1.03%** at none - against the 13.2 m table's 99.03% / 0.97%. The `MAP_SPEC.md`
-section now carries these numbers. The bake is byte-identical between the two trees
+section now carries these numbers beside the superseded caveat. The bake is byte-identical between the two trees
 (md5 `23ba7d53971c607e7babc62b2163eba3`), so both copies measure the same frozen data.
 
 **Gates.** `npx tsc --noEmit` clean; `npx vitest run` 49 files, 357 tests, all passing.
