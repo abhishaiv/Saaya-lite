@@ -179,14 +179,24 @@ const NEAR_M = 0.5; // GROUNDED-EXEMPT: a depth buffer range, not a product valu
  * zone fill is deliberately unfogged, so the probe was measuring the tint rather than the fog.
  * Re-measured on bare ground, the fog is what holds the far end of the seam.
  *
- * The value is now taken from the reference rather than chosen. Row-by-row in its walk frames the
- * dark seam is a full-width uniform band running from row 0.1656 to row 0.1812 of the frame -
- * 1.56% of it - with the sky flat above and the scenery brightening below. Our band's top edge is
- * not a free number: it is the ground plane's own far edge, at row 0.1672, because the plane's
- * size is the residency window and nothing else. So the far end is solved to give the band the
- * reference's own thickness, 1.56% of the frame from 0.1672, which puts our release row at 0.1828
- * and measures 410 m from the eye. At 800 the band measured 0.48% of the frame, a third of the
- * reference's; at 510 it measured 1.13%.
+ * The value is set by measurement, and the measurement is a threshold, not a dial: the visible
+ * ground reaches about 205 m, so every far end from 225 up returns the identical 0.474% band,
+ * and 200 - the first value inside the visible ground - doubles it, reading 1.836% and 1.896% of
+ * the frame across the sweep and 1.955% settled on one page, against the reference audit's own
+ * target of 1.99-2.01%. There is no intermediate value to tune to.
+ *
+ * Amended again 2026-09-23. An earlier revision of this paragraph solved the far end to 410 m
+ * from a reference reading, and that solve is withdrawn: it contradicts the sweep above and the
+ * day's own archived 410 capture, which reads 0.474%, the same plateau. Matched captures of the
+ * two values on the union at 390x844 under SwiftShader show why 200 is right: at 200 the far
+ * city still recedes into the haze (its grey reads luma 105 against the sky's 33), while at 410
+ * it renders unveiled and bright (180), the plane's far edge stepping 38.8 to 130.8 across two
+ * rows instead of grading 33-38-55. The far end has to sit inside the visible ground, not merely
+ * inside the plane's width. The sweep's band figures were measured under the night key, where
+ * the haze sat at the ground's own luma family; under the white-and-violet key of 2026-09-23 the
+ * haze is far darker than the land, so the same recession reads as a gradient rather than a flat
+ * band. The requirement is unchanged: the scenery fades into `color.walk.haze` with distance,
+ * and the far edge never reads as an edge.
  */
 const FOG_NEAR_M = 45; // GROUNDED-EXEMPT: a rendering range, not a product value.
 const FOG_FAR_M = 200; // GROUNDED-EXEMPT: a rendering range, not a product value.

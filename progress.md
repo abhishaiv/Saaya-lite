@@ -4631,3 +4631,70 @@ over.
 
 **Instruments.** `dpr_matrix.mjs` with `GL=swiftshader` and `WALK_URL=http://localhost:3120` to target
 land; `step_metric.py` for the exact-RGB band census.
+
+## 2026-09-23 - The handoff closed: the pair was a palette artefact, the floor frame was mislabelled, and the fog comment was the defect
+
+Both sessions' open questions, answered by measurement on this tree and the preserved one.
+
+**The published pair (90.33 / 90.24), closed.** The two PNGs are 390x844 and 780x1688 - two different
+buffers, so the "one page at DPR 2" hypothesis is refuted by the files themselves. Read exactly, the
+390x844 half is `#DBB5DB` tint over green at 89.68% - the union's own committed 390 cell, which
+reproduces at 89.69-90.37 across runs - and the 780x1688 half is **untinted green `#D5C9F7` at 89.90%**,
+the union's own committed 780 signature, previously green 8 of 8. The 90.33/90.24 pair were one reading
+of one state: the census used then had **no green entry**, so its nearest-match sent `#D5C9F7` to
+`#DBB5DB` (d^2 = 1220, inside the 3600 tolerance) and the casing likewise. The claim in the entry above
+that the 780 half "matches no committed state... a transient working-tree state" is **withdrawn** - there
+was no transient state, only a palette that could not tell green from tint-over-green.
+
+**The floor pair, re-taken with the exact palette and the right labels.** `land-floor390.png` (flat
+`#F0D1DB` 97.75%), published in the entry above as the land floor arm, is **imgdiff-identical to the
+union's floor frame** - mean 0.093, 0.37% of pixels over 2, against a fresh union floor capture; 0.103 /
+0.40% against `union-floor390.png` - so it was mislabelled at capture (an OUT/URL mixup) and is not land
+at all. Fresh SwiftShader cells on the exact tree at 390x844: **land bare `#EDE9F7` 97.94%** (the peer's
+97.96 confirmed), **union tint 97.80%**; at 780x1688 both keep the tint (union 97.84, land 98.00). So
+the floor's "tint survives, green does not" is not in question; what the pair shows is the same boom term
+the cube found, extended to the floor cells: land at 390 loses the tint, and only there. `land-floor780.png`
+(97.84, same colour as the union's) cannot be identified by pixels - the 780 captures carry different
+layouts - and nothing rests on it. An instrument fact from the sweep, worth keeping: **Metal plus the
+natural clock lands on the top rung, not the floor** (90.04% tint over green on land at 390), so
+Metal-floor captures are unreachable in this harness.
+
+**The fog question: `FOG_FAR_M = 200` is right, and the comment's 410 m solve is the defect.** The line
+has had exactly one value on this branch - 200, introduced in `e9e280d` together with the comment. The
+same commit's progress.md sweep is the record: the seam is a **threshold, not a dial** - the visible
+ground reaches about 205 m, every far end from 225 up returns the identical 0.474% band, and 200, the
+first value inside the visible ground, doubles it (1.836% and 1.896% across the sweep, 1.955% settled on
+one page by `seamtime.mjs`) against the reference audit's own target of 1.99-2.01%. The comment's "At 800
+the band measured 0.48%; at 510, 1.13%; solved to 410" does not match that record - at 800 the table
+itself reads the 0.474% plateau - and the day's archived `cam-origin-f410.png` re-measures today to the
+table's 410 row exactly (sky 53.7, min 51.1 at 0.1565, rows<=min+3 8 = **0.474%**, the plateau, not
+1.56%). A matched pair settles which value serves the scene: union at 390x844, SwiftShader read back,
+fast clock, one literal reverted 200 -> 410, same probe, same world. At **200** the far city still
+recedes into the haze - the far ground strip reads luma 55 and the far building grey 105 against the
+sky's 33, grading 33-38-55 across three rows; at **410** the same content renders unveiled and bright -
+strip 131, building 180 - and the plane's far edge steps 38.8 to 130.8 across two rows, a hard bright
+edge against the dark sky, which is the exact thing the comment says the far end is set to prevent.
+The pair's material differences (>1 luma per row) are confined to rows 0.130-0.296 of the frame; every
+row below is within 0.9 luma. One caveat recorded in the amended comment: the sweep's band percentages
+were measured under the night key, where the haze (`#192F6B`, luma 46.6) sat at the ground's own luma
+family and a fogged strip and an unfogged one read alike; under the white-and-violet key the haze is
+`#120C24` (luma 15) against a near-white land, so the same recession now reads as a gradient - the
+row<=min+3 band reads 0.24-0.36% today - and the requirement that survives is the stated one: the
+scenery fades into `color.walk.haze` with distance, and the far edge never reads as an edge. The comment
+in `walkScene.ts` is amended in this commit; the constant is unchanged in both trees. Fog still has no
+test - it needs a rasteriser - and its instrument of record is the capture pair, kept at
+`/tmp/walk-verify/fog/union-200.png` and `union-410-dpr1.png`.
+
+**Gates.** `npx tsc --noEmit` clean; `npx vitest run` 49 files, 357 tests, all passing; grounded check
+on the changed file, 0 ungrounded literals (399 live facts, 167 distinct values).
+
+**Instruments.** Added today: `rowprofile.mjs` (mean luma per row over the centre columns - the horizon
+region without the HUD in it) and `rowdiff.mjs` (per-row diff map between two same-size captures, which
+is how "changes confined to the far field" is measured rather than asserted). Reused: `hazemetric.py`,
+`rastercross.mjs`, `seamtime.mjs` - the last of which captures at 390x844 @ **DPR 2**, the geometry of
+record, which is why the archived sweep captures are 780x1688.
+
+**Unchanged and still open:** the horizon band's palette question (our sky reads 48 where the reference's
+reads 66-72, so the transition is subtler - recorded in `MAP_SPEC.md`, a founder call); the peer's
+hardening vote on the layer system (accepted, one owner, nothing landed unilaterally); the branch is not
+pushed. `/tmp/saaya-land` remains byte-identical to `b4f7e21`.
