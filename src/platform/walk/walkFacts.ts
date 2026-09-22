@@ -41,6 +41,24 @@ export const WALK_LEGEND_WIDTH_PX = 224; // fact: walk.legend.width
 export const WALK_CHARACTER_HEIGHT_M = 1.7; // fact: walk.character.height
 export const WALK_SPEED_MPS = 1.4; // fact: walk.speed
 
+// --- what she wears. Fact: color.brand, color.brandDark ---
+//
+// The asset pack has no violet in it. Every garment ships grey - `top_hoodie` is
+// (0.36, 0.31, 0.28) linear, `bottom_jeans` (0.22, 0.25, 0.36) - and each garment mesh is
+// a copy of the body's own surface, so a grey garment over the body's nude base texture
+// reads as skin at phone size. That is what the founder saw on his phone on 2026-09-23,
+// and it is a colour problem rather than a missing mesh: the top is loaded, lifted 14 mm
+// off the skin and drawn, and the frame still reads as unclothed.
+//
+// The palette he ruled for this view is white and violet, so the two garment axes are
+// painted with the interface's own two violets - the lavender over the darker one -
+// rather than with two new hexes invented for the occasion. Reused the same way the zone
+// constants below are reused: she cannot then disagree with the interface she is drawn
+// inside. There is no footwear axis in the pack, so her feet stay bare; that is owed to
+// the asset work rather than fixable here.
+export const GARMENT_TOP_COLOR = "#A78BFA"; // fact: color.brand
+export const GARMENT_BOTTOM_COLOR = "#8566D1"; // fact: color.brandDark
+
 // --- zone treatment, reused from the flat map rather than re-chosen. ---
 // The flat map's own constants in HomeMap.tsx carry the same ids; these are the same
 // values so a zone reads identically in both views.

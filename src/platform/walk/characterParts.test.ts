@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
 import {
+  axisIdForPart,
   CHARACTER_AXES,
   DEFAULT_CHARACTER,
   isBodyCoveringPart,
@@ -146,8 +147,7 @@ describe("withAxis", () => {
 });
 
 describe("isBodyCoveringPart", () => {
-  it("is true for every top and every bottom, and nothing else", () => {
-    const covering = CHARACTER_AXES.filter(
+  it("is true for every top and every bottom, and nothing else", () => {    const covering = CHARACTER_AXES.filter(
       (axis) => axis.id === "top" || axis.id === "bottom",
     ).flatMap((axis) => axis.options);
     for (const partId of partIdsOnDisk()) {
@@ -163,5 +163,21 @@ describe("isBodyCoveringPart", () => {
 
   it("is false for a part that does not exist", () => {
     expect(isBodyCoveringPart("top_parka")).toBe(false);
+  });
+});
+
+describe("axisIdForPart", () => {
+  it("names the axis that offers the part, for every part on disk", () => {
+    for (const axis of CHARACTER_AXES) {
+      for (const partId of axis.options) {
+        expect(axisIdForPart(partId)).toBe(axis.id);
+      }
+    }
+  });
+
+  it("is null for a part that no axis offers, so nothing is painted by accident", () => {
+    expect(axisIdForPart("top_parka")).toBeNull();
+    expect(axisIdForPart("anims")).toBeNull();
+    expect(axisIdForPart("")).toBeNull();
   });
 });

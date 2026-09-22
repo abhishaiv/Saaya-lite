@@ -115,6 +115,12 @@ export function partsForSelection(
   );
 }
 
+/** Which axis offers a part, or null when no axis does. */
+export function axisIdForPart(partId: string): string | null {
+  const axis = CHARACTER_AXES.find((candidate) => candidate.options.includes(partId));
+  return axis === undefined ? null : axis.id;
+}
+
 /** The axes whose parts are worn over the body rather than set beside it. */
 const BODY_COVERING_AXIS_IDS: readonly string[] = ["top", "bottom"];
 

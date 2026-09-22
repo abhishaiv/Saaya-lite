@@ -1,7 +1,24 @@
 import { describe, expect, it } from "vitest";
-import { BufferGeometry, Float32BufferAttribute, Mesh, Object3D } from "three";
+import {
+  BufferGeometry,
+  Color,
+  Float32BufferAttribute,
+  LineBasicMaterial,
+  Mesh,
+  MeshStandardMaterial,
+  Object3D,
+} from "three";
 
-import { liftOffSkin } from "./walkCharacter";
+import { CHARACTER_AXES, isBodyCoveringPart } from "./characterParts";
+import {
+  GARMENT_BOTTOM_COLOR,
+  GARMENT_TOP_COLOR,
+} from "./walkFacts";
+import {
+  applyGarmentColour,
+  GARMENT_COLOR_BY_AXIS,
+  liftOffSkin,
+} from "./walkCharacter";
 
 /**
  * The distances these tests hand the function.
@@ -14,7 +31,7 @@ const OTHER_GIVEN_M = 0.01; // GROUNDED-EXEMPT: a test fixture, not a product va
 const THIRD_GIVEN_M = 0.005; // GROUNDED-EXEMPT: a test fixture, not a product value.
 
 /** A two-triangle plane in the XY plane, all four normals pointing at +Z. */
-function flatPlane(): Mesh {
+function planeGeometry(): BufferGeometry {
   const geometry = new BufferGeometry();
   geometry.setAttribute(
     "position",
@@ -24,7 +41,11 @@ function flatPlane(): Mesh {
     "normal",
     new Float32BufferAttribute([0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1], 3),
   );
-  return new Mesh(geometry);
+  return geometry;
+}
+
+function flatPlane(): Mesh {
+  return new Mesh(planeGeometry());
 }
 
 function vertexZ(mesh: Mesh): number[] {
@@ -71,5 +92,94 @@ describe("liftOffSkin", () => {
     expect(mesh.geometry.boundingSphere).toBeNull();
     liftOffSkin(mesh, GIVEN_M);
     expect(mesh.geometry.boundingSphere).not.toBeNull();
+  });
+});
+
+/** A part shaped like the ones the loader hands over: a scene with meshes inside it. */
+function partWithMaterial(material: MeshStandardMaterial): Object3D {
+  const part = new Object3D();
+  part.add(new Mesh(planeGeometry(), material));
+  return part;
+}
+
+function standardMaterialIn(part: Object3D): MeshStandardMaterial {
+  let found: MeshStandardMaterial | null = null;
+  part.traverse((object) => {
+    if (found !== null || !(object instanceof Mesh)) return;
+    const materials = Array.isArray(object.material) ? object.material : [object.material];
+    for (const material of materials) {
+      if (material instanceof MeshStandardMaterial) found = material;
+    }
+  });
+  if (found === null) throw new Error("the fixture holds no standard material");
+  return found;
+}
+
+describe("applyGarmentColour", () => {
+  it("leaves the material drawing the colour the view states", () => {
+    const part = partWithMaterial(new MeshStandardMaterial());
+    applyGarmentColour(part, GARMENT_TOP_COLOR);
+    expect(standardMaterialIn(part).color.getHexString()).toBe(
+      GARMENT_TOP_COLOR.slice("#".length).toLowerCase(),
+    );
+  });
+
+  it("reaches a mesh nested under the part's scene", () => {
+    const nested = partWithMaterial(new MeshStandardMaterial());
+    const outer = new Object3D();
+    outer.add(nested);
+    applyGarmentColour(outer, GARMENT_BOTTOM_COLOR);
+    expect(standardMaterialIn(nested).color.getHexString()).toBe(
+      GARMENT_BOTTOM_COLOR.slice("#".length).toLowerCase(),
+    );
+  });
+
+  it("paints every material of a multi-material mesh, not just the first", () => {
+    const mesh = new Mesh(planeGeometry(), [
+      new MeshStandardMaterial(),
+      new MeshStandardMaterial(),
+    ]);
+    applyGarmentColour(mesh, GARMENT_TOP_COLOR);
+    const painted = (mesh.material as MeshStandardMaterial[]).map((material) =>
+      material.color.getHexString(),
+    );
+    expect(painted).toEqual([
+      GARMENT_TOP_COLOR.slice("#".length).toLowerCase(),
+      GARMENT_TOP_COLOR.slice("#".length).toLowerCase(),
+    ]);
+  });
+
+  it("leaves a material it cannot colour alone rather than throwing", () => {
+    const mesh = new Mesh(planeGeometry(), new LineBasicMaterial());
+    expect(() => applyGarmentColour(mesh, GARMENT_TOP_COLOR)).not.toThrow();
+  });
+});
+
+/**
+ * The invariants a frame cannot show on its own.
+ *
+ * A garment axis with no colour here ships grey and reads as skin; an entry for a part
+ * that is not a garment paints her hair the accent colour. Neither failure would say
+ * which of the two had happened, so both are pinned here instead.
+ */
+describe("the garments the walk view paints", () => {
+  it("covers every axis that clothes the body, and no other axis", () => {
+    const coveringAxisIds = CHARACTER_AXES.filter((axis) =>
+      axis.options.some((partId) => isBodyCoveringPart(partId)),
+    ).map((axis) => axis.id);
+    expect(Object.keys(GARMENT_COLOR_BY_AXIS).sort()).toEqual(
+      [...coveringAxisIds].sort(),
+    );
+  });
+
+  it("puts the lighter violet over the darker one, so the two read as two garments", () => {
+    const lightness = (hex: string): number => {
+      const hsl = { h: 0, s: 0, l: 0 };
+      new Color(hex).getHSL(hsl);
+      return hsl.l;
+    };
+    expect(lightness(GARMENT_TOP_COLOR)).toBeGreaterThan(
+      lightness(GARMENT_BOTTOM_COLOR),
+    );
   });
 });

@@ -3270,3 +3270,49 @@ origin confirms the app's storage works there.
 the legend's space tension needs his ruling (both states captured, above); the character's garment
 colours go to the peer session whose palette scope owns them; and the three-way reconcile onto
 `/tmp/saaya-land` still stands.
+
+## 2026-09-23 - she is clothed, and it was the colour all along
+
+**The pack has no violet in it, and that is the whole of the "nude" reading.** Dumped from the
+shipped GLBs: every garment is grey and none carries a base-colour texture -
+`top_hoodie_mat` `(0.36, 0.31, 0.28)` linear with `baseColorTexture: none`, `bottom_jeans_mat`
+`(0.22, 0.25, 0.36)`, `top_tee_mat` `(0.30, 0.33, 0.46)`, `top_jacket_mat` `(0.20, 0.22, 0.30)`;
+the accessories are muted rose and brown; the hair and the body carry textures of their own. So
+swapping parts would not have helped, and no violet exists anywhere in the pack to swap to.
+Because each garment mesh is a copy of the body's own surface, a grey garment over the body's
+nude base texture keeps the anatomy's silhouette *and* lands in the skin's own colour range. That
+is what the founder saw, and it was never a missing mesh.
+
+**The fix is colour, and the colour is reused, not invented.** `walkCharacter.ts` paints the two
+garment axes at load: `top` in `color.brand` `#A78BFA`, `bottom` in `color.brandDark` `#8566D1` -
+the two violets the interface already uses beside her, so the palette ruling (white + violet) is
+honoured without two new hexes. New in this batch: `axisIdForPart` in `characterParts.ts`,
+`GARMENT_COLOR_BY_AXIS` + `applyGarmentColour` in `walkCharacter.ts`, and the two constants in
+`walkFacts.ts`. The glTF files are untouched: a part file carries exactly one mesh and one
+material and no two part ids share a file, so writing the colour through to the material at load
+can only touch that part; `baseColorTexture: none` is what makes the set colour the drawn colour.
+
+**Verified on the frame, not inferred.** Rebuilt production build, captured, and sampled: her top
+reads `(165, 140, 252)` against the `#A78BFA` `(167, 139, 250)` it is set to, and her trousers
+`(127, 100, 204)` against `#8566D1` `(133, 102, 209)` - the two materials, lit. The zoomed crop
+shows a lavender top over darker violet trousers with her arms and feet reading as skin: the
+unclothed reading is gone.
+
+**Gates after the change:** `tsc` clean; vitest 49 files, **351** tests (8 new: paint behaviour
+on fixtures, the multi-material branch, the non-colourable-material branch, that the map covers
+exactly the body-covering axes, that the lighter violet is the top, and `axisIdForPart` over
+every part on disk and for unknown ids); `grounded_check` 157 files, 0 ungrounded against 397
+live facts, with `--explain` confirming `#A78BFA -> color.brand` and `#8566D1 -> color.brandDark`.
+Worth recording: the first grounded run I did this round reported `0 file(s)` and passed
+vacuously - zsh does not word-split an unquoted `$FILES`, so the whole list arrived as one
+argument. Re-run through `xargs`; the number above is from that run.
+
+**Docs:** `MAP_SPEC.md` gains "What she wears" under "The character" - the measurements, the two
+tokens, why the write-through is safe, and what is owed; `DESIGN_SYSTEM.md` gains a note under
+the palette table that two of its tokens are worn.
+
+**Still owed, and now on the record rather than in a message:** the garments are copies of the
+body, so the silhouette stays anatomical and she reads as wearing close-fitting clothes rather
+than a hoodie; a speckled seam is visible at the left shoulder where the body meets the garment,
+the stand-off being uniform where the body's curvature is not; and there is **no footwear axis at
+all**, so her feet stay bare. All three are asset work.

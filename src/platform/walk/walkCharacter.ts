@@ -23,6 +23,7 @@ import {
   Group,
   LoopRepeat,
   Mesh,
+  MeshStandardMaterial,
   Object3D,
   type AnimationAction,
   type AnimationClip,
@@ -31,6 +32,7 @@ import {
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
 import {
+  axisIdForPart,
   CHARACTER_CLIP_IDLE,
   CHARACTER_CLIP_WALK,
   isBodyCoveringPart,
@@ -38,7 +40,11 @@ import {
   partsForSelection,
   type CharacterSelection,
 } from "./characterParts";
-import { WALK_CHARACTER_HEIGHT_M } from "./walkFacts";
+import {
+  GARMENT_BOTTOM_COLOR,
+  GARMENT_TOP_COLOR,
+  WALK_CHARACTER_HEIGHT_M,
+} from "./walkFacts";
 
 /** What the scene holds once a character is assembled. */
 export interface CharacterRig {
@@ -113,6 +119,40 @@ export function liftOffSkin(part: Object3D, metres: number): void {
   });
 }
 
+/**
+ * What each garment axis is painted with. Fact: color.brand, color.brandDark.
+ *
+ * Exported because the invariant that matters is testable and would otherwise be
+ * invisible: every axis that clothes the body has a colour here, and nothing is painted
+ * that is not a garment. A new garment axis with no entry here ships grey and reads as
+ * skin again, and no frame would say which of the two had happened.
+ */
+export const GARMENT_COLOR_BY_AXIS: Readonly<Record<string, string>> = {
+  top: GARMENT_TOP_COLOR,
+  bottom: GARMENT_BOTTOM_COLOR,
+};
+
+/**
+ * Paint a garment in the product's violet.
+ *
+ * Written through to the material rather than to a clone, and that is safe for a reason
+ * worth stating: a part file carries exactly one mesh and one material, and no two part
+ * ids share a file, so the instance written to here is this part's own and no other part
+ * can be repainted by it. Both garment materials ship `baseColorTexture: none`, so this
+ * colour is the drawn colour rather than a tint multiplied over an atlas - which is why
+ * a colour change is enough to stop a garment reading as skin.
+ */
+export function applyGarmentColour(part: Object3D, hex: string): void {
+  part.traverse((object) => {
+    if (!(object instanceof Mesh)) return;
+    const materials = Array.isArray(object.material) ? object.material : [object.material];
+    for (const material of materials) {
+      if (!(material instanceof MeshStandardMaterial)) continue;
+      material.color.set(hex);
+    }
+  });
+}
+
 /** Raised when `anims.glb` is missing a clip the view requires. */
 export class MissingClipError extends Error {}
 
@@ -161,6 +201,11 @@ export async function loadCharacter(
     // depth as the skin and loses the depth test fragment by fragment. Lifting it is
     // what turns the speckles back into a garment.
     if (isBodyCoveringPart(partId)) liftOffSkin(scene, GARMENT_STANDOFF_M);
+    // And it ships grey, which over the body's nude base texture reads as skin, so the
+    // garment axes are painted rather than left as the pack authored them.
+    const axisId = axisIdForPart(partId);
+    const garmentColor = axisId === null ? undefined : GARMENT_COLOR_BY_AXIS[axisId];
+    if (garmentColor !== undefined) applyGarmentColour(scene, garmentColor);
     root.add(scene);
 
     const mixer = new AnimationMixer(scene);

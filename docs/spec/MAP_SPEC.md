@@ -800,6 +800,41 @@ corresponding file is a combination the customiser would offer and the view coul
 which is exactly what the fixed-list rule in `COMPONENT_LIBRARY.md` C15 exists to prevent.
 The customiser's option lists are generated from the parts present, so the two cannot drift.
 
+### What she wears
+
+**The pack has no violet in it, and that was a defect on the frame.** Every garment ships
+grey: `top_hoodie`'s material is `(0.36, 0.31, 0.28)` linear, about `#A19790` on screen, and
+`bottom_jeans` `(0.22, 0.25, 0.36)`, about `#828AA1`. Each garment mesh is a copy of the body's
+own surface - that is why the 14 mm stand-off exists at all - so a grey garment over the body's
+nude base texture keeps the anatomy's silhouette *and* sits in the skin's own colour range.
+Measured on the frame the founder opened on his phone: torso `(145, 137, 133)`, legs
+`(122, 131, 157)`, which is the two grey materials lit. She read as unclothed, and no part of
+that was a missing mesh.
+
+| | |
+|---|---|
+| Painted | the `top` and `bottom` axes, at load, in `src/platform/walk/walkCharacter.ts` |
+| Top | `color.brand` `#A78BFA`, the lavender |
+| Bottom | `color.brandDark` `#8566D1`, the darker violet |
+| Not painted | the hair, the eyes, the brows, the accessories and the body - their materials are their own |
+
+**Reused tokens, not new hexes.** The palette the founder ruled for this view is white and
+violet, and the two violets already in it are the ones the interface uses beside her, so she is
+painted with those rather than with two colours invented for her. `DESIGN_SYSTEM.md` carries the
+same note on the palette table.
+
+**Written through to the materials, never to the glTF.** The shipped files are untouched: each
+part file carries exactly one mesh and one material and no two part ids share a file, so setting
+the colour at load is this part's own material and cannot repaint another part. Both garment
+materials ship `baseColorTexture: none`, so the colour set is the drawn colour rather than a
+tint over an atlas.
+
+**What this does not fix, and is owed to the asset work.** The garments are copies of the body,
+so the silhouette stays anatomical: she reads as wearing a close-fitting top and trousers rather
+than a loose hoodie. There is also **no footwear axis in the pack** - her feet are the body's
+own and stay bare. Verified on the frame after the change: top `(165, 140, 252)` against the
+`#A78BFA` it is set to, trousers `(127, 100, 204)` against `#8566D1`.
+
 ### The customiser, and the first switch
 
 **The first time she switches to the walk view, and only if no character exists yet, she is

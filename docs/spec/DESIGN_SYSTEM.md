@@ -212,6 +212,12 @@ light theme either.
 | `amber` | `#F09921` | iOS `AppTheme.amber`. |
 | `danger` | `#FF3B30` | |
 
+**Two of these are worn.** The walk view's character is painted with `brand` for her top and
+`brandDark` for her trousers: the character pack ships every garment grey, and a grey garment
+over the body's own texture reads as skin at phone size. The tokens are reused rather than new
+hexes chosen for her, so she cannot disagree with the interface beside her. `MAP_SPEC.md`,
+"What she wears", carries the measurements.
+
 **Zone fills come from the data, never from these tokens.** `vizag_heatmap.geojson` carries
 `color` and `opacity` per zone: high `#FF3B30`, moderate `#FF9500`, elevated `#FFCC00`,
 safe `#00000000` which is not drawn.
