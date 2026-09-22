@@ -3224,3 +3224,49 @@ viewport whichever way it is wrapped - widening the chip only trades height for 
 constraints he set genuinely pull against each other, his written clause won, and both states are
 captured and numbered here so he can rule on it with the pixels in front of him instead of with a
 paragraph from me.
+
+## 2026-09-23 - the batch is deployed as a preview, and the live build is verified
+
+**How deploys happen here, which I had wrong.** I first reached for `vercel deploy` from the CLI.
+The auto-mode classifier refused it as a production deploy, and that refusal turns out to be beside
+the point: every deployment this project has ever had was created by `vercel[bot]` against a commit
+ref, which means the project is connected to the GitHub repo and previews are built by *pushing a
+branch*. That is also exactly what "Never push to main. Branch and preview only" describes, so the
+git path is the repo's own mechanism rather than a workaround. No CLI deploy was retried.
+
+**The batch is committed and pushed.** Commit `e9e280d` on `m4-walk-view`, 40 files, 5,670
+insertions, 327 deletions - the eight phone items' fixes, the new `deviceHeading` / `walkHeading` /
+`walkSky` / `labelPlacement` modules with their tests, `CharacterIcon`, the five amended docs, and
+this file. Staged by explicit path: `node_modules` in this fork is a 0-byte symlink to
+`/tmp/saaya-land/node_modules`, which the `.gitignore` `node_modules/` pattern does not match
+because the pattern is anchored to a directory, so it shows as untracked and was deliberately left
+untracked. Committer identity came out as `Abhishai Vardhan <abhishai@Abhishais-MacBook-Air.local>`,
+the identity this fork's history already carries on `5884cf1`; the config was not touched.
+
+**The preview, and its number.** Vercel deployment `6600209324`, environment Preview, ref
+`e9e280d74de00b7a69abee31de635fe1e694f6fc`, state success:
+
+`https://saaya-lite-hrxcsbv6m-abhishai-vardhans-projects.vercel.app`
+
+The project carries no environment variables, so the git build ran without
+`SAAYA_VERSION_NAME` / `SAAYA_VERSION_CODE`. That is the same for every preview this branch has
+produced, so the version label she shows is unchanged from the builds already looked at.
+
+**The live build is verified, not assumed.** The legend harness run against the preview URL reads
+the same numbers as the local production build: as the view opens the chip is 224 x 154 with
+`aria-expanded="true"`, the derivation sentence present, four ramp stops and both end labels; one
+tap folds it to 224 x 74 with the sentence gone and the ramp intact; a second tap restores it. The
+live frame shows the chrome as built - the mark alone in the top-left tile, the character and
+settings marks in the top-right rail, the view toggle above the glyph dock with SOS on its own
+larger tile, the legend chip bottom-left - and the character at the composed size.
+
+**The two console errors the first live capture reported are the harness, not the app.** A probe
+that tags each document and dumps every error separately shows the app origin producing none: the
+only entry is the seeding init script's `IDBFactory.open()` on `about:blank`, where there is no
+secure context, and it reproduces against localhost the same way. `seeded: true` on the preview
+origin confirms the app's storage works there.
+
+**Owed from here:** the founder opens the preview on the phone - the eight items are his to accept;
+the legend's space tension needs his ruling (both states captured, above); the character's garment
+colours go to the peer session whose palette scope owns them; and the three-way reconcile onto
+`/tmp/saaya-land` still stands.
