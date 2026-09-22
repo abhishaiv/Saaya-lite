@@ -4503,3 +4503,57 @@ are varying, and print it** - the buffer was assumed wrong once, the DPR was lab
 and the renderer was assumed by both sessions for a whole day.
 
 **Unchanged and still open:** `FOG_FAR_M = 200` against its own comment's 410 m, in both trees.
+
+## 2026-09-23 - The complete cube: on real hardware every tree and every buffer draws the whole stack; on the software path individual layer pairs sit at the depth threshold and either can lose
+
+The entry above says the software path "fails only at `390x844`". That is too tidy, and the complete cube
+shows why. Two trees, two buffers, two rasterisers, every cell measured by one driver, with the renderer
+and the buffer **read back from the page in every cell**, fixed 16.6 ms clock so all eight are the top
+rung. Census over CSS rows 354-591, exact RGB:
+
+| tree | buffer | SwiftShader | ANGLE Metal (Apple M1) |
+|---|---|---|---|
+| land `b4f7e21` @3120 | `390x844` | **bare `#EDE9F7` 97.92%** | tint over green 90.04% |
+| land `b4f7e21` @3120 | `780x1688` | tint over green 90.28% | tint over green 90.28% |
+| union `7390cf3` @3130 | `390x844` | tint over green 89.69% | tint over green 89.70% |
+| union `7390cf3` @3130 | `780x1688` | **untinted green `#D5C9F7` 89.93%** | tint over green 89.93% |
+
+**Every Metal cell is correct, in both trees, at both buffers.** That is the product-relevant half of the
+cube and it is now measured rather than argued.
+
+**The software path fails differently in each tree, and the two failures are the same phenomenon.** Land at
+`390x844` loses the whole low stack to the ground plane. The union at `780x1688` keeps green and the seam
+network and loses only the tint to the green 10 mm beneath it - `#D5C9F7` at 89.93%, the identical
+signature the `depthWrite: false` probe produced on land, reproduced across three hours (`u-390x844-s2.png`
+at 02:53 and `sw-u2-fast.png` at 04:26, 89.94% and 89.93%).
+
+**The tightest single result in this whole investigation**, and the reason to state it as a threshold rather
+than as a cause: the union at `780x1688` reads `89.93%` on **both** rasterisers - the same pixels, the same
+area, the same geometry. The only difference between the two frames is the *colour*: `#DBB5DB` when the tint
+wins the depth comparison, `#D5C9F7` when green wins it. Nothing about the geometry, the layering order, or
+the app's own state differs between those two cells. Which adjacent pair resolves is decided below the app.
+
+**So the honest statement is one sentence, and it replaces both earlier stories:** the stack's 10 mm
+separations sit **at** the depth-comparison threshold of the ground layers, and which pairs resolve is
+tipped by the rasteriser, the buffer, and the tree's own camera geometry - three things that each move the
+comparison by a hair around an operating point that is already marginal. Land at `390x844` and the union at
+`780x1688` are not two bugs; they are two sides of the same knife edge.
+
+**Consequences, in order of what they cost.** No product change is owed: Metal draws all four tree-and-buffer
+combinations. No amendment is owed: nothing in the product depends on this. The capture harness's own frames
+are not evidence about the product's look unless the renderer is printed - which it now is. And if the layer
+system is ever hardened, the knife edge is the reason to prefer `polygonOffset` (whose units are
+depth-resolution steps, so it self-scales past any rasteriser) over any hand-tuned world-space separation.
+
+**One discrepancy is still open, and it is the parallel session's to close.** Its published pair - union
+fast clock, `90.32%` / `90.24%`, both *tinted* - matches no row of this cube: the union at `780x1688` reads
+untinted green on the software path and tinted on Metal, and its own driver (`charfix/devices.mjs`) forces
+SwiftShader at line 83, so Metal is not what it ran. Two tinted frames at both buffers on the union is a
+state this cube does not contain at any cell. Its PNGs and command lines are the only things that can
+close it; both have been asked for. **Its verdict was still right, and nothing here changes it: the
+bare-ground frame was never a product risk.**
+
+**Instruments.** All eight cells: `/tmp/walk-verify/dpr_matrix.mjs` with `GL=hardware|swiftshader`, which
+prints the renderer it actually got and the canvas buffer every run. Census: `step_metric.py`. Metal
+captures need a headed browser on macOS (ANGLE Metal is unreachable headless), so those runs open a window
+for about thirty seconds.
