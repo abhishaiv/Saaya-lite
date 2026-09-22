@@ -4268,9 +4268,13 @@ over the trousers. **That was wrong, and it is corrected here.** Three measureme
   **walk cycle** (`walk-hip-after.png`, `--walk`): clean.
 - Drawn colours on the after frame, sampled tight: top `(161, 134, 243)` against `#A78BFA`,
   trousers `(60, 46, 94)` against `#3A2A5E` - recorded in `MAP_SPEC.md`.
-- Note for the record: in these SwiftShader captures the **ground renders pale** (tiles do not
-  upload) - identical before and after, so it does not affect this verification, but it is a
-  capture-path property worth knowing.
+- Note for the record, because it was misread here for a minute: the pale ground in these
+  captures is **not** a capture artefact. It is `color.walk.ground` `#EDE9F7`, luma 235 - the
+  white half of the Corner-language ruling - rendering exactly as the 2026-09-23 amendment
+  intends, with the zone tint over it reading pink and the road a mid lavender line. Against it
+  her trousers at luma ~50-56 are the darkest thing in the frame, which is the contrast the
+  trouser colour was chosen for: the fact's own reference is `color.tile.road` `#4B3A70`
+  (luma 66), and she is darker than that too.
 
 ### Owed to the founder (report, next message)
 
@@ -4283,3 +4287,11 @@ over the trousers. **That was wrong, and it is corrected here.** Three measureme
   level. The op separates the two coincident surfaces instead - it pushes the top's own drape
   further out over the trousers rather than levelling anything. Recorded in `MAP_SPEC.md`
   beside the ruling quote.
+
+### The deployed build, verified
+
+Pushed as `269a1a3`; Vercel built the branch preview in 37 s. Captured that deployment with the
+same driver (`nohud-preview-f0.png`, crop `preview-hip.png`): the top is lavender, the trousers
+render `(61, 47, 95)` against `#3A2A5E`, and the hem across the seat is the clean level line -
+the ruled outcome, verified on the deployed build rather than only on localhost. Branch alias:
+https://saaya-lite-git-m4-walk-view-abhishai-vardhans-projects.vercel.app
