@@ -4427,3 +4427,79 @@ the top six by area, so a threshold shows up as a curve; `/tmp/walk-verify/dpr_s
 run-lengths per row; `dpr_matrix.mjs` still crosses viewport against scale. `charfix/devices.mjs`
 (copy, do not edit) is the parallel session's and asserts the canvas size from the DOM - prefer a
 driver that prints the buffer it actually got over one that is told which buffer to assume.
+
+## 2026-09-23 - The variable is the rasteriser, not the buffer: the bare-ground frame is a SwiftShader artefact, and not a product risk
+
+The entry above this one is withdrawn **in part**, and the part matters. The mechanism, the sweep, the
+`NEAR_M` exclusion with its live-build control, and the pairwise finding all stand and are reproduced
+below. What falls is the claim in its title - that the required separation *scales with the drawing
+buffer*, and that the buffer is "the variable that decides it". The buffer was a proxy. The variable is
+which **rasteriser** is drawing.
+
+**The experiment.** CSS viewport held at `390x844` in every cell, DPR moved to move the buffer, and -
+this is the change that settles it - the renderer and the buffer both **read back from the page**
+(`WEBGL_debug_renderer_info`, and the canvas's own `width`/`height`) rather than trusted from the launch
+flags. Top rung in every cell (fixed 16.6 ms clock), land `b4f7e21` on 3120 unless noted. Census over CSS
+rows 354-591, exact RGB:
+
+| renderer | buffer | bare `#EDE9F7` | zone tint over green |
+|---|---|---|---|
+| SwiftShader (Vulkan, LLVM 10.0.0) | `390x844` | **97.92%** | - |
+| SwiftShader | `780x1688` | 0.00% | 90.28% |
+| ANGLE Metal, Apple M1 | `390x844` | 0.00% | 90.04% |
+| ANGLE Metal, Apple M1 | `780x1688` | 0.00% | 90.28% |
+| ANGLE Metal, Apple M1 (union `7390cf3`) | `390x844` | 0.00% | 89.70% |
+
+**Metal draws the overlays at both buffers.** The software path fails only at `390x844`, and there it
+fails completely and deterministically - `97.92%` bare in two sessions hours apart. So my reading was a
+real, reproducible frame, and the parallel session's was a real, reproducible frame too; they were taken
+on **different rasterisers**. Both of us spent the day arguing about a variable that was never the one
+moving.
+
+**That resolves both entries above.** The parallel session's published pair - fast clock `90.33%` /
+`90.24%` - matches the Metal numbers here to within 0.3 points, and its floor pair - `97.75%` / `97.84%`
+flat `#F0D1DB` - is the *documented correct* floor signature (the floor keeps the zone tint, dropping
+green and the seams), not a bare frame at all. Its harness was on the real GPU throughout, which is why
+its two arms agreed. Its product verdict, "do not record it as a product risk", was right; its
+mechanism, "a different condition in that harness, still unidentified", now has a name. The `90.59%`
+figure recorded in the entry above as the `780x1688` arm was likewise SwiftShader drawing the scene
+correctly at a larger buffer.
+
+**Why the arithmetic had to fail, and why that was a clue rather than a contradiction.** Depth precision
+cannot depend on the buffer's width and height - it is set by near/far and the depth format - so no
+app-level or projection-level term could ever have produced my reading. The earlier observation that
+**nothing in the walk view reads the drawing-buffer size** (only `setPixelRatio(Math.min(devicePixelRatio,
+MAX_PIXEL_RATIO))` and `setSize`) pointed at exactly that: the cause lives below the app, in the software
+rasteriser. It was read as a refutation at the time; it was the strongest hint on the page.
+
+**What survives, and is worth more than either original story.** The walk view's whole ground z-order
+rests on **10 mm of world Y resolving through a depth comparison**, and whether it resolves is a property
+of the **rasteriser in front of it** - measured on two rasterisers with opposite answers, which no
+depth-format argument predicts. The `40-50 mm` requirement is a SwiftShader-at-`390x844` figure and must
+never be quoted as a phone's. The comment on `LAYER_HEIGHT_STEP_M` claiming the step "only has to be
+larger than the depth buffer's resolution at the camera's distance" is still false as written - the
+resolution is not the depth buffer's to define - but it is now a robustness question, not a blocker:
+**nothing needs to change for a phone, and no amendment is owed on this evidence.** If the stack is ever
+hardened against a software path, the tools are its own - `polygonOffset` per layer (units are
+depth-resolution steps, so it self-scales) or painter order (`renderOrder` from `LAYER_ORDER` with
+`depthWrite: false`, keeping `depthTest` so buildings and the character still occlude).
+
+**The consequence that matters for the palette ruling.** On a real GPU the ground band reads `90%` zone
+tint over green at the top rung and `~98%` tint over ground at the floor: the overlays draw, the seam
+network draws, and that - not the bare plane - is what a phone will see. Every composition and palette
+judgement made from a SwiftShader capture needs re-checking against a Metal capture before it is used to
+block or approve a direction. The earlier `#EDE9F7` frames were never evidence about the product's look.
+
+**A self-correction to the record.** The `~29%` dark and `9.7%` brand-violet reading flagged in the last
+session as a possible confound in the DPR-2 arm was my own band arithmetic: an unscaled CSS band at DPR 2
+silently includes the demo panel and the buttons. The frames are the same composition, verified by eye.
+The band must be multiplied by DPR before it is sliced.
+
+**Instruments.** `/tmp/walk-verify/dpr_matrix.mjs` now takes `GL=hardware|swiftshader` and prints the
+renderer it actually got on every run; the hardware path needs a headed browser on macOS (ANGLE Metal is
+not reachable headless), so those runs open a window for about thirty seconds. `step_metric.py` gives one
+exact-RGB number per band. The lesson generalises the one already recorded: **read back the property you
+are varying, and print it** - the buffer was assumed wrong once, the DPR was labelled off the plan once,
+and the renderer was assumed by both sessions for a whole day.
+
+**Unchanged and still open:** `FOG_FAR_M = 200` against its own comment's 410 m, in both trees.
