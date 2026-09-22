@@ -194,6 +194,13 @@ token, never from a neighbouring example.
 Dark only. There is no light theme. The product is used at night, and the real app has no
 light theme either.
 
+**Amendment 2026-09-23: the rule is about the chrome, and there is exactly one exception.**
+The walk view's map is a white plane carrying dark violet streets - the founder's ruling that
+the view take Corner's map language in Saaya's own colours - so its land, roofs and buildings
+are not drawn from this table at all. They are walk-view facts governed by `MAP_SPEC.md`'s
+palette section, and Corner's own app is arranged the same way: dark chrome, white map. Every
+surface listed below is chrome, and none of them moved.
+
 | Token | Hex | Notes |
 |---|---|---|
 | `brand` | `#A78BFA` | Lavender. From iOS `AppTheme.brand`. |

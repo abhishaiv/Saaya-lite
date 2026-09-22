@@ -3,7 +3,7 @@
  "kind": "knowledge_graph",
  "note": "Domain facts with provenance. Never merge with build_graph.json - different truth standards.",
  "rule": "Every numeric or colour literal in source must trace to a fact id here, or the grounded checker fails the node.",
- "count": 428,
+ "count": 430,
  "facts": [
   {
    "id": "ladder.cd1",
@@ -4686,90 +4686,101 @@
   {
    "id": "color.tile.road",
    "kind": "color",
-   "value": "#3E466C",
+   "value": "#4B3A70",
    "unit": "hex",
-   "means": "Walk-view road surface. Amended 2026-09-22 from #1A1A20, and again the same day from #2E3450 once the reference was measured at full resolution: the road is the dark ribbon the risk bands are read against, so it must be dark, but a road darker than the sky it runs under stops reading as a surface. This sits at 0.56 of color.walk.ground, which is the ratio the reference frames measure (road luma 65-80 against a land of 110-140), and at luma 72 it clears the sky at 55 by 1.31x, the road-to-sky separation the reference measures at 1.25. The value it replaced rendered at luma 53 - the sky's own luma - so a road at the horizon had no separation from the sky at all.",
-   "sourced_from": "amended by founder ruling 2026-09-22, replacing the stated design value, walk-view scene palette, 2026-09-12. Placed on the luminance ladder measured from the reference video, in Saaya's own night key. Re-placed the same day when the land moved to luma 127; the 0.56 relation is unchanged, so the road followed the land.",
+   "means": "Walk-view road surface. Amended 2026-09-23 by founder ruling that the walk view take Corner's map language in Saaya's own colours - white and dark violet where Corner is white and black - so the map inverts from a dark scene carrying lit ribbons to a white plane carrying dark violet streets. The road stays dark for the reason it always was dark: it is the surface the risk bands are read against. At luma 66 it is darker than the night key's 71, and every frozen band gains separation from it - #FF3B30 at 1.52x against 1.41x, #FF9500 at 2.44x against 2.27x, #FFCC00 at 3.03x against 2.82x. It is now 3.6x darker than the land it runs on, where the night key held it at 0.56 of the land, so a street reads as a drawn line on paper. Amended 2026-09-22 from #1A1A20, and again the same day from #2E3450 once the reference was measured at full resolution.",
+   "sourced_from": "amended by founder ruling 2026-09-23 (\"We want a high quality aesthetic and UI which matches Corner's aesthetic. They used white and black for the map. Let us use White and dark violet.\"), replacing the value placed by the 2026-09-22 founder ruling. Corner's own map was measured from its App Store screenshots for the mechanism rather than copied for the colour: its land is a neutral #ededed and its roads and blocks are #ffffff, so its roads are the brightest thing on its map. That part is not taken. A white road would put the frozen #FFCC00 band at 1.29x against it, where this value holds that band at 3.03x, so the inversion is the land and not the road.",
    "governs": "MAP_SPEC.md",
    "frozen": true,
-   "was": "#2E3450",   "platform": "web"
+   "was": "#3E466C",   "platform": "web"
   },
   {
    "id": "color.tile.building",
    "kind": "color",
-   "value": "#3A4160",
+   "value": "#D9D1F0",
    "unit": "hex",
-   "means": "Walk-view building wall. Amended 2026-09-22 from #22222A: a wall reads as a volume against the ground it stands on, and below color.walk.ground it reads at night the way a backlit block does. The old value was 20 luma against an 11 luma ground, which is no edge at all.",
-   "sourced_from": "amended by founder ruling 2026-09-22, replacing the stated design value, walk-view scene palette, 2026-09-12.",
+   "means": "Walk-view building wall. Amended 2026-09-23 by the Corner-language founder ruling. The relation the night key recorded is kept exactly - a wall is a mass below the land it stands on, at 0.91 of it there and 0.91 of it here - and only the direction of the light is reversed: a wall was darker than a dark ground, and is now a light violet against a near-white one. Amended 2026-09-22 from #22222A, which rendered at 20 luma against an 11 luma ground and was no edge at all.",
+   "sourced_from": "amended by founder ruling 2026-09-23 (white and dark violet, Corner's map language in Saaya's own colours), replacing the value placed by the 2026-09-22 founder ruling. Corner's blocks are pale volumes read against a slightly darker land, and this keeps that mechanism while staying on the brand's own violet.",
    "governs": "MAP_SPEC.md",
    "frozen": true,
-   "was": "#22222A",   "platform": "web"
+   "was": "#3A4160",   "platform": "web"
   },
   {
    "id": "color.tile.building.roof",
    "kind": "color",
-   "value": "#8792B7",
+   "value": "#FFFFFF",
    "unit": "hex",
-   "means": "Walk-view building roof. Amended 2026-09-22 from #2A2A34 and now lighter than the ground, not a shade lighter than the wall: from a camera below the rooflines, the roofs are the pale plane the city is read from, and the reference frames put their lit blocks at luma 117-137. Amended again the same day to luma 147, to stay above the land once the land rose to 127: the value it replaced rendered at luma 126, level with the land it is supposed to be read against.",
-   "sourced_from": "amended by founder ruling 2026-09-22, replacing the stated design value, walk-view scene palette, 2026-09-12. Re-placed the same day to keep the roof's relation to the land it sits on.",
+   "means": "Walk-view building roof. Amended 2026-09-23 by the Corner-language founder ruling, and the roof's relation is the one the night key recorded: from a camera below the rooflines the roofs are the pale plane the city is read from, and that plane is now pure white, at 1.09x the near-white land. It is the brightest fill on the map bar nothing, and Corner's own blocks are the same move - white volumes standing on a slightly darker land. Amended 2026-09-22 from #2A2A34, and again the same day to stay above the land once the land rose.",
+   "sourced_from": "amended by founder ruling 2026-09-23 (white and dark violet, Corner's map language in Saaya's own colours), replacing the value placed by the 2026-09-22 founder ruling. White here is color.white's own value, so the city's roof plane and the product's white are one colour and not two.",
    "governs": "MAP_SPEC.md",
    "frozen": true,
-   "was": "#737D9C",   "platform": "web"
+   "was": "#8792B7",   "platform": "web"
   },
   {
    "id": "color.tile.green",
    "kind": "color",
-   "value": "#4A7C74",
+   "value": "#D5C9F7",
    "unit": "hex",
-   "means": "Walk-view park and green space. Amended 2026-09-22 from #14251A: at 0.85 of color.walk.ground it is the ratio the reference frames measure (green luma 107-120 against a land of 110-140), so a park reads as a place rather than as a slightly greener black. Amended again the same day to luma 109 and toward the teal the reference's own parks measure (hue 184 there, 147 before): the ground's rise to 127 would otherwise have left green at 82, and under the highest-risk zone tint the park rendered olive at hue 50, a colour that appears nowhere in the reference.",
-   "sourced_from": "amended by founder ruling 2026-09-22, replacing the stated design value, walk-view scene palette, 2026-09-12. Re-placed the same day to hold its 0.85 relation to the land and its hue against the frozen tint.",
+   "means": "Walk-view park and green space. Amended 2026-09-23 by the Corner-language founder ruling: a park is still a place rather than a hole in the land, which the night key got by putting green below the land at 0.85 of it, and this holds the same relation at 0.88. What changed is the hue. The night key's teal existed to survive the frozen zone tints over a dark ground; over a near-white ground the tints are read against the land instead, and the brief's two colours are white and dark violet, so a park is a pale violet field - the most saturated large area on the map, which is what makes it read as somewhere to go. Corner's own parks are the same move in mint. Amended 2026-09-22 from #14251A, and again the same day toward the teal the reference's parks measure.",
+   "sourced_from": "amended by founder ruling 2026-09-23 (white and dark violet, Corner's map language in Saaya's own colours), replacing the value placed by the 2026-09-22 founder ruling. The tint-survival reason the teal carried is retired rather than dropped: it was derived against a dark land, and the land is no longer dark.",
    "governs": "MAP_SPEC.md",
    "frozen": true,
-   "was": "#3F5C4C",   "platform": "web"
+   "was": "#4A7C74",   "platform": "web"
   },
   {
    "id": "color.tile.water",
    "kind": "color",
-   "value": "#1F3A5C",
+   "value": "#9E8FD0",
    "unit": "hex",
-   "means": "Walk-view water. Amended 2026-09-22 from #101C2E. Dark and cool, at the road's own luma: a river and a road both read as dark against the lit ground, and water that outshines the road it is bridged by inverts the ladder.",
-   "sourced_from": "amended by founder ruling 2026-09-22, replacing the stated design value, walk-view scene palette, 2026-09-12. The reference video frames contain no water, so this one is placed by relation to the measured ladder rather than measured itself.",
+   "means": "Walk-view water. Amended 2026-09-23 by the Corner-language founder ruling. Cool and below the land, which is the relation the night key recorded - water read dark against a lit ground, and reads a mid violet against a near-white one, at 0.64 of the land. It sits between the land and the road, so a river does not outshine the street it is bridged by and does not disappear into the ground it crosses. Amended 2026-09-22 from #101C2E.",
+   "sourced_from": "amended by founder ruling 2026-09-23 (white and dark violet, Corner's map language in Saaya's own colours), replacing the value placed by the 2026-09-22 founder ruling. The reference video frames contain no water, so this one is placed by relation to the ladder rather than measured, in either key.",
    "governs": "MAP_SPEC.md",
    "frozen": true,
-   "was": "#101C2E",   "platform": "web"
+   "was": "#1F3A5C",   "platform": "web"
+  },
+  {
+   "id": "color.tile.casing",
+   "kind": "color",
+   "value": "#B4A3DE",
+   "unit": "hex",
+   "means": "The walk view's line network: the edge drawn along every road, and the seam drawn along every building footprint, green ring and water ring. One colour for both, because a block's edge and a street's edge are the same kind of line, which is how the night key had it. New in the 2026-09-23 inversion, and it exists because the night key's rule stopped being possible rather than because it stopped being right. There, the casing was the road lightened by ROAD_CASING_LIGHTNESS - a pale halo around a dark ribbon on a dark land. On a white road, lightening is the one thing that cannot happen: #FFFFFF has nowhere to go, and the halo would have been the road's own colour, which is a road with no edge at all. So the line network becomes a colour of its own, at luma 171, sitting between the two things it separates - above the road at 66 and below the land at 235. It is what makes a street read as a street on a map whose land is nearly the road's opposite, and it is the closest thing here to Corner's own soft outline around its roads and blocks.",
+   "sourced_from": "added by founder ruling 2026-09-23 (white and dark violet, Corner's map language in Saaya's own colours). Placed by relation to the two values it separates rather than measured: the road it edges is color.tile.road at luma 66 and the land it is drawn on is color.walk.ground at luma 235, and this is between them and closer to the land, so the line is visible without becoming the map's subject.",
+   "governs": "MAP_SPEC.md",
+   "frozen": true,
+   "platform": "web"
   },
   {
    "id": "color.walk.sky",
    "kind": "color",
-   "value": "#183498",
+   "value": "#2B1B5E",
    "unit": "hex",
-   "means": "The walk view's sky, and the renderer's clear colour. Measured from the reference at full resolution: its sky is rgb(24,52,152), luma 55 and a saturated blue, and it barely lightens toward the horizon (luma 56 there). Amended 2026-09-22 from #223375, which held the reference's hue (227) and luma (53) but at less than two thirds of its saturation, so the frame's second-largest area read grey where the reference reads blue. It is the darker half of the view's contrast: the land is deliberately 2.3x its luma, which is the ratio the reference frames measure and the one the old all-black scene could not have (1.0).",
-   "sourced_from": "added by founder ruling 2026-09-22, amended the same day by the same ruling once the reference was measured at full resolution. Placed at the reference video's own measured sky colour. Governs the walk view only; the flat map's own color.background and color.tile.land are untouched.",
+   "means": "The walk view's sky, and the renderer's clear colour. Amended 2026-09-23 by the Corner-language founder ruling, which fixes the view's two colours as white and dark violet: the map is the white and this is the dark violet, held as one field so the two are figure and ground rather than a tint and its background. What the night key recorded is kept - the sky is the darker half of the view's contrast against a much brighter land, at 0.15 of it here and 0.41 of it there - and only which half is bright has moved. It stays dark enough for the glints the reference carries above the horizon, which is the one part of the view the reference owns outright: a sky that went white with the map would have to lose them. Amended 2026-09-22 from #223375.",
+   "sourced_from": "amended by founder ruling 2026-09-23 (\"They used white and black for the map. Let us use White and dark violet.\"), replacing the colour placed by the 2026-09-22 founder ruling at the reference video's own measured sky. Chosen from the brand's own dark violets - the icon ground family recorded in color.icon.ground.mid rather than a colour from another product - so the sky and the icon share one darkness. The reference's measured sky was rgb(24,52,152) and is no longer the source, which is recorded here rather than left implicit: the 2026-09-22 ruling took the walk palette from the reference, and this one takes the composition from the brand.",
    "governs": "MAP_SPEC.md",
    "frozen": true,
-   "was": "#223375",   "platform": "web"
+   "was": "#183498",   "platform": "web"
   },
   {
    "id": "color.walk.haze",
    "kind": "color",
-   "value": "#192F6B",
+   "value": "#120C24",
    "unit": "hex",
-   "means": "The walk view's distance haze, and the colour the scenery fades into at the far plane. Amended 2026-09-22 from #6B7EC4, which was placed on the reading that the reference's horizon band is its brightest large area. Measured at full resolution that reading was wrong: the horizon band is a dark seam, rgb(25,47,107) at luma 47, darker than the sky above it (luma 56) and darker still than the land below it (luma 124-129 in the rows just under). What the reference holds at luma 124-135 is the map itself, not a band at the horizon. Scenery now fades down into that seam rather than up into a glow, which is where the reference gets its depth. Roads, buildings, green and water are fogged; the zone tints, the zone boundaries and the road risk bands are deliberately not, so the safety overlay keeps its frozen colour at any distance.",
-   "sourced_from": "added by founder ruling 2026-09-22, amended the same day by the same ruling once the reference was measured at full resolution. Placed at the reference video's own measured horizon-seam colour. Renders as three.js scene fog; see MAP_SPEC.md, \"Distance\".",
+   "means": "The walk view's distance haze, and the colour the scenery fades into at the far plane. Amended 2026-09-23 by the Corner-language founder ruling. The relation the night key measured from the reference is kept exactly: the seam is darker than the sky above it and darker than the land below it. It is now darker than the sky by a wider margin than it was, because the land it must close off is far brighter - scenery travels from a 235-luma map down into a 15-luma seam where it used to travel from 130 into 47, so the depth at the horizon is the one thing here that strengthens rather than simply moves. Roads, buildings, green and water are fogged; the zone tints, the zone boundaries and the road risk bands are deliberately not, so the safety overlay keeps its frozen colour at any distance, and they are what stays legible longest as the scenery fades. Amended 2026-09-22 from #6B7EC4.",
+   "sourced_from": "amended by founder ruling 2026-09-23 (white and dark violet, Corner's map language in Saaya's own colours), replacing the colour placed by the 2026-09-22 founder ruling at the reference video's measured horizon seam. Taken from the brand's own darkest violet, color.icon.ground.mid, so the seam and the icon's ground are one darkness. Renders as three.js scene fog; see MAP_SPEC.md, \"Distance\".",
    "governs": "MAP_SPEC.md",
    "frozen": true,
-   "was": "#6B7EC4",   "platform": "web"
+   "was": "#192F6B",   "platform": "web"
   },
   {
    "id": "color.walk.ground",
    "kind": "color",
-   "value": "#578BAE",
+   "value": "#EDE9F7",
    "unit": "hex",
-   "means": "The walk view's land: the plane that shows where no tile has loaded, and the surface every zone tint, road and green area is read against. Measured from the reference at full resolution: its land is a blue-teal of luma 110-140, 78% of its map area falls in the 180-240 degree blue/cyan family, and it holds no magenta anywhere. Amended 2026-09-22 from #565F80, which rendered rgb(110,90,117) - hue 284, and half the frame - under the highest-risk zone tint. The tint is frozen data, so the scenery is the thing that has to survive it: this value renders blue under every tier tint the dataset carries (217 degrees under HIGH, 197 under MODERATE, 193 under ELEVATED). It is the brightest large plane in the view, 2.3x the sky, which is the ground-to-sky contrast the reference frames measure.",
-   "sourced_from": "added by founder ruling 2026-09-22, amended the same day by the same ruling once the reference was measured at full resolution. Replaces color.background under the walk view's own ground plane; the reference video frames place the land at rgb(87,140,174), and this is that colour. The flat map's color.tile.land is untouched.",
+   "means": "The walk view's land: the plane that shows where no tile has loaded, and the surface every zone tint, road and green area is read against. Amended 2026-09-23 by the Corner-language founder ruling. The land is the white half of the view's white-and-dark-violet pair: near-white, carrying the brand's own cast rather than a neutral one, at luma 235. This is the value the whole inversion turns on. The night key put the land at 130 with the scenery around it between 53 and 146; every one of those relations is re-derived against 235 rather than rescaled, and the two that had to be broken are recorded in their own facts - the road, which was darker than the land and now is much darker, and the sky, which was dark and is now the only thing dark besides the seam. The reference's own land is rgb(87,140,174), a blue-teal; that measurement is no longer the source, which is recorded here rather than left implicit. Amended 2026-09-22 from #565F80.",
+   "sourced_from": "amended by founder ruling 2026-09-23 (\"We want a high quality aesthetic and UI which matches Corner's aesthetic. They used white and black for the map. Let us use White and dark violet.\"), replacing the colour placed by the 2026-09-22 founder ruling. Corner's map was measured from its App Store screenshots for the mechanism: its land is a neutral #ededed under white roads and blocks. This keeps the mechanism - a near-white ground the map is drawn on - and takes the cast from the brand instead of the neutral, which is what makes it Saaya's rather than Corner's. Replaces color.background under the walk view's own ground plane; the flat map's color.tile.land is untouched and is still the CARTO Dark Matter tile map's own land.",
    "governs": "MAP_SPEC.md",
    "frozen": true,
-   "was": "#565F80",   "platform": "web"
+   "was": "#578BAE",   "platform": "web"
   }
  ]
 }

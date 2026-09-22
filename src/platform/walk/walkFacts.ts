@@ -16,8 +16,9 @@
 // 31.4 / 13.2 / 3.18, and then 32.4 / 13.0 / 3.21 once the first solve was found to have used
 // an angle-linear row model, which is not how a perspective camera projects. The three numbers
 // together are the reference's composition: horizon at 0.164 of the frame height, her feet at
-// 0.736 and her head at 0.616. See the facts' own `sourced_from` for the measurement, and
-// `walkComposition.test.ts` for the projection the rows are derived with.
+// 0.736 and her head where the reference's own measurements put it. See the facts' own
+// `sourced_from` for the measurement, and `walkComposition.test.ts` for the projection the rows
+// are derived with.
 //
 // Amended again 2026-09-23, by the same ruling and with the same method: the founder found her
 // drawn too small on his phone, the reference was re-measured frame by frame, and her height on
@@ -105,23 +106,28 @@ export const COLOR_WHITE = "#FFFFFF"; // fact: color.white
 
 // --- the walk view's own sky, haze and land. Facts: color.walk.* ---
 //
-// Added 2026-09-22 by the same ruling as the camera above, and amended the same day once the
-// reference was measured at full resolution rather than at half. These are the view's three
-// largest areas and the reference gives all three: sky rgb(24,52,152), a dark seam at the
-// horizon rgb(25,47,107), and land rgb(87,140,174). The walk view was one near-black colour in
-// all three places, which is why a correct scene rendered as a void.
+// Added 2026-09-22 by the same ruling as the camera above, and amended twice since: the same day
+// once the reference was measured at full resolution, and 2026-09-23 by the ruling that the view
+// take Corner's map language in Saaya's own colours. These are the view's three largest areas.
 //
-// The amendment's own reason: the reference's map area is 78% in the 180-240 degree blue/cyan
-// family and holds no magenta anywhere, while the old ground under the highest-risk zone tint
-// rendered rgb(110,90,117) - hue 284, and half the frame. Two of the three frozen tier tints
-// took the land off-family. The fix belongs in the scenery, not in the frozen data: the land is
-// chosen so that every tint the dataset carries leaves it in the reference's own family.
+// **The 2026-09-23 key.** White and dark violet, where Corner is white and black: the land is the
+// white half and the sky is the dark half, held as one field so the two are figure and ground.
+// The map inverts - the night key had a dark scene carrying lit ribbons, this has a white plane
+// carrying dark streets - and the sky and the horizon seam are what stay dark, so the view keeps
+// its depth and the glints the reference carries above the horizon keep something to sit in.
+//
+// Both earlier placements took these three colours from the reference video's own measurements.
+// This one does not, and that is recorded rather than left implicit: the composition comes from
+// the brand instead, and the sky and the seam are the brand's own darkest violet rather than a
+// colour from another product. What has not changed is the relation the reference taught - the
+// seam darker than the sky, both far darker than the land - which is why a white map still reads
+// as somewhere rather than as a diagram.
 //
 // They are walk-view facts and not the flat map's `color.background` / `color.tile.land`, which
 // are untouched: the flat map is a CARTO Dark Matter tile map and has no horizon to compose.
-export const COLOR_WALK_SKY = "#183498"; // fact: color.walk.sky
-export const COLOR_WALK_HAZE = "#192F6B"; // fact: color.walk.haze
-export const COLOR_WALK_GROUND = "#578BAE"; // fact: color.walk.ground
+export const COLOR_WALK_SKY = "#2B1B5E"; // fact: color.walk.sky
+export const COLOR_WALK_HAZE = "#120C24"; // fact: color.walk.haze
+export const COLOR_WALK_GROUND = "#EDE9F7"; // fact: color.walk.ground
 
 // --- budgets, used by the loop's own frame guard ---
 export const FRAME_BUDGET_MS = 32; // fact: perf.frame

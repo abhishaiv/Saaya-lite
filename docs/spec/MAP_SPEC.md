@@ -414,29 +414,50 @@ the only layers that are extruded, and so the only ones with an inside.
 restored, that frame is pixel-identical: it is an honest occlusion in a half-metre slit between
 two eight-metre buildings, and she is not inside a building there at all.
 
-### The palette, and the one inversion that matters
+### The palette, and the two inversions
 
-The walk view is a night scene and the reference is daylight, so the amendment takes the
-reference's **luminance structure** rather than its colours: every surface keeps Saaya's own
-indigo key, at the relations the reference frames measure.
+The walk view's first key was a night scene and the reference is daylight, so the first
+amendment took the reference's **luminance structure** rather than its colours: every surface
+kept Saaya's own indigo key, at the relations the reference frames measure.
 
-| Surface | Fact | Relation measured from the reference |
+**Amendment 2026-09-23 took the key itself.** The ruling: the view carries the map language
+Corner's own interface uses - "they used white and black for the map. Let us use White and dark
+violet" - so the land is now the white half of the frame, with the brand's own cast, and the
+sky, the horizon seam and the streets are violet at the dark end. The first inversion made the
+land brighter than the sky while everything stayed dark; this one makes the land read as a
+**plane**, the way a paper map does, and puts the darkness above it and in the streets.
+
+| Surface | Fact | Relation |
 |---|---|---|
-| Sky | `color.walk.sky` | the dark half of the frame |
-| Ground (land) | `color.walk.ground` | **1.8x the sky** - the contrast the old all-black scene could not have (1.0) |
-| Road | `color.tile.road` | 0.56 of the ground |
-| Green | `color.tile.green` | 0.85 of the ground |
-| Water | `color.tile.water` | the road's own luma - a river and a road both read dark |
-| Building wall | `color.tile.building` | below the ground: at night a block reads as a mass against a lit plane |
-| Building roof | `color.tile.building.roof` | at the reference's lit-block luma, and **lighter than the ground** |
-| Distance haze | `color.walk.haze` | the reference's horizon, which is a **dark seam** - see below |
+| Sky | `color.walk.sky` | the dark half of the frame - `#2B1B5E`, luma 35, **0.15 of the land** |
+| Ground (land) | `color.walk.ground` | the white plane, `#EDE9F7` luma 235: the frame's brightest large area |
+| Road | `color.tile.road` | `#4B3A70` luma 66: **3.6x darker than the land** - a drawn line on paper |
+| Casing | `color.tile.casing` | luma 171: strictly **between the road and the land** it separates |
+| Green | `color.tile.green` | luma 207: 0.88 of the land, the most saturated large area on it |
+| Water | `color.tile.water` | luma 151: 0.64 of the land - a river does not outshine its bridge |
+| Building wall | `color.tile.building` | luma 213: 0.91 of the land, so a block reads as a mass standing on it |
+| Building roof | `color.tile.building.roof` | `color.white` itself: 1.09x the land, the brightest fill there is |
+| Distance haze | `color.walk.haze` | `#120C24` luma 15: the horizon **seam, below the sky** - see below |
 
-**The inversion is the point.** In the reference the ground is brighter than the sky, and the
-roads and buildings are darker than the ground. A scene where everything is one near-black
-renders as a void however correct its geometry is - that is what the flat captures showed, and
-what this amendment fixes.
+The lumas are Rec. 709, the convention the facts' own prose uses.
 
-### The hue family, and the second amendment to the same five colours
+**The inversion is the point, in both keys.** In the reference the ground is brighter than the
+sky, and the roads and buildings are darker than the ground; in Corner's map a white plane
+carries dark streets and everything around it goes dark. A scene where everything is one
+near-black renders as a void however correct its geometry is - that is what the flat captures
+showed, and what the first amendment fixed. The second key keeps that relation and pushes it
+to its end: the plane is white, not merely lighter.
+
+**The road stays dark, and that is a safety decision before it is a taste one.** The risk bands
+are the frozen tier colours and the road is what they are read against, so the road's luma sets
+the contrast every band has against it. On this road: `#FF3B30` at **1.52x**, `#FF9500` at
+**2.44x**, `#FFCC00` at **3.03x**, each better than the night key's 1.41x / 2.27x / 2.82x. Corner's
+own move is the opposite - its roads and blocks are white on a neutral `#ededed` land, so its
+roads are the brightest thing on its map - and that part is not taken. Were our road white, the
+highest tier would sit at 1.29x against it and be *dimmer* than the land it warns about. The
+dark violet road is what keeps every warning colour the brightest thing on its street.
+
+### The hue family, and what replaced its rule
 
 **Amendment 2026-09-22, second ruling.** The luminance ladder above was necessary and not
 sufficient: a correct ladder in the wrong hue family is still not the reference's picture, and
@@ -447,35 +468,55 @@ the frames said so.
 | Reference map area | 43.4% | 34.6% | 12.8% | under 3% each |
 
 **78% of the reference's map area is in the blue/cyan family, and it holds no magenta
-anywhere.** Our ground did. Under the highest-risk zone's own tint at its scaled alpha, the old
-`color.walk.ground` rendered rgb(110,90,117) - **hue 284, and half the frame** - because
-`color.zone.high` at 0.14 over `#565F80` crushes green to 90 and flips the ground's own B>G>R
-ordering. Two of the three drawn tier tints took the land off-family.
+anywhere.** Our night key's ground did. Under the highest-risk zone's own tint at its scaled
+alpha, the ground then in use rendered rgb(110,90,117) - **hue 284, and half the frame** -
+because `color.zone.high` at 0.14 over `#565F80` crushes green to 90 and flips the ground's own
+B>G>R ordering. Two of the three drawn tier tints took the land off-family.
 
 **The fix is in the scenery, never in the frozen data.** The tier colours, the thresholds and
-the dataset's own per-zone opacities are untouched; what moved is the land they are cast over,
-so that *every* tint the dataset carries leaves it in the reference's own family. That is the
-rule this row is here to state, because it is the one a future colour change must not break:
-**the ground must stay blue/cyan under all three tier tints.**
+the dataset's own per-zone opacities are untouched; what moved is the land they are cast over.
+That is the rule this row is here to state, because it is the one a future colour change must
+not break - and it is restated here in the form the 2026-09-23 key can still honour.
 
-**The relation the old scene could not have.** The ladder lands on the reference's own ratios -
-ground/sky 2.32 against the reference's 2.33, road/ground 0.56, road/sky 1.31 against 1.25,
-green/ground 0.85 against 0.89 - and the render matches the arithmetic: ground rgb(111,128,156)
-luma 126.1, sky rgb(24,52,152) luma 55.0, road luma 71.9.
+**The blue/cyan rule is retired, and that is the ruling's own consequence rather than an
+oversight.** The census above measured the *reference video's* daylight map. The 2026-09-23
+ruling takes the composition from the brand instead, so the land is now `#EDE9F7` - hue 257, a
+violet-white - and the tints cast over it land warm by construction: HIGH at its scaled alpha
+over this land gives rgb(240,209,219), a rose. There is no violet-white land on which a
+red-orange family leaves the ground blue, and pretending otherwise would only hide the change.
+What the rule was *for* survives, and is what replaces it:
+
+**The tint is a cast, never a repaint.** Under the dataset's own scaled alpha the strongest tint
+moves the land by no more than a tenth - rgb(240,209,219) at luma 216 is **0.92 of the land** -
+and under all three tints the land stays above the casing and the road. The map therefore keeps
+reading as a light plane with dark lines on it whatever tier she is standing in, which is the
+same property the blue/cyan rule was protecting, stated in the terms this key is built from.
+
+**The relation the night key could not at first reach, recorded as history.** That key's ladder
+landed on the reference's own ratios - ground/sky 2.32 against the reference's 2.33, road/ground
+0.56, road/sky 1.31 against 1.25, green/ground 0.85 against 0.89 - and its render matched the
+arithmetic: ground rgb(111,128,156) luma 126.1, sky rgb(24,52,152) luma 55.0, road luma 71.9.
+The 2026-09-23 key keeps the *shape* (a land far brighter than its sky, streets darker than the
+land, a seam darker than both) and no longer claims the reference's ratios, because it is no
+longer built from the reference.
 
 **The haze fact's own rationale was measurably wrong, and is recorded as such.** It claimed the
 reference's horizon band "measures luma 124-135 and is the brightest large area". Measuring rows
-around the horizon gives sky 56-64, then **a dark seam at 46-48**, then map 124-156. The
-reference's horizon is darker than the sky above it and the land below it. `color.walk.haze` is
-`#192F6B` for that reason, and the fact's `sourced_from` records the measurement that displaced
-the old one rather than quietly replacing it.
+around the horizon gives sky 56-64, then **a dark seam at 46-48**, then map 124-156 - the
+reference's horizon is darker than the sky above it and the land below it. That measurement is
+what put a dark seam in this view in the first place. The seam's colour is now the brand's own
+darkest violet, `#120C24`, because the 2026-09-23 ruling places it rather than the reference;
+the fact's `sourced_from` records both the measurement that established the mechanism and the
+ruling that re-sourced the colour.
 
 ### Distance, and what the haze may not touch
 
 `color.walk.haze` is the scene's fog colour, and the scenery fades into it with distance, which
 is what produces the seam at the horizon. **It is a dark seam, not a bright band**: the
 reference measures sky 56-64 above it, the seam at 46-48, and the map at 124-156 behind it, so
-the haze reads as distance closing down rather than as light gathering.
+the haze reads as distance closing down rather than as light gathering. The 2026-09-23 key
+keeps the mechanism and widens it: scenery now travels from a 235-luma land into a 15-luma seam
+where it used to travel from 130 into 47, so the horizon closes down harder than it did.
 
 **The haze is applied to scenery only.** Zone tints, zone boundaries and road risk bands keep
 their frozen colour at every distance - the fog is switched off for those materials, not merely
@@ -503,9 +544,17 @@ the frame, how many rows sit within 3 of it, and the luma of the far field at 0.
 | **200** | 48.2 | **46.50** | 0.1559 | **1.896%** | 50.7 |
 | reference | 66.4-72.1 | 45.0-45.9 | 0.1672-0.1755 | 0.625-1.250% | 62.1-82.3 |
 
-`color.walk.haze` is `#192F6B`, luma 46.6, so at 200 m the seam's own minimum measures 46.2 -
-the frozen colour, reached. The audit that raised this set the target at the reference's
-1.99-2.01% of frame; 200 gives **1.955%**, settled, once the world is resident.
+The haze colour at the time of the measurement was `#192F6B`, luma 46.6, so at 200 m the seam's
+own minimum measured 46.2 - the frozen colour, reached. The audit that raised this set the target
+at the reference's 1.99-2.01% of frame; 200 gives **1.955%**, settled, once the world is resident.
+
+**The distance is a geometry result and survives the key; the table's lumas do not.** 200 m is
+where the far plane crosses the edge of the resident world, and that is a property of
+`RESIDENT_RING` and the tile size rather than of any colour - changing the haze to 2026-09-23's
+`#120C24`, luma 15, moves every luma column in the table down without moving the row width that
+selected the value. The table is therefore kept as the measurement that fixed the distance, and
+its luma figures are read as the night key's. The seam's new depth is the frozen colour's own
+(luma 15, against a 235-luma land) and it has not been re-measured in this key.
 
 **The band fills in as the world streams, and this is why it is stated as a settled number.**
 The visible ground reaches about as far as the tiles resident around her, so the width of the
@@ -527,15 +576,68 @@ reports changes confined to 0.1600-0.4408 of the frame, with a luma difference o
 row below 0.44 - that is, everything within about 25 m of her renders identically at either
 setting. Nothing in the walkable near field is dimmed to buy the seam.
 
-**Still owed a ruling.** The reference's seam is plain haze; ours carries the zone tint, which at
-the horizon reads violet at luma 57 against the reference's 45-46. The rule above is why: zone
-tints take `fog: false`, so the largest ground fill at the horizon keeps its frozen colour. The
-rule exists to stop risk information degrading with distance, and a zone's *fill* carries tier
-colour no more than its boundary does - but the tint is the zone's whole visible area, so
-fogging it is a change to what a zone looks like, and it is left for the founder rather than
-taken here. Fogging the fill alone would restore the dark seam at no cost to the near field
-(fog begins at 45 m; boundaries, glows and labels stay unfogged), and it is recorded as the
-cheapest way to close the remaining gap if the ruling is to close it.
+**Still owed a ruling, and the 2026-09-23 key sharpens it.** The reference's seam is plain haze;
+ours carries the zone tint, which under the night key read violet at luma 57 against the
+reference's 45-46. Under the white key the same tint at the same alpha reads **rgb(240,209,219),
+luma 216** - brighter than the land it covers, against a seam at luma 15. The rule above is why
+it is unfogged at all: zone tints take `fog: false`, so the largest ground fill at the horizon
+keeps its frozen colour, because risk information must not degrade with draw distance. A zone's
+*fill* carries tier colour no more than its boundary does - but the tint is the zone's whole
+visible area, so fogging it is a change to what a zone looks like, and it is left for the
+founder rather than taken here. Two things are now on the table together, and they are the same
+question asked twice - how loud the risk wash should be on a white map:
+
+1. **The tint's strength.** At the dataset's own per-zone opacities scaled by
+   `ZONE_FILL_ALPHA_SCALE` (0.4), the strongest tier covers the land under her in rose. Every
+   alpha above 0.046 flips a violet-white land's cast, so the current value cannot be softened
+   into invisibility by tuning alone; below that the wash stops reading as a warning.
+2. **The tint's reach.** Fogging the fill alone would let the seam close over a zone at the
+   horizon at no cost to the near field (fog begins at 45 m; boundaries, glows and labels stay
+   unfogged). That was the cheapest way to close the remaining gap in the night key, and in this
+   key it is the difference between a 216-luma rose band at the horizon and a 15-luma seam.
+
+**A "rendering defect" recorded here on 2026-09-23 was a measurement error, and this is the
+measurement that replaces it.** It was written down as: at the top rung of the quality ladder the
+zone fill does not render, and at the floor rung it renders at 33-50% of the frame. The
+comparison behind that reading was taken across two separate page loads whose tiles had streamed
+to different degrees, so the tint was being compared against two different grounds and the
+difference was read as the tint vanishing.
+
+Re-measured inside **one** session, with the ladder pinned so the frame guard could not move
+under the measurement and the tile stream settled at each rung, the fill renders at every rung.
+The zone occupies 49.71% of the frame at the floor and 49.46% at the top rung - the same zone to
+within the seam ribbons that are drawn over it - and the tint composites exactly in both. What
+changes is the surface beneath it, because `detail` is what gates the tile's green and water
+layers:
+
+| rung | tint over | reads as | share of frame |
+|---|---|---|---|
+| floor (`detail: false`) | `color.walk.ground` `#EDE9F7` | `#F0D1DB` | 49.71% |
+| top (`detail: true`) | `color.tile.green` `#D5C9F7` | `#DBB5DB` | 42.65% |
+| top | `color.walk.ground` `#EDE9F7` | `#F0D1DB` | 2.04% |
+| top | seam ribbons, drawn above the fill | `#B4A3DE` | 4.77% |
+
+Both composites are `#FF3B30` at the dataset's own alpha of 0.14 (`ZONE_FILL_ALPHA_SCALE`, 0.4,
+times a 0.35-opacity zone) over the layer below: 0.14 x (255,59,48) + 0.86 x (237,233,247) =
+(240,209,219), and over (213,201,247) = (219,181,219). Hiding the green meshes converts that
+42.65% back to `#F0D1DB` exactly, which is what identifies the layer rather than inferring it.
+
+**The geometry is not at fault, and that is checked rather than assumed.** Every mesh's summed
+triangle area was matched against the area of the bake's own polygons for the same tile, reading
+`world_tiled.json` and the live scene in the same run: 23 of 24 green meshes and every water mesh
+agree **to the square metre**, tile 0,0's own 14,821 m^2 among them. The 42.65% is a park the
+dataset contains, sitting 10-19 m from the camera, and the tint composites over it correctly.
+
+**What the ladder actually costs is a colour, and it is worth naming.** Descending to the floor
+does not make the map dimmer, it makes it a different map: the ground under 42.65% of the frame
+goes from `color.tile.green` at luma 207 to `color.walk.ground` at luma 235, because the floor
+stops drawing the tile layers and the placeholder plane shows through in their place. That is a
+consequence of the floor's own design rather than a defect - the plane is documented as what
+shows where a tile has not been drawn - but it is a 28-luma swing across nearly half the frame,
+and the palette above is read entirely against luma relations, so it is recorded here rather than
+left implicit. It is also the reason every full-palette capture in this document lies to the
+ladder about the clock: the floor drops buildings, roofs, seams, green and water, so a capture
+that let the ladder settle would photograph a different palette rather than a cheaper one.
 
 ### The camera turns to her compass, and the frame does not move with it
 
@@ -614,12 +716,15 @@ This is `FEATURES.md` Amendment 1 clause 3 and it is not negotiable in implement
 
 Roads are drawn as flat ribbons on the ground plane at the tile's own resolution. Class from
 `highway`, so a trunk road reads as a trunk road. Each road is edged by a **casing**: a ribbon a
-little wider than the surface and a little lighter than it, in a lightness derived from
-`color.tile.road` itself rather than a colour of its own. Its purpose is legibility - a road in
-this palette is a dark ribbon on a lit ground, and the rim is what lets a low camera see where
-the street's edges are. **Amendment 2026-09-22.** The casing carries no claim: it is a rendering
-width and a rendering multiplier, and it travels with the road rather than counting as scenery
-the degradation ladder may drop.
+little wider than the surface, in `color.tile.casing` - luma 171, strictly between the road at
+66 and the land at 235. Its purpose is legibility: a road in this palette is a dark ribbon on a
+lit ground, and the rim is what lets a low camera see where the street's edges are.
+**Amendment 2026-09-22** introduced the casing; **amendment 2026-09-23 made it a fact of its
+own.** Until then it was the road's own colour `lighten`ed by `ROAD_CASING_LIGHTNESS`, and that
+derivation stopped being possible rather than stopped being right - no multiplier on a dark road
+reaches a line that must sit above the road and below a white land. The casing carries no claim:
+it is a rendering colour, a rendering width and a rendering multiplier, and it travels with the
+road rather than counting as scenery the degradation ladder may drop.
 
 ### What the band is drawn on, and how wide
 
@@ -654,7 +759,9 @@ in the renderer's linear working space, where a factor of 2.2 renders `#2E3450` 
 - a factor of about 1.5 to the eye, and a rim too faint for the street capture's own column
 profile to find. The casing lightens the road colour's own bytes instead, so the factor is the
 factor the number reads as. Nothing about the casing's intent changes: it is the same rim
-derived a little lighter than the road it edges.
+derived a little lighter than the road it edges. **Superseded 2026-09-23**, with the derivation
+itself: the casing is `color.tile.casing`'s own value now, so no factor is applied anywhere and
+this step is kept as the record of the intermediate one.
 
 ## Zones in 3D
 
@@ -903,6 +1010,33 @@ The escalation accent never animates here either.
 ambient motion. **The risk bands and her position never degrade**, for the same reason the
 flat map drops tiles before zones: the safety information is the product, the scenery is
 context.
+
+**Amendment 2026-09-23: the order is unchanged; the drop now has a floor and a dwell.** Both
+came out of an A/B on the walk view, and neither is a change to the order above.
+
+*The floor is ring 1, not nothing.* Honouring the order to its last rung meant the bottom step
+dropped the resident ring to 0. A capture of that state renders one flat plane, the sky's
+glints, two labels and **no city** - and the state is not rare. The floor is reached by any
+device that cannot produce a frame under `1/perf.fps`, and such a device never climbs back, so
+below roughly 31 fps the floor is the only thing that device ever renders. The floor now holds
+the ring at `RESIDENT_RING - 1`: the last step costs detail and ambient motion, not the world.
+The draw-distance drop is still first and still the largest saving.
+
+What the last step does cost is a colour, and the palette section above measures it: `detail:
+false` stops drawing the tile's green and water layers, so the ground under every zone fill falls
+back to `color.walk.ground` at luma 235 where the green layer had it at 207. At the founder's own
+coordinate that is 42.65% of the frame. The floor is still the right floor - a cheaper version of
+the neighbourhood beats an empty world - but it is a visible change to the map's colour rather
+than only to its content, and a ruling on the tint's strength should weigh it.
+
+*A rung change waits for a run of frames.* One over-budget frame is a tile decoding, a
+collection, or a load's first frames - and crossing the detail boundary removes every resident
+tile to stop paying for them, so a single stall used to cost the whole world and then take a
+frame per tile to rebuild it. Eight consecutive frames over `perf.frame` - a quarter of a
+second - now gate a step down, and the same run gates the climb back up, so a device hovering
+at the threshold cannot cross the detail boundary in either direction every few frames.
+`LADDER_DWELL_FRAMES` is a rendering responsiveness rather than a product value and is not a
+fact. `perf.frame` and `perf.fps` still fix the two thresholds and are unchanged.
 
 ## Why not the alternatives
 

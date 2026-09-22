@@ -5,7 +5,9 @@ import {
   COLOR_WALK_GROUND,
   COLOR_WALK_HAZE,
   COLOR_WALK_SKY,
+  COLOR_ZONE_ELEVATED,
   COLOR_ZONE_HIGH,
+  COLOR_ZONE_MODERATE,
   WALK_CAMERA_DIST_M,
   WALK_CAMERA_FOV_DEG,
   WALK_CAMERA_LOOK_AT_M,
@@ -191,36 +193,41 @@ describe("the amended palette keeps the reference's luminance relations", () => 
     lumaOf(`#${material.color.getHexString()}`);
 
   it("makes the ground the brighter half of the view, which the old all-black scene did not", () => {
-    // Amended 2026-09-22. Measured at full resolution the reference's land is rgb(87,140,174)
-    // at luma 128 and its sky rgb(24,52,152) at luma 55, a ratio of 2.33; across the buckets
-    // it actually occupies (land 110-140, sky 53-64) the ratio runs 2.16-2.4. The earlier band
-    // of 1.7-2.1 came from a half-resolution read and is what held the land at luma 96.
-    expect(ground / sky).toBeGreaterThan(2.15); // GROUNDED-EXEMPT: the lower end of the band the reference frames' own land:sky ratio was measured in.
-    expect(ground / sky).toBeLessThan(2.45); // GROUNDED-EXEMPT: the upper end of that measured band.
+    // Amended 2026-09-23 with the key. The band this asserted was the reference's own
+    // land:sky ratio, measured at 2.16-2.45 on its night frames, and it held the placement
+    // against the reference's measurements. The 2026-09-23 ruling takes the brand's own
+    // white-and-dark-violet key instead, where the pair measures 5.98: the band is gone and
+    // what it was ever for is kept - the land is the bright half and the sky the dark one,
+    // and the pair is at least as strong as the reference's own, so the inversion deepens
+    // the figure/ground the composition rests on rather than weakening it.
+    expect(ground / sky).toBeGreaterThan(2.45); // GROUNDED-EXEMPT: the upper end of the band the reference frames' own land:sky ratio was measured in, kept as the floor the inversion has to clear.
+    // And the sky stays darker than the darkest thing drawn on the map, so the map reads as
+    // something in a world rather than as the whole of the frame. The night key's sky was
+    // darker than its road too (53 against 71); the inversion moves both and keeps the order.
+    expect(sky).toBeLessThan(luma(materials.roadSurface));
   });
 
-  it("keeps the road dark against the ground, at the reference's own ratio", () => {
-    expect(luma(materials.roadSurface) / ground).toBeCloseTo(0.56, 2); // GROUNDED-EXEMPT: the ratio `color.tile.road`'s own text records; the fact's value is a hex, so its prose ratio is not readable mechanically.
+  it("keeps the road dark against the ground, the surface the risk bands are read on", () => {
+    // Amended 2026-09-23. The old assertion was the reference's own 0.56, which is the road's
+    // value in the night key. The inversion moves it to about 0.29 - `color.tile.road` records
+    // the same move as 3.6x darker than the land - so a ratio to the land is no longer the
+    // thing to hold. What the ratio was standing in for is: the road is the surface the risk
+    // bands are read against, so it has to be dark, and every band has to read on it.
+    expect(luma(materials.roadSurface) / ground).toBeLessThan(0.35); // GROUNDED-EXEMPT: the top of the band the inverted road sits in, stated so a later edit that lightened the road fails here.
+    for (const tier of [COLOR_ZONE_HIGH, COLOR_ZONE_MODERATE, COLOR_ZONE_ELEVATED]) {
+      expect(lumaOf(tier)).toBeGreaterThan(luma(materials.roadSurface));
+    }
   });
 
-  it("keeps the road's edge in the luma band the reference draws its lines in", () => {
-    // The reference's map is outlined by thin bright lines: measured at 1080x1920, its road
-    // and block edges peak at luma 190-250 over a land of 110-140 and a road of 65-80. A rim
-    // merely lighter than the road is not that line, and the street network is the thing this
-    // view exists to show her walking on.
-    //
-    // Amended 2026-09-22, from `> ground * 2`. That relation was written when the land was at
-    // luma 96, where a line twice the land's brightness is still only luma 192. Once the land
-    // moved to the reference's own 127 the relation became unsatisfiable - twice 127 is 254,
-    // and no colour is brighter than 255 - so the line is now held to the band the reference
-    // actually draws its lines in, which is the thing that was always meant.
-    const REFERENCE_LINE_FLOOR = 190; // GROUNDED-EXEMPT: the lower end of the reference's own measured edge-line band.
-    const REFERENCE_LINE_CEILING = 250; // GROUNDED-EXEMPT: the upper end of that same measured band.
-    expect(luma(materials.roadCasing)).toBeGreaterThan(REFERENCE_LINE_FLOOR);
-    expect(luma(materials.roadCasing)).toBeLessThan(REFERENCE_LINE_CEILING);
-    // And still brighter than everything it is drawn over, which is what makes it an edge.
-    expect(luma(materials.roadCasing)).toBeGreaterThan(ground);
-    expect(luma(materials.roadCasing)).toBeGreaterThan(luma(materials.buildingRoof));
+  it("keeps the line network between the road it edges and the land it seams", () => {
+    // Amended 2026-09-23. The band this held - luma 190-250 over a land of 110-140 - was the
+    // reference's own bright edge lines drawn on its own dark map, and the white land makes it
+    // impossible rather than merely wrong: a line at 190-250 on a plane of 235 is a line that
+    // disappears into the plane. The rule that replaced the derivation is what the derivation
+    // was for: a line strictly between the two things it separates. Brighter than the road,
+    // so a street has an edge; darker than the land, so a block has a seam.
+    expect(luma(materials.roadCasing)).toBeGreaterThan(luma(materials.roadSurface));
+    expect(luma(materials.roadCasing)).toBeLessThan(ground);
   });
 
   /**
@@ -527,6 +534,7 @@ describe("a banded street is still drawn as a street", () => {
 });
 
 describe("a zone tint is a cast over the ground, not a repaint of it", () => {
+  const ground = lumaOf(COLOR_WALK_GROUND);
   const snapshot = bundledZoneRepository.snapshot().mapZones;
   const strongest = [...snapshot].sort((left, right) => right.zone.opacity - left.zone.opacity)[0]!;
   const meta = parseWorldMeta({
@@ -552,6 +560,15 @@ describe("a zone tint is a cast over the ground, not a repaint of it", () => {
     return { red: mixed[0] ?? 0, green: mixed[1] ?? 0, blue: mixed[2] ?? 0 };
   }
 
+  /** The luma of the ground after the tint is laid over it at `alpha`. */
+  function tintedGroundLuma(tintHex: string, alpha: number): number {
+    const mixed = overGround(tintHex, alpha);
+    const hex = `#${[mixed.red, mixed.green, mixed.blue]
+      .map((channel) => channel.toString(16).padStart(2, "0"))
+      .join("")}`;
+    return lumaOf(hex);
+  }
+
   it("draws the fill at a fraction of the dataset's opacity", () => {
     const layer = buildZoneLayer([strongest], meta, 0.5);
     const fill = (layer.group.children[0] as { children: unknown[] }).children[0] as {
@@ -561,15 +578,20 @@ describe("a zone tint is a cast over the ground, not a repaint of it", () => {
   });
 
   it("keeps the ground reading as ground under the strongest tint the dataset carries", () => {
-    // Measured: at the dataset's own 0.35 the street capture's profile found rgb(145,82,100)
-    // over 35% of the frame - red-dominant, and the ground's own colour nowhere in it. Scaled,
-    // the ground keeps its blue-dominance, so the tint reads as a cast on the ground.
-    const scaled = overGround(strongest.zone.colorHex, strongest.zone.opacity * ZONE_FILL_ALPHA_SCALE);
-    expect(scaled.blue).toBeGreaterThan(scaled.red);
+    // Amended 2026-09-23. The old form of this assertion was the land's own blue-dominance,
+    // which held only because the night key's land was blue: rgb(87,140,174) has 87 bytes
+    // between its red and its blue, and the white-violet land that replaced it has ten, so
+    // the strongest tint the dataset carries flips the ordering. The old assertion was
+    // measuring the land's hue, not the tint's weight.
+    //
+    // What it was for survives the key. Measured, the strongest is HIGH at the dataset's own
+    // 0.35, and at the scaled alpha it costs the land 16 luma of 236: the tint is a cast, so
+    // the plane it is cast over stays the plane. The sibling test holds the other half - the
+    // dataset's own alpha would take a fifth of the land's brightness, which is a repaint.
+    expect(tintedGroundLuma(strongest.zone.colorHex, strongest.zone.opacity * ZONE_FILL_ALPHA_SCALE) / ground).toBeGreaterThan(0.9); // GROUNDED-EXEMPT: how much of the land's brightness a cast may cost and still be a cast, stated here so a later edit to the scale fails rather than passing quietly.
   });
 
-  it("is a scale that is doing work: the dataset's own alpha would flip the ground warm", () => {
-    const unscaled = overGround(strongest.zone.colorHex, strongest.zone.opacity);
-    expect(unscaled.red).toBeGreaterThan(unscaled.blue);
+  it("is a scale that is doing work: the dataset's own alpha would repaint the ground", () => {
+    expect(tintedGroundLuma(strongest.zone.colorHex, strongest.zone.opacity) / ground).toBeLessThan(0.85); // GROUNDED-EXEMPT: the other side of the same line - see the test above.
   });
 });

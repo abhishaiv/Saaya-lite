@@ -122,27 +122,17 @@ const ROAD_CLASS_WIDTH_DEFAULT = 1;
 export const ROAD_CASING_M = 0.25; // GROUNDED-EXEMPT: a rendering width, not a product value.
 
 /**
- * How much lighter the casing is than the road surface.
+ * The line network that edges every road and seams every block: `color.tile.casing`.
  *
- * GROUNDED-EXEMPT: a rendering multiplier, not a colour of its own. `color.tile.road` is
- * the only road colour the spec states, so the casing is derived from it rather than
- * named — if the road's colour is ever amended, its rim follows without a second ruling.
- *
- * It multiplies the road colour's own hex components (see `lighten`), which is the space
- * the frame is composited in. Amended 2026-09-22: it used to multiply the *linear* value
- * through `Color.multiplyScalar`, and 2.2 in that space renders `#2E3450` as rgb(69,78,117)
- * against the road's rgb(46,52,80) - a rim the profile could not find.
- *
- * Amended again the same day, to a factor chosen from the reference's own edge lines rather
- * than from a ratio to the road: at 1080x1920 the lines along its roads and block edges sit
- * in a luma band of 190-250, and 4.5 was picked when the road was dark enough that a factor
- * that large could not reach that band. With the road on the ladder the reference measures
- * (see `color.tile.road`), 4.5 clamps every channel to white; at 3.1 the rim lands at luma
- * 216, inside the band, and stays a cool pale ice rather than a warm yellow - the tier
- * colours are warm, and a kerb that reads as a tier colour would be a false claim. Only the
- * blue channel clamps, which is what keeps the rim cool.
+ * It used to be derived — `color.tile.road` multiplied up by a factor, in the road's own hue —
+ * because the road was the only line colour the spec stated, and a rim that follows its road
+ * was worth more than a second ruling. 2026-09-23 retired the derivation: the key inverts,
+ * the road goes dark, and the line has to sit *above* it and *below* the white land to read
+ * at all, which no factor on the road's own colour can reach. So it became its own fact, and
+ * its own value sits between the road's luma and the land's. That is the whole of the change —
+ * the line still draws both jobs it always drew, the road edge and the block seam, and the
+ * fact's own text records why one value serves both.
  */
-export const ROAD_CASING_LIGHTNESS = 3.1; // GROUNDED-EXEMPT: a rendering multiplier, not a colour of its own.
 
 /**
  * How wide the road's risk band is drawn, as a fraction of the road's own width.
@@ -167,8 +157,8 @@ export const ROAD_BAND_WIDTH_FRACTION = 0.55; // GROUNDED-EXEMPT: a rendering fr
  * The renderer's working space is linear; a hex is not. `Color.multiplyScalar(2.2)` on
  * `#2E3450` converts to linear, doubles a near-black, and converts back to rgb(69,78,117)
  * — a factor of 1.5 to the eye, not 2.2. Multiplying the hex's own bytes gives the colour
- * the number reads as, and every other colour in this file is written as a hex, so the
- * casing is too.
+ * the number reads as, and every other colour in this file is written as a hex, so a shade
+ * derived from one is too.
  */
 function lighten(hex: string, factor: number): string {
   const value = Number.parseInt(hex.slice(1), 16);
@@ -178,35 +168,48 @@ function lighten(hex: string, factor: number): string {
 }
 
 /**
- * The tile palette. Amended 2026-09-22 by founder ruling, twice the same day.
+ * The tile palette. Amended 2026-09-22 by founder ruling, twice the same day, and again
+ * 2026-09-23 by the ruling that the view take Corner's map language in Saaya's own colours.
  *
  * Every value here was `#1A1A20`-dark before, on a near-black ground, which is a scene with no
  * contrast in it: a wall reads at 20 luma against a ground of 11, which is no edge at all, and
- * a road at 27 against a sky of 11 hides the street she is walking on. The five values are now
- * placed on the luminance ladder measured from the reference frames, in Saaya's night key: the
- * ground is the lit plane (see `color.walk.ground`), the road is 0.56 of it, green is 0.85 of
- * it, the roofs are the pale plane the city is read from, and the walls are the masses standing
- * on it. Each value's own fact carries the measurement it came from.
+ * a road at 27 against a sky of 11 hides the street she is walking on. The 2026-09-22 amendments
+ * placed the five values on the luminance ladder measured from the reference frames, in a night
+ * key: the ground the lit plane, the road 0.56 of it, green 0.85 of it, the roofs the pale plane
+ * the city is read from, and the walls the masses standing on it.
  *
- * The second amendment raised the whole ladder: the reference's land is luma 110-140, its road
- * 65-80 and its sky 55, and the ladder's first placement put the land at 96, which dragged the
- * road to the sky's own luma and left the road with no separation from it at the horizon.
+ * **The 2026-09-23 key inverts the map.** The ruling is white and dark violet, where Corner is
+ * white and black: the land becomes the white half (see `color.walk.ground`) and the streets,
+ * walls and parks are read as marks on it rather than as lit ribbons in the dark. What does not
+ * invert is the order of the ladder - a wall is still a mass below the land, green still sits
+ * under it, water under that - so the city keeps its depth and every value keeps the relation to
+ * the land the reference taught.
+ *
+ * **The road stays dark, and that is a safety decision, not a taste one.** The frozen tier
+ * colours are drawn as bands on the road surface. A white road would put `#FFCC00` at 1.29x
+ * against its own surface - the ELEVATED band would stop being a band - where the dark violet
+ * road on white land lifts all three frozen bands above the contrast they had in the night key
+ * (`#FF3B30` 1.52x, `#FF9500` 2.44x, `#FFCC00` 3.03x). The road is therefore the one element of
+ * Corner's recipe that does not become white, and `color.tile.road` carries the arithmetic.
  */
 
-/** Road surface. Dark against the lit ground, so the risk bands read on it and the street reads as a surface. */
-const COLOR_ROAD_SURFACE = "#3E466C"; // fact: color.tile.road
+/** Road surface. Dark against the white land, so the risk bands read on it and the street reads as a surface. */
+const COLOR_ROAD_SURFACE = "#4B3A70"; // fact: color.tile.road
 
-/** Building face. Below the ground, so a block reads as a mass standing on a lit plane. */
-const COLOR_BUILDING = "#3A4160"; // fact: color.tile.building
+/** Building face. Below the land, so a block reads as a mass standing on it. */
+const COLOR_BUILDING = "#D9D1F0"; // fact: color.tile.building
 
-/** Building roof, lighter than the ground: from a camera below the rooflines, the roofs are the pale plane. */
-const COLOR_BUILDING_ROOF = "#8792B7"; // fact: color.tile.building.roof
+/** Building roof, above the land: from a camera below the rooflines, the roofs are the pale plane. */
+const COLOR_BUILDING_ROOF = "#FFFFFF"; // fact: color.tile.building.roof
 
-/** Green space, at 0.85 of the ground's luma and toward the teal the reference's parks measure. */
-const COLOR_GREEN = "#4A7C74"; // fact: color.tile.green
+/** Green space, below the land and violet rather than green: the brand's parks are its own hue, not a literal green. */
+const COLOR_GREEN = "#D5C9F7"; // fact: color.tile.green
 
-/** Water, dark and cool, at the road's own luma: a river and a road both read dark against the ground. */
-const COLOR_WATER = "#1F3A5C"; // fact: color.tile.water
+/** Water, between the land and the road: a river reads darker than the land and lighter than a street. */
+const COLOR_WATER = "#9E8FD0"; // fact: color.tile.water
+
+/** The line network - every road edge and every block seam. Between the road's luma and the land's. */
+const COLOR_CASING = "#B4A3DE"; // fact: color.tile.casing
 
 /**
  * How much a building face's own tone may differ from `color.tile.building`.
@@ -214,12 +217,13 @@ const COLOR_WATER = "#1F3A5C"; // fact: color.tile.water
  * GROUNDED-EXEMPT: a rendering variation around a fact, not a colour of its own.
  * `color.tile.building` stays the wall colour and stays the mean of this; the factor is how far
  * a single face may sit from it, applied in the hex's own bytes so the spread is the one the eye
- * reads - the same space `lighten` and `ROAD_CASING_LIGHTNESS` work in.
+ * reads - the same space `lighten` works in.
  *
  * **Why the walls vary at all.** Every wall in the city was one colour, so a run of them read as
- * a single mass: measured, rows 0.20-0.22 of the frame were 84.9-100% one rgb(56,64,96), where
- * the reference's row 0.22 carries 9-29 separate runs. A street in the reference is many faces at
- * slightly different tones, and an exactly uniform wall is the one thing a real one is not.
+ * a single mass: measured under the night key, rows 0.20-0.22 of the frame were 84.9-100% one
+ * rgb(56,64,96), where the reference's row 0.22 carries 9-29 separate runs. A street in the
+ * reference is many faces at slightly different tones, and an exactly uniform wall is the one
+ * thing a real one is not.
  *
  * **This is not a lighting model.** The view has no sun - see the `MeshBasicMaterial` note on
  * `createTileMaterials` - and a face's tone here comes from its own position, not from its angle
@@ -324,9 +328,9 @@ export function createTileMaterials(): TileMaterials {
   const outward = (color: string | Color): MeshBasicMaterial =>
     new MeshBasicMaterial({ color: new Color(color), side: FrontSide });
   return {
-    // `color.tile.road`, lightened — see `ROAD_CASING_LIGHTNESS`. Amended 2026-09-22: it was
-    // `new Color(COLOR_ROAD_SURFACE).multiplyScalar(...)` in the linear working space.
-    roadCasing: flat(lighten(COLOR_ROAD_SURFACE, ROAD_CASING_LIGHTNESS)),
+    // Its own fact since 2026-09-23 — see `COLOR_CASING`. Before that it was the road
+    // lightened, because the road was the only line colour the spec stated.
+    roadCasing: flat(COLOR_CASING),
     roadSurface: flat(COLOR_ROAD_SURFACE),
     // The scene's distance haze is switched off for the band, not tuned down for it. `MAP_SPEC.md`:
     // "A distant road band faded into haze would be the risk information degrading with draw

@@ -147,7 +147,8 @@ describe("withAxis", () => {
 });
 
 describe("isBodyCoveringPart", () => {
-  it("is true for every top and every bottom, and nothing else", () => {    const covering = CHARACTER_AXES.filter(
+  it("is true for every top and every bottom, and nothing else", () => {
+    const covering = CHARACTER_AXES.filter(
       (axis) => axis.id === "top" || axis.id === "bottom",
     ).flatMap((axis) => axis.options);
     for (const partId of partIdsOnDisk()) {

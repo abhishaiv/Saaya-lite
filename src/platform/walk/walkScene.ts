@@ -227,8 +227,9 @@ interface QualityStep {
  * she is standing in is still there to look at, and `detail: false` has already taken the
  * buildings off all nine.
  *
- * `MAP_SPEC.md` fixes the order and does not name a floor, so this is the ladder's order
- * honoured to its last stated rung rather than a new order.
+ * `MAP_SPEC.md`'s Performance section fixes the order and, as of the same amendment that
+ * put this floor in, names it: draw distance first and still the largest saving, with the
+ * drop stopping at `RESIDENT_RING - 1`.
  */
 const QUALITY_LADDER: readonly QualityStep[] = [
   { ring: RESIDENT_RING, detail: true, ambient: true },

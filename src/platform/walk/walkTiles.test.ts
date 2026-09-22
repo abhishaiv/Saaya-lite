@@ -5,6 +5,7 @@ import { layerHeight } from "./walkGeometry";
 import type { WorldMeta } from "./walkProjection";
 import { parseWorldMeta } from "./walkProjection";
 import {
+  COLOR_WALK_GROUND,
   COLOR_ZONE_ELEVATED,
   COLOR_ZONE_HIGH,
   COLOR_ZONE_MODERATE,
@@ -20,7 +21,6 @@ import {
   decodeTile,
   disposeGroup,
   disposeTileMaterials,
-  ROAD_CASING_LIGHTNESS,
   ROAD_CASING_M,
   ROAD_CLASS_WIDTH_MULTIPLIER,
   ROAD_HALF_WIDTH_M,
@@ -282,26 +282,21 @@ describe("buildTileMeshes", () => {
     );
   });
 
-  it("derives the casing's colour from the road's own fact rather than naming one", () => {
-    // Amended 2026-09-22: the lightening is applied to the road colour's own hex components,
-    // not through `Color.multiplyScalar`, which works in the renderer's linear working space
-    // and rendered this factor as a rim the street capture's column profile could not find.
-    // Asserted through luma, because that is the thing the frame is made of: a casing that
-    // reads as `ROAD_CASING_LIGHTNESS` times lighter than the road it edges.
+  it("holds the casing's colour between the road it edges and the land it seams", () => {
+    // Amended 2026-09-23. The casing used to be derived - the road's own fact multiplied up -
+    // and this asserted the ratio. The key inverted, and no factor on a dark road can reach a
+    // line that has to sit above the road and below the white land, so the casing became its
+    // own fact. What is asserted now is the relation that made it necessary: a line strictly
+    // between the two surfaces it separates, so it reads against both.
     const luma = (color: Color): number => {
       const hex = color.getHex();
       return 0.299 * ((hex >> 16) & 0xff) + 0.587 * ((hex >> 8) & 0xff) + 0.114 * (hex & 0xff); // GROUNDED-EXEMPT: the Rec. 601 luma coefficients, the standard the reference frames were sampled in.
     };
-    expect(materials.roadCasing.color.getHex()).not.toBe(materials.roadSurface.color.getHex());
-    // Not to the byte: each channel is rounded to a whole value before it is written back,
-    // and a channel that would pass 255 is clamped - so the rendered ratio lands under the
-    // factor rather than on it, by more the brighter the factor is.
-    // The blue channel clamps at full scale, so at 3.1 the rendered ratio lands about 0.13
-    // under it (2.98 against 3.1) - the factor is a derivation, not a promise.
-    expect(luma(materials.roadCasing.color) / luma(materials.roadSurface.color)).toBeCloseTo(
-      ROAD_CASING_LIGHTNESS,
-      0,
-    );
+    const casing = luma(materials.roadCasing.color);
+    const road = luma(materials.roadSurface.color);
+    const land = luma(new Color(COLOR_WALK_GROUND));
+    expect(casing).toBeGreaterThan(road);
+    expect(casing).toBeLessThan(land);
   });
 
   it("keeps every road fragment in one mesh rather than one mesh per fragment", () => {
