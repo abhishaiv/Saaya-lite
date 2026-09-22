@@ -16,6 +16,7 @@ import {
 } from "./walkFacts";
 import {
   applyGarmentColour,
+  clearHemOverTrousers,
   GARMENT_COLOR_BY_AXIS,
   liftOffSkin,
 } from "./walkCharacter";
@@ -29,6 +30,8 @@ import {
 const GIVEN_M = 0.008; // GROUNDED-EXEMPT: a test fixture, not a product value.
 const OTHER_GIVEN_M = 0.01; // GROUNDED-EXEMPT: a test fixture, not a product value.
 const THIRD_GIVEN_M = 0.005; // GROUNDED-EXEMPT: a test fixture, not a product value.
+/** A trousers-top height, in the fixture plane's own units. */
+const TROUSERS_TOP_Y_M = 0.5; // GROUNDED-EXEMPT: a test fixture, not a product value.
 
 /** A two-triangle plane in the XY plane, all four normals pointing at +Z. */
 function planeGeometry(): BufferGeometry {
@@ -91,6 +94,66 @@ describe("liftOffSkin", () => {
     const mesh = flatPlane();
     expect(mesh.geometry.boundingSphere).toBeNull();
     liftOffSkin(mesh, GIVEN_M);
+    expect(mesh.geometry.boundingSphere).not.toBeNull();
+  });
+});
+
+describe("clearHemOverTrousers", () => {
+  it("moves every vertex at or below the trousers' top out by the clearance", () => {
+    const mesh = flatPlane();
+    clearHemOverTrousers(mesh, TROUSERS_TOP_Y_M, GIVEN_M);
+    // The plane spans y 0..1, so the two low vertices are under the trousers' top and
+    // the two high ones are clear of it already.
+    const z = vertexZ(mesh);
+    expect(z[0]).toBeCloseTo(GIVEN_M, 6);
+    expect(z[1]).toBeCloseTo(GIVEN_M, 6);
+    expect(z[2]).toBeCloseTo(0, 6);
+    expect(z[3]).toBeCloseTo(0, 6);
+  });
+
+  it("eases to nothing across the clearance above the trousers' top", () => {
+    const mesh = flatPlane();
+    const position = mesh.geometry.getAttribute("position");
+    position.setY(1, TROUSERS_TOP_Y_M + GIVEN_M / 2);
+    position.setY(2, TROUSERS_TOP_Y_M + GIVEN_M);
+    clearHemOverTrousers(mesh, TROUSERS_TOP_Y_M, GIVEN_M);
+    const z = vertexZ(mesh);
+    // Halfway through the fade is half the clearance; the fade's far edge is untouched.
+    expect(z[1]).toBeCloseTo(GIVEN_M / 2, 6);
+    expect(z[2]).toBeCloseTo(0, 6);
+    expect(z[0]).toBeCloseTo(GIVEN_M, 6);
+  });
+
+  it("moves a vertex along its own normal, not along a shared one", () => {
+    const mesh = flatPlane();
+    mesh.geometry.getAttribute("normal").setXYZ(1, 1, 0, 0);
+    clearHemOverTrousers(mesh, TROUSERS_TOP_Y_M, GIVEN_M);
+    const position = mesh.geometry.getAttribute("position");
+    expect(position.getX(1)).toBeCloseTo(1 + GIVEN_M, 6);
+    expect(position.getZ(1)).toBeCloseTo(0, 6);
+    expect(position.getZ(0)).toBeCloseTo(GIVEN_M, 6);
+  });
+
+  it("reaches meshes nested under the part's scene", () => {
+    const part = new Object3D();
+    const child = flatPlane();
+    part.add(child);
+    clearHemOverTrousers(part, TROUSERS_TOP_Y_M, THIRD_GIVEN_M);
+    expect(vertexZ(child)[0]).toBeCloseTo(THIRD_GIVEN_M, 6);
+  });
+
+  it("leaves a part with no normals untouched rather than throwing", () => {
+    const geometry = new BufferGeometry();
+    geometry.setAttribute("position", new Float32BufferAttribute([1, 0, 3], 3));
+    const mesh = new Mesh(geometry);
+    expect(() => clearHemOverTrousers(mesh, TROUSERS_TOP_Y_M, GIVEN_M)).not.toThrow();
+    expect(mesh.geometry.getAttribute("position").getZ(0)).toBe(3);
+  });
+
+  it("gives the part bounds it did not have before", () => {
+    const mesh = flatPlane();
+    expect(mesh.geometry.boundingSphere).toBeNull();
+    clearHemOverTrousers(mesh, TROUSERS_TOP_Y_M, GIVEN_M);
     expect(mesh.geometry.boundingSphere).not.toBeNull();
   });
 });

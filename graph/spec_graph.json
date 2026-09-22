@@ -413,6 +413,17 @@
    "platform": "any"
   },
   {
+   "id": "color.garment.trouser",
+   "kind": "color",
+   "value": "#3A2A5E",
+   "unit": "hex",
+   "means": "her trousers in the walk view. A new fact rather than a reuse: the founder ruled the outfit by name on 2026-09-23 - a light top, dark trousers - so her legs take a colour of their own instead of another violet from the interface palette, and the top keeps color.brand.",
+   "sourced_from": "founder ruling 2026-09-23, on a preview pairing this value with the top's color.brand - \"Light top, dark trousers\", the option's stated pairing being top #A78BFA and bottom ~#3A2A5E. Chosen from rendered candidates at the founder's own origin rather than picked in the abstract: the road under her in this view is color.tile.road #4B3A70, and #3A2A5E holds color.brand's hue family at 16.3 luma below the road, so the trousers read as a garment against the surface she walks on. Rejected on that render: #7C3AED, lighter than the road and so on the wrong side of it; #2E2150 and #191230, darker alternatives (26.3 and 43.8 below the road) rendered and not chosen. Recorded in DESIGN_SYSTEM.md, MAP_SPEC.md and progress.md. This fact replaces the top's-and-trousers'-shared violet the same day: before it, both garments were painted from the interface palette (top color.brand, bottom color.brandDark), which is the dress the founder's ruling amends.",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true,
+   "platform": "web"
+  },
+  {
    "id": "color.background",
    "kind": "color",
    "value": "#0B0B0F",

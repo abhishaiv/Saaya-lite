@@ -922,13 +922,20 @@ that was a missing mesh.
 |---|---|
 | Painted | the `top` and `bottom` axes, at load, in `src/platform/walk/walkCharacter.ts` |
 | Top | `color.brand` `#A78BFA`, the lavender |
-| Bottom | `color.brandDark` `#8566D1`, the darker violet |
+| Bottom | `color.garment.trouser` `#3A2A5E`, the dark violet her trousers take |
 | Not painted | the hair, the eyes, the brows, the accessories and the body - their materials are their own |
 
-**Reused tokens, not new hexes.** The palette the founder ruled for this view is white and
-violet, and the two violets already in it are the ones the interface uses beside her, so she is
-painted with those rather than with two colours invented for her. `DESIGN_SYSTEM.md` carries the
-same note on the palette table.
+**A reused token for the top, a fact of her own for the trousers.** The palette the founder
+ruled for this view is white and violet, so her top keeps the lavender the interface uses beside
+her rather than a colour invented for her. The trousers were first painted with
+`color.brandDark` - the darker interface violet - and the founder amended the outfit by name
+later the same day: *"Light top, dark trousers"*. They now take `color.garment.trouser`
+`#3A2A5E`. That value was not picked in the abstract: the road surface she walks on at the
+founder's own origin is `color.tile.road` `#4B3A70`, and `#3A2A5E` holds the lavender's own hue family 16.3 luma
+below the road, so her legs read as a garment rather than as road; `#7C3AED` was rendered the
+same way and rejected for sitting lighter than the road, and `#2E2150` and `#191230` for
+sitting darker than the pack's own shadow range. `DESIGN_SYSTEM.md` carries the same note on
+the palette table.
 
 **Written through to the materials, never to the glTF.** The shipped files are untouched: each
 part file carries exactly one mesh and one material and no two part ids share a file, so setting
@@ -936,11 +943,29 @@ the colour at load is this part's own material and cannot repaint another part. 
 materials ship `baseColorTexture: none`, so the colour set is the drawn colour rather than a
 tint over an atlas.
 
+**Why the top is pushed a further 5 mm clear of the trousers.** `clearHemOverTrousers`, at load,
+applies that extra stand-off to the top wherever it overlaps the trousers and eases it to nothing
+5 mm above their top edge, so nothing steps on the garment above. The reason is that the two
+garments are largely *the same surface*: 106 of the hoodie's 327 vertices below y=1.06 sit at
+exactly 0.000 m from a jeans vertex, spread all round the ring, and a uniform stand-off moves both
+by the same amount along the same normals - so no stand-off can change either one's position
+relative to the other. Measured after the lift, the two sit within ±1 mm of each other over
+y 0.92-1.00, which is why the depth test resolved them per fragment and the boundary came out as
+the pale scalloped band across her hips. 5 mm decides every one of those fragments for the top,
+and at the scale this camera draws her at (about 133.5 px per metre at the founder's own origin)
+it moves her silhouette by less than a pixel. The hem edge it draws is level, not wavy: a
+straight-on render from behind puts its lowest pixel within 1 px of level across its whole span,
+and the two raised spots an earlier per-bin measurement showed were that measurement's 3-degree
+bins crossing edges rather than vertices. Amended 2026-09-23 under the founder's ruling on the
+frilled look: *"A small geometry op at load that levels the hem's edge, so the top reads as a
+normal straight top instead of a frilled one."* The outcome is the ruled one; the mechanism is
+this one, because the measurement says the frill was never the edge's shape.
+
 **What this does not fix, and is owed to the asset work.** The garments are copies of the body,
 so the silhouette stays anatomical: she reads as wearing a close-fitting top and trousers rather
 than a loose hoodie. There is also **no footwear axis in the pack** - her feet are the body's
-own and stay bare. Verified on the frame after the change: top `(165, 140, 252)` against the
-`#A78BFA` it is set to, trousers `(127, 100, 204)` against `#8566D1`.
+own and stay bare. Verified on the frame after the change: top `(161, 134, 243)` against the
+`#A78BFA` it is set to, trousers `(60, 46, 94)` against `#3A2A5E`.
 
 ### The customiser, and the first switch
 

@@ -96,22 +96,39 @@ const CHARACTER_FACING_RADIANS = 0;
  * vertex's own normal, so this is a stand-off, not an inflation.
  *
  * What 14 mm does not fix, and 22 mm or 35 mm do not either: the pale scalloped band across
- * her hips. An earlier note here called that band the jeans' own waistband. That was wrong,
- * and the correction came from an isolation render of the two garments alone with one flat
- * colour each: the band is **the top's hem**, drawn over the upper hip of the trousers in the
- * shape of the hem's modelled wavy edge. It survives every standoff for the same reason it is
- * not a depth artefact at all - a uniform lift moves both garments by the same amount and so
- * cannot change either one's position relative to the other, only their shared distance from
- * the skin. The rim measurements say why the hem wins there: at the back the jeans' waistband
- * rim curls inward to 120 mm from the axis, the body's hip surface at that height is 143-146
- * mm, and the hem hangs at 148 mm. The hem is the only one of the three outside the body, so
- * it is drawn in front. Raising the standoff to chase the band only holds the garments further
- * off the body.
+ * her hips. An earlier note here called that band the jeans' own waistband, and a later one
+ * called it the top's hem drawn in the shape of a modelled wavy edge. Both were wrong, and
+ * the correction came from measuring the two garments against each other rather than from
+ * another render: the band is a depth fight between two surfaces that are *the same
+ * surface*. The top's lower drape and the trousers were authored as copies of each other
+ * around the hips - 106 of the hoodie's 327 vertices below y=1.06 sit at exactly 0.000 m
+ * from a jeans vertex, spread all round the ring - and a uniform lift moves both by the
+ * same amount along the same normals, so after it the two are still within ±1 mm of each
+ * other over y 0.92-1.00. The depth test then resolves per fragment, and the boundary of
+ * that mosaic is what reads as a frill. The hem edge itself is level, not wavy: a
+ * straight-on render from behind puts its lowest pixel within 1 px of level across its
+ * whole span, and the two raised spots an earlier per-bin table showed were that table's
+ * 3-degree bins crossing edges rather than vertices. `clearHemOverTrousers` is what
+ * answers the band, by pushing the top further out than the trousers where they overlap.
  * GROUNDED-EXEMPT: a depth separation between two surfaces, not a product value - the
  * same kind of constant as `LAYER_HEIGHT_STEP_M`, which separates the coplanar ground
  * layers, and for the same reason.
  */
 const GARMENT_STANDOFF_M = 0.014; // GROUNDED-EXEMPT: depth separation between the skin and what she wears, not a product value.
+
+/**
+ * How much further out the top is pushed where it overlaps the trousers, in metres.
+ *
+ * The 14 mm stand-off cannot separate the two garments because it moves them together; this
+ * is the extra that separates them, applied only below the trousers' top edge and eased to
+ * nothing within `HEM_CLEARANCE_M` above it, so the added stand-off is continuous. Sized
+ * from the frame rather than from taste: 5 mm is 0.7 px at the scale the view draws her at
+ * (≈133.5 px per metre at the founder's own origin), so the top's silhouette does not visibly
+ * move, while 5 mm of separation at a camera 12.58 m away is far more than the depth buffer
+ * needs to resolve the two surfaces cleanly.
+ * GROUNDED-EXEMPT: a depth separation between two surfaces, not a product value.
+ */
+const HEM_CLEARANCE_M = 0.005; // GROUNDED-EXEMPT: depth separation between the two garments, not a product value.
 
 /**
  * Move every vertex of a part outward along its own normal.
@@ -141,7 +158,48 @@ export function liftOffSkin(part: Object3D, metres: number): void {
 }
 
 /**
- * What each garment axis is painted with. Fact: color.brand, color.brandDark.
+ * Push the top clear of the trousers where the two overlap, so the top is drawn over them.
+ *
+ * Every vertex at or below `trousersTopY` moves `metres` further along its own normal,
+ * easing to nothing at `trousersTopY + metres`. Both garments were lifted along the same
+ * normals by the same amount, so the extra offset - and only the extra offset - decides
+ * which of the two wins each fragment. This is a stand-off, not an inflation: it changes
+ * where the surface sits, and the fade keeps the change continuous so no step appears on
+ * the garment above the trousers' edge.
+ *
+ * Takes the trousers' top rather than reading it, because the two garments are separate
+ * files and only the caller holds both. Bounds are recomputed for `liftOffSkin`'s reason:
+ * the renderer culls against a bounding sphere that would otherwise be a lie.
+ */
+export function clearHemOverTrousers(
+  part: Object3D,
+  trousersTopY: number,
+  metres: number,
+): void {
+  part.traverse((object) => {
+    if (!(object instanceof Mesh)) return;
+    const position = object.geometry.getAttribute("position");
+    const normal = object.geometry.getAttribute("normal");
+    if (position === undefined || normal === undefined) return;
+    for (let vertex = 0; vertex < position.count; vertex += 1) {
+      const y = position.getY(vertex);
+      if (y >= trousersTopY + metres) continue;
+      const ease = y <= trousersTopY ? 1 : (trousersTopY + metres - y) / metres;
+      const extra = metres * ease;
+      position.setXYZ(
+        vertex,
+        position.getX(vertex) + normal.getX(vertex) * extra,
+        position.getY(vertex) + normal.getY(vertex) * extra,
+        position.getZ(vertex) + normal.getZ(vertex) * extra,
+      );
+    }
+    position.needsUpdate = true;
+    object.geometry.computeBoundingSphere();
+  });
+}
+
+/**
+ * What each garment axis is painted with. Fact: color.brand, color.garment.trouser.
  *
  * Exported because the invariant that matters is testable and would otherwise be
  * invisible: every axis that clothes the body has a colour here, and nothing is painted
@@ -215,14 +273,36 @@ export async function loadCharacter(
   const walkActions: AnimationAction[] = [];
   const idleActions: AnimationAction[] = [];
 
+  // What she wears is a copy of the skin's own surface, so it is drawn at the same
+  // depth as the skin and loses the depth test fragment by fragment. Lifting it is
+  // what turns the speckles back into a garment. Every garment is lifted before
+  // anything is measured, because what the top has to clear is where the trousers end
+  // *after* the lift rather than what the shipped file says.
+  for (const { partId, file } of partFiles) {
+    if (isBodyCoveringPart(partId)) liftOffSkin(file.scene, GARMENT_STANDOFF_M);
+  }
+
+  // The top's lower drape is the trousers' own surface, so the two draw at one depth
+  // and the boundary between them comes out as speckle. Read the trousers' top off the
+  // lifted mesh rather than stating it: a part swap or a stand-off change moves it.
+  let trousersTopY: number | null = null;
+  for (const { partId, file } of partFiles) {
+    if (axisIdForPart(partId) !== "bottom") continue;
+    const top = new Box3().setFromObject(file.scene).max.y;
+    trousersTopY = trousersTopY === null ? top : Math.max(trousersTopY, top);
+  }
+  if (trousersTopY !== null) {
+    for (const { partId, file } of partFiles) {
+      if (axisIdForPart(partId) === "top") {
+        clearHemOverTrousers(file.scene, trousersTopY, HEM_CLEARANCE_M);
+      }
+    }
+  }
+
   for (const { partId, file } of partFiles) {
     const scene = file.scene;
     scene.name = `part:${partId}`;
-    // What she wears is a copy of the skin's own surface, so it is drawn at the same
-    // depth as the skin and loses the depth test fragment by fragment. Lifting it is
-    // what turns the speckles back into a garment.
-    if (isBodyCoveringPart(partId)) liftOffSkin(scene, GARMENT_STANDOFF_M);
-    // And it ships grey, which over the body's nude base texture reads as skin, so the
+    // It ships grey, which over the body's nude base texture reads as skin, so the
     // garment axes are painted rather than left as the pack authored them.
     const axisId = axisIdForPart(partId);
     const garmentColor = axisId === null ? undefined : GARMENT_COLOR_BY_AXIS[axisId];

@@ -42,7 +42,7 @@ export const WALK_LEGEND_WIDTH_PX = 224; // fact: walk.legend.width
 export const WALK_CHARACTER_HEIGHT_M = 1.7; // fact: walk.character.height
 export const WALK_SPEED_MPS = 1.4; // fact: walk.speed
 
-// --- what she wears. Fact: color.brand, color.brandDark ---
+// --- what she wears. Fact: color.brand, color.garment.trouser ---
 //
 // The asset pack has no violet in it. Every garment ships grey - `top_hoodie` is
 // (0.36, 0.31, 0.28) linear, `bottom_jeans` (0.22, 0.25, 0.36) - and each garment mesh is
@@ -51,14 +51,19 @@ export const WALK_SPEED_MPS = 1.4; // fact: walk.speed
 // and it is a colour problem rather than a missing mesh: the top is loaded, lifted 14 mm
 // off the skin and drawn, and the frame still reads as unclothed.
 //
-// The palette he ruled for this view is white and violet, so the two garment axes are
-// painted with the interface's own two violets - the lavender over the darker one -
-// rather than with two new hexes invented for the occasion. Reused the same way the zone
-// constants below are reused: she cannot then disagree with the interface she is drawn
-// inside. There is no footwear axis in the pack, so her feet stay bare; that is owed to
-// the asset work rather than fixable here.
+// The palette he ruled for this view is white and violet, so both axes were first painted
+// with the interface's own two violets, the lavender over the darker one. The same day he
+// amended the outfit by name - "Light top, dark trousers" - so the top keeps `color.brand`
+// and the trousers take `color.garment.trouser`, a new fact. That value was not picked in
+// the abstract: the road she walks on is `color.tile.road` #4B3A70, and #3A2A5E holds
+// color.brand's hue family 16.3 luma below the road, so the legs read as a garment against
+// the surface under her (#7C3AED was rendered and rejected for sitting lighter than the
+// road; #2E2150 and #191230 for sitting darker than the pack's own shadow range).
+//
+// There is no footwear axis in the pack, so her feet stay bare; that is owed to the asset
+// work rather than fixable here.
 export const GARMENT_TOP_COLOR = "#A78BFA"; // fact: color.brand
-export const GARMENT_BOTTOM_COLOR = "#8566D1"; // fact: color.brandDark
+export const GARMENT_BOTTOM_COLOR = "#3A2A5E"; // fact: color.garment.trouser
 
 // --- zone treatment, reused from the flat map rather than re-chosen. ---
 // The flat map's own constants in HomeMap.tsx carry the same ids; these are the same

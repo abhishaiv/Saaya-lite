@@ -4211,3 +4211,75 @@ top's own lit colour appearing as a separate strip between the two bright bands.
 
 Instruments: `/tmp/walk-verify/meshview/{index.html,shot.mjs,crop.cjs}`, `insidecheck.cjs`,
 `hemline.cjs`, `backline.cjs` in `/tmp/walk-verify/charfix/`.
+
+## 2026-09-23 - the outfit ruling and the hem op, implemented
+
+### What the founder ruled, and what was built from it
+
+Two rulings, both taken on the frame:
+
+1. **"Light top, dark trousers."** Her top keeps `color.brand` `#A78BFA`; her trousers take a
+   new fact, **`color.garment.trouser` `#3A2A5E`** (spliced into `graph/spec_graph.json` in the
+   house amendment style, with the ruling quoted), and `GARMENT_BOTTOM_COLOR` moves off
+   `color.brandDark`. Both docs that stated the old pairing - `DESIGN_SYSTEM.md` ("Two of these
+   are worn") and `MAP_SPEC.md` ("What she wears") - were amended to say what is true now.
+2. **"Straighten the hem"** - the option's own text: *"A small geometry op at load that levels
+   the hem's edge, so the top reads as a normal straight top instead of a frilled one. It
+   modifies the authored mesh at runtime, so it needs your ruling and a recorded note."*
+
+### What the measurement found first, because it changed the op
+
+The last entry here said the band across her hips was the hem's **modelled wavy edge** drawn
+over the trousers. **That was wrong, and it is corrected here.** Three measurements, in order:
+
+- The hem's edge is **level**. A straight-on render from behind (`mode=flat`, pitch 0) puts its
+  lowest pixel within **1 px of level across its whole span** (`edgescan.cjs`). The "two raised
+  spots" an earlier 3-degree-bin table showed were that table's bins crossing *edges* rather
+  than vertices - there is nothing to straighten.
+- The band is a **depth fight between two surfaces that are the same surface**. `twins.cjs`:
+  **106 of the hoodie's 327 vertices below y=1.06 sit at exactly 0.000 m from a jeans vertex**,
+  spread all round the ring; after the 14 mm lift both move by the same amount along the same
+  normals, so `whowins.cjs` finds them **within ±1 mm of each other** over y 0.92-1.00. The
+  depth test resolves that per fragment, and the mosaic's boundary is what reads as a frill.
+- **No stand-off can separate them** - confirmed, and it is exactly why the op has to be an
+  *extra* offset on one garment only.
+
+### What was implemented
+
+- `clearHemOverTrousers(part, trousersTopY, metres)` in `src/platform/walk/walkCharacter.ts`:
+  every vertex at or below `trousersTopY` moves **5 mm** (`HEM_CLEARANCE_M`, GROUNDED-EXEMPT as
+  a depth separation) further along its own normal, easing to nothing 5 mm above that edge so
+  nothing steps on the garment above. Wired into `loadCharacter` as a pre-pass: all
+  body-covering parts are lifted first, then the trousers' top is **read off the lifted mesh**
+  (`Box3.max.y`) rather than stated, then the top is cleared. No trousers, no op.
+- Six tests in `walkCharacter.test.ts` mirroring `liftOffSkin`'s: full distance at/below the
+  edge, the linear fade, along-vertex normals, nested meshes, no normals, bounds.
+- The doc comment on `GARMENT_STANDOFF_M` is rewritten: it now names the coincidence as the
+  mechanism and records that the earlier waverers - the waistband note and the wavy-edge note -
+  were both wrong.
+
+### Gates and the frame
+
+- `tsc` clean; **vitest 49 files / 357 tests** (351 + 6 new); `grounded_check.py`: 0 ungrounded
+  literals, 399 live facts.
+- No-HUD Chromium captures at the founder's own origin, idle - before (`nohud-f0.png`) and after
+  (`nohud-after-f0.png`), the hip crop side by side in `hip-before-after.png`: **the frilled
+  band is gone**; the hem now draws as a clean line over dark trousers. Same check under the
+  **walk cycle** (`walk-hip-after.png`, `--walk`): clean.
+- Drawn colours on the after frame, sampled tight: top `(161, 134, 243)` against `#A78BFA`,
+  trousers `(60, 46, 94)` against `#3A2A5E` - recorded in `MAP_SPEC.md`.
+- Note for the record: in these SwiftShader captures the **ground renders pale** (tiles do not
+  upload) - identical before and after, so it does not affect this verification, but it is a
+  capture-path property worth knowing.
+
+### Owed to the founder (report, next message)
+
+- **Item 8, the size**: her drawn height is **≈0.13 of the frame** (ours 0.1345 against the
+  reference's 0.1245-0.1302, feet matching to a pixel). The earlier "roughly a fifth" figure was
+  wrong and is corrected here.
+- **The honest mechanism note on the hem ruling**: the ruled *outcome* is delivered ("the top
+  reads as a normal straight top instead of a frilled one"), but the *mechanism* the option's
+  text described - levelling the edge - is not what was needed, because the edge was already
+  level. The op separates the two coincident surfaces instead - it pushes the top's own drape
+  further out over the trousers rather than levelling anything. Recorded in `MAP_SPEC.md`
+  beside the ruling quote.

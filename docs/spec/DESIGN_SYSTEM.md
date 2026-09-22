@@ -219,11 +219,14 @@ surface listed below is chrome, and none of them moved.
 | `amber` | `#F09921` | iOS `AppTheme.amber`. |
 | `danger` | `#FF3B30` | |
 
-**Two of these are worn.** The walk view's character is painted with `brand` for her top and
-`brandDark` for her trousers: the character pack ships every garment grey, and a grey garment
-over the body's own texture reads as skin at phone size. The tokens are reused rather than new
-hexes chosen for her, so she cannot disagree with the interface beside her. `MAP_SPEC.md`,
-"What she wears", carries the measurements.
+**One of these is worn, and one colour is her own.** The walk view's character is painted with
+`brand` for her top. Her trousers take `color.garment.trouser` `#3A2A5E`, which is a fact of the
+walk view rather than a token of this table: the founder ruled the outfit by name on 2026-09-23 -
+*"Light top, dark trousers"* - after the two-violet pairing had shipped, so the top keeps the
+lavender the interface uses beside her and the legs are no longer a second violet. The character
+pack ships every garment grey, and a grey garment over the body's own texture reads as skin at
+phone size. `MAP_SPEC.md`, "What she wears", carries the measurements and the render the trouser
+colour was chosen on.
 
 **Zone fills come from the data, never from these tokens.** `vizag_heatmap.geojson` carries
 `color` and `opacity` per zone: high `#FF3B30`, moderate `#FF9500`, elevated `#FFCC00`,
