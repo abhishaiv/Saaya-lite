@@ -4013,3 +4013,53 @@ findings were re-run against it, not against a local tree:
   dock (Demo/SUS/SOS), and the 224 px chip legend over the white-and-violet key. The only control
   on the frame that is not ours is Vercel's own preview-toolbar badge, which appears on preview
   deployments and not in production.
+
+## 2026-09-23 - The ground-overlay stack can fail to render, and it is not the device pixel ratio
+
+On `/tmp/saaya-land` at `b4f7e21`, with the drawing buffer at 390x844, the walk view renders a bare
+`color.walk.ground` plane: `water`, `green`, `zoneFill` and `groundSeam` are all absent - exactly
+`LAYER_ORDER` 0-3 - while the roads (4-6), the buildings and the character render normally. At a
+780x1688 buffer the same build renders them. Matched evidence, in-repo harness, two runs per cell,
+deterministic to two decimals:
+
+| CSS viewport | DPR | drawing buffer | ground |
+| --- | --- | --- | --- |
+| 390x844 | 1 | 390x844 | bare `#EDE9F7` 49.89%, seams 0.02%, no tint |
+| 390x844 | 2 | 780x1688 | tint over green `#DBB5DB` 42.54%, seams 4.74% |
+| 720x1280 | 1 | 720x1280 | tint over green `#DBB5DB` 47.90%, seams 5.29% |
+
+Rows 1 and 2 hold CSS size fixed and differ only in the drawing buffer. Row 3 is DPR 1 with a
+720x1280 buffer and it keeps the overlays. So the operative variable is the **drawing-buffer
+resolution, not `devicePixelRatio`**. This corrects the note written into `scripts/walk_capture.mjs`
+earlier today ("DPR removes those layers on its own"): `--scale` moves DPR and buffer size together,
+so it cannot separate them, and that is the second time this session a single flag was read as a
+single variable.
+
+The quality ladder is a separate axis and does not cause this. At scale 1 the ground is bare under
+both the fixed clock and the natural clock. The rung changes *which* tint appears - floor: tint over
+`color.walk.ground`; top: tint over `color.tile.green`, because green is a detail layer - not
+whether one appears.
+
+**Not established on this branch.** The union at `78b3f9f` is a materially different build
+(different walk chrome, a violet outfit, a different camera pose) and three captures against it do
+not reproduce the land signature: its ground renders healthily, with untinted green over most of the
+frame and the tint band in the near foreground, which is simply where the zone ends. The two builds
+are not comparable on this point, so the land result must not be restated as a union result and the
+live preview is not known to carry it.
+
+**Mechanism open.** Candidates: a depth interaction between coplanar layers - `LAYER_HEIGHT_STEP_M`
+is 0.01 m and its own comment claims it only has to beat the depth buffer's resolution at the
+camera's distance, which is the claim under test - or a ribbon cut that degenerates when its width
+in metres is large. `metresPerPixel()` divides by `canvas.clientHeight`, so CSS height sets a
+ribbon's width in metres, but rows 1 and 2 above hold CSS height fixed at 844 and still differ, so
+that alone cannot be the cause. The numbers to work through are `antialias: true`,
+`camera.far = planeTilesAcross() * tileM`, and `camera.near` at the three.js default of 0.1.
+
+**Why it matters:** the tint is the risk layer, and `MAP_SPEC.md` states the risk information must
+not degrade. A configuration that drops it draws a map with no risk shading at all. The project's
+stated target is a 2 GB device, and a low-end Android at 360x640 CSS with DPR 1 gives a 360x640
+buffer, well under the threshold these three points bracket.
+
+Instruments: `/tmp/walk-verify/dpr_matrix.mjs` (viewport crossed against scale, `WALK_URL` for the
+target tree) and `/tmp/walk-verify/dpr_column.py` / `dpr_scan.py` / `pnglib.py` (exact colour
+census, no image library needed).
