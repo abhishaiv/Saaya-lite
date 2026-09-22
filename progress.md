@@ -4334,3 +4334,24 @@ Two things came out of the same test worth keeping:
   the walk view is not up. Scratch instrument: `/tmp/walk-verify/charfix/devices.mjs` (CSS size
   and DPR independently, `WALK_URL` for either tree, `REAL_CLOCK=1` pins the floor, colour
   census of the ground band).
+
+### Addendum, same day: two more candidate causes excluded
+
+The parallel session went looking for the mechanism behind its buffer-size reading. Three
+candidate causes now stand excluded, so the arithmetic it plans (depth resolution against the
+0.01 m layer steps) should not be expected to find one:
+
+- **No code reads the drawing-buffer size.** The only buffer-touching lines in the walk view are
+  `renderer.setPixelRatio(Math.min(devicePixelRatio, MAX_PIXEL_RATIO))` - `MAX_PIXEL_RATIO` is 2,
+  so a 2.625-DPR device renders a 2x buffer - and `renderer.setSize(w, h, false)`. Nothing
+  branches on it.
+- **An early frame is not it either.** Captures on land at 390x844@1 taken 200 / 800 / 1600 /
+  3000 ms after the walk view reports ready: tinted in all four, 90.33-90.38%.
+- **Depth precision cannot carry a buffer-size dependence at all.** It is a function of near/far
+  and the depth format's bit depth, not the buffer's width and height; resolution changes
+  sampling, not depth comparisons.
+
+What the bare-ground signature would require is `color.walk.ground` visible - so green and water
+dropped (that is `detail: false`) *and* the zone fill absent or empty, since the floor alone keeps
+the tint. The one channel still standing is the zone layer being empty in those runs: a
+load-state question, not a resolution one.
