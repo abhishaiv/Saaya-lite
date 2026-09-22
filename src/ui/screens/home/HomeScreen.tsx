@@ -22,6 +22,7 @@ import type { HeatmapHotspot } from "../../../domain/model/heatmapHotspot";
 import { RiskTier } from "../../../domain/model/zone";
 import type { PoliceStation } from "../../../domain/model/policeStation";
 import { browserClock } from "../../../platform/clock";
+import { requestHeadingAccess } from "../../../platform/deviceHeading";
 import { readGeolocationPermissionState } from "../../../platform/geolocationPermission";
 import {
   createLocalSessionId,
@@ -53,6 +54,7 @@ import {
   MapControlButtonStack,
 } from "../../components/MapControlButton";
 import { formatCopy, M4_COPY, type SaayaLocale } from "../../copy/strings";
+import { CharacterIcon } from "../../icons/CharacterIcon";
 import { HomeEngineBridge, type HomeEngineView } from "./homeEngineBridge";
 import { HomeMap } from "./HomeMap";
 import { DemoPanel } from "./DemoPanel";
@@ -138,6 +140,10 @@ export function HomeScreen({
   const [demoSpeedEnabled, setDemoSpeedEnabled] = useState(false);
   const [demoSessionActive, setDemoSessionActive] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>("FLAT");
+  // The compass answer, taken on the tap that opens the walk view. False until then, which
+  // is the recorded camera: a phone with no compass draws the frame the facts were solved
+  // for rather than a frame that claims a heading it never had.
+  const [headingAllowed, setHeadingAllowed] = useState(false);
   const [characterLoad, setCharacterLoad] = useState<CharacterLoad>({
     kind: "absent",
   });
@@ -384,6 +390,15 @@ export function HomeScreen({
   }, [copy, heatmapHotspots, locale, zoneDetails, zones]);
 
   useEffect(() => {
+    // The walk view is the one screen whose whole subject is her position, and it is
+    // entered by an explicit tap - she cannot be looking at it from her pocket. While it
+    // is showing, the watch feeds the map every fix it is already receiving and asks for
+    // precise ones; the recorded sampling cadence is untouched, so nothing about
+    // containment or the ladder changes. Founder finding, 2026-09-23.
+    locationRuntimeRef.current?.setWalkViewVisible(viewMode === "WALK");
+  }, [viewMode]);
+
+  useEffect(() => {
     if (engineView.state !== "IDLE") return;
     setArmAcknowledgement(null);
     setArmBannerVisible(false);
@@ -612,6 +627,16 @@ export function HomeScreen({
     const next: ViewMode = viewMode === "FLAT" ? "WALK" : "FLAT";
     setViewMode(next);
     setAnnouncement(next === "WALK" ? copy.annViewWalk : copy.annViewFlat);
+    if (next === "WALK") {
+      // Asked here, inside the tap that opens the view, because iOS only answers this
+      // while a gesture is being handled - an ask from an effect, a moment later, never
+      // prompts at all. "unsupported" is not a refusal: Android reads its compass with no
+      // permission, so a view that only listened on "granted" would never turn there.
+      // Founder finding, 2026-09-23: the view did not turn with him.
+      void requestHeadingAccess().then((permission) => {
+        setHeadingAllowed(permission !== "denied");
+      });
+    }
     if (next === "WALK" && needsCharacter(characterLoad)) {
       setCustomiserFirstRun(true);
       setCustomiserOpen(true);
@@ -701,14 +726,11 @@ export function HomeScreen({
         <WalkView
           character={character}
           copy={copy}
+          headingAllowed={headingAllowed}
           hourBand={hourBandAtEpochMs(browserClock.nowEpochMs())}
           location={location}
           locationStatus={locationStatus}
           mapZones={mapZones}
-          onEditCharacter={() => {
-            setCustomiserFirstRun(false);
-            setCustomiserOpen(true);
-          }}
           onZoneSelected={handleZoneSelected}
           selectedZoneId={selectedZoneId}
           sessionState={engineView.state}
@@ -729,11 +751,12 @@ export function HomeScreen({
       )}
 
       {engineView.state === "IDLE" || engineView.state === "RESOLVED" ? (
-        <div aria-label={copy.appName} className="home-screen__brand-lockup">
-          {/* The supplied compact v2 mark is the production brand asset. */}
+        // Founder instruction, 2026-09-23: the supplied compact v2 mark is the production
+        // brand asset and it is the whole lockup - the wordmark beside it was taking the
+        // top of the frame. The mark carries the name as its alt text.
+        <div className="home-screen__brand-lockup">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img alt="" src="/assets/icons/saaya-icon-v2-small.svg" />
-          <span>{copy.appName}</span>
+          <img alt={copy.appName} src="/assets/icons/saaya-icon-v2-small.svg" />
         </div>
       ) : null}
 
@@ -761,16 +784,32 @@ export function HomeScreen({
         policeStations={policeStations}
       />
 
-      <div className="home-screen__settings">
-        <MapControlButton
-          icon="settings"
-          label={copy.cdSettings}
-          onClick={() => {
-            setSelectedZoneId(null);
-            setDemoPanelOpen(false);
-            setSettingsOpen(true);
-          }}
-        />
+      <div className="home-screen__top-rail">
+        <MapControlButtonStack>
+          {viewMode === "WALK" ? (
+            // Founder instruction, 2026-09-23: the way into the customiser is a mark on the
+            // right, not a wordy chip across the top. It is the walk view's control - the
+            // flat map has no character in it - so it appears and disappears with the view
+            // she is already toggling.
+            <MapControlButton
+              label={copy.walkEditCharacter}
+              mark={<CharacterIcon />}
+              onClick={() => {
+                setCustomiserFirstRun(false);
+                setCustomiserOpen(true);
+              }}
+            />
+          ) : null}
+          <MapControlButton
+            icon="settings"
+            label={copy.cdSettings}
+            onClick={() => {
+              setSelectedZoneId(null);
+              setDemoPanelOpen(false);
+              setSettingsOpen(true);
+            }}
+          />
+        </MapControlButtonStack>
       </div>
 
       <div className="home-screen__controls">
@@ -854,9 +893,14 @@ export function HomeScreen({
 
       <style jsx>{`
         .home-screen {
+          /* The dock's tallest control is the SOS mark, which stands one step over the
+             touch target so the one action that must never be missed is the one the eye
+             lands on. The clearance the map's own chrome keeps is declared from that
+             height, so the legend chip clears the dock by the same margin either way. */
+          --home-action-dock-height: calc(var(--minimum-touch-target) + var(--space-8));
           --home-action-dock-clearance: calc(
-            env(safe-area-inset-bottom) + var(--minimum-touch-target) +
-              var(--space-24)
+            env(safe-area-inset-bottom) + var(--home-action-dock-height) +
+              var(--space-20)
           );
 
           position: relative;
@@ -885,7 +929,7 @@ export function HomeScreen({
           white-space: nowrap;
         }
 
-        .home-screen__settings {
+        .home-screen__top-rail {
           position: fixed;
           z-index: 4;
           inset-block-start: calc(env(safe-area-inset-top) + var(--space-12));
@@ -895,19 +939,14 @@ export function HomeScreen({
         .home-screen__brand-lockup {
           position: fixed;
           z-index: 4;
+          display: grid;
+          inline-size: var(--minimum-touch-target);
+          block-size: var(--minimum-touch-target);
+          place-items: center;
           inset-block-start: calc(env(safe-area-inset-top) + var(--space-12));
           inset-inline-start: var(--screen-padding);
-          display: inline-flex;
-          align-items: center;
-          gap: var(--space-8);
-          padding: var(--space-8) var(--space-12);
           border-radius: var(--radius-control);
           background: var(--color-card-fill);
-          color: var(--color-text-primary);
-          font-size: var(--type-label-size);
-          font-weight: var(--weight-semibold);
-          letter-spacing: var(--type-label-tracking);
-          line-height: var(--type-label-line-height);
         }
 
         .home-screen__brand-lockup img {

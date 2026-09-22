@@ -5,14 +5,22 @@
  * `SAFE` zones are never drawn." That is enforced upstream rather than here: the caller
  * passes the same `mapZones` array `leafletMap.ts` draws, which `zoneRepository.ts` has
  * already filtered to the 19 drawn zones and joined to their cards. Nothing in this file
- * selects, filters or recolours a zone.
+ * selects, filters or recolours a zone. It scales the fill's opacity for this view, which is
+ * the one number here the flat map does not share — `ZONE_FILL_ALPHA_SCALE` says why.
  *
  * **No vertical extrusion.** The spec is explicit: a translucent wall rising out of the
  * ground "would read as a fence, which is a different and worse claim". Every mesh here
  * is a flat thing at one height on the ground plane.
+ *
+ * Every material is `DoubleSide`, matching `createTileMaterials()` in `walkTiles.ts`. The
+ * zone geometry is a closed ring seen from above, and a boundary ribbon's winding flips
+ * with the direction its ring happens to run; one-sided materials cull half the zones'
+ * boundaries for that reason alone. `appendRingFill` normalises a fill's winding, so a
+ * one-sided fill would work — this is the same belt-and-braces the tile layer wears, and
+ * it costs nothing when the winding is already right.
  */
 
-import { BufferGeometry, Color, Group, Mesh, MeshBasicMaterial } from "three";
+import { BufferGeometry, Color, DoubleSide, Group, Mesh, MeshBasicMaterial } from "three";
 
 import type { MapZone } from "../../data/repository/zoneRepository";
 import type { LatLng } from "../../domain/model/zone";
@@ -44,6 +52,29 @@ const FULL_OPACITY = 1; // GROUNDED-EXEMPT: a structural clamp, not a product va
  * A ribbon's half-width is half of a stated width; these are the two ends of that scale.
  */
 const HALF = 2; // GROUNDED-EXEMPT: a divisor. Half of a stated value is still half of it.
+
+/**
+ * What a zone's fill opacity is multiplied by to draw it here.
+ *
+ * GROUNDED-EXEMPT: a rendering multiplier over a data value, not a fact of its own. The
+ * fill's colour is still `color.zone.*` and its per-zone opacity is still the dataset's
+ * `opacity` — nothing here chooses either.
+ *
+ * Amended 2026-09-22. Those opacities were tuned against the flat map's near-black sheet,
+ * where 0.35 of `color.zone.high` renders as rgb(96,28,27): a dark red *area* on a dark
+ * sheet. This view composites in sRGB over a **lit** ground, so the same 0.35 renders as
+ * rgb(145,82,100), and the profile of the street capture found that one colour covering
+ * 35% of the frame — the ground's own colour, the roads on it and the blocks beside them
+ * all read as that tint rather than as ground. The same *contrast* is what the tint is for,
+ * not the same number: the multiplier brings the tint to a shade *cast over* the ground so
+ * the map underneath it stays the picture, which is what the reference frames show and what
+ * `MAP_SPEC.md` "the zone is a tint on the ground" asks for.
+ *
+ * The selected raise (`alpha.map.zone.selected.raise`) is scaled with it, because that fact
+ * states an *increase on this fill* — scaling one and not the other would turn a tenth of the
+ * fill into three quarters of it.
+ */
+export const ZONE_FILL_ALPHA_SCALE = 0.4; // GROUNDED-EXEMPT: a rendering multiplier over a data value, not a product value.
 
 interface ZoneEntry {
   readonly stationId: string;
@@ -142,7 +173,13 @@ export function buildZoneLayer(
     const fillMaterial = new MeshBasicMaterial({
       color,
       transparent: true,
-      opacity: zone.opacity,
+      opacity: zone.opacity * ZONE_FILL_ALPHA_SCALE,
+      side: DoubleSide,
+      // All three zone materials opt out of the scene's distance haze. `MAP_SPEC.md`: the
+      // haze is applied to scenery only, because "a distant road band faded into haze would
+      // be the risk information degrading with draw distance". A zone's boundary is the
+      // same claim as a road's band, so it keeps its frozen colour at every distance too.
+      fog: false,
     });
     const fill = new Mesh(fillGeometry, fillMaterial);
     fill.renderOrder = index;
@@ -154,8 +191,10 @@ export function buildZoneLayer(
       color,
       transparent: true,
       opacity: ZONE_GLOW_ALPHA,
+      side: DoubleSide,
+      fog: false,
     }));
-    const outlineMaterial = new MeshBasicMaterial({ color });
+    const outlineMaterial = new MeshBasicMaterial({ color, side: DoubleSide, fog: false });
     const normal = new Mesh(undefined, outlineMaterial);
     const selected = new Mesh(undefined, outlineMaterial);
     normal.renderOrder = index;
@@ -166,7 +205,7 @@ export function buildZoneLayer(
     entries.push({
       stationId: zone.stationId,
       ring,
-      baseOpacity: zone.opacity,
+      baseOpacity: zone.opacity * ZONE_FILL_ALPHA_SCALE,
       fill,
       fillMaterial,
       glow,
@@ -217,7 +256,8 @@ export function buildZoneLayer(
       const isSelected = entry.stationId === selectedId;
       entry.fillMaterial.opacity = Math.min(
         FULL_OPACITY,
-        entry.baseOpacity + (isSelected ? ZONE_SELECTED_ALPHA_RAISE : 0),
+        entry.baseOpacity +
+          (isSelected ? ZONE_SELECTED_ALPHA_RAISE * ZONE_FILL_ALPHA_SCALE : 0),
       );
       // All three ribbons share the zone's ring, so either the ring carried a ribbon
       // for every one of them or it carried none. One flag covers the set.

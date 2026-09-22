@@ -32,19 +32,31 @@ import type { GroundPoint } from "./walkProjection";
  * 2. `zoneFill` — the zone's tint on the ground, *under* the roads. `MAP_SPEC.md`: "the
  *    zone is a tint on the ground". Putting it over the roads would wash the risk bands,
  *    which are the thing that must never degrade.
- * 3. `roadBase`, `roadBand` — the road, then its risk band on top of it.
- * 4. `zoneGlow`, `zoneOutline` — the boundary, above everything, because the spec's
+ * 3. `groundSeam` — the pale line along a ring the ground has none of: every green, water
+ *    and building footprint gets its edge drawn, which is the ground's only texture. It sits
+ *    above the zone tint so a tint cannot swallow it, and below the roads so a street's own
+ *    casing wins where the two meet.
+ * 4. `roadBase`, `roadBand` — the road, then its risk band on top of it.
+ * 5. `zoneGlow`, `zoneOutline` — the boundary, above everything, because the spec's
  *    stated purpose for it is legibility: "a line at the zone edge, so the boundary is
  *    legible from a low camera".
+ * 6. `characterMark` — the disc she stands on. It belongs in this list rather than beside
+ *    the camera maths for the same reason as the rest: it is a flat thing on the ground,
+ *    and its height should be the stack's business, not a number written at the call site.
+ *    It sits on top because she is the frame's subject, and because a translucent disc
+ *    that a zone boundary drew over would read as part of the boundary.
  */
 export const LAYER_ORDER = [
   "water",
   "green",
   "zoneFill",
+  "groundSeam",
+  "roadCasing",
   "roadBase",
   "roadBand",
   "zoneGlow",
   "zoneOutline",
+  "characterMark",
 ] as const;
 
 export type LayerName = (typeof LAYER_ORDER)[number];
@@ -194,12 +206,44 @@ export function appendRingFill(
     const pb = contour[b];
     const pc = contour[c];
     if (pa === undefined || pb === undefined || pc === undefined) continue;
+    // `b` and `c` are deliberately swapped.
+    //
+    // `triangulateShape` normalises its input, so a ring's own winding does not survive it:
+    // every fill it returns comes out wound the same way, and in the ground plane that way
+    // is **downward**. A downward fill is invisible from every camera above it. The tile
+    // layers never noticed, because every tile material is `DoubleSide`; the zone layer
+    // draws its tints and its boundaries with one-sided materials and rendered nothing at
+    // all — the safety overlay, absent from the frame, for no reason anyone could see in
+    // the data. (Measured, not reasoned about: a probe over `triangulateShape` in both
+    // windings returns the same downward faces. `walkGeometry.test.ts` pins it.)
+    //
+    // Swapping the last two vertices faces every fill up by construction, whichever way its
+    // caller's ring runs, so neither layer depends on the winding its data happens to have.
     positions.push(
       pa.x, height, pa.y,
-      pb.x, height, pb.y,
       pc.x, height, pc.y,
+      pb.x, height, pb.y,
     );
   }
+}
+
+/**
+ * A ring's signed area in the ground plane, in metres squared.
+ *
+ * Positive is the winding most of the bake's own building rings carry, and the winding the
+ * fixture in `walkGeometry.test.ts` calls counter-clockwise. `appendRingFill` ignores this
+ * on purpose: it faces every fill up whichever way its caller's ring runs. A wall cannot,
+ * because it is extruded along the ring's own order.
+ */
+function signedAreaM2(ring: readonly GroundPoint[]): number {
+  let twiceArea = 0;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i, i += 1) {
+    const a = ring[j];
+    const b = ring[i];
+    if (a === undefined || b === undefined) continue;
+    twiceArea += a.x * b.z - b.x * a.z;
+  }
+  return twiceArea / 2;
 }
 
 /** Append the walls and roof of one building footprint. */
@@ -219,6 +263,20 @@ export function appendBuilding(
     contour = contour.slice(0, -1);
   }
   if (contour.length < 3) return;
+
+  // Face the walls outward, whichever way the data runs.
+  //
+  // A wall is extruded along the ring's own order, so its facing is whatever winding the
+  // bake happens to carry, and the bake's building rings disagree with each other. That is
+  // why the building material had to be `DoubleSide` - and a double-sided box does not
+  // merely show its walls, it shows them to a camera that is *inside* it, filling the frame
+  // with its own interior. The material can be one-sided once every wall faces out, and a
+  // box the camera has ended up inside is then culled away instead of drawn from within.
+  //
+  // From outside, the same wall faces the camera it always did, pixel for pixel: this
+  // changes only what a camera inside a building sees. The winding split and the frame the
+  // old material produced are measured in `MAP_SPEC.md`.
+  if (signedAreaM2(contour) > 0) contour.reverse();
 
   for (let i = 0; i < contour.length; i += 1) {
     const a = contour[i];

@@ -57,7 +57,7 @@ rather than widening the subset quietly.
 | `location.fill` | `my_location` | Her position |
 | `phone.fill` | `call` | Call station |
 | `gearshape.fill` | `settings` | Settings |
-| `eye.fill` | `visibility` | What the police see |
+| `eye.fill` | `visibility` | The demo panel's mark (`cd_demo_panel`). The iOS feature this symbol was mapped for, "What the police see", is cut to round two with F28 - the symbol and its glyph are unchanged, only the row it is used for on web. |
 | `house.fill` | `home` | I am home |
 | `person.2.fill` | `group` | Favourites |
 | `chevron.right` | `chevron_right` | Navigation |

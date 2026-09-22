@@ -8,9 +8,12 @@ import {
   DEMO_DIVISOR,
   DEMO_RULES,
   ENTER_DWELL_SEC,
+  IDLE_SAMPLING_SEC,
   MAX_CONTAINMENT_ACCURACY_M,
   MIN_ENTRY_FIXES,
   PENDING_DWELL_SAMPLING_SEC,
+  SHADOW_SAMPLING_SEC,
+  SOS_SAMPLING_SEC,
 } from "../domain/engine/rules";
 import type {
   ArmMode,
@@ -141,7 +144,60 @@ describe("page-open automatic arming", () => {
     expect(sampling).toContainEqual({
       intervalSec: PENDING_DWELL_SAMPLING_SEC,
       enableHighAccuracy: true,
+      forwardEveryFix: false,
     });
+  });
+
+  it("adds live fixes for the walk view without moving a recorded cadence", () => {
+    const session = new EngineBridge();
+    const sampling: LocationSampling[] = [];
+    const runtime = new LocationArmingRuntime(
+      bundledZoneData.heatmapHotspots,
+      DEFAULT_RULES,
+      session,
+      { onSamplingChanged: (value) => sampling.push(value) },
+    );
+    runtime.start();
+    expect(sampling.at(-1)).toEqual({
+      intervalSec: IDLE_SAMPLING_SEC,
+      enableHighAccuracy: false,
+      forwardEveryFix: false,
+    });
+
+    runtime.setWalkViewVisible(true);
+    expect(sampling.at(-1)).toEqual({
+      intervalSec: IDLE_SAMPLING_SEC,
+      enableHighAccuracy: true,
+      forwardEveryFix: true,
+    });
+
+    // A session change re-derives the request, which is where a view-only flag kept
+    // anywhere else would be silently wiped.
+    session.state = "SHADOW";
+    runtime.synchronizeSessionState();
+    expect(sampling.at(-1)).toEqual({
+      intervalSec: SHADOW_SAMPLING_SEC,
+      enableHighAccuracy: true,
+      forwardEveryFix: true,
+    });
+
+    // Leaving the view restores the recorded request exactly, in whatever state it left.
+    runtime.setWalkViewVisible(false);
+    expect(sampling.at(-1)).toEqual({
+      intervalSec: SHADOW_SAMPLING_SEC,
+      enableHighAccuracy: true,
+      forwardEveryFix: false,
+    });
+
+    // SOS keeps its own recorded cadence while the view is showing, and the intervals the
+    // view ever asked for are exactly the ones the session already had.
+    session.state = "SOS_ACTIVE";
+    runtime.setWalkViewVisible(true);
+    runtime.synchronizeSessionState();
+    expect(sampling.at(-1)?.intervalSec).toBe(SOS_SAMPLING_SEC);
+    expect(new Set(sampling.map((value) => value.intervalSec))).toEqual(
+      new Set([IDLE_SAMPLING_SEC, SHADOW_SAMPLING_SEC, SOS_SAMPLING_SEC]),
+    );
   });
 
   it("returns to quiet idle when the arming matrix rejects the completed proof", () => {

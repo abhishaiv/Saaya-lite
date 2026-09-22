@@ -7,13 +7,24 @@ import {
 
 export type MapControlIconName = MaterialSymbolName;
 
-export type MapControlButtonProps = Readonly<{
-  icon: MapControlIconName;
-  /** Action name announced for the otherwise icon-only control. */
-  label: string;
-  onClick: MouseEventHandler<HTMLButtonElement>;
-  className?: string;
-}>;
+/**
+ * The button's mark: one of the pinned Material Symbols, or a drawn component.
+ *
+ * Added 2026-09-23 for the walk view's character control, whose mark is Saaya's own
+ * (`CharacterIcon`) because the pinned subset has no glyph that means "your character" -
+ * see that file for why drawing beat regenerating the subset font.
+ */
+type MapControlGlyph =
+  | Readonly<{ icon: MapControlIconName; mark?: never }>
+  | Readonly<{ icon?: never; mark: ReactNode }>;
+
+export type MapControlButtonProps = MapControlGlyph &
+  Readonly<{
+    /** Action name announced for the otherwise icon-only control. */
+    label: string;
+    onClick: MouseEventHandler<HTMLButtonElement>;
+    className?: string;
+  }>;
 
 export type MapControlButtonStackProps = Readonly<{
   children: ReactNode;
@@ -49,30 +60,29 @@ export function MapControlButtonStack({
 }
 
 /** C13's icon-only map utility action. */
-export function MapControlButton({
-  icon,
-  label,
-  onClick,
-  className,
-}: MapControlButtonProps) {
-  const classes = ["saaya-map-control-button", className]
+export function MapControlButton(props: MapControlButtonProps) {
+  const classes = ["saaya-map-control-button", props.className]
     .filter(Boolean)
     .join(" ");
 
   return (
     <button
-      aria-label={label}
+      aria-label={props.label}
       className={classes}
-      onClick={onClick}
+      onClick={props.onClick}
       type="button"
     >
       <span aria-hidden="true" className="saaya-map-control-button__icon">
-        <MaterialSymbol
-          decorative
-          fill="utility"
-          name={icon}
-          size={24}
-        />
+        {props.icon !== undefined ? (
+          <MaterialSymbol
+            decorative
+            fill="utility"
+            name={props.icon}
+            size={24}
+          />
+        ) : (
+          props.mark
+        )}
       </span>
 
       <style jsx>{`

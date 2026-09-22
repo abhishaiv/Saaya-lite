@@ -9,7 +9,7 @@ import {
 } from "../../../platform/walk/characterParts";
 import { M4_COPY } from "../../copy/strings";
 import { CharacterCustomiser } from "./CharacterCustomiser";
-import { WalkView } from "./WalkView";
+import { WalkLegend, WalkView } from "./WalkView";
 
 const snapshot = bundledZoneRepository.snapshot();
 
@@ -37,11 +37,11 @@ function renderWalk(
       <WalkView
         character={DEFAULT_CHARACTER}
         copy={copy}
+        headingAllowed={false}
         hourBand="DAY"
         location={null}
         locationStatus="SEARCHING"
         mapZones={snapshot.mapZones}
-        onEditCharacter={() => undefined}
         onZoneSelected={() => undefined}
         selectedZoneId={null}
         sessionState="IDLE"
@@ -86,8 +86,41 @@ describe("M4 walk view", () => {
     expect(html).toContain(copy.walkLegendTitle);
     expect(html).toContain(copy.walkLegendLow);
     expect(html).toContain(copy.walkLegendHigh);
+    expect(html).toContain('aria-expanded="true"');
+    // The derivation is stated as the view opens rather than waiting behind a tap.
+    // FEATURES.md Amendment 1 clause 1 asks the view to state that per-road risk comes from
+    // zone data rather than imply it, and a sentence behind a tap states it only on request.
     expect(html).toContain(copy.walkRiskNote);
-    expect(html).toContain(copy.walkEditCharacter);
+  });
+
+  it("renders whole and folds to its ramp, so the streets clear without hiding the reading", () => {
+    const copy = M4_COPY.en;
+    const legend = (open: boolean) =>
+      decode(
+        renderToStaticMarkup(
+          <WalkLegend copy={copy} onToggle={() => undefined} open={open} />,
+        ),
+      );
+    // Whole - which is how the view opens - the sentence is stated, not offered.
+    const whole = legend(true);
+    expect(whole).toContain(copy.walkRiskNote);
+    expect(whole).toContain('aria-expanded="true"');
+    expect(whole).toContain(copy.walkLegendTitle);
+    expect(whole).toContain(copy.walkLegendLow);
+    expect(whole).toContain(copy.walkLegendHigh);
+    // Folded, the ramp, its two ends and the heading she needs to read it are all still
+    // there. Founder instruction, 2026-09-23: the card was covering the map she came to look
+    // at, so it is a chip that can be folded; SCREENS.md S14 carries the amendment.
+    const folded = legend(false);
+    expect(folded).toContain(copy.walkLegendTitle);
+    expect(folded).toContain(copy.walkLegendLow);
+    expect(folded).toContain(copy.walkLegendHigh);
+    expect(folded).toContain('aria-expanded="false"');
+    // The ground plus the three bands: the ramp is the picture the shading is cut from,
+    // and a ramp missing a band would be a legend describing a different map.
+    expect(folded.match(/class="walk-view__ramp-stop"/g)).toHaveLength(4);
+    // Folding is the one thing the tap does: it takes the sentence away, nothing else.
+    expect(folded).not.toContain(copy.walkRiskNote);
   });
 
   it("says the streets are still coming, and only that, until the world resolves", () => {
@@ -127,8 +160,15 @@ describe("M4 walk view", () => {
       const copy = M4_COPY[locale];
       const html = renderWalk(copy);
       expect(html).toContain(copy.walkLegendTitle);
-      expect(html).toContain(copy.walkRiskNote);
-      expect(html).toContain(copy.walkEditCharacter);
+      expect(html).toContain(copy.walkLegendLow);
+      expect(html).toContain(copy.walkLegendHigh);
+      // The derivation is a copy row too, so it is checked in the state that shows it.
+      const expanded = decode(
+        renderToStaticMarkup(
+          <WalkLegend copy={copy} onToggle={() => undefined} open={true} />,
+        ),
+      );
+      expect(expanded).toContain(copy.walkRiskNote);
     }
   });
 });

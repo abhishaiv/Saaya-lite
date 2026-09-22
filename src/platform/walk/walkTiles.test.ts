@@ -20,6 +20,10 @@ import {
   decodeTile,
   disposeGroup,
   disposeTileMaterials,
+  ROAD_CASING_LIGHTNESS,
+  ROAD_CASING_M,
+  ROAD_CLASS_WIDTH_MULTIPLIER,
+  ROAD_HALF_WIDTH_M,
   type RawRoad,
   type TileMaterials,
 } from "./walkTiles";
@@ -191,23 +195,24 @@ describe("buildTileMeshes", () => {
     expect(colors?.getZ(0)).toBeCloseTo(expected.b);
   });
 
-  it("draws a primary road three times as wide as a residential one", () => {
-    const residential = buildTileMeshes(
-      decodeTile(TILE_ZERO, { roads: [road({ c: "residential" })] }, meta),
-      materials,
-      true,
+  it("draws every highway class the bake emits at its own multiple of the residential width", () => {
+    // Amended 2026-09-22 with the road widths. It used to pin one ratio (primary at three
+    // times a residential street); the table is the thing that decides every class, so this
+    // reads it rather than restating one of its entries.
+    for (const [highwayClass, multiplier] of Object.entries(ROAD_CLASS_WIDTH_MULTIPLIER)) {
+      const built = buildTileMeshes(
+        decodeTile(TILE_ZERO, { roads: [road({ c: highwayClass })] }, meta),
+        materials,
+        true,
+      );
+      const surface = meshWith(built, materials.roadSurface);
+      if (surface === null) throw new Error(`no road layer for ${highwayClass}`);
+      expect(zSpan(surface)).toBeCloseTo(2 * ROAD_HALF_WIDTH_M * multiplier, 6);
+    }
+    // A trunk road still reads wider than a lane, which is the whole point of the table.
+    expect(ROAD_CLASS_WIDTH_MULTIPLIER.primary).toBeGreaterThan(
+      ROAD_CLASS_WIDTH_MULTIPLIER.residential ?? 0,
     );
-    const primary = buildTileMeshes(
-      decodeTile(TILE_ZERO, { roads: [road({ c: "primary" })] }, meta),
-      materials,
-      true,
-    );
-    const residentialMesh = meshWith(residential, materials.roadSurface);
-    const primaryMesh = meshWith(primary, materials.roadSurface);
-    expect(residentialMesh).not.toBeNull();
-    expect(primaryMesh).not.toBeNull();
-    if (residentialMesh === null || primaryMesh === null) return;
-    expect(zSpan(primaryMesh) / zSpan(residentialMesh)).toBeCloseTo(3);
   });
 
   it("falls back to the residential width for a class the bake never emitted", () => {
@@ -250,10 +255,53 @@ describe("buildTileMeshes", () => {
       "buildingRoof",
       "green",
       "roadBand",
+      "roadCasing",
       "roadSurface",
       "water",
     ]);
-    expect(layerNames(reduced, materials)).toEqual(["roadBand", "roadSurface"]);
+    // The casing travels with the road, for the same reason the band does: it is what the
+    // road is drawn with, not scenery that can be given up.
+    expect(layerNames(reduced, materials)).toEqual([
+      "roadBand",
+      "roadCasing",
+      "roadSurface",
+    ]);
+  });
+
+  it("draws the casing wider than the road it edges, and beneath it", () => {
+    const tile = decodeTile(TILE_ZERO, { roads: [road()] }, meta);
+    const group = buildTileMeshes(tile, materials, true);
+    const casing = meshWith(group, materials.roadCasing);
+    const surface = meshWith(group, materials.roadSurface);
+    if (casing === null || surface === null) throw new Error("no road layer");
+    // An edge only reads if it stands proud of the surface it edges.
+    expect(zSpan(casing)).toBeGreaterThan(zSpan(surface));
+    expect(zSpan(casing)).toBeCloseTo(zSpan(surface) + 2 * ROAD_CASING_M);
+    expect(casing.geometry.getAttribute("position").getY(0)).toBeCloseTo(
+      layerHeight("roadCasing"),
+    );
+  });
+
+  it("derives the casing's colour from the road's own fact rather than naming one", () => {
+    // Amended 2026-09-22: the lightening is applied to the road colour's own hex components,
+    // not through `Color.multiplyScalar`, which works in the renderer's linear working space
+    // and rendered this factor as a rim the street capture's column profile could not find.
+    // Asserted through luma, because that is the thing the frame is made of: a casing that
+    // reads as `ROAD_CASING_LIGHTNESS` times lighter than the road it edges.
+    const luma = (color: Color): number => {
+      const hex = color.getHex();
+      return 0.299 * ((hex >> 16) & 0xff) + 0.587 * ((hex >> 8) & 0xff) + 0.114 * (hex & 0xff); // GROUNDED-EXEMPT: the Rec. 601 luma coefficients, the standard the reference frames were sampled in.
+    };
+    expect(materials.roadCasing.color.getHex()).not.toBe(materials.roadSurface.color.getHex());
+    // Not to the byte: each channel is rounded to a whole value before it is written back,
+    // and a channel that would pass 255 is clamped - so the rendered ratio lands under the
+    // factor rather than on it, by more the brighter the factor is.
+    // The blue channel clamps at full scale, so at 3.1 the rendered ratio lands about 0.13
+    // under it (2.98 against 3.1) - the factor is a derivation, not a promise.
+    expect(luma(materials.roadCasing.color) / luma(materials.roadSurface.color)).toBeCloseTo(
+      ROAD_CASING_LIGHTNESS,
+      0,
+    );
   });
 
   it("keeps every road fragment in one mesh rather than one mesh per fragment", () => {

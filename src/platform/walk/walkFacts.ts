@@ -11,9 +11,31 @@
  */
 
 // --- the walk camera. Fact: walk.camera.* ---
+//
+// Amended 2026-09-22 by founder ruling, twice: pitch 52 / dist 27 / no aim point became
+// 31.4 / 13.2 / 3.18, and then 32.4 / 13.0 / 3.21 once the first solve was found to have used
+// an angle-linear row model, which is not how a perspective camera projects. The three numbers
+// together are the reference's composition: horizon at 0.164 of the frame height, her feet at
+// 0.736 and her head at 0.616. See the facts' own `sourced_from` for the measurement, and
+// `walkComposition.test.ts` for the projection the rows are derived with.
+//
+// Amended again 2026-09-23, by the same ruling and with the same method: the founder found her
+// drawn too small on his phone, the reference was re-measured frame by frame, and her height on
+// screen there is 0.124 of the frame while walking, not 0.120. Distance and aim point carry it
+// (the angle and the field of view are pinned by the horizon row), so the boom is 0.42 m nearer
+// along the same aim line and the frame reads horizon 0.1646 / feet 0.7361 / head 0.6121.
 export const WALK_CAMERA_FOV_DEG = 54; // fact: walk.camera.fov
-export const WALK_CAMERA_PITCH_DEG = 52; // fact: walk.camera.pitch
-export const WALK_CAMERA_DIST_M = 27; // fact: walk.camera.dist
+export const WALK_CAMERA_PITCH_DEG = 32.4; // fact: walk.camera.pitch
+export const WALK_CAMERA_DIST_M = 12.58; // fact: walk.camera.dist
+export const WALK_CAMERA_LOOK_AT_M = 3.11; // fact: walk.camera.look_at
+
+// --- the risk legend chip. Fact: walk.legend.width ---
+//
+// Compacted 2026-09-23 on founder instruction: the legend was a card across the frame
+// ("The street shading rectangle is taking up all the space"), and is now a chip in the
+// bottom-left corner whose ramp and both ends stay in view. The width is a chosen design
+// value rather than a measured one, and the fact says so.
+export const WALK_LEGEND_WIDTH_PX = 224; // fact: walk.legend.width
 
 // --- the character. Fact: walk.character.height, walk.speed ---
 export const WALK_CHARACTER_HEIGHT_M = 1.7; // fact: walk.character.height
@@ -62,6 +84,26 @@ export const COLOR_BACKGROUND = "#0B0B0F"; // fact: color.background
 export const COLOR_TILE_LAND = "#0E0E10"; // fact: color.tile.land
 export const COLOR_BRAND = "#A78BFA"; // fact: color.brand
 export const COLOR_WHITE = "#FFFFFF"; // fact: color.white
+
+// --- the walk view's own sky, haze and land. Facts: color.walk.* ---
+//
+// Added 2026-09-22 by the same ruling as the camera above, and amended the same day once the
+// reference was measured at full resolution rather than at half. These are the view's three
+// largest areas and the reference gives all three: sky rgb(24,52,152), a dark seam at the
+// horizon rgb(25,47,107), and land rgb(87,140,174). The walk view was one near-black colour in
+// all three places, which is why a correct scene rendered as a void.
+//
+// The amendment's own reason: the reference's map area is 78% in the 180-240 degree blue/cyan
+// family and holds no magenta anywhere, while the old ground under the highest-risk zone tint
+// rendered rgb(110,90,117) - hue 284, and half the frame. Two of the three frozen tier tints
+// took the land off-family. The fix belongs in the scenery, not in the frozen data: the land is
+// chosen so that every tint the dataset carries leaves it in the reference's own family.
+//
+// They are walk-view facts and not the flat map's `color.background` / `color.tile.land`, which
+// are untouched: the flat map is a CARTO Dark Matter tile map and has no horizon to compose.
+export const COLOR_WALK_SKY = "#183498"; // fact: color.walk.sky
+export const COLOR_WALK_HAZE = "#192F6B"; // fact: color.walk.haze
+export const COLOR_WALK_GROUND = "#578BAE"; // fact: color.walk.ground
 
 // --- budgets, used by the loop's own frame guard ---
 export const FRAME_BUDGET_MS = 32; // fact: perf.frame

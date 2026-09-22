@@ -219,6 +219,23 @@ the future round-two state-view delivery path, not to this submission.
 | Shadow armed | 15 s | `enableHighAccuracy: true` |
 | SOS active | 5 s | `enableHighAccuracy: true` |
 
+**Amendment, 2026-09-23: this table is the evidence cadence, and the map is not evidence.**
+The founder opened the build on his phone and found the view did not move as he walked. The
+browser was delivering roughly one fix a second; `BrowserLocationWatch` was dropping all but
+one every thirty seconds, because 30 s is the idle sample interval above. The table was never
+wrong about what it controls - which fixes count as samples of her position for containment
+and for the ladder - but it had been applied to the picture as well, and the picture is not
+a sample. Fixes the cadence rejects are now forwarded to the map alone
+(`LocationSampling.forwardEveryFix`, `onDisplayFix`) and reach neither the dwell evaluator
+nor any SUS record.
+
+Two things move with that, and neither is an interval. **Precision:** while the walk view is
+showing, the watch asks for `enableHighAccuracy: true`, because that view draws her at her
+own coordinates and a network-located fix can be a kilometre out. The idle row above stays
+coarse for the reason it was written - the phone is normally in her pocket, and the walk view
+cannot be reached without an explicit tap. **Interval:** no row above moves, in any state, and
+the tighter rows are never loosened: SOS still samples at 5 s with the walk view open.
+
 ### Localized circle rule: no city-scale false positives
 
 The authoritative live shape is one localized hotspot circle, not a police-jurisdiction

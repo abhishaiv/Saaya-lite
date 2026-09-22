@@ -3,7 +3,7 @@
  "kind": "knowledge_graph",
  "note": "Domain facts with provenance. Never merge with build_graph.json - different truth standards.",
  "rule": "Every numeric or colour literal in source must trace to a fact id here, or the grounded checker fails the node.",
- "count": 424,
+ "count": 428,
  "facts": [
   {
    "id": "ladder.cd1",
@@ -4620,24 +4620,35 @@
   {
    "id": "walk.camera.pitch",
    "kind": "number",
-   "value": 52,
+   "value": 32.4,
    "unit": "deg",
-   "means": "walk view camera angle above the horizon. High enough to see the road ahead and the zone she is in, low enough to keep a street-level feel rather than a map feel.",
-   "sourced_from": "founder 2026-09-11 walk-view ruling; stated design value",
+   "means": "walk view camera angle above the horizon. Amended 2026-09-22 from 31.4, which was itself amended from 52; the angle itself did not move in the 2026-09-23 amendment that shortened the boom: at walk.camera.dist 12.58 it puts the horizon at 0.1646 of the frame height, her feet at 0.7361 and her head at 0.6121, which is where the reference frames put all three (0.164, 0.736, 0.612 as re-measured that day).",
+   "sourced_from": "amended by founder ruling 2026-09-22 (\"perfection in-terms of User experience and look and feel ... matches or even does better than the Pokemon Go version\"), replacing the stated design value of the founder 2026-09-11 walk-view ruling; 52 -> 31.4 -> 32.4. The value before this one was solved with an angle-linear row model - a row taken as (depression - axis)/fov - which is not how a perspective camera projects. A perspective projection is NDC_y = tan(angle above the axis)/tan(vFOV/2), row = 0.5 - NDC_y/2, and the two agree near the frame centre and diverge with distance: on this rig the linear model puts the horizon at 0.164 and the render puts it at 0.178, which is where the frame was measured to have it - the ground plane's far edge renders at row 0.1808, which is the true projection's 0.1809 and not the linear model's 0.1664. The reference rows were re-measured too, and the ones the first solve used were two rows that are not her: 0.746 is the thin unfilled ground ring the reference draws around its avatar (0.694-0.755), below her shoes in every frame, and 0.621 is the dark underside of her hair, not its lit top. Re-measured, her shoes sit at 0.735-0.737 across three walk frames and her hair top bobs 0.613-0.622 with the walk cycle. Solved under the true projection rather than chosen: with walk.camera.fov held at 54 and walk.character.height at 1.7, the measured rows (horizon 0.164 H, feet 0.736 H, head 0.616 H) fix the camera at 6.97 m above 10.98 m of ground, and that height over that distance is 32.4 deg above the horizon.",
    "governs": "MAP_SPEC.md",
    "frozen": true,
-   "platform": "web"
+   "was": 31.4,   "platform": "web"
   },
   {
    "id": "walk.camera.dist",
    "kind": "number",
-   "value": 27,
+   "value": 12.58,
    "unit": "m",
-   "means": "walk view camera distance behind the character. Close enough that she reads as the subject, far enough that the next junction is visible.",
-   "sourced_from": "founder 2026-09-11 walk-view ruling; stated design value",
+   "means": "walk view camera distance behind the character, measured along the view axis. Amended 2026-09-22 from 13.2, which was itself amended from 27, and amended again 2026-09-23 from 13.0: at the amended pitch and aim point, 12.58 m puts her on the frame at the height the reference avatar measures, 0.124 of the frame, where 13.0 m put her at 0.120.",
+   "sourced_from": "amended by founder ruling 2026-09-22, replacing the stated design value of the founder 2026-09-11 walk-view ruling; 27 -> 13.2 -> 13.0 -> 12.58. Derived from the same re-solve that amended walk.camera.pitch: under the true perspective projection, 10.98 m of ground back and 6.97 m up is 13.0 m along the axis. The reason this fact's own text once gave for shortening the boom - that 27 m sat behind a 16 m building at dense corners - is falsified by measurement and is recorded as falsified in MAP_SPEC.md: the shorter boom is inside a building 4.4x as often, not less often, so the amendment stands on the composition it was solved for and not on a claim about rooflines it does not have. The 2026-09-23 amendment comes from the founder opening the view on his phone and ruling that she was drawn too small - \"The character size is too small for the screen, take inspiration from the Pokemon Go game and replicate the size used for the character there\" - and from a frame-by-frame re-measurement of the reference video that same day: her height on screen while walking is a median 0.124 of the frame height (range 0.117-0.129), not the 0.120 the 2026-09-22 solve had read off a smaller sample. Solved, not chosen: distance and aim point carry the change (pitch and fov are pinned by the horizon row and by walk.camera.pitch's own solve, and her height in metres does not move), and the camera slides 0.42 m closer along the same aim line. The rows it produces are horizon 0.1646, feet 0.7361, head 0.6121 - inside 0.0004 of every measured row. Recorded in MAP_SPEC.md and in progress.md.",
    "governs": "MAP_SPEC.md",
    "frozen": true,
-   "platform": "web"
+   "was": 13.0,   "platform": "web"
+  },
+  {
+   "id": "walk.camera.look_at",
+   "kind": "number",
+   "value": 3.11,
+   "unit": "m",
+   "means": "height above her feet where the camera's optical axis crosses her vertical line. Above her head on purpose: aiming at the character centres her and loses the ground she is walking on, which is what the view is for.",
+   "sourced_from": "added by founder ruling 2026-09-22, amended the same day from 3.18 and again 2026-09-23 from 3.21. Measured, not chosen: with walk.camera.fov at 54 the reference frames put their horizon at 0.164 H, which under a true perspective projection is an axis 18.89 deg below horizontal - the first solve read 18.14 deg off the horizon row with an angle-linear model, which is the mistake walk.camera.pitch records - and from a camera 6.97 m up and 10.98 m back a line 18.89 deg down crosses her vertical 3.21 m above her feet (1.89x walk.character.height). Replaces the character's mid-height, which put the horizon off the top of the frame entirely. The 2026-09-23 amendment carries only what the closer camera requires: the horizon row pins the axis depression, so an aim point 0.42 m nearer has to sit 0.10 m lower on her line for the same horizon, and it moves with walk.camera.dist and for the same reason - see that fact.",
+   "governs": "MAP_SPEC.md",
+   "frozen": true,
+   "was": 3.21,   "platform": "web"
   },
   {
    "id": "walk.character.height",
@@ -4662,59 +4673,103 @@
    "platform": "web"
   },
   {
-   "id": "color.tile.road",
-   "kind": "color",
-   "value": "#1A1A20",
-   "unit": "hex",
-   "means": "Walk-view road surface. A neutral dark grey so the risk band is the only colour on the ground.",
-   "sourced_from": "stated design value, walk-view scene palette, 2026-09-12",
+   "id": "walk.legend.width",
+   "kind": "number",
+   "value": 224,
+   "unit": "px",
+   "means": "width of the risk legend chip in the walk view, the card that explains what the road shading means.",
+   "sourced_from": "chosen 2026-09-23 during the compaction the founder asked for - \"The street shading rectangle is taking up all the space\" - and recorded here rather than left as a bare literal, because a width the layout depends on is a product value like any other. Chosen, not measured: it is the narrowest the chip can be and still hold its title row, its ramp and both of the ramp's end labels on one line at the smallest supported viewport, and it is the value the founder's own build renders with. Unlike the walk.camera.* facts it makes no claim about the reference video.",
    "governs": "MAP_SPEC.md",
    "frozen": true,
    "platform": "web"
+  },
+  {
+   "id": "color.tile.road",
+   "kind": "color",
+   "value": "#3E466C",
+   "unit": "hex",
+   "means": "Walk-view road surface. Amended 2026-09-22 from #1A1A20, and again the same day from #2E3450 once the reference was measured at full resolution: the road is the dark ribbon the risk bands are read against, so it must be dark, but a road darker than the sky it runs under stops reading as a surface. This sits at 0.56 of color.walk.ground, which is the ratio the reference frames measure (road luma 65-80 against a land of 110-140), and at luma 72 it clears the sky at 55 by 1.31x, the road-to-sky separation the reference measures at 1.25. The value it replaced rendered at luma 53 - the sky's own luma - so a road at the horizon had no separation from the sky at all.",
+   "sourced_from": "amended by founder ruling 2026-09-22, replacing the stated design value, walk-view scene palette, 2026-09-12. Placed on the luminance ladder measured from the reference video, in Saaya's own night key. Re-placed the same day when the land moved to luma 127; the 0.56 relation is unchanged, so the road followed the land.",
+   "governs": "MAP_SPEC.md",
+   "frozen": true,
+   "was": "#2E3450",   "platform": "web"
   },
   {
    "id": "color.tile.building",
    "kind": "color",
-   "value": "#22222A",
+   "value": "#3A4160",
    "unit": "hex",
-   "means": "Walk-view building wall.",
-   "sourced_from": "stated design value, walk-view scene palette, 2026-09-12",
+   "means": "Walk-view building wall. Amended 2026-09-22 from #22222A: a wall reads as a volume against the ground it stands on, and below color.walk.ground it reads at night the way a backlit block does. The old value was 20 luma against an 11 luma ground, which is no edge at all.",
+   "sourced_from": "amended by founder ruling 2026-09-22, replacing the stated design value, walk-view scene palette, 2026-09-12.",
    "governs": "MAP_SPEC.md",
    "frozen": true,
-   "platform": "web"
+   "was": "#22222A",   "platform": "web"
   },
   {
    "id": "color.tile.building.roof",
    "kind": "color",
-   "value": "#2A2A34",
+   "value": "#8792B7",
    "unit": "hex",
-   "means": "Walk-view building roof, a shade lighter so the top face reads from the high walk camera.",
-   "sourced_from": "stated design value, walk-view scene palette, 2026-09-12",
+   "means": "Walk-view building roof. Amended 2026-09-22 from #2A2A34 and now lighter than the ground, not a shade lighter than the wall: from a camera below the rooflines, the roofs are the pale plane the city is read from, and the reference frames put their lit blocks at luma 117-137. Amended again the same day to luma 147, to stay above the land once the land rose to 127: the value it replaced rendered at luma 126, level with the land it is supposed to be read against.",
+   "sourced_from": "amended by founder ruling 2026-09-22, replacing the stated design value, walk-view scene palette, 2026-09-12. Re-placed the same day to keep the roof's relation to the land it sits on.",
    "governs": "MAP_SPEC.md",
    "frozen": true,
-   "platform": "web"
+   "was": "#737D9C",   "platform": "web"
   },
   {
    "id": "color.tile.green",
    "kind": "color",
-   "value": "#14251A",
+   "value": "#4A7C74",
    "unit": "hex",
-   "means": "Walk-view park and green space.",
-   "sourced_from": "stated design value, walk-view scene palette, 2026-09-12",
+   "means": "Walk-view park and green space. Amended 2026-09-22 from #14251A: at 0.85 of color.walk.ground it is the ratio the reference frames measure (green luma 107-120 against a land of 110-140), so a park reads as a place rather than as a slightly greener black. Amended again the same day to luma 109 and toward the teal the reference's own parks measure (hue 184 there, 147 before): the ground's rise to 127 would otherwise have left green at 82, and under the highest-risk zone tint the park rendered olive at hue 50, a colour that appears nowhere in the reference.",
+   "sourced_from": "amended by founder ruling 2026-09-22, replacing the stated design value, walk-view scene palette, 2026-09-12. Re-placed the same day to hold its 0.85 relation to the land and its hue against the frozen tint.",
    "governs": "MAP_SPEC.md",
    "frozen": true,
-   "platform": "web"
+   "was": "#3F5C4C",   "platform": "web"
   },
   {
    "id": "color.tile.water",
    "kind": "color",
-   "value": "#101C2E",
+   "value": "#1F3A5C",
    "unit": "hex",
-   "means": "Walk-view water.",
-   "sourced_from": "stated design value, walk-view scene palette, 2026-09-12",
+   "means": "Walk-view water. Amended 2026-09-22 from #101C2E. Dark and cool, at the road's own luma: a river and a road both read as dark against the lit ground, and water that outshines the road it is bridged by inverts the ladder.",
+   "sourced_from": "amended by founder ruling 2026-09-22, replacing the stated design value, walk-view scene palette, 2026-09-12. The reference video frames contain no water, so this one is placed by relation to the measured ladder rather than measured itself.",
    "governs": "MAP_SPEC.md",
    "frozen": true,
-   "platform": "web"
+   "was": "#101C2E",   "platform": "web"
+  },
+  {
+   "id": "color.walk.sky",
+   "kind": "color",
+   "value": "#183498",
+   "unit": "hex",
+   "means": "The walk view's sky, and the renderer's clear colour. Measured from the reference at full resolution: its sky is rgb(24,52,152), luma 55 and a saturated blue, and it barely lightens toward the horizon (luma 56 there). Amended 2026-09-22 from #223375, which held the reference's hue (227) and luma (53) but at less than two thirds of its saturation, so the frame's second-largest area read grey where the reference reads blue. It is the darker half of the view's contrast: the land is deliberately 2.3x its luma, which is the ratio the reference frames measure and the one the old all-black scene could not have (1.0).",
+   "sourced_from": "added by founder ruling 2026-09-22, amended the same day by the same ruling once the reference was measured at full resolution. Placed at the reference video's own measured sky colour. Governs the walk view only; the flat map's own color.background and color.tile.land are untouched.",
+   "governs": "MAP_SPEC.md",
+   "frozen": true,
+   "was": "#223375",   "platform": "web"
+  },
+  {
+   "id": "color.walk.haze",
+   "kind": "color",
+   "value": "#192F6B",
+   "unit": "hex",
+   "means": "The walk view's distance haze, and the colour the scenery fades into at the far plane. Amended 2026-09-22 from #6B7EC4, which was placed on the reading that the reference's horizon band is its brightest large area. Measured at full resolution that reading was wrong: the horizon band is a dark seam, rgb(25,47,107) at luma 47, darker than the sky above it (luma 56) and darker still than the land below it (luma 124-129 in the rows just under). What the reference holds at luma 124-135 is the map itself, not a band at the horizon. Scenery now fades down into that seam rather than up into a glow, which is where the reference gets its depth. Roads, buildings, green and water are fogged; the zone tints, the zone boundaries and the road risk bands are deliberately not, so the safety overlay keeps its frozen colour at any distance.",
+   "sourced_from": "added by founder ruling 2026-09-22, amended the same day by the same ruling once the reference was measured at full resolution. Placed at the reference video's own measured horizon-seam colour. Renders as three.js scene fog; see MAP_SPEC.md, \"Distance\".",
+   "governs": "MAP_SPEC.md",
+   "frozen": true,
+   "was": "#6B7EC4",   "platform": "web"
+  },
+  {
+   "id": "color.walk.ground",
+   "kind": "color",
+   "value": "#578BAE",
+   "unit": "hex",
+   "means": "The walk view's land: the plane that shows where no tile has loaded, and the surface every zone tint, road and green area is read against. Measured from the reference at full resolution: its land is a blue-teal of luma 110-140, 78% of its map area falls in the 180-240 degree blue/cyan family, and it holds no magenta anywhere. Amended 2026-09-22 from #565F80, which rendered rgb(110,90,117) - hue 284, and half the frame - under the highest-risk zone tint. The tint is frozen data, so the scenery is the thing that has to survive it: this value renders blue under every tier tint the dataset carries (217 degrees under HIGH, 197 under MODERATE, 193 under ELEVATED). It is the brightest large plane in the view, 2.3x the sky, which is the ground-to-sky contrast the reference frames measure.",
+   "sourced_from": "added by founder ruling 2026-09-22, amended the same day by the same ruling once the reference was measured at full resolution. Replaces color.background under the walk view's own ground plane; the reference video frames place the land at rgb(87,140,174), and this is that colour. The flat map's color.tile.land is untouched.",
+   "governs": "MAP_SPEC.md",
+   "frozen": true,
+   "was": "#565F80",   "platform": "web"
   }
  ]
 }

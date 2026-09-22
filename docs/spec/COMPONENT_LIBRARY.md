@@ -201,18 +201,32 @@ button. Vertically centred in the available space, never top-aligned.
 48 x 48 px, radius 14 px, fill `cardFill` @ 92%, 24 px icon in `textPrimary`.
 Stacked vertically on the right with 12 px gaps.
 
-Three of them, in this order, top to bottom. The third is the walk view toggle added
-2026-09-11, and it is **a control, not a mode switch with its own screen** - the sheet, the
-ladder and the SOS button are unchanged around it.
+Two stacks, both against the right edge at `--screen-padding`, in the order below. The
+walk view toggle was added 2026-09-11, and it is **a control, not a mode switch with its
+own screen** - the sheet, the ladder and the SOS button are unchanged around it.
 
-| # | Icon | Label | Action |
+| Stack | Icon | Label | Action |
 |---|---|---|---|
-| 1 | `my_location` | Recentre | recentre the map |
-| 2 | `visibility` | What the police see | opens `PoliceView` |
-| 3 | `map` / `3d_rotation` | View | toggles flat and walk. Icon shows the view she would switch **to**. |
+| top | drawn `CharacterIcon` | `walk_edit_character` | opens the customiser. Walk view only - the flat map has no character in it. |
+| top | `settings` | `cd_settings` | opens `SettingsScreen` |
+| bottom | `map` / `3d_rotation` | `view_toggle` | toggles flat and walk. Icon shows the view she would switch **to**. |
+| bottom | `my_location` | `cd_recentre` | recentre the map. Flat map only: the walk camera is pinned to her position, so here the same button would be a control that does nothing. |
+
+`visibility` / "What the police see" was the second control in this stack and is **cut,
+round two** with `PoliceView` (`SCREENS.md` S10). It is not in this build, and no rail row
+claims it.
 
 The toggle carries `view_toggle` as its accessible label and announces on change
 (`ann_view_walk`, `ann_view_flat`). It is the only control whose icon changes with state.
+
+**Amendment 2026-09-23: every control in these stacks is a mark.** The founder asked for
+the chrome to stop competing with the scene - the branding down to just the mark, and the
+controls down to marks on the right. All four rows above are icon-only, each keeps its
+accessible name, and the icon-only posture is asserted by test rather than by eye. One row
+is not a `MaterialSymbol` glyph: the pinned subset has no glyph that means "your character"
+(`CharacterIcon.tsx` records why), so the character mark is drawn to the subset's own rules
+- 24 px box, 2 px stroke, round caps and joins - and this library counts it as part of the
+set rather than an exception to it.
 
 ---
 

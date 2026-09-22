@@ -1,4 +1,4 @@
-import { Color, Mesh, MeshBasicMaterial } from "three";
+import { Color, DoubleSide, Mesh, MeshBasicMaterial } from "three";
 import { describe, expect, it } from "vitest";
 
 import { bundledZoneRepository } from "../../data/repository/zoneRepository";
@@ -6,7 +6,7 @@ import { RiskTier } from "../../domain/model/zone";
 import { layerHeight } from "./walkGeometry";
 import { toGround, parseWorldMeta, type WorldMeta } from "./walkProjection";
 import { ZONE_SELECTED_ALPHA_RAISE } from "./walkFacts";
-import { buildZoneLayer, type ZoneLayer } from "./walkZones";
+import { buildZoneLayer, ZONE_FILL_ALPHA_SCALE, type ZoneLayer } from "./walkZones";
 
 /**
  * A meta block for these fixtures. The tile size and quantisation step go unread by the
@@ -123,7 +123,40 @@ describe("buildZoneLayer", () => {
     fills.forEach((fill, index) => {
       const zone = sorted[index];
       if (zone === undefined) throw new Error(`No zone at ${index}`);
-      expect(opacityOf(fill)).toBeCloseTo(zone.zone.opacity);
+      // The data's own opacity, realised for a lit ground: see `ZONE_FILL_ALPHA_SCALE`.
+      // The order of the zones' opacities is the data's and survives the scale.
+      expect(opacityOf(fill)).toBeCloseTo(zone.zone.opacity * ZONE_FILL_ALPHA_SCALE);
+    });
+  });
+
+  it("keeps the dataset's own shading order, so the scale ranks the zones as the data does", () => {
+    const sorted = [...MAP_ZONES].sort(
+      (left, right) => left.zone.riskScore - right.zone.riskScore,
+    );
+    const { fills } = split(buildZoneLayer(MAP_ZONES, meta, PROBE_METRES_PER_PIXEL));
+    const opacities = fills.map(opacityOf);
+    const dataOpacities = sorted.map(({ zone }) => zone.opacity);
+    // A scale is only a rendering choice if it preserves the order it scales: two zones the
+    // data shades differently must not come out equally shaded here, and the darkest must
+    // stay the darkest.
+    const ranked = [...dataOpacities].sort((left, right) => left - right);
+    expect([...opacities].sort((left, right) => left - right)).toEqual(
+      ranked.map((opacity) => opacity * ZONE_FILL_ALPHA_SCALE),
+    );
+    expect(Math.max(...opacities)).toBeGreaterThan(Math.min(...opacities));
+  });
+
+  it("draws every zone surface two-sided, so no zone can be culled away", () => {
+    // The bug this pins: `appendRingFill` used to emit fills wound downward (see its own
+    // comment), the tile layers never noticed because every tile material is two-sided,
+    // and the zone layer — one-sided — rendered no fills and no boundaries at all. The
+    // whole safety overlay was missing from the frame while the flat map drew all 19. The
+    // emitter now faces fills up; this is the second guard, and it is the same
+    // `DoubleSide` every tile material wears.
+    const layer = buildZoneLayer(MAP_ZONES, meta, PROBE_METRES_PER_PIXEL);
+    layer.group.traverse((object) => {
+      if (!(object instanceof Mesh)) return;
+      expect((object.material as MeshBasicMaterial).side).toBe(DoubleSide);
     });
   });
 
@@ -202,7 +235,11 @@ describe("selection", () => {
       const expectedBase = before[fillIndex];
       if (expectedBase === undefined) throw new Error("missing fill");
       if (fillIndex === index) {
-        expect(opacity).toBeCloseTo(expectedBase + ZONE_SELECTED_ALPHA_RAISE);
+        // The raise is stated as an increase on this fill, so it takes the same scale the
+        // fill does — scaling one and not the other would turn a tenth into a half.
+        expect(opacity).toBeCloseTo(
+          expectedBase + ZONE_SELECTED_ALPHA_RAISE * ZONE_FILL_ALPHA_SCALE,
+        );
       } else {
         expect(opacity).toBeCloseTo(expectedBase);
       }

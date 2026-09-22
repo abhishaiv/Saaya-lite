@@ -9,6 +9,7 @@ import type { PoliceStation } from "../../../domain/model/policeStation";
 import type { LatLng } from "../../../domain/model/zone";
 import type { LocationStatus } from "../../../platform/locationWatch";
 import { ArmBanner } from "../../components/ArmBanner";
+import { MaterialSymbol } from "../../icons/MaterialSymbol";
 import type { M4Copy } from "../../copy/strings";
 import type { HomeEngineView } from "./homeEngineBridge";
 import { CheckInOverlay } from "./CheckInOverlay";
@@ -146,22 +147,22 @@ export function HomeSessionSurface({
           ) : state === "IDLE" ? (
             <>
               <button
-                aria-label="SUS"
-                className="home-session-action home-session-action--sus"
-                data-home-action="sus"
-                onClick={onManualArm}
-                type="button"
-              >
-                SUS
-              </button>
-              <button
                 aria-label={copy.cdDemoPanel}
-                className="home-session-action home-session-action--demo"
+                className="home-session-action home-session-action--icon home-session-action--demo"
                 data-home-action="demo"
                 onClick={onOpenDemo}
                 type="button"
               >
-                Demo
+                <MaterialSymbol decorative fill="utility" name="visibility" size={24} />
+              </button>
+              <button
+                aria-label="SUS"
+                className="home-session-action home-session-action--icon home-session-action--sus"
+                data-home-action="sus"
+                onClick={onManualArm}
+                type="button"
+              >
+                <MaterialSymbol decorative fill="state" name="gpp_maybe" size={24} />
               </button>
             </>
           ) : (
@@ -178,12 +179,12 @@ export function HomeSessionSurface({
 
           <button
             aria-label={copy.cdHelpNow}
-            className="home-session-action home-session-action--sos"
+            className="home-session-action home-session-action--icon home-session-action--sos"
             data-home-action="sos"
             onClick={onHelpNow}
             type="button"
           >
-            SOS
+            <MaterialSymbol decorative fill="state" name="sos" size={32} />
           </button>
         </div>
       ) : null}
@@ -265,16 +266,18 @@ export function HomeSessionSurface({
           outline-offset: 2px;
         }
 
+        /* Founder instruction, 2026-09-23: the direct actions are marks on the right, not
+           a full-width slab across the bottom of the map. The cluster is anchored to the
+           same right edge the map controls use, and sits on their baseline. */
         .home-session-action-dock {
           position: fixed;
           z-index: 6; /* GROUNDED-EXEMPT: direct actions remain above the map and below an active ladder or SOS. */
-          inset-inline: var(--screen-padding);
           inset-block-end: calc(
             env(safe-area-inset-bottom) + var(--space-12)
           );
-          display: grid;
-          grid-auto-columns: minmax(0, 1fr); /* GROUNDED-EXEMPT: every available direct action receives an equal map-safe column. */
-          grid-auto-flow: column;
+          inset-inline-end: var(--screen-padding);
+          display: flex;
+          align-items: flex-end;
           gap: var(--space-8);
         }
 
@@ -293,6 +296,15 @@ export function HomeSessionSurface({
           font-weight: var(--weight-semibold);
           line-height: var(--type-body-line-height);
           text-align: center;
+        }
+
+        /* The square marks. Text actions in the same cluster (resume, End SUS) keep the
+           base padding and stretch to their words. */
+        .home-session-action--icon {
+          inline-size: var(--minimum-touch-target);
+          block-size: var(--minimum-touch-target);
+          padding: 0;
+          border-radius: var(--radius-control);
         }
 
         .home-session-action--sus {
@@ -326,7 +338,13 @@ export function HomeSessionSurface({
           line-height: var(--type-body-line-height);
         }
 
+        /* One step over the touch target: SOS is the action that must never be missed, and
+           it is the only control in the cluster that is bigger than the rest. --home-action-
+           dock-height is declared on .home-screen from this same sum, so the map's own
+           chrome clears the biggest mark in the dock. */
         .home-session-action--sos {
+          inline-size: var(--home-action-dock-height);
+          block-size: var(--home-action-dock-height);
           background: var(--color-danger);
         }
       `}</style>

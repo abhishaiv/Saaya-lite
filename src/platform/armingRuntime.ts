@@ -49,6 +49,7 @@ export interface ArmingRuntimeCallbacks {
 export class LocationArmingRuntime {
   private dwellState: DwellState = resetDwellEvidence();
   private sampling: LocationSampling | null = null;
+  private walkViewVisible = false;
 
   constructor(
     private readonly hotspots: readonly HeatmapHotspot[],
@@ -64,6 +65,19 @@ export class LocationArmingRuntime {
   setRules(rules: Rules): void {
     this.rules = rules;
     this.dwellState = resetDwellEvidence();
+    this.synchronizeSampling();
+  }
+
+  /**
+   * The view she is looking at, which is not a session state and not evidence.
+   *
+   * Kept here rather than in the watch so that a later `synchronizeSessionState` cannot
+   * overwrite it - every state change re-derives the sampling request through
+   * `samplingForSession`, and this is one of its inputs.
+   */
+  setWalkViewVisible(visible: boolean): void {
+    if (this.walkViewVisible === visible) return;
+    this.walkViewVisible = visible;
     this.synchronizeSampling();
   }
 
@@ -124,10 +138,12 @@ export class LocationArmingRuntime {
     const next = samplingForSession(
       snapshot.state,
       this.dwellState.candidateZoneId !== null,
+      this.walkViewVisible,
     );
     if (
       this.sampling?.intervalSec === next.intervalSec &&
-      this.sampling.enableHighAccuracy === next.enableHighAccuracy
+      this.sampling.enableHighAccuracy === next.enableHighAccuracy &&
+      this.sampling.forwardEveryFix === next.forwardEveryFix
     ) {
       return;
     }
@@ -153,18 +169,57 @@ export class LocationArmingRuntime {
   }
 }
 
+/**
+ * What the watch is asked for.
+ *
+ * The first half is the recorded cadence for the state, unchanged: `BUSINESS_RULES.md`
+ * section 12 and the sampling facts in `rules.ts` still decide what counts as a sample of
+ * her position, and the walk view is not allowed to touch that. The second half is what
+ * the walk view adds on top of it, and it adds two things that are not cadence at all:
+ *
+ * 1. `enableHighAccuracy`, because the view draws her at her own coordinates and a
+ *    network-located fix can be a kilometre out - she chose "use my live GPS in the app",
+ *    and the idle cadence is coarse because the phone is usually in her pocket.
+ * 2. `forwardEveryFix`, so the map she is looking at moves at the rate the browser
+ *    delivers instead of the rate the ladder samples. See `LocationSampling`.
+ *
+ * It never shortens the interval, so a tighter recorded cadence (SOS, 5 s) is never
+ * loosened and no escalation input changes. Added 2026-09-23.
+ */
 export function samplingForSession(
+  state: SessionState,
+  pendingDwell: boolean,
+  walkViewVisible = false,
+): LocationSampling {
+  const base = baseSamplingForSession(state, pendingDwell);
+  if (!walkViewVisible) return base;
+  return { ...base, enableHighAccuracy: true, forwardEveryFix: true };
+}
+
+function baseSamplingForSession(
   state: SessionState,
   pendingDwell: boolean,
 ): LocationSampling {
   if (state === "SOS_ACTIVE") {
-    return { intervalSec: SOS_SAMPLING_SEC, enableHighAccuracy: true };
+    return {
+      intervalSec: SOS_SAMPLING_SEC,
+      enableHighAccuracy: true,
+      forwardEveryFix: false,
+    };
   }
   if (isActive(state)) {
-    return { intervalSec: SHADOW_SAMPLING_SEC, enableHighAccuracy: true };
+    return {
+      intervalSec: SHADOW_SAMPLING_SEC,
+      enableHighAccuracy: true,
+      forwardEveryFix: false,
+    };
   }
-  if (pendingDwell) return PENDING_DWELL_SAMPLING;
-  return { intervalSec: IDLE_SAMPLING_SEC, enableHighAccuracy: false };
+  if (pendingDwell) return { ...PENDING_DWELL_SAMPLING, forwardEveryFix: false };
+  return {
+    intervalSec: IDLE_SAMPLING_SEC,
+    enableHighAccuracy: false,
+    forwardEveryFix: false,
+  };
 }
 
 function isActive(state: SessionState): boolean {

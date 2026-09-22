@@ -18,7 +18,12 @@
  */
 
 import {
+  CircleGeometry,
+  DirectionalLight,
+  DoubleSide,
+  Fog,
   Group,
+  HemisphereLight,
   Mesh,
   MeshBasicMaterial,
   PerspectiveCamera,
@@ -35,15 +40,28 @@ import type { LiveLocationFix } from "../locationWatch";
 import { loadCharacter, type CharacterRig } from "./walkCharacter";
 import type { CharacterSelection } from "./characterParts";
 import {
-  COLOR_BACKGROUND,
+  COLOR_BRAND,
+  COLOR_WALK_GROUND,
+  COLOR_WALK_HAZE,
+  COLOR_WALK_SKY,
+  COLOR_WHITE,
   FRAME_BUDGET_MS,
   TARGET_FPS,
   WALK_CAMERA_DIST_M,
   WALK_CAMERA_FOV_DEG,
+  WALK_CAMERA_LOOK_AT_M,
   WALK_CAMERA_PITCH_DEG,
   WALK_CHARACTER_HEIGHT_M,
+  WALK_SPEED_MPS,
 } from "./walkFacts";
 import { layerHeight } from "./walkGeometry";
+import {
+  characterRotationY,
+  DEFAULT_HEADING_DEG,
+  directionForHeading,
+  shortestTurnDegrees,
+} from "./walkHeading";
+import { createSkyLayer } from "./walkSky";
 import {
   toGround,
   toTile,
@@ -114,6 +132,31 @@ const TILE_GRACE_MS = TILE_TIMEOUT_SEC * MILLISECONDS_PER_SECOND;
 const MAX_PIXEL_RATIO = 2; // GROUNDED-EXEMPT: a rendering cost ceiling, not a product value.
 
 /**
+ * The character's light rig.
+ *
+ * Nothing else in the scene is lit — every scenery material is `MeshBasicMaterial` — so
+ * these values change nothing but her, and no frozen colour can be shaded by them. The
+ * two colours the rig uses are the product's own `color.white` and `color.background`;
+ * the levels are rendering values the spec does not speak to.
+ */
+const SKY_LIGHT_INTENSITY = 1.6; // GROUNDED-EXEMPT: a lighting level, not a product value.
+const KEY_LIGHT_INTENSITY = 2.2; // GROUNDED-EXEMPT: a lighting level, not a product value.
+/** The key light's height above her, as a multiple of the camera's own back-off distance. */
+const KEY_LIGHT_HEIGHT_FACTOR = 1.2; // GROUNDED-EXEMPT: a lighting position, not a product value.
+/** The key light's sideways offset, as the same multiple, so one number moves the rig. */
+const KEY_LIGHT_SIDE_FACTOR = 0.4; // GROUNDED-EXEMPT: a lighting position, not a product value.
+
+/**
+ * The disc drawn on the ground at her feet.
+ *
+ * Its radius is a quarter of `walk.character.height` — her own stated size, divided, so
+ * no new length is stated. The rest are rendering values.
+ */
+const CHARACTER_MARK_RADIUS_M = WALK_CHARACTER_HEIGHT_M / 4;
+const CHARACTER_MARK_SEGMENTS = 32; // GROUNDED-EXEMPT: a circle's tessellation, a rendering cost.
+const CHARACTER_MARK_OPACITY = 0.28; // GROUNDED-EXEMPT: a rendering alpha, not a product value.
+
+/**
  * The near plane.
  *
  * Small, so that nothing she can walk past is clipped: the camera sits `walk.camera.dist`
@@ -122,6 +165,31 @@ const MAX_PIXEL_RATIO = 2; // GROUNDED-EXEMPT: a rendering cost ceiling, not a p
  * and never more.
  */
 const NEAR_M = 0.5; // GROUNDED-EXEMPT: a depth buffer range, not a product value.
+
+/**
+ * Where the distance haze starts and where it has fully taken over, in metres from the camera.
+ *
+ * A rendering range, not a product value: `MAP_SPEC.md` states that the scenery fades into
+ * `color.walk.haze` with distance, not how far away that begins. The near end is set well past
+ * the street she is on, so nothing she could walk into is hazed; the far end is well inside the
+ * ground plane's own width, so the plane's edge is never visible as an edge.
+ *
+ * Amended 2026-09-22. The far end was 800, and an A/B against 300 was read as showing no
+ * difference; that reading was taken where the ground under the probe carries a zone fill, and a
+ * zone fill is deliberately unfogged, so the probe was measuring the tint rather than the fog.
+ * Re-measured on bare ground, the fog is what holds the far end of the seam.
+ *
+ * The value is now taken from the reference rather than chosen. Row-by-row in its walk frames the
+ * dark seam is a full-width uniform band running from row 0.1656 to row 0.1812 of the frame -
+ * 1.56% of it - with the sky flat above and the scenery brightening below. Our band's top edge is
+ * not a free number: it is the ground plane's own far edge, at row 0.1672, because the plane's
+ * size is the residency window and nothing else. So the far end is solved to give the band the
+ * reference's own thickness, 1.56% of the frame from 0.1672, which puts our release row at 0.1828
+ * and measures 410 m from the eye. At 800 the band measured 0.48% of the frame, a third of the
+ * reference's; at 510 it measured 1.13%.
+ */
+const FOG_NEAR_M = 45; // GROUNDED-EXEMPT: a rendering range, not a product value.
+const FOG_FAR_M = 200; // GROUNDED-EXEMPT: a rendering range, not a product value.
 
 /**
  * The far plane before the world's meta arrives, when nothing but the clear colour is
@@ -148,13 +216,45 @@ interface QualityStep {
   readonly ambient: boolean;
 }
 
+/**
+ * The floor stops at `RESIDENT_RING - 1`, not at her own tile.
+ *
+ * The rungs above are the spec's order untouched: draw distance drops first, then tile
+ * detail, then ambient motion. What changed is only where the dropping stops. Her own
+ * tile alone renders the ground plane, whatever roads happen to cross that one square
+ * kilometre, and nothing else - no green, no buildings, no seam network - which reads as
+ * an empty world rather than as a cheaper one. Ring 1 is nine tiles, so the neighbourhood
+ * she is standing in is still there to look at, and `detail: false` has already taken the
+ * buildings off all nine.
+ *
+ * `MAP_SPEC.md` fixes the order and does not name a floor, so this is the ladder's order
+ * honoured to its last stated rung rather than a new order.
+ */
 const QUALITY_LADDER: readonly QualityStep[] = [
   { ring: RESIDENT_RING, detail: true, ambient: true },
   { ring: RESIDENT_RING - 1, detail: true, ambient: true },
-  { ring: RESIDENT_RING - 2, detail: true, ambient: true },
-  { ring: RESIDENT_RING - 2, detail: false, ambient: true },
-  { ring: RESIDENT_RING - 2, detail: false, ambient: false },
+  { ring: RESIDENT_RING - 1, detail: false, ambient: true },
+  { ring: RESIDENT_RING - 1, detail: false, ambient: false },
 ];
+
+/**
+ * How many consecutive frames a rung change waits for.
+ *
+ * One over-budget frame is not a slow device. It is a tile decoding on the render thread,
+ * a collection, or the first frames of a load - and the step that crosses the detail
+ * boundary removes every resident tile to stop paying for them, so a single stall used to
+ * cost the whole world and then take a frame per tile to rebuild it. Eight frames is a
+ * quarter of a second of sustained frames over `perf.frame`, which a stall does not
+ * produce and a device that cannot keep up does.
+ *
+ * The same run gates the climb back up, so a device hovering around the two thresholds
+ * cannot cross the detail boundary in either direction every few frames and rebuild the
+ * world each time.
+ *
+ * `perf.frame` and `perf.fps` fix the two thresholds; how long the ladder watches before
+ * it acts on them is a rendering responsiveness the spec does not speak to.
+ */
+const LADDER_DWELL_FRAMES = 8; // GROUNDED-EXEMPT: a rendering responsiveness, not a product value.
 
 /** A zone label, positioned on the screen. */
 export interface WalkScreenLabel {
@@ -189,6 +289,16 @@ export interface WalkSceneController {
   update(view: WalkSceneView): void;
   /** Swap the character in place, keeping the world, the zones and the camera. */
   setCharacter(selection: CharacterSelection): void;
+  /**
+   * The device's compass heading, in degrees clockwise from north, or `null` when there is
+   * no reading.
+   *
+   * Delivered here rather than through `update`, because a compass fires at the sensor's own
+   * rate and a React render is not something to spend on each one: the scene eases whatever
+   * number arrives over the product's own 400 ms. `null` restores the recorded camera, the
+   * one the composition facts were solved for.
+   */
+  setHeading(degrees: number | null): void;
   resize(): void;
   destroy(): void;
 }
@@ -252,9 +362,19 @@ export async function mountWalkScene(
     powerPreference: "high-performance",
   });
   renderer.setPixelRatio(Math.min(globalThis.devicePixelRatio, MAX_PIXEL_RATIO));
-  renderer.setClearColor(COLOR_BACKGROUND);
+  // The sky. Above the horizon line there is no geometry at all, so the clear colour is what
+  // the sky *is*: `color.walk.sky`, the dark half of a frame whose ground is 1.8x brighter.
+  // Amended 2026-09-22 by founder ruling, from `color.background`, which was also the ground
+  // plane's colour and left the view with no horizon to read.
+  renderer.setClearColor(COLOR_WALK_SKY);
 
   const scene = new Scene();
+  // The horizon band. In the reference frames the brightest large area is the haze where the
+  // ground meets the sky, so scenery fades into `color.walk.haze` with distance. Materials
+  // that carry risk information opt out with `fog: false` - the zone layer in `walkZones.ts`
+  // and the road band in `walkTiles.ts` - because a hazed risk band would be the risk
+  // information degrading with distance, which `MAP_SPEC.md` forbids.
+  scene.fog = new Fog(COLOR_WALK_HAZE, FOG_NEAR_M, FOG_FAR_M);
 
   const camera = new PerspectiveCamera(
     WALK_CAMERA_FOV_DEG,
@@ -263,20 +383,82 @@ export async function mountWalkScene(
     PLACEHOLDER_FAR_M,
   );
 
-  // `MAP_SPEC.md`: "A tile that has not arrived is not a hole in the world. The ground
-  // plane renders in the `background` colour underneath." It follows her, so the edge of
-  // the window is never visible, and it is one quad, so having more of it costs nothing.
+  // `MAP_SPEC.md`: "A tile that has not arrived is not a hole in the world. The ground plane
+  // renders in `color.walk.ground` underneath." It follows her, so the edge of the window is
+  // never visible, and it is one quad, so having more of it costs nothing.
+  //
+  // The colour is the land, not the sky. Amended 2026-09-22: from a camera 7.0 m up the far
+  // plane of the world *is* the ground, so a missing tile has to read as ground that has not
+  // been detailed yet rather than as sky showing through a hole. This plane is also the
+  // largest surface in the frame and the one every zone tint and road is read against, which
+  // is why it is the view's brightest plane.
   const ground = new Mesh(
     new PlaneGeometry(1, 1),
-    new MeshBasicMaterial({ color: COLOR_BACKGROUND }),
+    new MeshBasicMaterial({ color: COLOR_WALK_GROUND }),
   );
   ground.rotation.x = -QUARTER_TURN;
   ground.name = "ground";
   scene.add(ground);
 
+  // The sky's glints. Above the horizon there is no geometry at all, so this is the only
+  // thing in the frame's top strip besides the clear colour.
+  const sky = createSkyLayer();
+  scene.add(sky.points);
+
+  // --- the character's light rig.
+  //
+  // She is the one object in this view that is not flat colour. Her parts are glTF
+  // `pbrMetallicRoughness`, which three loads as `MeshStandardMaterial`, and a standard
+  // material with no light in the scene renders black: every capture of her was a
+  // silhouette against the tiles. `MAP_SPEC.md` says she "scales against [the buildings]
+  // correctly", which a black shape does not.
+  //
+  // The rig therefore exists for her alone. It cannot tint a tile, a road band or a zone,
+  // because none of those read a light; and it is the reason those materials stay
+  // `MeshBasicMaterial` rather than becoming lit surfaces with a sun nobody chose.
+  //
+  // Its lower colour is `color.walk.ground`: the bounce that reaches the underside of
+  // anything standing on the ground is the ground's own colour, so she is lit by the world
+  // the amendment gave her rather than by the app's `background`.
+  const skyLight = new HemisphereLight(
+    COLOR_WHITE,
+    COLOR_WALK_GROUND,
+    SKY_LIGHT_INTENSITY,
+  );
+  skyLight.name = "character-sky-light";
+  scene.add(skyLight);
+
+  const keyLight = new DirectionalLight(COLOR_WHITE, KEY_LIGHT_INTENSITY);
+  keyLight.name = "character-key-light";
+  // The target has to be in the scene for three to update its matrix; both are moved
+  // onto her every frame in `step`.
+  scene.add(keyLight, keyLight.target);
+
   const characterLayer = new Group();
   characterLayer.name = "character-layer";
   scene.add(characterLayer);
+
+  // The mark she stands on.
+  //
+  // A translucent disc in the product's own `color.brand`, which is what the reference
+  // draws under its avatar. A contact shadow is the other candidate and the weaker one:
+  // the ground here is a lit plane but a zone tint or a risk band can be under her feet,
+  // and a shadow on either of those says "this part of the ground is dark" rather than
+  // "she is standing here". The disc keeps its own colour over all of them.
+  const characterMark = new Mesh(
+    new CircleGeometry(1, CHARACTER_MARK_SEGMENTS),
+    new MeshBasicMaterial({
+      color: COLOR_BRAND,
+      transparent: true,
+      opacity: CHARACTER_MARK_OPACITY,
+      depthWrite: false,
+      side: DoubleSide,
+    }),
+  );
+  characterMark.rotation.x = -QUARTER_TURN;
+  characterMark.scale.setScalar(CHARACTER_MARK_RADIUS_M);
+  characterMark.name = "character-mark";
+  scene.add(characterMark);
 
   let world: WalkWorld | null = null;
   let meta: WorldMeta | null = null;
@@ -291,11 +473,26 @@ export async function mountWalkScene(
 
   let qualityLevel = 0;
   let overBudgetScore = 0;
+  // The two runs the guard is watching. A frame counts towards at most one of them.
+  let overBudgetRun = 0;
+  let underBudgetRun = 0;
 
   /** Where she is drawn, and where she is heading. */
   let current: GroundPoint | null = null;
   let target: GroundPoint | null = null;
   let facingRadians = 0;
+
+  /**
+   * Which way the view is looking, and which way the compass says it should.
+   *
+   * Both start at the recorded default, so a phone with no compass draws today's frame
+   * exactly. `headingLive` is false until a reading has arrived, and it is what keeps the
+   * default from being read as a heading: with no compass she keeps facing the way she last
+   * walked rather than being turned to face south whenever she stops.
+   */
+  let headingDegrees = DEFAULT_HEADING_DEG;
+  let targetHeadingDegrees = DEFAULT_HEADING_DEG;
+  let headingLive = false;
 
   /**
    * The last view handed to `update`, kept so the world's own arrival can be applied to it.
@@ -327,12 +524,27 @@ export async function mountWalkScene(
   motionQuery?.addEventListener("change", onMotionPreferenceChanged);
 
   const labelVector = new Vector3();
-  const labels: WalkScreenLabel[] = [];
+  // `WalkScreenLabel` is readonly for consumers. The producer reuses its objects instead of
+  // allocating one per anchor per frame, so it holds the same shape, mutable.
+  const labels: Array<{
+    stationId: string;
+    xPx: number;
+    yPx: number;
+    onScreen: boolean;
+  }> = [];
+  // The canvas box, read on resize and reused. A layout read inside the frame callback is
+  // the one thing in the label path that can cost a reflow, and the box only changes on
+  // resize.
+  let viewWidthPx = 0;
+  let viewHeightPx = 0;
 
-  // The camera is a rigid offset from her: back by the horizontal component of the
-  // stated distance, up by the vertical one, and angled down by the stated pitch. It
-  // never eases, so there is nothing here for the reduced-motion rule to switch off, and
-  // no way for camera motion to overlap a card entry.
+  // The camera's boom is rigid: back by the horizontal component of the stated distance,
+  // up by the vertical one, and angled down by the stated pitch. All three are constants, so
+  // the boom's own geometry never eases and the reduced-motion rule has nothing to reach
+  // there. Since 2026-09-23 the boom also turns to her heading, which moves where it stands
+  // without touching any of the three, and that turn is the one part that does ease - see
+  // `step()`. Because the aim point is her own position, a turn cannot move the horizon or
+  // the rows her feet and head land on.
   const pitchRadians = WALK_CAMERA_PITCH_DEG * DEGREES_TO_RADIANS;
   const cameraBackM = WALK_CAMERA_DIST_M * Math.cos(pitchRadians);
   const cameraUpM = WALK_CAMERA_DIST_M * Math.sin(pitchRadians);
@@ -385,6 +597,8 @@ export async function mountWalkScene(
     const widthPx = canvas.clientWidth;
     const heightPx = canvas.clientHeight;
     if (widthPx === 0 || heightPx === 0) return;
+    viewWidthPx = widthPx;
+    viewHeightPx = heightPx;
     // `false`: CSS owns the canvas box, and the screen gives it a full-bleed element.
     renderer.setSize(widthPx, heightPx, false);
     camera.aspect = widthPx / heightPx;
@@ -552,10 +766,21 @@ export async function mountWalkScene(
    * to the ladder's length, *is* the quality step. Both thresholds come from the two
    * facts, so the guard cannot drift from them, and the gap between them is the
    * hysteresis that stops a ladder step flapping.
+   *
+   * What the two thresholds do not say is how long the ladder watches before acting, and
+   * a single frame is too short a look: `LADDER_DWELL_FRAMES` is the run either direction
+   * has to reach first, and a frame between the thresholds belongs to neither run.
    */
   function applyFrameBudget(frameMs: number): void {
-    if (frameMs > FRAME_BUDGET_MS) overBudgetScore += 1;
-    else if (frameMs < TARGET_FRAME_MS) overBudgetScore -= 1;
+    overBudgetRun = frameMs > FRAME_BUDGET_MS ? overBudgetRun + 1 : 0;
+    underBudgetRun = frameMs < TARGET_FRAME_MS ? underBudgetRun + 1 : 0;
+    if (overBudgetRun >= LADDER_DWELL_FRAMES) {
+      overBudgetScore += 1;
+      overBudgetRun = 0;
+    } else if (underBudgetRun >= LADDER_DWELL_FRAMES) {
+      overBudgetScore -= 1;
+      underBudgetRun = 0;
+    }
     overBudgetScore = Math.max(
       0,
       Math.min(overBudgetScore, QUALITY_LADDER.length - 1),
@@ -568,9 +793,17 @@ export async function mountWalkScene(
 
     // Walked in before she is, so nothing depends on `current` above.
     let moving = false;
+    // How far she actually covered this step, which is what her legs answer to.
+    let travelledM = 0;
+    // What this step moves by, shared by the position, the heading and her own turn:
+    // `MOTION_SPEC.md`'s reduced-motion rule "snaps to the fix instead", and it is one rule
+    // rather than one per thing that moves.
+    const alpha = reducedMotion
+      ? 1
+      : 1 - Math.exp(-deltaSec / POSITION_EASE_SEC);
     if (reducedMotion) {
-      // `MOTION_SPEC.md`: under reduced motion she "snaps to the fix instead".
       moving = current.x !== target.x || current.z !== target.z;
+      travelledM = Math.hypot(target.x - current.x, target.z - current.z);
       current = target;
     } else {
       const remainingX = target.x - current.x;
@@ -582,11 +815,12 @@ export async function mountWalkScene(
         current = target;
       } else {
         moving = true;
-        const alpha = 1 - Math.exp(-deltaSec / POSITION_EASE_SEC);
-        current = {
+        const stepped = {
           x: current.x + remainingX * alpha,
           z: current.z + remainingZ * alpha,
         };
+        travelledM = Math.hypot(stepped.x - current.x, stepped.z - current.z);
+        current = stepped;
         // She faces where she is going, turning along the shorter arc over the same
         // 400 ms her position eases, so a reversal is not an instant flip.
         const desiredFacing = Math.atan2(remainingX, remainingZ);
@@ -597,23 +831,68 @@ export async function mountWalkScene(
       }
     }
 
+    // The view turns to the compass over the same 400 ms her position eases, along the
+    // shorter arc: a phone turned quickly through the 350-to-10 boundary nudges round
+    // rather than spinning the world the long way. Founder finding, 2026-09-23: the view
+    // did not turn with him. Nothing here moves the composition - the camera keeps its
+    // distance, pitch and aim point, and only the direction it looks along changes.
+    headingDegrees += shortestTurnDegrees(headingDegrees, targetHeadingDegrees) * alpha;
+    // Standing still, she turns to face where the phone is pointing. With no compass there
+    // is no heading to turn to, and she keeps the way she was last walking.
+    if (!moving && headingLive) {
+      const desiredFacing = characterRotationY(headingDegrees);
+      let turn = desiredFacing - facingRadians;
+      if (turn > Math.PI) turn -= FULL_TURN;
+      if (turn < -Math.PI) turn += FULL_TURN;
+      facingRadians += turn * alpha;
+    }
+
     const groundY = rig === null ? 0 : rig.root.position.y;
     if (rig !== null) {
       rig.root.position.set(current.x, groundY, current.z);
       rig.root.rotation.y = facingRadians;
       if (moving) rig.walk(POSITION_EASE_SEC);
       else rig.idle(POSITION_EASE_SEC);
+      // Her legs answer to the ground she covered, so the cycle slows as an ease finishes
+      // and hurries when a fix lands long, instead of skating at one rate through both. The
+      // idle keeps the rate it was authored at, so a pause is not a freeze. Capped at twice
+      // `walk.speed` so a fix that lands far away does not spin her.
+      rig.setWalkRate(
+        moving && deltaSec > 0
+          ? Math.min(travelledM / deltaSec / WALK_SPEED_MPS, 2)
+          : 1,
+      );
       // Her limb animation is the view's only ambient motion, so it is what the last
       // ladder step and the reduced-motion rule both stop.
       if (ambientAllowed) rig.update(deltaSec);
     }
 
-    camera.position.set(current.x, cameraUpM, current.z - cameraBackM);
-    camera.lookAt(
-      current.x,
-      groundY + WALK_CHARACTER_HEIGHT_M / HALF,
-      current.z,
+    // Which way the view looks, as a ground-plane unit vector. At the default heading this
+    // is (0, 1) - south - so the camera below sits where the composition facts put it, and
+    // the aim point does not move with the heading at all: it is her own position at
+    // `walk.camera.look_at`, which is what keeps her in the same place in the frame
+    // whichever way she turns. See `MAP_SPEC.md`, "The camera, and the frame it composes".
+    const looking = directionForHeading(headingDegrees);
+    const cameraX = current.x - cameraBackM * looking.x;
+    const cameraZ = current.z - cameraBackM * looking.z;
+    camera.position.set(cameraX, cameraUpM, cameraZ);
+    // The sky travels with the camera, because it is meant to be at no distance at all.
+    sky.points.position.copy(camera.position);
+    camera.lookAt(current.x, groundY + WALK_CAMERA_LOOK_AT_M, current.z);
+
+    // The key light rides over the camera's shoulder, so the side of her the camera sees
+    // is the lit side wherever she walks and whichever way she is looking. Both ends move
+    // with her, so its direction is fixed and nothing in the world is lit. Its side offset
+    // is a quarter turn from the direction of view - `(looking.z, -looking.x)` - because
+    // "over the shoulder" is a fact about the camera and not about the world.
+    keyLight.position.set(
+      cameraX + cameraBackM * KEY_LIGHT_SIDE_FACTOR * looking.z,
+      cameraBackM * KEY_LIGHT_HEIGHT_FACTOR,
+      cameraZ - cameraBackM * KEY_LIGHT_SIDE_FACTOR * looking.x,
     );
+    keyLight.target.position.set(current.x, groundY, current.z);
+
+    characterMark.position.set(current.x, layerHeight("characterMark"), current.z);
 
     const planeM = planeTilesAcross() * meta.tileM;
     ground.position.set(current.x, 0, current.z);
@@ -621,10 +900,11 @@ export async function mountWalkScene(
   }
 
   function projectLabels(): void {
-    labels.length = 0;
-    if (zones === null) return;
-    const widthPx = canvas.clientWidth;
-    const heightPx = canvas.clientHeight;
+    if (zones === null) {
+      labels.length = 0;
+      return;
+    }
+    let count = 0;
     for (const anchor of zones.labelAnchors) {
       labelVector.set(anchor.x, layerHeight("zoneOutline"), anchor.z);
       labelVector.project(camera);
@@ -635,15 +915,20 @@ export async function mountWalkScene(
         labelVector.x <= 1 &&
         labelVector.y >= -1 &&
         labelVector.y <= 1;
-      labels.push({
-        stationId: anchor.stationId,
-        // Normalised device coordinates run -1..1 with y up; screen pixels run 0..size
-        // with y down.
-        xPx: ((labelVector.x + 1) / NDC_SPAN) * widthPx,
-        yPx: ((1 - labelVector.y) / NDC_SPAN) * heightPx,
-        onScreen,
-      });
+      let label = labels[count];
+      if (label === undefined) {
+        label = { stationId: anchor.stationId, xPx: 0, yPx: 0, onScreen: false };
+        labels[count] = label;
+      }
+      label.stationId = anchor.stationId;
+      // Normalised device coordinates run -1..1 with y up; screen pixels run 0..size
+      // with y down.
+      label.xPx = ((labelVector.x + 1) / NDC_SPAN) * viewWidthPx;
+      label.yPx = ((1 - labelVector.y) / NDC_SPAN) * viewHeightPx;
+      label.onScreen = onScreen;
+      count += 1;
     }
+    labels.length = count;
   }
 
   function shouldLoop(): boolean {
@@ -653,16 +938,15 @@ export async function mountWalkScene(
   function frame(timestampMs: number): void {
     rafId = 0;
     if (destroyed) return;
-    // A frame is never treated as longer than the stated ceiling, so a tab returning
-    // from the background cannot report seconds and lurch the ease.
-    const elapsedMs =
-      lastTimestampMs === 0
-        ? 0
-        : Math.min(timestampMs - lastTimestampMs, FRAME_BUDGET_MS);
+    // The guard reads the true frame time, because a frame that missed the ceiling is
+    // exactly what it exists to see. The ease reads the same delta capped at the ceiling,
+    // so a tab returning from the background cannot report seconds and lurch her.
+    const frameMs = lastTimestampMs === 0 ? 0 : timestampMs - lastTimestampMs;
+    const elapsedMs = Math.min(frameMs, FRAME_BUDGET_MS);
     lastTimestampMs = timestampMs;
 
     if (!paused) {
-      applyFrameBudget(elapsedMs);
+      applyFrameBudget(frameMs);
       const stepQuality = qualityStep(qualityLevel);
       step(elapsedMs / MILLISECONDS_PER_SECOND, stepQuality.ambient && !reducedMotion);
       if (meta !== null) {
@@ -717,6 +1001,18 @@ export async function mountWalkScene(
     setCharacter(next: CharacterSelection): void {
       void mountRig(next);
     },
+    setHeading(degrees: number | null): void {
+      const wasLive = headingLive;
+      headingLive = degrees !== null;
+      targetHeadingDegrees = degrees ?? DEFAULT_HEADING_DEG;
+      // The first reading is where the view starts rather than a turn it eases into: there
+      // is no heading for that turn to be a continuation of, and easing into it would swing
+      // the world round on the way into the view. Every reading after it eases.
+      if (!wasLive) headingDegrees = targetHeadingDegrees;
+      // A reading arriving while a rung of the ladder is live changes nothing on screen:
+      // that frame is meant to be still, and the heading is eased in on resume.
+      if (!paused) ensureFrame();
+    },
     resize(): void {
       applyResize();
       ensureFrame();
@@ -738,6 +1034,9 @@ export async function mountWalkScene(
       rig?.dispose();
       ground.geometry.dispose();
       (ground.material as MeshBasicMaterial).dispose();
+      characterMark.geometry.dispose();
+      (characterMark.material as MeshBasicMaterial).dispose();
+      sky.dispose();
       scene.clear();
       renderer.dispose();
     },

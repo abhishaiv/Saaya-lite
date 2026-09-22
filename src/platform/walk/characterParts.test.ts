@@ -6,6 +6,7 @@ import { describe, expect, it } from "vitest";
 import {
   CHARACTER_AXES,
   DEFAULT_CHARACTER,
+  isBodyCoveringPart,
   parseCharacterSelection,
   partFileUrl,
   partsForSelection,
@@ -141,5 +142,26 @@ describe("withAxis", () => {
   it("ignores an axis that does not exist", () => {
     const next = withAxis(DEFAULT_CHARACTER, "hat", "top_tee");
     expect(next).toBe(DEFAULT_CHARACTER);
+  });
+});
+
+describe("isBodyCoveringPart", () => {
+  it("is true for every top and every bottom, and nothing else", () => {
+    const covering = CHARACTER_AXES.filter(
+      (axis) => axis.id === "top" || axis.id === "bottom",
+    ).flatMap((axis) => axis.options);
+    for (const partId of partIdsOnDisk()) {
+      expect(isBodyCoveringPart(partId)).toBe(covering.includes(partId));
+    }
+  });
+
+  it("is false for the hair and the accessories, which already stand off the skin", () => {
+    for (const partId of ["hair_long", "acc_scarf", "acc_bag", "acc_glasses", "body_base"]) {
+      expect(isBodyCoveringPart(partId)).toBe(false);
+    }
+  });
+
+  it("is false for a part that does not exist", () => {
+    expect(isBodyCoveringPart("top_parka")).toBe(false);
   });
 });

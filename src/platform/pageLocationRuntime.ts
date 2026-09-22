@@ -38,6 +38,10 @@ export class PageLocationRuntime {
       geolocation,
       {
         onFix: (fix) => this.arming.acceptLiveFix(fix),
+        // Straight to the map, and deliberately not offered to the arming runtime: a fix
+        // the evidence cadence rejected must not enter dwell evidence or the ladder. See
+        // `LocationSampling.forwardEveryFix`.
+        onDisplayFix: (fix) => callbacks.onLiveFix(fix),
         onStatus: callbacks.onStatus,
         onInterrupted: (reason) => {
           this.arming.interruptWatch(reason, this.clock.nowEpochMs());
@@ -47,6 +51,11 @@ export class PageLocationRuntime {
       clock,
       scheduler,
     );
+  }
+
+  /** The walk view is showing: live fixes for the map, cadence untouched. */
+  setWalkViewVisible(visible: boolean): void {
+    this.arming.setWalkViewVisible(visible);
   }
 
   startAfterConsent(): void {

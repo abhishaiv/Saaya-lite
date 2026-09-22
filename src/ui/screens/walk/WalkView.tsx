@@ -5,30 +5,44 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { MapZone } from "../../../data/repository/zoneRepository";
 import { displayRisk, displayRiskLabel } from "../../../domain/engine/rules";
 import type { HourBand, SessionState } from "../../../domain/model/session";
+import { DeviceHeadingWatch } from "../../../platform/deviceHeading";
 import type { LiveLocationFix, LocationStatus } from "../../../platform/locationWatch";
 import type { CharacterSelection } from "../../../platform/walk/characterParts";
 import {
-  COLOR_TILE_LAND,
+  COLOR_WALK_GROUND,
   COLOR_ZONE_ELEVATED,
   COLOR_ZONE_HIGH,
   COLOR_ZONE_MODERATE,
+  WALK_LEGEND_WIDTH_PX,
 } from "../../../platform/walk/walkFacts";
 import type {
   WalkSceneController,
   WalkScreenLabel,
 } from "../../../platform/walk/walkScene";
 import { SectionHeader } from "../../components/SectionHeader";
+import { MaterialSymbol } from "../../icons/MaterialSymbol";
 import { localizedRiskBand } from "../../copy/riskBandLabel";
 import { formatCopy, type M4Copy } from "../../copy/strings";
+import {
+  type LabelAnchor,
+  type LabelBounds,
+  type LabelBoxSize,
+  placeLabels,
+} from "./labelPlacement";
 
 export interface WalkViewProps {
   readonly character: CharacterSelection;
   readonly copy: M4Copy;
+  /**
+   * Whether the device's compass may be read, which is the answer to the permission ask
+   * taken on the tap that opened this view. `false` is not a failure: the view then draws
+   * the recorded camera, which is the frame the composition facts were solved for.
+   */
+  readonly headingAllowed: boolean;
   readonly hourBand: HourBand;
   readonly location: LiveLocationFix | null;
   readonly locationStatus: LocationStatus;
   readonly mapZones: readonly MapZone[];
-  readonly onEditCharacter: () => void;
   readonly onZoneSelected: (stationId: string) => void;
   readonly selectedZoneId: string | null;
   readonly sessionState: SessionState;
@@ -37,17 +51,27 @@ export interface WalkViewProps {
 /**
  * The ramp the bands are cut from, low to high.
  *
- * The low end is the land colour rather than a fourth band, because that is what the
+ * The low end is the ground colour rather than a fourth band, because that is what the
  * world does with it: `bandColorForRisk` returns nothing below the low threshold, so a
  * quiet area is drawn unshaded. The legend says "fewer records" at that end, which is the
  * same statement.
+ *
+ * It is `color.walk.ground` and not the flat map's `color.tile.land`. The walk view draws
+ * its own land, and a legend whose low swatch is a colour that appears nowhere in the view
+ * is a legend describing a different picture. Amended 2026-09-22 with the palette.
  */
 const LEGEND_STOPS: readonly string[] = [
-  COLOR_TILE_LAND,
+  COLOR_WALK_GROUND,
   COLOR_ZONE_MODERATE,
   COLOR_ZONE_ELEVATED,
   COLOR_ZONE_HIGH,
 ];
+
+/** How far inside the frame a zone name is kept. `--screen-padding`, read as a number. */
+const LABEL_FRAME_INSET_PX = 20; // GROUNDED-EXEMPT: structural frame inset, the pixel value of --screen-padding.
+
+/** The gap between two zone names that had to be stacked. `--space-4`, read as a number. */
+const LABEL_GAP_PX = 4; // GROUNDED-EXEMPT: structural label gap, the pixel value of --space-4.
 
 /**
  * The walk view: a canvas, the zone labels drawn over it, and the reading she needs to
@@ -66,11 +90,11 @@ const LEGEND_STOPS: readonly string[] = [
 export function WalkView({
   character,
   copy,
+  headingAllowed,
   hourBand,
   location,
   locationStatus,
   mapZones,
-  onEditCharacter,
   onZoneSelected,
   selectedZoneId,
   sessionState,
@@ -81,6 +105,14 @@ export function WalkView({
   const [labelIds, setLabelIds] = useState<readonly string[]>([]);
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
+  // The legend renders whole and can be folded to its ramp. Founder instruction,
+  // 2026-09-23: the card was covering the map she came to look at, so it is a chip now.
+  // It still opens with its derivation sentence showing, because FEATURES.md Amendment 1
+  // clause 1 requires the view to *state* that per-road risk comes from zone data rather
+  // than imply it, and a sentence behind a tap states it only on request. The fold is the
+  // answer to the space complaint; hiding the statement by default is not. Recorded in
+  // SCREENS.md S14 and MAP_SPEC.md.
+  const [legendOpen, setLegendOpen] = useState(true);
 
   const zoneByStation = useMemo(() => {
     const byStation = new Map<string, MapZone>();
@@ -103,7 +135,35 @@ export function WalkView({
   const zonesRef = useRef(mapZones);
   zonesRef.current = mapZones;
 
+  /**
+   * Each label's own box, measured once.
+   *
+   * `offsetWidth` costs a layout flush, and this runs inside the scene's frame callback - so
+   * measuring every name every frame would charge her phone a reflow per name per frame for
+   * a number that only changes when the text does, which is never. The first sighting of a
+   * node measures it; after that the size is read back.
+   */
+  const labelSizes = useRef(new Map<string, LabelBoxSize>());
+  // The canvas box, kept rather than read. `clientWidth` inside the scene's frame callback
+  // is a layout read, and it returns the same number on every frame that is not a resize.
+  const boundsRef = useRef<LabelBounds | null>(null);
+  // The transform last written to each node, so a frame that moved nothing writes nothing.
+  const lastTransforms = useRef(new Map<HTMLButtonElement, string>());
+
   const handleLabels = useCallback((labels: readonly WalkScreenLabel[]) => {
+    const frame = canvasRef.current;
+    let bounds = boundsRef.current;
+    if (bounds === null) {
+      const widthPx = frame?.clientWidth ?? 0;
+      const heightPx = frame?.clientHeight ?? 0;
+      bounds = { heightPx, insetPx: LABEL_FRAME_INSET_PX, widthPx };
+      // A zero box means the canvas has not been laid out yet, so it is not worth keeping.
+      if (widthPx !== 0 && heightPx !== 0) boundsRef.current = bounds;
+    }
+
+    const anchors: LabelAnchor[] = [];
+    const sizes: LabelBoxSize[] = [];
+    const nodes: HTMLButtonElement[] = [];
     for (const label of labels) {
       const node = labelRefs.current.get(label.stationId);
       if (node === undefined || node === null) continue;
@@ -112,9 +172,28 @@ export function WalkView({
         continue;
       }
       node.hidden = false;
-      // The second translate centres the label on its anchor, so the scene reports one
-      // point and this does not have to know how wide the words turned out to be.
-      node.style.transform = `translate3d(${label.xPx}px, ${label.yPx}px, 0) translate(-50%, -50%)`;
+      let size = labelSizes.current.get(label.stationId);
+      if (size === undefined || size.widthPx === 0 || size.heightPx === 0) {
+        // Visible before it is measured, or the box comes back zero.
+        size = { heightPx: node.offsetHeight, widthPx: node.offsetWidth };
+        labelSizes.current.set(label.stationId, size);
+      }
+      anchors.push({ xPx: label.xPx, yPx: label.yPx });
+      sizes.push(size);
+      nodes.push(node);
+    }
+
+    const placed = placeLabels(anchors, sizes, bounds, LABEL_GAP_PX);
+    for (let index = 0; index < nodes.length; index += 1) {
+      const node = nodes[index];
+      const spot = placed[index];
+      if (node === undefined || spot === undefined) continue;
+      // The second translate centres the label on the spot, so placement works in centres
+      // and never has to know how wide the words turned out to be.
+      const transform = `translate3d(${spot.xPx}px, ${spot.yPx}px, 0) translate(-50%, -50%)`;
+      if (lastTransforms.current.get(node) === transform) continue;
+      lastTransforms.current.set(node, transform);
+      node.style.transform = transform;
     }
     // The set of zones does not change while she walks, so this settles on the first
     // frame and reports no update again. Returning the previous array is React's bail-out.
@@ -186,7 +265,24 @@ export function WalkView({
   }, [character]);
 
   useEffect(() => {
-    const onResize = () => controllerRef.current?.resize();
+    if (!headingAllowed) return undefined;
+    // Her heading goes straight to the scene instead of through React state. A compass
+    // fires at the sensor's own rate - sixty-odd readings a second on a good phone - and
+    // re-rendering the sheet around the canvas at that rate is the one cost this view
+    // exists to avoid, which is why the zone labels are written to the DOM directly too.
+    // The scene eases each reading over the product's own 400 ms.
+    const watch = new DeviceHeadingWatch((reading) => {
+      controllerRef.current?.setHeading(reading.degrees);
+    });
+    watch.start();
+    return () => watch.stop();
+  }, [headingAllowed]);
+
+  useEffect(() => {
+    const onResize = () => {
+      boundsRef.current = null;
+      controllerRef.current?.resize();
+    };
     globalThis.addEventListener("resize", onResize);
     return () => globalThis.removeEventListener("resize", onResize);
   }, []);
@@ -228,16 +324,11 @@ export function WalkView({
         })}
       </div>
 
-      <div className="walk-view__top">
-        {status === null ? null : (
-          <p className="walk-view__status" role="status">
-            {status}
-          </p>
-        )}
-        <button className="walk-view__edit" onClick={onEditCharacter} type="button">
-          {copy.walkEditCharacter}
-        </button>
-      </div>
+      {status === null ? null : (
+        <p className="walk-view__status" role="status">
+          {status}
+        </p>
+      )}
 
       {denied ? (
         <p className="walk-view__notice" role="status">
@@ -245,28 +336,24 @@ export function WalkView({
         </p>
       ) : null}
 
-      <section className="walk-view__legend">
-        <SectionHeader className="walk-view__legend-title" level={2}>
-          {copy.walkLegendTitle}
-        </SectionHeader>
-        <div aria-hidden="true" className="walk-view__ramp">
-          {LEGEND_STOPS.map((hex) => (
-            <span
-              className="walk-view__ramp-stop"
-              key={hex}
-              style={{ background: hex }}
-            />
-          ))}
-        </div>
-        <div className="walk-view__legend-ends">
-          <span>{copy.walkLegendLow}</span>
-          <span>{copy.walkLegendHigh}</span>
-        </div>
-        <p className="walk-view__legend-note">{copy.walkRiskNote}</p>
-      </section>
+      <WalkLegend
+        copy={copy}
+        onToggle={() => setLegendOpen((open) => !open)}
+        open={legendOpen}
+      />
 
       <style jsx>{`
         .walk-view {
+          /* The right edge of the frame belongs to the home screen's own rail - the
+             settings button at the top, the control stack at the bottom - which is a fixed
+             48 px column at --screen-padding, and stays put whichever view is showing. This
+             view owns the whole frame, so its own chrome has to stop short of that column
+             or the rail lands on top of it. Measured before this: the legend's last line ran
+             under the control stack and "Change your character" was cut to "Change your
+             cha". One clearance, held by this view's top row; the legend is anchored to the
+             left edge now, so it is the only row that needs it. */
+          --walk-view-rail: calc(var(--minimum-touch-target) + var(--space-8));
+
           position: absolute;
           inset: 0;
           overflow: hidden;
@@ -310,40 +397,19 @@ export function WalkView({
           transition: none;
         }
 
-        .walk-view__top {
-          position: absolute;
-          inset-block-start: var(--space-12);
-          inset-inline: var(--screen-padding);
-          display: flex;
-          align-items: flex-start;
-          justify-content: space-between;
-          gap: var(--space-8);
-        }
-
+        /* The brand lockup holds the top-left corner in every view, so this reading sits
+           below it rather than beside it, and clears the notch the way the lockup does. */
         .walk-view__status {
+          position: absolute;
+          inset-block-start: calc(
+            env(safe-area-inset-top) + var(--space-12) +
+              var(--minimum-touch-target) + var(--space-8)
+          );
+          inset-inline: var(--screen-padding) calc(var(--screen-padding) + var(--walk-view-rail));
           margin: 0;
           color: var(--color-text-tertiary);
           font-size: var(--type-caption-size);
           line-height: var(--type-caption-line-height);
-        }
-
-        .walk-view__edit {
-          display: inline-flex;
-          align-items: center;
-          min-block-size: var(--minimum-touch-target);
-          margin-inline-start: auto;
-          padding: var(--space-8) var(--space-12);
-          border: 0;
-          border-radius: var(--radius-control);
-          appearance: none;
-          background: rgb(from var(--color-card-fill) r g b / 0.92);
-          color: var(--color-text-on-card);
-          font-family: inherit;
-          font-size: var(--type-label-size);
-          font-weight: var(--weight-semibold);
-          line-height: var(--type-label-line-height);
-          animation: none;
-          transition: none;
         }
 
         .walk-view__notice {
@@ -360,21 +426,110 @@ export function WalkView({
           text-align: center;
         }
 
+      `}</style>
+    </div>
+  );
+}
+
+export type WalkLegendProps = Readonly<{
+  readonly copy: M4Copy;
+  readonly onToggle: () => void;
+  readonly open: boolean;
+}>;
+
+/**
+ * The street-shading reading: the ramp and both of its ends always, the derivation on a tap.
+ *
+ * A separate component so both of its states can be rendered and checked directly - the
+ * test suite runs in node with no DOM, so a chip whose second state only exists after a
+ * click is a state nothing can assert.
+ */
+export function WalkLegend({ copy, onToggle, open }: WalkLegendProps) {
+  return (
+    <section className="walk-view__legend" data-expanded={open || undefined}>
+      <button
+        aria-expanded={open}
+        className="walk-view__legend-summary"
+        onClick={onToggle}
+        type="button"
+      >
+        <SectionHeader className="walk-view__legend-title" level={2}>
+          {copy.walkLegendTitle}
+        </SectionHeader>
+        <span aria-hidden="true" className="walk-view__legend-chevron">
+          <MaterialSymbol decorative fill="utility" name="chevron_right" size={16} />
+        </span>
+        <div aria-hidden="true" className="walk-view__ramp">
+          {LEGEND_STOPS.map((hex) => (
+            <span
+              className="walk-view__ramp-stop"
+              key={hex}
+              style={{ background: hex }}
+            />
+          ))}
+        </div>
+        <div className="walk-view__legend-ends">
+          <span>{copy.walkLegendLow}</span>
+          <span>{copy.walkLegendHigh}</span>
+        </div>
+      </button>
+      {open ? (
+        <p className="walk-view__legend-note">{copy.walkRiskNote}</p>
+      ) : null}
+
+      <style jsx>{`
+        /* Clears the action dock rather than sitting under it. --home-action-dock-clearance
+         * is the space the dock occupies, declared on .home-screen and inherited here, so
+         * the card clears it by the same margin the right-edge control stack does and the
+         * two line up. The capture's own numbers are in MAP_SPEC.md.
+         *
+         * Compacted 2026-09-23 on founder instruction ("taking up all the space"): the card
+         * is now a chip in the bottom-left corner. It renders whole - title, ramp, both ends
+         * and the derivation sentence - and folds to the ramp on a tap, so the streets can be
+         * cleared without the statement ever being hidden by default. SCREENS.md S14 carries
+         * the amendment, and the width is walk.legend.width rather than a literal. */
         .walk-view__legend {
           position: absolute;
-          inset-block-end: var(--space-20);
-          inset-inline: var(--screen-padding);
+          inset-block-end: var(--home-action-dock-clearance);
+          inset-inline-start: var(--screen-padding);
+          inline-size: ${WALK_LEGEND_WIDTH_PX}px;
           padding: var(--space-12);
-          border-radius: var(--radius-small);
+          border-radius: var(--radius-control);
           background: rgb(from var(--color-card-fill) r g b / 0.92);
           color: var(--color-text-on-card);
         }
 
-        /* C11 supplies its own padding for a full-width section label; inside this card
-           it is the second line of a heading block, so that padding comes back off. */
-        .walk-view :global(.walk-view__legend-title) {
+        /* The whole chip is the control: one tap folds the sentence away, one brings it
+           back. The ramp and both ends never move. */
+        .walk-view__legend-summary {
+          display: grid;
+          inline-size: 100%;
+          padding: 0;
+          border: 0;
+          appearance: none;
+          background: none;
+          color: inherit;
+          font: inherit;
+          grid-template-columns: minmax(0, 1fr) auto;
+          row-gap: var(--space-4);
+          text-align: start;
+        }
+
+        .walk-view__legend-chevron {
+          display: inline-flex;
+          align-items: center;
+          color: var(--color-text-secondary);
+        }
+
+        .walk-view__legend[data-expanded] .walk-view__legend-chevron {
+          transform: rotate(90deg);
+        }
+
+        /* C11 supplies its own padding for a full-width section label; inside this chip it
+           is the heading of a control, so that padding comes back off. */
+        .walk-view__legend :global(.walk-view__legend-title) {
           padding-block: 0;
-          margin-block-end: var(--space-8);
+          margin: 0;
           color: var(--color-text-on-card);
         }
 
@@ -383,6 +538,7 @@ export function WalkView({
           block-size: 8px;
           overflow: hidden;
           border-radius: var(--radius-small);
+          grid-column: 1 / -1;
         }
 
         .walk-view__ramp-stop {
@@ -392,9 +548,9 @@ export function WalkView({
         .walk-view__legend-ends {
           display: flex;
           justify-content: space-between;
-          margin-block-start: var(--space-4);
           color: var(--color-text-secondary);
           font-size: var(--type-caption-size);
+          grid-column: 1 / -1;
           line-height: var(--type-caption-line-height);
         }
 
@@ -405,6 +561,6 @@ export function WalkView({
           line-height: var(--type-caption-line-height);
         }
       `}</style>
-    </div>
+    </section>
   );
 }

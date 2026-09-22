@@ -58,11 +58,26 @@ describe("M4 Home session surface", () => {
     expect(html).toContain('data-home-action="sus"');
     expect(html).toContain('data-home-action="demo"');
     expect(html).toContain('data-home-action="sos"');
-    expect(html).toContain(">SUS<");
-    expect(html).toContain(">Demo<");
-    expect(html).toContain(">SOS<");
     expect(html).not.toContain("saaya-bottom-sheet");
     expect(html).not.toContain(M4_COPY.en.warnKeepOpenBody);
+  });
+
+  it("makes every direct action a mark on the right, announced rather than spelled out", () => {
+    // Founder instruction, 2026-09-23: "Demo, SUS and SOS can be logos on the right." The
+    // words are gone from the dock, so the name each control still needs is the one it
+    // announces - a screen reader hears it, the map does not carry it.
+    const copy = M4_COPY.en;
+    const html = render("IDLE");
+
+    // Three actions, all of them marks. The count is over the class attribute rather than
+    // the bare class name, because styled-jsx writes its own CSS into the same markup.
+    expect(html.match(/class="home-session-action /g)).toHaveLength(3);
+    expect(html).toContain('aria-label="SUS"');
+    expect(html).toContain(`aria-label="${copy.cdDemoPanel}"`);
+    expect(html).toContain(`aria-label="${copy.cdHelpNow}"`);
+    expect(html).not.toContain(">SUS<");
+    expect(html).not.toContain(">Demo<");
+    expect(html).not.toContain(">SOS<");
   });
 
   it("shows automatic SHADOW with its transient acknowledgement and a compact end action", () => {

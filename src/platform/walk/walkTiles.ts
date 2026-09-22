@@ -20,7 +20,7 @@
  * specific to a tile: its materials, its decode, and how a fragment becomes a layer.
  */
 
-import { Color, DoubleSide, Group, Mesh, MeshBasicMaterial } from "three";
+import { Color, DoubleSide, FrontSide, Group, Mesh, MeshBasicMaterial } from "three";
 
 import {
   appendBuilding,
@@ -28,6 +28,7 @@ import {
   appendRingFill,
   buildColoredGeometry,
   buildGeometry,
+  closePath,
   layerHeight,
   pushColor,
 } from "./walkGeometry";
@@ -78,8 +79,17 @@ export interface RawTile {
  *
  * GROUNDED-EXEMPT: a rendering width. The spec fixes road *risk*, not road width, and
  * no product claim depends on how wide a street is drawn.
+ *
+ * Amended 2026-09-22, from 4. At her distance the frame shows about 6 m of ground across
+ * (6.05 m at the row of her feet, solved from `walk.camera.fov` 54 on a 390x844 viewport),
+ * so the old 8 m residential street was wider than the whole frame and the narrow one at
+ * that: with the class multipliers below, a `primary` came out 24 m wide - four frames'
+ * worth - so its band filled the picture from the horizon to her feet and the city was a
+ * colour field. The reference's own road ribbons measure 2.5-3.2 m across at the depths
+ * this camera reads them at (per-row profiles of `/tmp/pogo-over`, rows 0.62 and 0.85 of
+ * frame height), so this is that measurement, in metres.
  */
-const ROAD_HALF_WIDTH_M = 4;
+export const ROAD_HALF_WIDTH_M = 1.5;
 
 /**
  * How much wider each `highway` class is drawn than a residential street.
@@ -87,33 +97,182 @@ const ROAD_HALF_WIDTH_M = 4;
  * Multipliers, not widths, so the base width above stays the only tuning point. Only
  * the seven classes the bake actually emitted appear; anything else falls to the
  * residential default rather than being given a width nobody chose.
+ *
+ * Amended 2026-09-22 with the base width: a trunk road reads wider than a lane, but the
+ * reference's ribbons differ by less than this set used to, and a street that stops being
+ * a ribbon stops carrying a legible band.
  */
-const ROAD_CLASS_WIDTH_MULTIPLIER: Readonly<Record<string, number>> = {
-  primary: 3,
-  secondary: 2,
-  tertiary: 2,
-  residential: 1,
-  living_street: 1,
-  unclassified: 1,
-  service: 1,
-};
+export const ROAD_CLASS_WIDTH_MULTIPLIER: Readonly<Record<string, number>> = { primary: 2, secondary: 1.6, tertiary: 1.3, residential: 1, living_street: 1, unclassified: 1, service: 0.8 }; // GROUNDED-EXEMPT: rendering multipliers, not product values — see the block above.
 
 const ROAD_CLASS_WIDTH_DEFAULT = 1;
 
-/** Road surface. A neutral dark grey so the risk bands are the only colour on the ground. */
-const COLOR_ROAD_SURFACE = "#1A1A20"; // fact: color.tile.road
+/**
+ * How far the road casing stands proud of the road surface, on each side, in metres.
+ *
+ * GROUNDED-EXEMPT: a rendering width, the same kind of value as `ROAD_HALF_WIDTH_M`. A
+ * road in this palette is a dark ribbon on a dark ground; a lighter rim along each edge
+ * is what lets a low camera see where the street is. It carries no claim.
+ *
+ * Amended 2026-09-22 to a hairline. The reference's own road edges are thin bright lines,
+ * not bands: at 1080x1920 its edge lines measure 3-6 px across, and a rim 0.5 m wide is
+ * 32 px at the near field - sixteen times as thick, and it reads as a painted shoulder
+ * rather than as an edge. At 0.25 m it still holds a pixel of its own out to about 150 m,
+ * which is where the reference's own lines stop resolving.
+ */
+export const ROAD_CASING_M = 0.25; // GROUNDED-EXEMPT: a rendering width, not a product value.
 
-/** Building face colour. */
-const COLOR_BUILDING = "#22222A"; // fact: color.tile.building
+/**
+ * How much lighter the casing is than the road surface.
+ *
+ * GROUNDED-EXEMPT: a rendering multiplier, not a colour of its own. `color.tile.road` is
+ * the only road colour the spec states, so the casing is derived from it rather than
+ * named — if the road's colour is ever amended, its rim follows without a second ruling.
+ *
+ * It multiplies the road colour's own hex components (see `lighten`), which is the space
+ * the frame is composited in. Amended 2026-09-22: it used to multiply the *linear* value
+ * through `Color.multiplyScalar`, and 2.2 in that space renders `#2E3450` as rgb(69,78,117)
+ * against the road's rgb(46,52,80) - a rim the profile could not find.
+ *
+ * Amended again the same day, to a factor chosen from the reference's own edge lines rather
+ * than from a ratio to the road: at 1080x1920 the lines along its roads and block edges sit
+ * in a luma band of 190-250, and 4.5 was picked when the road was dark enough that a factor
+ * that large could not reach that band. With the road on the ladder the reference measures
+ * (see `color.tile.road`), 4.5 clamps every channel to white; at 3.1 the rim lands at luma
+ * 216, inside the band, and stays a cool pale ice rather than a warm yellow - the tier
+ * colours are warm, and a kerb that reads as a tier colour would be a false claim. Only the
+ * blue channel clamps, which is what keeps the rim cool.
+ */
+export const ROAD_CASING_LIGHTNESS = 3.1; // GROUNDED-EXEMPT: a rendering multiplier, not a colour of its own.
 
-/** Building roof, a shade lighter so the top face reads from a high camera. */
-const COLOR_BUILDING_ROOF = "#2A2A34"; // fact: color.tile.building.roof
+/**
+ * How wide the road's risk band is drawn, as a fraction of the road's own width.
+ *
+ * GROUNDED-EXEMPT: a rendering fraction, not a product value. The band's *colour* and
+ * *thresholds* are facts and are unchanged; this is how much of the road surface it covers.
+ *
+ * It used to be the whole road, at the band layer's height above the surface, which meant
+ * a banded street rendered as a slab of tier colour with the road, its casing and its
+ * junction geometry all invisible underneath it. Every road in the dense captures carried a
+ * band, so the street network — the thing the view exists to show her walking on — read as
+ * one flat colour from the horizon down. The band is now a spine down the middle of the
+ * road: the tier colour is still on the road surface at every point the risk applies to,
+ * still at `color.zone.*`, still drawn over everything the risk layer outranks, and the
+ * road it describes stays visible on both sides of it.
+ */
+export const ROAD_BAND_WIDTH_FRACTION = 0.55; // GROUNDED-EXEMPT: a rendering fraction, not a product value.
 
-/** Green space. */
-const COLOR_GREEN = "#14251A"; // fact: color.tile.green
+/**
+ * Lighten a colour in the space its hex is written in.
+ *
+ * The renderer's working space is linear; a hex is not. `Color.multiplyScalar(2.2)` on
+ * `#2E3450` converts to linear, doubles a near-black, and converts back to rgb(69,78,117)
+ * — a factor of 1.5 to the eye, not 2.2. Multiplying the hex's own bytes gives the colour
+ * the number reads as, and every other colour in this file is written as a hex, so the
+ * casing is too.
+ */
+function lighten(hex: string, factor: number): string {
+  const value = Number.parseInt(hex.slice(1), 16);
+  const byte = (shift: number): number =>
+    Math.min(0xff, Math.round(((value >> shift) & 0xff) * factor));
+  return `#${((byte(16) << 16) | (byte(8) << 8) | byte(0)).toString(16).padStart(6, "0")}`;
+}
 
-/** Water. */
-const COLOR_WATER = "#101C2E"; // fact: color.tile.water
+/**
+ * The tile palette. Amended 2026-09-22 by founder ruling, twice the same day.
+ *
+ * Every value here was `#1A1A20`-dark before, on a near-black ground, which is a scene with no
+ * contrast in it: a wall reads at 20 luma against a ground of 11, which is no edge at all, and
+ * a road at 27 against a sky of 11 hides the street she is walking on. The five values are now
+ * placed on the luminance ladder measured from the reference frames, in Saaya's night key: the
+ * ground is the lit plane (see `color.walk.ground`), the road is 0.56 of it, green is 0.85 of
+ * it, the roofs are the pale plane the city is read from, and the walls are the masses standing
+ * on it. Each value's own fact carries the measurement it came from.
+ *
+ * The second amendment raised the whole ladder: the reference's land is luma 110-140, its road
+ * 65-80 and its sky 55, and the ladder's first placement put the land at 96, which dragged the
+ * road to the sky's own luma and left the road with no separation from it at the horizon.
+ */
+
+/** Road surface. Dark against the lit ground, so the risk bands read on it and the street reads as a surface. */
+const COLOR_ROAD_SURFACE = "#3E466C"; // fact: color.tile.road
+
+/** Building face. Below the ground, so a block reads as a mass standing on a lit plane. */
+const COLOR_BUILDING = "#3A4160"; // fact: color.tile.building
+
+/** Building roof, lighter than the ground: from a camera below the rooflines, the roofs are the pale plane. */
+const COLOR_BUILDING_ROOF = "#8792B7"; // fact: color.tile.building.roof
+
+/** Green space, at 0.85 of the ground's luma and toward the teal the reference's parks measure. */
+const COLOR_GREEN = "#4A7C74"; // fact: color.tile.green
+
+/** Water, dark and cool, at the road's own luma: a river and a road both read dark against the ground. */
+const COLOR_WATER = "#1F3A5C"; // fact: color.tile.water
+
+/**
+ * How much a building face's own tone may differ from `color.tile.building`.
+ *
+ * GROUNDED-EXEMPT: a rendering variation around a fact, not a colour of its own.
+ * `color.tile.building` stays the wall colour and stays the mean of this; the factor is how far
+ * a single face may sit from it, applied in the hex's own bytes so the spread is the one the eye
+ * reads - the same space `lighten` and `ROAD_CASING_LIGHTNESS` work in.
+ *
+ * **Why the walls vary at all.** Every wall in the city was one colour, so a run of them read as
+ * a single mass: measured, rows 0.20-0.22 of the frame were 84.9-100% one rgb(56,64,96), where
+ * the reference's row 0.22 carries 9-29 separate runs. A street in the reference is many faces at
+ * slightly different tones, and an exactly uniform wall is the one thing a real one is not.
+ *
+ * **This is not a lighting model.** The view has no sun - see the `MeshBasicMaterial` note on
+ * `createTileMaterials` - and a face's tone here comes from its own position, not from its angle
+ * to anything. That is what keeps it deterministic: the same wall is the same tone in every frame
+ * and every session, and two clients showing the same street show the same street.
+ */
+const BUILDING_SHADE_SPREAD = 0.08; // GROUNDED-EXEMPT: a rendering variation around a fact.
+
+/** Vertices per wall quad, which `appendBuilding` writes in one run. */
+const WALL_VERTEX_COUNT = 6; // GROUNDED-EXEMPT: a geometry count, not a product value.
+
+/** Floats per wall quad: `WALL_VERTEX_COUNT` vertices of three components. */
+const WALL_STRIDE_FLOATS = WALL_VERTEX_COUNT * 3;
+
+/**
+ * A deterministic unit value in [0, 1) from a point's own coordinates.
+ *
+ * Quantised to a tenth of a metre before mixing, so two neighbouring tiles that compute the same
+ * wall's midpoint from their own origins - and land a few last bits apart - still give it one
+ * tone. The mixing constants are arbitrary and only have to spread; nothing is measured by them.
+ */
+function hashUnit(x: number, z: number): number {
+  // GROUNDED-EXEMPT: the four constants below are the arbitrary mixing integers of a stable hash.
+  const HASH_X = 73856093; // GROUNDED-EXEMPT: see above.
+  const HASH_Z = 19349663; // GROUNDED-EXEMPT: see above.
+  const HASH_MIX = 1274126177; // GROUNDED-EXEMPT: see above.
+  const HASH_SPAN = 4294967296; // GROUNDED-EXEMPT: see above.
+  const quantisedX = Math.round(x * 10);
+  const quantisedZ = Math.round(z * 10);
+  let mixed = (quantisedX * HASH_X) ^ (quantisedZ * HASH_Z);
+  mixed = Math.imul(mixed ^ (mixed >>> 13), HASH_MIX);
+  return ((mixed ^ (mixed >>> 16)) >>> 0) / HASH_SPAN;
+}
+
+/**
+ * One tone per wall, taken from the wall's own midpoint.
+ *
+ * `appendBuilding` writes six vertices per wall in one run, so this walks the walls buffer in
+ * strides of `WALL_STRIDE_FLOATS` and gives each stride one tone across all six of its vertices:
+ * a face reads as one face, and its neighbours read as their own. The colour attribute this fills
+ * is what `materials.building` multiplies, and the material is white for it - the fact's value is
+ * carried here, per face, so that a face cannot be lit twice.
+ */
+function pushWallShades(colors: number[], walls: readonly number[]): void {
+  const at = (index: number): number => walls[index] ?? 0;
+  for (let start = 0; start + WALL_STRIDE_FLOATS <= walls.length; start += WALL_STRIDE_FLOATS) {
+    const midX = (at(start) + at(start + 3) + at(start + 6)) / WALL_VERTEX_COUNT;
+    const midZ = (at(start + 2) + at(start + 5) + at(start + 8)) / WALL_VERTEX_COUNT;
+    const shade = 1 + BUILDING_SHADE_SPREAD * (hashUnit(midX, midZ) - 0.5) * 2;
+    const color = new Color(lighten(COLOR_BUILDING, shade));
+    for (let i = 0; i < WALL_VERTEX_COUNT; i += 1) colors.push(color.r, color.g, color.b);
+  }
+}
 
 /**
  * The colour a road band is drawn in, or `null` for "this road carries no band".
@@ -132,6 +291,7 @@ export function bandColorForRisk(risk: number): string | null {
 
 /** Shared materials, created once for the whole world and disposed once. */
 export interface TileMaterials {
+  readonly roadCasing: MeshBasicMaterial;
   readonly roadSurface: MeshBasicMaterial;
   readonly roadBand: MeshBasicMaterial;
   readonly building: MeshBasicMaterial;
@@ -148,13 +308,40 @@ export interface TileMaterials {
  * the frame cost predictable on the 2 GB device `perf.fps` is written for.
  */
 export function createTileMaterials(): TileMaterials {
-  const flat = (color: string): MeshBasicMaterial =>
+  const flat = (color: string | Color): MeshBasicMaterial =>
     new MeshBasicMaterial({ color: new Color(color), side: DoubleSide });
+  /**
+   * A layer with an outside and nothing else.
+   *
+   * `appendBuilding` faces every wall outward, so a building's walls and its roof can be
+   * one-sided. That is what lets the camera pass through a building it has ended up inside,
+   * rather than filling the frame with that building's interior; the measurement is in
+   * `MAP_SPEC.md`. Every other layer here lies flat on the ground and is seen from one side
+   * only in principle, but is left `DoubleSide` so a fill never depends on its data's
+   * winding - `appendRingFill` already guarantees a fill faces up, and this way a second
+   * guarantee cannot silently fight the first.
+   */
+  const outward = (color: string | Color): MeshBasicMaterial =>
+    new MeshBasicMaterial({ color: new Color(color), side: FrontSide });
   return {
+    // `color.tile.road`, lightened — see `ROAD_CASING_LIGHTNESS`. Amended 2026-09-22: it was
+    // `new Color(COLOR_ROAD_SURFACE).multiplyScalar(...)` in the linear working space.
+    roadCasing: flat(lighten(COLOR_ROAD_SURFACE, ROAD_CASING_LIGHTNESS)),
     roadSurface: flat(COLOR_ROAD_SURFACE),
-    roadBand: new MeshBasicMaterial({ side: DoubleSide, vertexColors: true }),
-    building: flat(COLOR_BUILDING),
-    buildingRoof: flat(COLOR_BUILDING_ROOF),
+    // The scene's distance haze is switched off for the band, not tuned down for it. `MAP_SPEC.md`:
+    // "A distant road band faded into haze would be the risk information degrading with draw
+    // distance." Every other material here is scenery and is fogged.
+    roadBand: new MeshBasicMaterial({ side: DoubleSide, vertexColors: true, fog: false }),
+    // White, with `vertexColors`, because each face's tone is carried in the geometry instead -
+    // see `pushWallShades`. The fact's value still governs: `color.tile.building` is what every
+    // face is shaded around, and an even face renders it exactly, since `lighten(hex, 1)` is the
+    // hex back again. The material stays white so a face cannot be multiplied by the fact twice.
+    building: new MeshBasicMaterial({
+      color: "#FFFFFF", // GROUNDED-EXEMPT: white, the identity of a vertex-colour multiply.
+      side: FrontSide,
+      vertexColors: true,
+    }),
+    buildingRoof: outward(COLOR_BUILDING_ROOF),
     green: flat(COLOR_GREEN),
     water: flat(COLOR_WATER),
   };
@@ -195,8 +382,8 @@ export function decodeTile(id: TileId, raw: RawTile, meta: WorldMeta): DecodedTi
  *
  * One mesh per layer rather than one per fragment: a tile carries up to 258 road
  * fragments, and 258 draw calls per tile is not a frame budget any phone will hold. A
- * tile that has every layer therefore draws six meshes in total (road, band, walls,
- * roof, green, water), however many fragments each of them holds.
+ * tile that has every layer therefore draws seven meshes in total (casing, road, band,
+ * walls, roof, green, water), however many fragments each of them holds.
  *
  * `detail` controls the scenery layers only. Buildings go first because they are the
  * expensive layer, and then green and water. **Roads are never dropped**, whatever
@@ -211,6 +398,7 @@ export function buildTileMeshes(
   const group = new Group();
   group.name = `tile:${tile.id.tx},${tile.id.ty}`;
 
+  const roadCasing: number[] = [];
   const roadBase: number[] = [];
   const roadBandPositions: number[] = [];
   const roadBandColors: number[] = [];
@@ -218,15 +406,26 @@ export function buildTileMeshes(
     const multiplier =
       ROAD_CLASS_WIDTH_MULTIPLIER[road.c] ?? ROAD_CLASS_WIDTH_DEFAULT;
     const halfWidth = ROAD_HALF_WIDTH_M * multiplier;
+    appendRibbon(roadCasing, path, halfWidth + ROAD_CASING_M, layerHeight("roadCasing"));
     appendRibbon(roadBase, path, halfWidth, layerHeight("roadBase"));
 
     const band = bandColorForRisk(road.r);
     if (band === null) continue;
     const before = roadBandPositions.length;
-    appendRibbon(roadBandPositions, path, halfWidth, layerHeight("roadBand"));
+    // The spine, not the road: see `ROAD_BAND_WIDTH_FRACTION`.
+    appendRibbon(
+      roadBandPositions,
+      path,
+      halfWidth * ROAD_BAND_WIDTH_FRACTION,
+      layerHeight("roadBand"),
+    );
     pushColor(roadBandColors, band, (roadBandPositions.length - before) / 3);
   }
 
+  const casingGeometry = buildGeometry(roadCasing);
+  if (casingGeometry !== null) {
+    group.add(new Mesh(casingGeometry, materials.roadCasing));
+  }
   const baseGeometry = buildGeometry(roadBase);
   if (baseGeometry !== null) {
     group.add(new Mesh(baseGeometry, materials.roadSurface));
@@ -242,13 +441,39 @@ export function buildTileMeshes(
     for (const { ring, building } of tile.buildings) {
       appendBuilding(walls, roofs, ring, building.h);
     }
-    const wallGeometry = buildGeometry(walls);
+    const wallShades: number[] = [];
+    pushWallShades(wallShades, walls);
+    const wallGeometry = buildColoredGeometry(walls, wallShades);
     if (wallGeometry !== null) {
       group.add(new Mesh(wallGeometry, materials.building));
     }
     const roofGeometry = buildGeometry(roofs);
     if (roofGeometry !== null) {
       group.add(new Mesh(roofGeometry, materials.buildingRoof));
+    }
+
+    // The ground's own line network. Only roads had a casing, so between them the ground was one
+    // unbroken fill - measured, the largest single fill covered 82.7-95.5% of the band, where the
+    // reference's largest covers 0.5-1.0% and its rows carry 2-8 pale runs. Every ring that lies
+    // on the ground gets its edge drawn with the road casing's own material and its own hairline
+    // width, because a block's edge and a street's edge are the same kind of line.
+    //
+    // A building's seam shows its outer half: the inner half is under the building, whose wall
+    // stands on this same boundary. That is where the network's density comes from - there are
+    // 12,690 footprints in the bake and 248 green and water rings.
+    const seams: number[] = [];
+    for (const { ring } of tile.buildings) {
+      appendRibbon(seams, closePath(ring), ROAD_CASING_M, layerHeight("groundSeam"));
+    }
+    for (const ring of tile.green) {
+      appendRibbon(seams, closePath(ring), ROAD_CASING_M, layerHeight("groundSeam"));
+    }
+    for (const ring of tile.water) {
+      appendRibbon(seams, closePath(ring), ROAD_CASING_M, layerHeight("groundSeam"));
+    }
+    const seamGeometry = buildGeometry(seams);
+    if (seamGeometry !== null) {
+      group.add(new Mesh(seamGeometry, materials.roadCasing));
     }
 
     const green: number[] = [];

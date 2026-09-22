@@ -32,11 +32,24 @@ export interface MapCenterOnlyFix extends LatLng {
 export interface LocationSampling {
   readonly intervalSec: number;
   readonly enableHighAccuracy: boolean;
+  /**
+   * Whether a fix the cadence rejects is still handed to the map.
+   *
+   * The cadence is an evidence cadence: it decides which fixes count as samples of her
+   * position for containment and the ladder, and `BUSINESS_RULES.md` section 12 fixes it
+   * per state. The picture she is looking at is not evidence, and freezing it at the
+   * evidence cadence is exactly what the founder saw on his phone - 30 s between moves,
+   * because that is the idle sample interval and not the rate the browser was delivering.
+   * A rejected fix goes to the display through `onDisplayFix` and nowhere else: it never
+   * reaches the dwell evaluator, the ladder or any SUS record. Added 2026-09-23.
+   */
+  readonly forwardEveryFix: boolean;
 }
 
 export const IDLE_LOCATION_SAMPLING: LocationSampling = {
   intervalSec: IDLE_SAMPLING_SEC,
   enableHighAccuracy: false,
+  forwardEveryFix: false,
 };
 
 export type LocationStatus =
@@ -54,6 +67,10 @@ export type WatchInterruption =
 
 export interface LocationWatchCallbacks {
   onFix(fix: LiveLocationFix): void;
+  /**
+   * A fix that the evidence cadence rejected, for the map only. See `forwardEveryFix`.
+   */
+  onDisplayFix?(fix: LiveLocationFix): void;
   onStatus(status: LocationStatus): void;
   onInterrupted(reason: WatchInterruption): void;
 }
@@ -165,11 +182,22 @@ export class BrowserLocationWatch {
   private readonly handlePosition: PositionCallback = (position) => {
     if (this.paused || this.permissionDenied) return;
     const deliveredAtEpochMs = this.clock.nowEpochMs();
+    const fix: LiveLocationFix = {
+      source: "LIVE_WATCH",
+      latitude: position.coords.latitude,
+      longitude: position.coords.longitude,
+      accuracyM: position.coords.accuracy,
+      observedAtEpochMs: position.timestamp,
+    };
     const minimumGapEpochMs = secondsToEpochMs(this.sampling.intervalSec);
     if (
       this.lastDeliveredEpochMs !== null &&
       deliveredAtEpochMs - this.lastDeliveredEpochMs < minimumGapEpochMs
     ) {
+      // Too soon to be a sample of her position, and still where she is right now. It
+      // goes to the map and no further: the status, the evidence clock and everything
+      // downstream of `onFix` are left exactly as the cadence left them.
+      if (this.sampling.forwardEveryFix) this.callbacks.onDisplayFix?.(fix);
       return;
     }
 
@@ -177,13 +205,7 @@ export class BrowserLocationWatch {
     this.lastDeliveredEpochMs = deliveredAtEpochMs;
     this.clearSlowStatus();
     this.callbacks.onStatus("CURRENT");
-    this.callbacks.onFix({
-      source: "LIVE_WATCH",
-      latitude: position.coords.latitude,
-      longitude: position.coords.longitude,
-      accuracyM: position.coords.accuracy,
-      observedAtEpochMs: position.timestamp,
-    });
+    this.callbacks.onFix(fix);
   };
 
   private readonly handleInitialPositionError: PositionErrorCallback = (

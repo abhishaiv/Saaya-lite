@@ -131,19 +131,30 @@ function setup() {
   const scheduler = new FakeScheduler(clock);
   const geolocation = new FakeGeolocation();
   const fixes: LiveLocationFix[] = [];
+  const displayFixes: LiveLocationFix[] = [];
   const statuses: LocationStatus[] = [];
   const interruptions: WatchInterruption[] = [];
   const watch = new BrowserLocationWatch(
     geolocation,
     {
       onFix: (fix) => fixes.push(fix),
+      onDisplayFix: (fix) => displayFixes.push(fix),
       onStatus: (status) => statuses.push(status),
       onInterrupted: (reason) => interruptions.push(reason),
     },
     clock,
     scheduler,
   );
-  return { clock, scheduler, geolocation, fixes, statuses, interruptions, watch };
+  return {
+    clock,
+    scheduler,
+    geolocation,
+    fixes,
+    displayFixes,
+    statuses,
+    interruptions,
+    watch,
+  };
 }
 
 describe("browser location watch", () => {
@@ -182,6 +193,7 @@ describe("browser location watch", () => {
     harness.watch.setSampling({
       intervalSec: PENDING_DWELL_SAMPLING_SEC,
       enableHighAccuracy: true,
+      forwardEveryFix: false,
     });
 
     expect(harness.geolocation.watchOptions.at(-1)).toEqual({
@@ -189,6 +201,45 @@ describe("browser location watch", () => {
     });
     expect(harness.geolocation.cleared).toHaveLength(1);
     expect(harness.interruptions).toEqual([]);
+  });
+
+  it("hands the map every fix the cadence rejected, and evidence none of them", () => {
+    // Founder finding, 2026-09-23: the map did not move when he moved. The browser was
+    // delivering about one fix a second and this gate was dropping all but one every
+    // thirty, so the picture was frozen at the evidence cadence. The fix goes to the map
+    // and nowhere else.
+    const harness = setup();
+    harness.watch.startAfterConsent();
+    harness.geolocation.emit(position(harness.clock.now));
+    expect(harness.fixes).toHaveLength(1);
+
+    harness.watch.setSampling({
+      intervalSec: IDLE_SAMPLING_SEC,
+      enableHighAccuracy: false,
+      forwardEveryFix: true,
+    });
+    // A display stream is not a sampling change: no watch is restarted for it.
+    expect(harness.geolocation.cleared).toEqual([]);
+
+    harness.clock.now = secondsToEpochMs(IDLE_SAMPLING_SEC) - 1;
+    harness.geolocation.emit(position(harness.clock.now));
+    // Too soon to be evidence, and still where she is.
+    expect(harness.fixes).toHaveLength(1);
+    expect(harness.displayFixes).toHaveLength(1);
+    // It did not touch the status channel either, so nothing downstream can read it as a
+    // fresh sample of her position.
+    expect(harness.statuses).toEqual(["SEARCHING", "CURRENT"]);
+
+    // With the stream off the map is back on the cadence, which is the recorded default.
+    harness.watch.setSampling({
+      intervalSec: IDLE_SAMPLING_SEC,
+      enableHighAccuracy: false,
+      forwardEveryFix: false,
+    });
+    harness.clock.now = secondsToEpochMs(IDLE_SAMPLING_SEC) - 1;
+    harness.geolocation.emit(position(harness.clock.now));
+    expect(harness.displayFixes).toHaveLength(1);
+    expect(harness.fixes).toHaveLength(1);
   });
 
   it("throttles delivered fixes to the current sampling interval", () => {

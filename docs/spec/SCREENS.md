@@ -353,9 +353,15 @@ bottom sheet, the ladder and the SOS button exactly where they are. Full spec in
 | no WebGL | `EmptyState`, and the control is **disabled rather than hidden** so the view is not a mystery | stays on the flat map |
 
 **The legend and the derivation note are part of the view, not an optional extra.**
-`walk_legend_title`, the two bands, and `walk_risk_note` render with the view. `FEATURES.md`
-Amendment 1 clause 1 requires the derivation to be stated in the UI, and clause 2 requires a
-band to be a band. Neither is a tooltip she has to find.
+`walk_legend_title`, the ramp, both of its end labels and the derivation sentence,
+`walk_risk_note`, all render as the view opens; on a phone they are the whole of the chip.
+`FEATURES.md` Amendment 1 clause 1 requires the derivation to be *stated* in the UI rather than
+implied, and a sentence behind a tap states it only on request, so the chip opens whole rather
+than folded. Clause 2 requires a band to be a band: the ramp and its two ends render in both of
+the chip's states, so no state of it is a legend without its picture. The chip can be folded -
+that is the answer to the founder's "taking up all the space", not a way to hide the statement -
+and folding takes the sentence and nothing else. `MAP_SPEC.md`'s 2026-09-23 amendment, "the
+legend is a chip, not a card", carries the full reasoning.
 
 **Session overlays render over the walk view unchanged.** While any rung is live the render
 loop is paused, so `SOS_ACTIVE` sits on a still frame. See `MOTION_SPEC.md`.
@@ -363,6 +369,27 @@ loop is paused, so `SOS_ACTIVE` sits on a still frame. See `MOTION_SPEC.md`.
 **About gains no bullet for this.** The walk view adds no mock: the streets are real OSM
 geometry from the same extract, the risk is the same zone data, and the character is hers.
 Nothing in it is fabricated, so nothing is claimed in the mock list.
+
+### Amendment 2026-09-23: the chrome became marks
+
+The founder opened the view on his phone and asked for the chrome to stop competing with the
+scene: the branding reduced to just the mark, and the controls reduced to marks on the right.
+
+| Element | Was | Is |
+|---|---|---|
+| Branding | the mark with the wordmark beside it, across the top | the mark alone (`saaya-icon-v2-small.svg`, 30 px), the name carried as its alt text |
+| Way into the customiser | a worded chip across the top | the drawn `CharacterIcon` mark in the top-right rail, present only while the walk view shows |
+| Demo, SUS, SOS | worded chips in the action dock | icon marks in the bottom-right dock (`visibility`, `gpp_maybe`, `sos`) |
+| Risk legend | a card across the lower-left | a chip, bottom-left, that opens whole and folds to its ramp - full record in `MAP_SPEC.md`, "the legend is a chip, not a card" |
+
+**A mark is still a name.** Every one of these keeps its accessible name, and the idle dock is
+asserted by test to contain no visible `SUS`, `Demo` or `SOS` word at all - the mark carries
+the meaning for the eye and the label carries it for assistive tech.
+
+**Where a word survives, and why.** Two controls stay words, both mid session rather than mid
+walk: `resume`, coming back to a minimised ladder, and `End SUS` while SUS is armed. In both,
+the next action has to be unmistakable rather than compact, and neither is part of the frame
+the founder was looking at when he asked for marks.
 
 ## S15. CharacterCustomiser (added 2026-09-11)
 
