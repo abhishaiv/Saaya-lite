@@ -4295,3 +4295,42 @@ same driver (`nohud-preview-f0.png`, crop `preview-hip.png`): the top is lavende
 render `(61, 47, 95)` against `#3A2A5E`, and the hem across the seat is the clean level line -
 the ruled outcome, verified on the deployed build rather than only on localhost. Branch alias:
 https://saaya-lite-git-m4-walk-view-abhishai-vardhans-projects.vercel.app
+
+## 2026-09-23 - the "overlays vanish at a low drawing-buffer resolution" scare, falsified by a crossed A/B
+
+The parallel session reported that the walk view's zone/risk overlays disappear at a low
+drawing-buffer resolution - a 390x844 buffer reading as a bare `color.walk.ground` plane with
+`water`, `green`, `zoneFill` and `groundSeam` all absent (exactly `LAYER_ORDER` 0-3), while
+720x1280 and 780x1688 read healthy - and flagged it as a risk to the 2 GB device target, since
+a low-end Android at 360x640 CSS DPR 1 gives exactly such a buffer. It was measured on the land
+tree at `b4f7e21`, and it was going to go to the founder.
+
+A crossed test does not support it. Holding CSS size at 390x844 and moving **only** the buffer
+(DPR 1 -> 390x844 buffer; DPR 2 -> 780x1688 buffer), on **both** trees, in **both** rung states:
+
+| | buffer 390x844 | buffer 780x1688 |
+| --- | --- | --- |
+| land `b4f7e21`, fast clock (top rung) | tint over green `#DBB5DB` 90.33% | 90.24% |
+| land `b4f7e21`, real clock (SwiftShader floor) | tint over ground `#F0D1DB` 97.75% | 97.84% |
+| union `1af746a`, fast clock | 90.32% | 90.24% |
+
+The buffers 360x640 (union, fast clock) and 824x1830 (union, Pixel-7-class) are tinted too:
+82.23% and 89.91%. Buffer size changes nothing in either tree or either rung; the reported
+390x844 row does not reproduce even on the tree it came from, so the attribution is a harness
+difference and not a product risk. It should not go to the founder as one.
+
+Two things came out of the same test worth keeping:
+
+- **The floor's signature, verified on both trees.** At the floor (`detail: false`) buildings,
+  green, water and the ground-seam network all drop - and **the zone tint stays**, simply over
+  `color.walk.ground` instead of over green, which is why a floor-pinned capture reads
+  tint `#F0D1DB` across ~98% of the band with seams down to ~1.2%. The risk layer does not
+  degrade, exactly as `MAP_SPEC.md` says it must not, and a truly untinted ground is therefore
+  neither the floor nor a buffer-size effect.
+- **A harness bug of my own, found by running the known-good driver as a control.** The new
+  device-shaped driver seeded the character record as an object literal where the settings store
+  holds a JSON *string*, so the app read a malformed record and fell back to the character
+  editor - three captures census'd the editor, not the map. The fixed driver now fails hard when
+  the walk view is not up. Scratch instrument: `/tmp/walk-verify/charfix/devices.mjs` (CSS size
+  and DPR independently, `WALK_URL` for either tree, `REAL_CLOCK=1` pins the floor, colour
+  census of the ground band).
