@@ -4610,3 +4610,24 @@ two buffers the cube happened to cross.
 every run, `GL=hardware` opening a headed window on macOS, `WAIT_MS` for a settled frame, and a census
 palette that now names `color.tile.green` `#D5C9F7` as its own colour, which is what makes "untinted green"
 and "tint over green" separable readings rather than one nearest-match.
+
+## 2026-09-23 - The boom isolation holds in both directions, and the experiment tree is left exactly as found
+
+An addendum to the entry above, run independently by the other session.
+
+**The isolation reproduces from the opposite direction.** The entry above moves the union's boom to land's
+values and reproduces land's signature. The reverse swap reproduces the union's: the peer tree
+`/tmp/saaya-land` at `b4f7e21` - a clean tree - with exactly the union's two camera literals
+(`WALK_CAMERA_DIST_M` 13.0 -> 12.58, `WALK_CAMERA_LOOK_AT_M` 3.21 -> 3.11) reads **0.00% bare, `#DBB5DB`
+89.69%** at 390x844 on SwiftShader, with the renderer read back as SwiftShader. That is the union's own
+committed 390x844 cell to two decimals. Two one-variable swaps in opposite directions, each landing on the
+other tree's signature: the camera boom is not merely correlated with the tree term, it is the tree term.
+
+**And that tree was left exactly as found.** The two literals were reverted to 13.0 / 3.21, the revert
+verified by a fresh capture at the original condition - **97.93% bare**, within the pre-experiment
+baseline's own spread (97.91-97.98 across four runs) - and `git status --porcelain` in `/tmp/saaya-land`
+is empty, so the tree is byte-identical to `b4f7e21`, the clean starting point the parallel session handed
+over.
+
+**Instruments.** `dpr_matrix.mjs` with `GL=swiftshader` and `WALK_URL=http://localhost:3120` to target
+land; `step_metric.py` for the exact-RGB band census.
