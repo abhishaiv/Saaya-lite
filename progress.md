@@ -3919,3 +3919,48 @@ white map) and `color.brand` `#A78BFA` (the chrome lavender, which is chrome and
 genuinely new and collides with nothing. It goes in as a grounded fact with an amendment behind it,
 per the standing rule that reference colours enter our code as grounded facts, never as copied
 literals.
+
+## 2026-09-23 - The union: the white-and-violet key and the phone-feedback work become one tree
+
+**What happened.** The two clones that had been building the walk view in parallel - this
+session's eight-item work and the parallel session's white-and-violet key - are now a single tree
+on `m4-walk-view` (merge commit `0f22bf9`). The fork existed because the founder's two 2026-09-23
+rulings ("the character is too small for the screen", then "white and dark violet") landed on
+separate clones; the merge resolves them together rather than letting one win.
+
+**How the conflicts were resolved.** Source and spec files were resolved by *which side is correct
+under the new key*, not by which side was newer: the palette facts, the tile palette and every
+ratio test that reads them are the parallel session's, because the night key's relations cannot be
+satisfied over a white land; the camera (dist 12.58 m, aim 3.11 m), the heading turn, the chrome
+and the composition rows are this session's. `graph/spec_graph.json` was spliced textually, never
+regenerated: **430 facts**, each byte-verbatim from one side, one-space indent on every object, and
+each fact's `was` its immediate predecessor and nothing else.
+
+**Gates on the union.** `tsc --noEmit` clean; `vitest run` 49 files / 351 tests; grounded check
+177 files / 0 ungrounded literals.
+
+**The union captured.** Same origin, same fixed clock, scale 2, one run per tree: the union
+renders the parallel session's key unchanged - tinted ground `#DBB5DB` at 48.9% of the frame
+(43.7% in their tree, the difference being this session's smaller chrome), sky `#2B1B5E` at 12.5%
+(9.8%), casing `#B4A3DE` at 3.0% (3.1%) - and the eight-item chrome on top of it: the brand is the
+mark alone, "Change your character" is a glyph, Demo/SUS/SOS are a glyph dock, and the legend is
+the 224 px chip. The road risk bands render identically in both trees, so their width is the
+design and not a merge artifact.
+
+**The garment pair, measured, per the answer owed to the parallel session.** They were asked which
+violet the recoloured garments should use and offered `color.tile.road` `#4B3A70`. This session
+painted them with the interface's own two violets instead - `color.brand` `#A78BFA` over
+`color.brandDark` `#8566D1` - and the promise was to measure them under the new key and report.
+Measured on the union build at the phone's own DPR: the top renders as `#B093FF` lit (`#AF92FF` to
+`#B698FF`, luma 168) and the bottom as `#7E61C7` shaded (`#785CBE` to `#8466D0`, luma 117), against
+the tinted ground at luma 197 and the white land at luma 235. Luma separations: top 1.17x on the
+tinted ground and 1.40x on white land; bottom 1.68x and 2.01x. The top's separation is carried by
+chroma - a saturated lavender over pale pink - rather than by luma, and she reads as clothed at
+phone size, which is the failure the pair was painted to fix. The pair therefore stays as it is,
+and `#4B3A70` is recorded as the fallback if the founder reads the lavender as too close to the
+ground.
+
+**Still owed, unchanged by the merge.** The chip's open state covers about 10.5% of the frame
+against the card's 11% that the founder flagged - a ruling is still owed on whether the open or
+folded state should be the default. The bare feet, the anatomical silhouette and the speckled
+waist seam are asset work, not colour.
