@@ -349,11 +349,15 @@ every 2 m: 416,608 positions.
 The shorter boom is inside a building **4.4x as often**, not less often: 11 m of ground back from
 a road centreline lands in the building on the near side of that street. It improves the
 sightline only modestly. So the amendment stands on the composition it was measured for, and not
-on a claim about rooflines it does not have. The table is the 13.2 m boom's own measurement; the
-correction moved the boom to 13.0 m and 0.7 deg steeper, which is 2.6% less ground back and
-changes these rates by well under a percentage point - not re-measured, and not relied on. The
-2026-09-23 amendment took the boom to 12.58 m, which is a further 3.2% of ground back; these three
-rates are the same order and carry the same caveat.
+on a claim about rooflines it does not have. The table is the 13.2 m boom's own measurement, and the
+boom that ships is now measured against it. The correction moved the boom to 13.0 m and 0.7 deg
+steeper (2.6% less ground back) and the 2026-09-23 amendment took it to 12.58 m (a further 3.2%).
+Over the same 416,608 road positions, the three rates at the shipping 12.58 m boom are **5.19%**
+(camera inside a building tall enough to enclose it), **5.83%** (building between the camera and her
+eye) and **5.23%** (camera exactly inside a ring, her outside) - against the 13.2 m column's
+5.54 / 6.30 / 5.58. Every one is marginally better and none changed in kind; the roughly 4x penalty
+against the old boom stands (5.19% against 1.26% at 27 m). `DIST` and `PITCH` on `roadocclude.mjs`
+and `enclosedexact.mjs` set the boom, and both print the boom they used.
 
 **The camera-inside-a-building population, and what decides whether the frame survives.** Of the
 road positions where the camera is genuinely inside a building ring (5.58%), its **depth past
@@ -402,7 +406,8 @@ where it says it acts, and nowhere else.
 
 **What the rule does not do.** It does not fix occlusion. Where a building genuinely stands
 between the camera and her, the wall is still drawn, and rightly so - **99.0%** of blocked road
-positions clear at a boom of 3 m or less, and **0.97%** clear at no boom at all. Camera
+positions clear at a boom of 3 m or less, and **0.97%** clear at no boom at all (98.97% and
+1.03% at the shipping 12.58 m boom). Camera
 collision is a different change and is not made here.
 
 **All other layers stay `DoubleSide`.** `appendRingFill` is winding-agnostic by construction - it

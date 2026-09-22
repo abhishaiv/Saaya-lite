@@ -4698,3 +4698,36 @@ record, which is why the archived sweep captures are 780x1688.
 reads 66-72, so the transition is subtler - recorded in `MAP_SPEC.md`, a founder call); the peer's
 hardening vote on the layer system (accepted, one owner, nothing landed unilaterally); the branch is not
 pushed. `/tmp/saaya-land` remains byte-identical to `b4f7e21`.
+
+## 2026-09-23 - The camera-collision table measured at the boom that ships
+
+`MAP_SPEC.md`'s camera-collision table (5.54% / 6.30% / 5.58% at the 13.2 m boom) carried its own
+caveat for the two later booms: "not re-measured, and not relied on". The shipping boom is now
+measured, and the caveat sentence is gone.
+
+**The instrument reproduces the published table first.** `roadocclude.mjs` and `enclosedexact.mjs` now
+take `DIST` / `PITCH` from the environment (defaults unchanged at 13.2 / 31.4) and print the boom they
+used. At the defaults, over the same 416,608 road positions: enclosed 23,064 = **5.54%**, sightline
+blocked 26,237 = **6.30%**, ring-exact enclosed 23,250 = **5.58%**, 27 m comparators 1.27% / 7.78%,
+"no boom in [1, 13.2] clears it" 0.97% - every published number to the digit. Only then was the new
+boom run.
+
+**At the shipping boom (12.58 m / 32.4 deg; 6.74 m up, 10.62 m back):**
+
+| rate | 13.2 m table | 12.58 m measured |
+|---|---|---|
+| camera inside a building tall enough to enclose it | 5.54% | **5.19%** |
+| building between the camera and her eye | 6.30% | **5.83%** |
+| camera exactly inside a ring, her outside | 5.58% | **5.23%** |
+
+All three are marginally better and none changed in kind; the roughly 4x penalty against the old boom
+stands (5.19% against 1.26% at 27 m with the shipped pitch). Of the blocked, 98.97% clear at a boom of
+3 m or less and **1.03%** at none - against the 13.2 m table's 99.03% / 0.97%. The `MAP_SPEC.md`
+section now carries these numbers. The bake is byte-identical between the two trees
+(md5 `23ba7d53971c607e7babc62b2163eba3`), so both copies measure the same frozen data.
+
+**Gates.** `npx tsc --noEmit` clean; `npx vitest run` 49 files, 357 tests, all passing.
+
+**Instruments.** `roadocclude.mjs` (2 m road sampling over the bake, 80-sample sightlines, the
+shortest-clear-boom banding) and `enclosedexact.mjs` (the ring-exact version with the
+depth-inside histogram) - both now `DIST`/`PITCH`-parameterised and self-printing.
