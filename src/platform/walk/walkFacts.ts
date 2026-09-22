@@ -11,9 +11,17 @@
  */
 
 // --- the walk camera. Fact: walk.camera.* ---
+//
+// Amended 2026-09-22 by founder ruling, twice: pitch 52 / dist 27 / no aim point became
+// 31.4 / 13.2 / 3.18, and then 32.4 / 13.0 / 3.21 once the first solve was found to have used
+// an angle-linear row model, which is not how a perspective camera projects. The three numbers
+// together are the reference's composition: horizon at 0.164 of the frame height, her feet at
+// 0.736 and her head at 0.616. See the facts' own `sourced_from` for the measurement, and
+// `walkComposition.test.ts` for the projection the rows are derived with.
 export const WALK_CAMERA_FOV_DEG = 54; // fact: walk.camera.fov
-export const WALK_CAMERA_PITCH_DEG = 52; // fact: walk.camera.pitch
-export const WALK_CAMERA_DIST_M = 27; // fact: walk.camera.dist
+export const WALK_CAMERA_PITCH_DEG = 32.4; // fact: walk.camera.pitch
+export const WALK_CAMERA_DIST_M = 13.0; // fact: walk.camera.dist
+export const WALK_CAMERA_LOOK_AT_M = 3.21; // fact: walk.camera.look_at
 
 // --- the character. Fact: walk.character.height, walk.speed ---
 export const WALK_CHARACTER_HEIGHT_M = 1.7; // fact: walk.character.height
@@ -62,6 +70,31 @@ export const COLOR_BACKGROUND = "#0B0B0F"; // fact: color.background
 export const COLOR_TILE_LAND = "#0E0E10"; // fact: color.tile.land
 export const COLOR_BRAND = "#A78BFA"; // fact: color.brand
 export const COLOR_WHITE = "#FFFFFF"; // fact: color.white
+
+// --- the walk view's own sky, haze and land. Facts: color.walk.* ---
+//
+// Added 2026-09-22 by the same ruling as the camera above, and amended twice since: the same day
+// once the reference was measured at full resolution, and 2026-09-23 by the ruling that the view
+// take Corner's map language in Saaya's own colours. These are the view's three largest areas.
+//
+// **The 2026-09-23 key.** White and dark violet, where Corner is white and black: the land is the
+// white half and the sky is the dark half, held as one field so the two are figure and ground.
+// The map inverts - the night key had a dark scene carrying lit ribbons, this has a white plane
+// carrying dark streets - and the sky and the horizon seam are what stay dark, so the view keeps
+// its depth and the glints the reference carries above the horizon keep something to sit in.
+//
+// Both earlier placements took these three colours from the reference video's own measurements.
+// This one does not, and that is recorded rather than left implicit: the composition comes from
+// the brand instead, and the sky and the seam are the brand's own darkest violet rather than a
+// colour from another product. What has not changed is the relation the reference taught - the
+// seam darker than the sky, both far darker than the land - which is why a white map still reads
+// as somewhere rather than as a diagram.
+//
+// They are walk-view facts and not the flat map's `color.background` / `color.tile.land`, which
+// are untouched: the flat map is a CARTO Dark Matter tile map and has no horizon to compose.
+export const COLOR_WALK_SKY = "#2B1B5E"; // fact: color.walk.sky
+export const COLOR_WALK_HAZE = "#120C24"; // fact: color.walk.haze
+export const COLOR_WALK_GROUND = "#EDE9F7"; // fact: color.walk.ground
 
 // --- budgets, used by the loop's own frame guard ---
 export const FRAME_BUDGET_MS = 32; // fact: perf.frame

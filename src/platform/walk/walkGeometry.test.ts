@@ -146,6 +146,73 @@ describe("appendRingFill", () => {
   });
 });
 
+describe("ring winding", () => {
+  // A ring's winding is not a detail. `toGround` sends north to -z, so a ring written the
+  // ordinary counter-clockwise way triangulates into faces pointing *down*, and a fill
+  // that faces down is invisible from every camera above it. The zone polygons arrive in
+  // that winding, which is why the whole safety overlay drew nothing. Both windings must
+  // therefore come out facing the camera.
+  const counterClockwise: readonly GroundPoint[] = [
+    point(0, 0),
+    point(10, 0),
+    point(10, 10),
+    point(0, 10),
+  ];
+  const clockwise: readonly GroundPoint[] = [...counterClockwise].reverse();
+  const AREA_M2 = 100; // GROUNDED-EXEMPT: the probe square's own area, asserted back.
+
+  /** The y component of a triangle's face normal. Positive is a face looking up. */
+  function faceNormalY(positions: readonly number[], index: number): number {
+    const [ax, , az] = vertex(positions, index);
+    const [bx, , bz] = vertex(positions, index + 1);
+    const [cx, , cz] = vertex(positions, index + 2);
+    return (bz - az) * (cx - ax) - (bx - ax) * (cz - az);
+  }
+
+  function assertFacesUp(positions: readonly number[]): void {
+    expect(positions.length).toBeGreaterThan(0);
+    for (let i = 0; i < positions.length / 3; i += 3) {
+      expect(faceNormalY(positions, i)).toBeGreaterThan(0);
+    }
+  }
+
+  function areaOf(positions: readonly number[]): number {
+    let total = 0;
+    for (let i = 0; i < positions.length / 3; i += 3) {
+      total += faceNormalY(positions, i) / 2;
+    }
+    return total;
+  }
+
+  it("faces a counter-clockwise ring up, which its own winding would not", () => {
+    const positions: number[] = [];
+    appendRingFill(positions, counterClockwise, 0);
+    assertFacesUp(positions);
+  });
+
+  it("faces a clockwise ring up too, so neither caller has to know which it holds", () => {
+    const positions: number[] = [];
+    appendRingFill(positions, clockwise, 0);
+    assertFacesUp(positions);
+  });
+
+  it("covers the same area whichever way the ring was written", () => {
+    const fromCounterClockwise: number[] = [];
+    const fromClockwise: number[] = [];
+    appendRingFill(fromCounterClockwise, counterClockwise, 0);
+    appendRingFill(fromClockwise, clockwise, 0);
+    expect(areaOf(fromCounterClockwise)).toBeCloseTo(AREA_M2);
+    expect(areaOf(fromClockwise)).toBeCloseTo(AREA_M2);
+  });
+
+  it("gives a building's roof the same upward face, since a roof is a ring fill", () => {
+    const walls: number[] = [];
+    const roof: number[] = [];
+    appendBuilding(walls, roof, counterClockwise, 9); // GROUNDED-EXEMPT: an arbitrary probe height for this fixture.
+    assertFacesUp(roof);
+  });
+});
+
 describe("appendBuilding", () => {
   it("builds four walls from the ground to the height it was given, and a roof at the top", () => {
     // An arbitrary probe height for this fixture. At runtime the height is read from the
@@ -180,6 +247,97 @@ describe("appendBuilding", () => {
     appendBuilding(walls, roof, [point(0, 0), point(1, 0)], 5);
     expect(walls).toEqual([]);
     expect(roof).toEqual([]);
+  });
+});
+
+describe("building wall facing", () => {
+  // The building material is one-sided, so every wall has to face outward whichever way its
+  // footprint was written. The bake's own rings disagree with each other, which is why the
+  // material used to be `DoubleSide` - and a double-sided box shows its interior to a camera
+  // that is inside it, which is how the densest baked tile came out as one flat wall.
+  //
+  // These assertions test the property the material depends on, rather than restating the
+  // implementation: a wall's outward face must point away from the building, so stepping
+  // off that face in its own normal direction lands outside the footprint, and stepping the
+  // other way lands inside.
+  const PROBE_STEP_M = 0.01; // GROUNDED-EXEMPT: an arbitrary probe step, far smaller than this fixture's walls.
+
+  const counterClockwise: readonly GroundPoint[] = [
+    point(0, 0),
+    point(10, 0),
+    point(10, 10),
+    point(0, 10),
+  ];
+  const clockwise: readonly GroundPoint[] = [...counterClockwise].reverse();
+
+  function inRing(p: GroundPoint, ring: readonly GroundPoint[]): boolean {
+    let inside = false;
+    for (let i = 0, j = ring.length - 1; i < ring.length; j = i, i += 1) {
+      const a = ring[i];
+      const b = ring[j];
+      if (a === undefined || b === undefined) continue;
+      if (a.z > p.z !== b.z > p.z && p.x < ((b.x - a.x) * (p.z - a.z)) / (b.z - a.z) + a.x) {
+        inside = !inside;
+      }
+    }
+    return inside;
+  }
+
+  /** The horizontal part of a triangle's face normal, as `(nx, nz)`. */
+  function faceNormalXZ(positions: readonly number[], index: number): [number, number] {
+    const [ax, ay, az] = vertex(positions, index);
+    const [bx, by, bz] = vertex(positions, index + 1);
+    const [cx, cy, cz] = vertex(positions, index + 2);
+    const ux = bx - ax, uy = by - ay, uz = bz - az;
+    const vx = cx - ax, vy = cy - ay, vz = cz - az;
+    return [uy * vz - uz * vy, ux * vy - uy * vx];
+  }
+
+  function assertWallsFaceOut(positions: readonly number[], ring: readonly GroundPoint[]): void {
+    const triangles = positions.length / 9;
+    expect(triangles).toBeGreaterThan(0);
+    for (let i = 0; i < triangles; i += 1) {
+      // The probe point is the triangle's own midpoint, which lies on the wall and, being a
+      // midpoint rather than a vertex, is never on a corner where a perpendicular step would
+      // land on the neighbouring wall instead of clearing the footprint.
+      const at = [0, 1, 2]
+        .map((corner) => vertex(positions, i * 3 + corner))
+        .reduce(
+          (sum, v) => ({ x: sum.x + v[0] / 3, z: sum.z + v[2] / 3 }),
+          { x: 0, z: 0 },
+        );
+      const [nx, nz] = faceNormalXZ(positions, i * 3);
+      const length = Math.hypot(nx, nz);
+      expect(length).toBeGreaterThan(0);
+      const step = (sign: number) => ({
+        x: at.x + sign * (nx / length) * PROBE_STEP_M,
+        z: at.z + sign * (nz / length) * PROBE_STEP_M,
+      });
+      expect(inRing(step(1), ring)).toBe(false);
+      expect(inRing(step(-1), ring)).toBe(true);
+    }
+  }
+
+  it("faces a counter-clockwise footprint's walls outward", () => {
+    const walls: number[] = [];
+    const roof: number[] = [];
+    appendBuilding(walls, roof, counterClockwise, 9); // GROUNDED-EXEMPT: an arbitrary probe height for this fixture.
+    assertWallsFaceOut(walls, counterClockwise);
+  });
+
+  it("faces a clockwise footprint's walls outward too, so the data's winding does not decide it", () => {
+    const walls: number[] = [];
+    const roof: number[] = [];
+    appendBuilding(walls, roof, clockwise, 9); // GROUNDED-EXEMPT: an arbitrary probe height for this fixture.
+    assertWallsFaceOut(walls, clockwise);
+  });
+
+  it("builds the very same walls from the same footprint written either way", () => {
+    const fromCounterClockwise: number[] = [];
+    const fromClockwise: number[] = [];
+    appendBuilding(fromCounterClockwise, [], counterClockwise, 9); // GROUNDED-EXEMPT: an arbitrary probe height for this fixture.
+    appendBuilding(fromClockwise, [], clockwise, 9); // GROUNDED-EXEMPT: an arbitrary probe height for this fixture.
+    expect(fromCounterClockwise).toEqual(fromClockwise);
   });
 });
 

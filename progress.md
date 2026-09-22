@@ -1706,3 +1706,1834 @@ re-derivation rather than as a standing ruling. It is not counted among the thre
 open rulings.
 
 No source file changed in this step. `progress.md` and `HANDOVER.md` only.
+
+### 2026-09-22 - The safety overlay was invisible, and she was a silhouette
+
+Work resumed on `m4-walk-view` in the fresh clone. The five gaps are unchanged;
+this step closes three of the causes behind them and pins each one with a test.
+
+**The zone layer rendered nothing at all.** Not "faint", not "hard to see": every
+zone fill and every zone boundary was missing from the frame, while the flat map
+drew all 19. The cause was found by measurement, not by reading. `appendRingFill`
+calls three's `ShapeUtils.triangulateShape`, and that function normalises its
+input — a probe over both windings returns the *same* triangles. In the ground
+plane those triangles face **downward**, every time. A downward fill is invisible
+from any camera above it. The tile layers never noticed, because every tile
+material is `DoubleSide`; the zone materials alone were one-sided, so the entire
+safety overlay was culled. The fix is in the emitter (`b` and `c` swapped, so
+every fill faces up whichever way its ring runs) and in the zone materials, which
+now wear the same `DoubleSide` the tile layer does. Pinned by
+`walkGeometry.test.ts` (both windings, face normals asserted) and
+`walkZones.test.ts` (every zone mesh two-sided).
+
+The product consequence is worth stating plainly: a zone tint is the one thing
+this view exists to show, and it was absent from every frame of the walk view
+ever captured. That is the first of the five gaps closed for real.
+
+**She rendered as a black silhouette.** Her parts are glTF
+`pbrMetallicRoughness`, which three loads as `MeshStandardMaterial`, and a
+standard material with no light in the scene renders black. There was no light
+anywhere in the scene. Two lights now exist — a hemisphere and a directional key
+over the camera's shoulder — and they exist for her alone: every scenery material
+stays `MeshBasicMaterial`, so no frozen colour can be shaded by them. This is a
+deliberate divergence from the 2026-09-16 recommendation to move the scenery to
+`MeshLambertMaterial`: a lit tile would render `color.tile.road` as *that colour
+shaded by a sun the product never chose*, which is the spec-graph violation the
+whole gate exists to prevent. Colours in the rig are the product's own
+`color.white` and `color.background`; the levels are GROUNDED-EXEMPT rendering
+values.
+
+**Her ground mark.** `color.brand` at 0.28 alpha on a disc a quarter of her
+height in radius, in a new top layer `characterMark`. A dark contact shadow is
+the usual tool and the wrong one here: this ground is near-black, so a shadow has
+nothing to darken. The reference draws a translucent ring under the avatar for
+the same reason.
+
+**Road casing.** `roadCasing` is a new layer below `roadBase`, drawn
+`ROAD_CASING_M` wider on each side and lightened from `color.tile.road` by
+`ROAD_CASING_LIGHTNESS` — derived from the road's own fact, so no second colour
+is named. In the captures the edge now separates a street from the ground it
+crosses; at the camera's present height it is a subtle read, and it is one of the
+things the ruling below affects.
+
+**A second capture finding, not yet fixed.** At `17.726, 83.30922` — a corner the
+world data picks out as building-dense — the camera at 21 m up and 16.6 m back
+sits *behind a 16 m building*, and the frame is a flat dark mass of walls with
+her hidden behind them. Walls and roofs also read identically, because unlit flat
+colour has no form. This is the composition gap showing its teeth: it is not a
+bug in any one layer, it is `walk.camera.dist` 27 and `walk.camera.pitch` 52.
+
+**Measured reference targets** (calibration workflow, per-frame row profiles over
+`/tmp/pogo-over/o_01…o_06`):
+
+| Quantity | Reference | Ours |
+| --- | --- | --- |
+| Horizon line | 16.1% of frame height (flat within 2 px across the width) | no horizon in frame |
+| Camera axis below horizontal | 18.3 deg | about 51 deg |
+| Character height | 12.6% of frame height (121 px of 960) | about 7.7% |
+| Sky | 13% of frame, deep blue `rgb(23,49,143)` rising to `rgb(40,66,160)` | none |
+| Brightest large area | the horizon band, luma 124-135 | n/a |
+| Mid ground | luma 131-137 | about 25 |
+| Ground at her feet | luma 108-124 | about 25 |
+| Road fill | `rgb(41,82,127)`, 19% of frame, lighter casing | `#1A1A20`, casing `#2F2F3A` |
+
+The 2026-09-16 estimate of "about 80 m at 62 deg" does not survive these
+measurements: the reference camera is *close and low* (axis 18.3 deg below
+horizontal), not far and steep. The earlier estimate was eyeballed from a frame;
+these are per-row profiles.
+
+**What this needs is a ruling, and it is the second open item from 2026-09-16.**
+`walk.camera.dist`, `walk.camera.pitch` and every `color.tile.*` are
+`"frozen": true`, and `HANDOVER.md` is explicit that every fact in
+`spec_graph.json` is unmodifiable. Reaching the reference composition means
+amending `walk.camera.dist` (27 to about 15), `walk.camera.pitch` (52 to about
+31), adding a look-at height (about 3.4 m, twice her height), and lifting the
+world palette off black — four amendments plus new sky/fog facts. The frozen spec
+"is amended properly, not worked around", so the request is in the founder's
+hands and nothing above this line touches a fact.
+
+Gate: `npx vitest run` 272 passed, `npx tsc --noEmit` clean,
+`python3 scripts/grounded_check.py src/platform/walk/*.ts` 0 ungrounded
+literals.
+
+### 2026-09-22 — The ruling landed: the facts were amended, and the view became a place
+
+**The ruling, in the founder's words:** *"We need perfection in-terms of User
+experience and look and feel. We want a smooth and aesthetic experince which
+matches or even does better than the Pokemon Go version. Do what ever it takes
+to acheive the same."* That is what makes amending a frozen fact lawful here.
+`HANDOVER.md` says every fact in `spec_graph.json` is unmodifiable, and it also
+says the frozen spec "is amended properly, not worked around". A founder ruling
+is the proper path; a constant in `src/` would have been the workaround, and
+none was written.
+
+**Amended, in `graph/spec_graph.json`** — spliced textually, one fact at a time,
+never regenerated:
+
+| Fact | Was | Now | Where it came from |
+| --- | --- | --- | --- |
+| `walk.camera.pitch` | 52 deg | 31.4 deg | solved from the measured rows, fov held at 54 |
+| `walk.camera.dist` | 27 m | 13.2 m | 11.25 m of ground back, 6.87 m up |
+| `walk.camera.look_at` | — | 3.18 m | new; the axis crosses her vertical 1.87x her height |
+| `color.tile.road` | `#1A1A20` | `#2E3450` | 0.56 of the measured ground luma |
+| `color.tile.building` | `#1A1A20` | `#3A4160` | below the ground: a mass on a lit plane |
+| `color.tile.building.roof` | `#2F2F3A` | `#737D9C` | above the ground: the pale plane |
+| `color.tile.green` | `#1A1A20` | `#3F5C4C` | 0.85 of the ground luma |
+| `color.tile.water` | `#1A1A20` | `#1F3A5C` | the road's own luma; the reference has no water, so by relation |
+| `color.walk.sky` | — | `#223375` | new; the reference's measured sky luma |
+| `color.walk.ground` | — | `#565F80` | new; replaces `background` under the ground plane |
+| `color.walk.haze` | — | `#6B7EC4` | new; the reference's horizon band, used as scene fog |
+
+Seven amended, four added. Each carries its own measurement in `sourced_from`,
+and each says it was a founder ruling so a reader can find this entry. `fov` was
+deliberately *not* amended: the reference's own field of view is unknown, so the
+solve held Saaya's fixed, which is what makes the measured rows fov-independent
+targets.
+
+**Also corrected this pass:** the graph's own `count` field still said 424 after
+the array had grown to 428. Nothing reads it programmatically, which is exactly
+why it would have rotted. It is 428 now, and the live / superseded split the
+checker prints (396 / 32) is unchanged.
+
+**Then the frames were still wrong, and three column profiles said why.** The
+camera amendment was necessary and not sufficient: a correct composition with the
+wrong rendering is still a void, in a new colour.
+
+**The zone tint repainted the frame.** The street capture's column profile found
+one colour — rgb(145,82,100) — over 35% of the frame. That is `color.zone.high`
+at the dataset's own 0.35, composited in sRGB over the lit ground. The dataset's
+per-zone opacities were tuned against the flat map's near-black sheet, where 0.35
+of the same red renders as rgb(96,28,27): a dark area on a dark sheet, which is a
+different picture from a red wash over a lit plane. `ZONE_FILL_ALPHA_SCALE`
+(0.4) brings it to a shade *cast over* the ground. What is scaled is the
+rendering, never the data: each zone's own opacity, the order across the 19
+zones, the tier colour, and `alpha.map.zone.selected.raise` (scaled with the fill
+it is an increase on) are all the frozen values still, and the flat map is
+untouched.
+
+**The band had replaced the road it was drawn on.** Every banded road — and in
+the dense tiles every road carries a band — rendered as a slab of tier colour at
+the band layer's height, with the road surface, its casing and its junctions
+invisible underneath it. The street network, which is the thing this view exists
+to show her walking on, was one flat colour from the horizon down.
+`ROAD_BAND_WIDTH_FRACTION` (0.55) makes the band a spine down the middle: the
+tier colour is still on the road surface at every point the risk applies to, and
+the road it describes is visible on both sides of it.
+
+**The casing was invisible, and the cause was a colour space.**
+`Color.multiplyScalar(2.2)` works in the renderer's linear working space, where
+`#2E3450` doubles to rgb(69,78,117): a factor of about 1.5 to the eye, on a rim a
+tenth of the road's width. The profile could not find it. The casing now lightens
+the road colour's own hex bytes, which is the space the frame is composited in,
+and the rim measures 117 against the road's 53 — the factor the number reads as.
+
+**The roads were highways.** Measured from the reference frames at the depths
+this camera reads them at, a road ribbon is 2.5–3.2 m across. Ours was 8 m for a
+residential street and 24 m for a `primary` — the frame shows about 6 m of ground
+across at her feet (6.05 m, solved from the camera facts on a 390×844 viewport;
+the same solve puts the horizon at 0.164 and her feet at 0.745, which is what
+the reference measures), so a single `primary` was four frames' worth of width
+and the picture was that road. `ROAD_HALF_WIDTH_M` is 1.5 m now, with a
+per-class multiplier table, and the street capture reads as a place: a legible
+street web, junctions, kerbs, roofs on the horizon.
+
+**The legend was describing a different picture.** Its low swatch was the flat map's
+`color.tile.land`, a colour that appears nowhere in the walk view — the view draws
+`color.walk.ground` as its own land, and the legend's job is to explain the frame she
+is looking at. It is `color.walk.ground` now. The bands above it are unchanged: the
+tier colours are the tier colours in both views.
+
+**Tests rewritten to the new contract, not the old one.**
+`walkComposition.test.ts` re-derives the frame from the four camera facts and
+asserts it against the measured rows, so an edit to any one of them fails here
+rather than quietly moving the horizon; it also pins the palette's luminance
+relations, that a banded street still has a band narrower than its road, and that
+the tint keeps the ground reading as ground. `walkTiles.test.ts` reads the
+class-width table rather than restating one entry from it, and asserts the casing
+through *luma* — because luma is the thing the frame is made of.
+`walkZones.test.ts` pins the scale, the order it preserves, and that it does
+work: at the dataset's own alpha the ground flips red-dominant.
+
+**`MAP_SPEC.md` amended** for all of it — the camera section's second ruling, the
+band as a spine and the measured widths, the casing's colour space, and the
+fill's alpha scale — because a rule that lives only in a comment is a rule the
+next reader will not find.
+
+**Two measured findings are open, and neither is being decided unilaterally.**
+
+*Roads: darker than the land, or lighter?* The frozen `color.tile.road` is 0.56
+of the ground, which is the relation the day-frame calibration measured. But the
+reference's night frames show pale ribbons *brighter* than the land between them
+(luma 110+ against 106–132), which would invert it. The two readings disagree,
+and a second self-authorised amendment to a frozen colour is exactly what the
+governance rule exists to prevent. It goes to the verification round below.
+
+*Zone labels are structurally near-unreachable.* Of 19 zone-centroid anchors, 0
+of 8 are in frustum at the street position, 2 of 11 at the park, 1 of 13 at the
+corner; `visibleLabels` measured 2, 1 and 0 at the three captures. Meanwhile the
+reference frame shows no in-world text labels at all — only UI chrome. The
+candidate fix is to label the zone she is *in* rather than all 19 centroids, but
+that changes what the view asserts, so it waits for the round.
+
+**Verification round, running now.** Five judges with distinct lenses
+(composition, palette, legibility, avatar, the risk overlay), each measuring our
+three captures against the seven reference frames with per-row profiles before
+asserting anything; then an adversarial pass that re-measures every finding and
+aims to refute it; then a completeness critic. Its confirmed findings are what
+the next round of work acts on, and any amendment they justify goes through the
+same path as the one above.
+
+Gate: `npx vitest run` 295 passed in 44 files, `npx tsc --noEmit` clean,
+`python3 scripts/grounded_check.py src/platform/walk/*.ts` 0 ungrounded
+literals (396 live facts, 32 superseded and excluded). The two new tests pin the
+frame's own ground footprint - the number the road widths were rescaled against -
+by deriving it from the camera facts rather than restating it.
+
+## 2026-09-22 - The palette amendment, and two gates that were not what they said
+
+**Six frozen colours amended by the same founder ruling**, each recorded in its own
+fact's `means` and `sourced_from` rather than worked around in code: `color.tile.road`
+`#2E3450` -> `#3E466C`, `color.tile.building.roof` `#737D9C` -> `#8792B7`,
+`color.tile.green` `#3F5C4C` -> `#4A7C74`, `color.walk.sky` `#223375` -> `#183498`,
+`color.walk.haze` `#6B7EC4` -> `#192F6B`, `color.walk.ground` `#565F80` -> `#578BAE`.
+
+The reason is a measurement, not a preference. The reference's map area is **78% in the
+180-240 degree blue/cyan family and holds no magenta anywhere** (per-row hue histogram of
+the 1080p frames: 180-210 deg 43.4%, 210-240 deg 34.6%, 150-180 deg 12.8%, and under 3%
+across every other bin). The old ground under the highest-risk zone wash rendered
+rgb(110,90,117) - **hue 284, and half the frame** - because `#FF3B30` at 0.14 over
+`#565F80` crushes green to 90 and flips the ground's own B>G>R ordering. Two of the three
+frozen tier tints took the land off-family. The fix belongs in the scenery, not in the
+frozen data: the land is chosen so that every tint the dataset carries leaves it in the
+reference's own family. The amendment's own test was passing throughout, because
+`scaled.blue > scaled.red` survives a hue rotation.
+
+**A frozen fact's stated rationale was measurably false.** `color.walk.haze` claimed the
+reference's horizon band "measures luma 124-135 and is the brightest large area". Measuring
+rows around the horizon gives sky 56-64 -> **a dark seam at 46-48** -> map 124-156. The
+reference's horizon is darker than both the sky above it and the land below. The fact now
+records the measurement and the old rationale's error, and the test that asserted the haze
+is "the brightest large area" was inverted to assert it fades distance into a dark seam.
+
+**`ROAD_CASING_M` 0.5 -> 0.25 and `ROAD_CASING_LIGHTNESS` 2.2 -> 4.5 -> 3.1.** The
+reference's own road-edge lines measure 3-6 px at 1080x1920; a 0.5 m rim is 32 px at the
+near field, sixteen times as thick, and reads as a painted shoulder. At 3.1 the rim lands
+at luma 216, inside the reference's measured 190-250 line band, with only the blue channel
+clamping, which is what keeps it a cool ice rather than a warm one - the tier colours are
+warm, and a kerb reading as a tier colour would be a false claim.
+
+**Two gates were not what they said.**
+
+*The grounded check was hollow.* `scripts/grounded_check.py` takes **files**, not
+directories - `paths=[a for a in sys.argv[1:] if a.endswith(EXTS)]` - so a directory
+argument scans nothing and prints `grounded: 0 file(s)`, which reads as a pass. Earlier
+runs this session scanned 0 and then 1 file. Run correctly it is
+`find src app -type f \( -name '*.ts' -o -name '*.tsx' -o -name '*.css' \) -print0 | xargs -0
+python3 scripts/grounded_check.py` -> **147 files, 0 ungrounded literals**. Note for zsh:
+an unquoted `$FILES` is not word-split, so the `find -print0 | xargs -0` form is the one
+that works.
+
+*The gate count was stale.* The previous entry records 295 tests. It is **296 in 44
+files**.
+
+**The near field was never a rendering bug.** Three captures showed a bare ground plane in
+the lower half of the frame, and the obvious read was that tiles were not loading. They
+were. `camera.position.set(current.x, cameraUpM, current.z - cameraBackM)` places the camera
+a fixed distance **due north** of her, looking due south, always. Decoding the bake properly
+and measuring true segment distance and **direction** from her, the "street" point holds 27
+road fragments within 60 m - and **25 of them are north, behind the camera**. Southward
+there are two, both `service`, both 37 m west, both outside a frame that is 6.05 m across at
+her feet and 16 m across at 30 m. She had been teleported into the middle of a block
+interior. The earlier "29 fragments within 60 m" probe was not wrong, it just never asked
+which way they lay. A 20-second wait changed nothing, which is what ruled out a load race.
+The origin capture, where the bake does hold four roads ahead of her, renders them.
+
+**The camera does not rotate with her heading, and neither does the reference.** The code
+turns the character (`rig.root.rotation.y = facingRadians`) while the camera stays put,
+which reads as a bug until the reference is checked: in `m_11` the avatar is in **profile**,
+walking across a map that stays fixed, and in `m_03` she is seen from behind. Avatar
+rotation is independent of camera orientation in both. Recorded here so nobody "fixes" it
+later.
+
+**The largest remaining gap cannot be closed in this repo.** The reference's ground is a
+mosaic of filled parcels with pale outlines; ours is one flat plane, and that is most of why
+the frame still reads as empty. `world_tiled.json` carries only roads, buildings, green and
+water - there is **no bake script and no raw OSM extract anywhere in the repo**, so the
+parcel layer cannot be regenerated here. That is a founder decision, not a code change.
+
+Verification round running over the full-resolution reference set: four measurement lenses
+(ground, roads, avatar, depth) then four adversarial refuters (measurement validity,
+presence, feasibility, reference representativeness) then a synthesis.
+
+**The bake tree does exist, and the parcel layer is one query away.** The previous entry said
+the parcel mosaic could not be closed in this repo because there was no bake script and no raw
+OSM extract. That is true of the repo and false of the machine. `MAP_SPEC.md` names the bake's
+own home in its world-asset section, and `/Users/abhishai/saaya-lite-world/` holds the whole
+pipeline: `fetch.py` (four Overpass queries over the Vizag bbox), `bake2.py` (projection, risk
+by density, building heights by the stated storey rule), `tile.py` (seam-correct clipping and
+quantisation), plus every intermediate - `roads.json`, `buildings.json`, `green.json`,
+`water.json`, `world_raw.json`, `world_tiled.json`. There is **no landuse query and no
+parcels layer**, which is why the ground is flat.
+
+So the gap is not a missing asset, it is an unasked question. A `landuse` entry in
+`fetch.py`'s `QUERIES` map, one `emit` loop in `tile.py`, and a layer in the client would put
+the parcel mosaic in the bake. That is a new network fetch of live OSM data and a rebuild of
+the asset the app serves, so it is **not mine to do unilaterally** - it needs a founder ruling.
+Recorded with the reconnaissance done, so the ruling is cheap to make.
+
+**Layout: three chrome collisions, all measured, all fixed.** `layout.mjs` (new, in
+`/tmp/walk-verify/`) measures the walk view's DOM chrome in CSS pixels and reports every box
+that can collide and every label the frame edge can clip. At the origin position it measured
+three defects, all of them visible in the captures:
+
+| | Before | After |
+|---|---|---|
+| The legend's closing sentence | buried under the action dock - card bottom 824 px, dock top 784 px, **40 px** covered | card bottom 772 px, **12 px clear** |
+| "Change your character" against the settings button | cut to "Change your cha" - both boxes ending at 370 px | edit row ends 314 px, **8 px clear** |
+| The legend's last line under the control stack | control stack 724-772 px inside the card's 634-772 px span | card ends 314 px, stack starts 322 px, **8 px clear** |
+
+The fix is one custom property, `--walk-view-rail`, on the value of the home screen's own
+right-edge column (48 px touch target plus `--space-8`), used by the top row and the legend
+card; and the legend clearing the dock by `--home-action-dock-clearance`, the same clearance
+the control stack already used. No new numbers.
+
+**Zone names printed over each other, and off the frame edge.** The same probe measured "Old
+Town" and "Soldierpet" overlapping by **33.9 x 24.7 px** because their anchors projected 43 px
+apart, and "Soldierpet" **10.7 px past the right edge** with the rest of the word off screen.
+The scene reports a projection - a point - and the view drew a box centred on it with no idea
+how wide the box was or what else was there. `labelPlacement.ts` (new, with 10 tests) places
+the box: centred on its anchor, pulled back inside the frame, stepped clear of anything already
+placed (below first, then above), and the clamped centre if nothing fits - a name overlapping
+another is still a tap target, and the risk reading must not vanish. Sizes are measured off
+each node **once and cached**, because `offsetWidth` costs a layout flush and this runs inside
+the scene's frame callback. After: **no collisions, no clipping**, both names fully in frame.
+This is not the label system `MAP_SPEC.md` refuses for the flat map - that section is about not
+burying 19 circles under a dense ring of names, and this decides only where a name that is
+already showing sits. Recorded as an amendment in `MAP_SPEC.md`.
+
+**The green layer's colour relation holds in luma and not in hue.** At the origin she stands
+**inside** an OSM green polygon (nearest edge 1.0 m), and **73%** of the ground the camera can
+see is inside one, so rows 0.40-0.70 of the frame are 94-100% one colour. Sampled:
+**rgb(99,115,106) L109 h146**. That is exactly `color.tile.green` #4A7C74 (rgb(74,124,116)
+L108 h170) with `color.zone.high` at 0.35 x `ZONE_FILL_ALPHA_SCALE` 0.4 = 0.14 over it:
+0.14 x (255,59,48) + 0.86 x (74,124,116) = rgb(99,115,107). Measured rgb(99,115,106) - the
+render is faithful to the facts to one unit on every channel.
+
+But the palette amendment's rule - **"the ground must stay blue/cyan under all three tier
+tints"** - was verified over the *ground plane*, where it holds (rgb(111,128,156) h217). Over
+the green layer it does not: h170 under the high tint lands at **h146**. The reference's hue
+histogram fills 120-150 with 2.4% of its map area, so h146 is not unheard of there, but 55% of
+this frame sits in it. The rule as written is narrower than its stated intent, and that is a
+spec finding rather than a code one - the luma ladder (green at 0.85 of the ground, measured
+109 against the fact's own 108) is exactly right. What is wrong is the *composition*: the
+default position puts her in a park, so the near field is the one surface the palette was not
+tuned against.
+
+Gates green: **306 tests in 45 files**, `tsc --noEmit` clean, grounded check **149 files,
+0 ungrounded literals**. The +10 tests are `labelPlacement.test.ts`. The grounded check caught
+all 22 new literals on the first run - the two measured pixel values in a CSS comment were
+moved into this record and `MAP_SPEC.md` rather than marked exempt, and the 21 test probes were
+collapsed into named constants with exemptions.
+
+**The building walls were drawn from the inside, and now they cannot be.** The dense tile's
+frame - 77.7% one flat wall - was traced to the building material being `DoubleSide`. A
+double-sided box shows its walls to a camera that is inside it, so the question was whether the
+bake's footprints could be extruded with their walls facing outward and the material made
+one-sided. They can, and it is now guaranteed in code rather than assumed of the data.
+
+`appendBuilding` normalises each ring's winding first - positive signed area is reversed - so
+every wall faces outward whichever way its footprint was written. The algebra: a ring step
+`(dx, 0, dz)` extruded as `(a₀, b₀, bH)` has a face normal of `(-dz, 0, dx)`. The bake's own
+rings **disagree with each other** - of 12,690 building rings, **81.0%** are positive and
+**18.9%** negative - which is exactly why the material had been `DoubleSide`. With the winding
+normalised, `building` and `buildingRoof` are `FrontSide` (`walkTiles.ts:268-269`); every other
+layer stays double-sided, because `appendRingFill` already faces every fill up by construction
+and a second guarantee should not fight the first.
+
+**Proven, not asserted: the A/B at a stationary camera.** The harness is byte-reproducible at a
+fixed position - two captures in the same material state share an md5 exactly - so a difference
+at a fixed position is the material and nothing else. One variable changed, same position:
+
+| Camera's depth inside its ring | Enclosing ring | Pixels differing | What the `DoubleSide` frame was |
+|---|---|---|---|
+| 0.0 m | 57.6 m | **138** of 1,316,640 (0.01%) | the street - the wall is edge-on |
+| 9.2 m | 12.8 m | **986,454** (74.9%) | the inside of the building |
+| 10.4 m | 8 m | **948,101** (72.0%) | the inside of the building |
+
+At the deep positions the old frame is a flat wall with **the character not visible at all** -
+the app is unusable - and the new frame is the street with her standing on it. At the shallow
+position the two frames agree to 138 pixels. The fix acts exactly where it claims to and nowhere
+else. The dense-tile frame that started this is **not** one of these cases: with `DoubleSide`
+restored it is pixel-identical, because it is an honest occlusion in a half-metre slit between
+two eight-metre buildings, and she is not inside a building there at all.
+
+The rule is written into `MAP_SPEC.md` with the measurement, and its limits are written down
+with it: it does not address occlusion (**99.0%** of blocked road positions clear at a boom of
+3 m or less; **0.97%** clear at none), and camera collision is a separate change that is not made.
+
+**MAP_SPEC's stated reason for the 27 m to 13.2 m camera amendment is falsified.** The section
+said a 13.2 m camera "passes under the rooflines" where 27 m sat behind a building. Measured
+over the bake's own roads, sampled every 2 m (416,608 positions):
+
+| | 13.2 m boom | 27 m boom |
+|---|---|---|
+| Camera inside a building tall enough to enclose it | **5.54%** | 1.27% |
+| Building between the camera and her eye | **6.30%** | 7.78% |
+
+The shorter boom is inside a building **4.4x as often**, not less often, and improves the
+sightline only modestly. The amendment itself stands - it is what reproduces the reference's
+composition, which is the reason that matters - but it no longer carries a claim about rooflines
+that the data does not support. Both the falsification and the corrected numbers are in
+`MAP_SPEC.md`.
+
+**Two probes were wrong, and finding that out was most of the work.** `occludeprobe.mjs` and
+`roadocclude.mjs` rasterised ring bounding boxes in **world** coordinates straight into a grid
+indexed **tile-locally**, so nearly every write clamped into the last row band and the grids were
+mostly empty; their first numbers (0.30% camera-inside, 0.32% blocked) described a grid that did
+not exist. The road loop then had the mirror-image bug, handing `coverAt` a tile-local `x` where
+it keys on world. Fixed to rasterise and query in one frame, the grid agrees with a completely
+independent exact-ring test - **5.54% / 5.58% / 5.59%** camera-enclosed from three methods - and
+that agreement is what makes the numbers above usable. The exact-ring probe also reports what the
+cell test cannot: the camera's **depth** inside its ring, which is the variable the material
+question actually turns on.
+
+**Gates green: 309 tests in 45 files**, `tsc --noEmit` clean, grounded check **149 files,
+0 ungrounded literals**. `walkGeometry.test.ts` is 28 tests: the three new ones assert the
+property the material depends on - stepping off each wall's own outward normal lands outside the
+footprint and stepping the other way lands inside, for both windings, with both producing
+byte-identical walls - rather than restating the implementation. The fix's two files are backed
+up verbatim at `/tmp/walk-verify/keep-*.ts` and were restored exactly after each A/B.
+
+**The reference-frame gap audit: eight verified findings, none refuted.** A nine-agent workflow
+measured the Pokemon GO reference frames against our captures, dimension by dimension, and each
+finding was then adversarially verified - 8 survived, 0 were refuted, and one dimension (the
+avatar) is **unmeasured**: its agent died on a gateway error, so nothing here speaks to how the
+character reads against the reference. The findings, ranked by severity and tagged by what each
+one needs:
+
+| # | Gap | Sev | What it needs |
+|---|---|---|---|
+| 1 | Land between roads is one flat fill, not the reference's parcel mosaic - our largest ground fill covers 82.7-95.5% of the band, the reference's largest covers 0.5-1.0% with 52-66 distinct fills | 5 | **A re-bake.** `world_tiled.json` has no landuse layer and there is no bake script in the repo, so it is out of reach from here. Reported, not proposed. |
+| 2 | No ground seam network - only roads get a casing, so the ground has no pale line network (reference: 12.1-24.4% of the band is pale, 2-8 runs per row) | 4 | **Do now.** A seam ribbon along every ring that has none, reusing `appendRibbon` and the existing casing material. |
+| 3 | Far field is an opaque wall, not an open pale plane - rows 0.17-0.22 are 69.5-99.0% one colour with no structure behind | 3 | **Founder ruling**, then do. Needs a `MAP_SPEC.md` amendment on the storey height before the change. |
+| 4 | Horizon haze seam missing - the reference's horizon is a full-width dark seam at 1.99-2.01% of frame; ours is 0.080% | 3 | **Do now.** `FOG_FAR_M` 800 -> ~300. |
+| 5 | Building walls are one flat colour - rows 0.20-0.22 are 84.9-100% a single rgb(56,64,96), where the reference row 0.22 carries 9-29 runs | 3 | **Do now.** Deterministic per-fragment luminance variation via vertex colours. |
+| 6 | No sky, no star field - the reference's sky carries a world-fixed star field, 10-17 clusters above luma 90 | 2 | **Do now.** A `three.Points` star layer, and a horizon-ward lift. |
+| 7 | No street at her own depth | 3 | **Not a defect.** A capture artefact: the position is 25 m from the nearest road and the camera's wedge misses it. Re-shoot, do not fix. |
+| 8 | Buildings have no ground footprint | 4 -> | **Refuted as a fix.** The observation is true but the proposed fill renders nothing - it is enclosed by the building's own walls and capped by its roof, invisible from every exterior camera. Dropped. |
+
+The four "do now" items are the next work. Item 3 needs a ruling before it can be made, and item
+1 needs data the repo does not have; both are recorded here so the ruling is cheap to make.
+
+
+## 2026-09-22 - She moves with her location, and the haze seam lands
+
+### What was asked
+
+*"As I move the character must move on the 3D vizag map using my location."* Verified, and
+demonstrated two ways: the fixes reaching the app, and the world's own projection responding to
+them.
+
+### The character tracks the fix - measured
+
+A position that arrives and a world that moves can be confused for each other, so the two were
+measured separately. `walkpath.mjs` instruments `navigator.geolocation` before the app loads and
+logs every `watchPosition` call, every `clearWatch`, and every fix handed to the callback with its
+coordinates - that is the delivery side. `trackwalk.mjs` then walks a path fix by fix and samples
+the live `walk-view__label` rects every 100 ms, and `herlat.py` solves her lateral world position
+back out of them: the labels are the scene's own projection of fixed zone centroids at known
+lat/lon, so their columns invert to a position, with `hz` held at the commanded GPS value and the
+fit's residual reported per label. Lateral is the only solvable axis - at 4 km depth a column
+carries about 0.005 px per metre - which is why the instrument solves position and not distance.
+
+| run | frames p50 | commanded pace | result |
+|---|---|---|---|
+| walk pace (`path4.json`, 40 fixes 0.35 m apart, 13.7 m at a true 1.4 m/s) | 117 ms | 1.4 m/s | `her_x - gps_x` median **0.01 m**, p90 0.33 m, max 0.34 m; span 12.9 m against the commanded 12.9 m |
+| jog (`path3.json`, 1.4 m per fix) | 117 ms | 4.03 m/s | lag median **-6.34 m**, span 12.7 m of 18.5 m |
+| the same jog at `--scale 1` | 83 ms | 4.04 m/s | lag median **-5.45 m**, span 12.7 m of 18.5 m |
+| zigzag (`zigzag.json`, +/-60 m every 2 s) | 133 ms | - | reversals at 2.02-2.03 s, span 48.4 m of 60 m |
+
+At a walking pace she tracks the fix to within a third of a metre - the median error is one
+centimetre. Per-fix evidence agrees: every step's coordinates arrive intact, once per step, with
+no `.walk-view__notice` raised, so nothing is being dropped or substituted along the way.
+
+### Why the jog lags, and why that is not a defect
+
+All four rows fall out of one model, which is the movement code as written. She **snaps** when the
+remaining distance is at or under the world's own quantum, `meta.q` = 4 m; otherwise she traverses
+it as a 400 ms exponential ease (`POSITION_EASE_MS`, fact `motion.400ms`). The frame delta driving
+that ease is clamped to 32 ms (`FRAME_BUDGET_MS`, fact `perf.frame`, `walkScene.ts:800`), so under
+a renderer slower than 32 ms per frame the ease advances by `32/frameMs` of wall-clock time - it
+stretches. The lag the clamp predicts is `v * tau * (frameMs / 32)`: at 4.03 m/s and 117 ms frames
+that is 5.89 m against 6.34 m measured; at 83 ms frames 4.19 m against 5.45 m. Both within a
+frame's worth of the prediction.
+
+The walking pace needs no correction to the model, only to the arithmetic: 1.4 m/s * 400 ms is
+0.56 m, which is less than the 4 m quantum, so the ease is never entered and she snaps to every
+fix - hence a 0.01 m median. **On hardware the clamp never engages** (16.7 ms frames), so tau stays
+400 ms exactly and the same snap covers every walking fix: sub-stride tracking is the product's
+behaviour, and the jog lag is an artefact of this machine's software renderer.
+
+### The correction that has to be recorded with it
+
+An earlier reading in this session said a 250 ms run proved a 14% app-side throttle on delivered
+fixes. **That reading was wrong and is withdrawn.** The zigzag run settles it - the scene follows
+reversals every 2.02 s, which no gate on a 30 s sampling interval could do. The actual cause is the
+32 ms clamp above meeting a renderer running at 8-12 fps under SwiftShader. The 14% figure should
+not be reused.
+
+### The delivery gate, restated from the code
+
+`locationWatch.ts` (`handlePosition`) drops any fix that arrives less than `sampling.intervalSec`
+after the last delivered one, and the gate resets on start, on resume, on the page going hidden, on
+a synchronous failure and on a watch error - not on a sampling change, so a session that moves into
+SHADOW keeps the interval it started with until one of those events. The intervals are facts:
+idle 30 s, SHADOW 15 s at high accuracy, SOS 5 s at high accuracy, dwell-pending 15 s
+(`rules.ts:13-16`). None of this blocks a walking fix in practice, because at walking pace the
+app is in the SHADOW/idle set where fixes arrive far slower than 15 s anyway.
+
+### The haze seam, calibrated, and the spec amended
+
+The reference gap audit's item 4 asked for the horizon seam and named `FOG_FAR_M` 800 -> ~300.
+Sweeping it with the same instrument (`hazemetric.py`: minimum luma in the frame band 0.150-0.190,
+how many rows lie within 3 of it, and the far field's luma at 0.192) found something the item's
+arithmetic did not anticipate - the transition is a **threshold, not a dial**:
+
+| fog far | sky @ 0.152 | min luma | min at | rows <= min+3 | far @ 0.192 |
+|---|---|---|---|---|---|
+| 410 | 53.7 | 51.2 | 0.1559 | 0.474% | 60.3 |
+| 300 | 51.9 | 49.6 | 0.1559 | 0.474% | 56.6 |
+| 250 | 50.2 | 48.2 | 0.1559 | 0.474% | 53.9 |
+| 225 | 49.4 | 47.5 | 0.1559 | 0.474% | 52.9 |
+| **200** | 48.2 | **46.50** | 0.1559 | **1.896%** | 50.7 |
+| 200 again | 48.3 | 46.56 | 0.1559 | 1.836% | 51.0 |
+| reference f01/f03 | 66.4-72.1 | 45.0-45.9 | 0.1672-0.1755 | 0.625-1.250% | 62.1-82.3 |
+
+Every value from 225 up returns the identical 0.474% band; 200 doubles it, and 200 was confirmed
+by a second capture (1.836%). The scene's visible ground reaches about 205 m, so the band appears
+only once the far plane crosses that edge - there is no intermediate value to tune to. At 200 the
+seam's minimum measures **46.50**, and `color.walk.haze` `#192F6B` is luma 46.6: the seam now
+reaches the frozen colour exactly, against the reference's 45-46. The audit's own target was
+1.99-2.01% of frame; 200 delivers 1.84-1.90%.
+
+**The near field pays nothing for it.** A row-by-row difference of the 410 m and 200 m captures
+reports changes confined to 0.1600-0.4408 of the frame with a luma difference of **0.0 for every
+row below 0.44** - everything within about 25 m of her is pixel-identical at either setting.
+
+`MAP_SPEC.md`'s "Distance, and what the haze may not touch" now carries the range, the method, the
+measured rows and the threshold finding as an amendment. The rule it states is unchanged and was
+not touched: zone tints, zone boundaries and road risk bands keep `fog: false`.
+
+### Still owed a ruling, not taken here
+
+The reference's seam is plain haze; ours carries the zone tint, violet at luma 57 against the
+reference's 45-46, because the frozen rule forbids fogging zone tints and the horizon band is one
+zone's fill. Fogging the fill alone would close the remaining gap at no near-field cost (fog
+begins at 45 m; boundaries, glows and labels stay unfogged), but it changes what a zone looks
+like, so it is surfaced rather than taken. Recorded in `MAP_SPEC.md` with the measurement.
+
+### Gates
+
+`npx tsc --noEmit` clean; `npx vitest run` 45 files, 313 tests, all passing; the grounded check
+149 files with 0 ungrounded literals (396 live facts, 165 distinct values, 32 superseded and
+excluded). The only source change in this stretch is the fog constant, which is `GROUNDED-EXEMPT`
+as a rendering range.
+
+
+## 2026-09-22 - The second reference: corner, read frame by frame
+
+### What was asked
+
+*"Use this too, watch it frame by frame. It is an Amazing UI and overall experience."* - a 150.8 s,
+60 fps iPhone recording (1180 x 2556) of the corner app, handed over alongside two links to the
+app's store page and its Mobbin page, in service of the standing question: how do we get from
+where the walk view is to a Pokemon GO level of feel.
+
+### How it was read
+
+Not one frame at a time - 9,033 frames is 150 seconds at 60 fps and reading them singly would have
+been a very expensive way to learn very little. Three passes instead, in `/tmp/walk-verify/ref2/`:
+
+| pass | what it gives |
+|---|---|
+| five contact sheets at 0.5 fps (`sheet01-05.png`) | coverage of every second of the recording, to find where the structure is |
+| nine full-resolution stills at the moments that carry design (`t1, t20, t40, t60, t80, t100, t120, t140, t149`) | the type, the surfaces, the pin system, the event card |
+| three 20 fps filmstrips of the parts that move (`motionA-D.png`) | how cards enter, how the map populates, how a card's contents swap |
+
+Note the working method that made this cheap: the contact sheets answer "where is the structure",
+the stills answer "what does it look like", and the filmstrips answer "how does it move". Only the
+last of those needs a high frame rate, and only for two seconds at a time.
+
+### What corner is
+
+From its own store copy: a personalised map of places, "curate & share places", hand-picked by
+150k+ curators in 400+ cities, "no bots, no ads, just vibes". The product is a map first and
+everything else is a sheet floating over it. Signed-in home is a city map; onboarding is a sequence
+of single-decision cards that appear over that same live map while it populates behind them.
+
+### The design language, measured
+
+Sampled from the frames rather than eyeballed (`PIL`, modal colour per region):
+
+| token | value | where |
+|---|---|---|
+| accent blue | `#0055FF` | the mascot speech bubble, the core of the primary CTA gradient |
+| status: new | `#57EA62` | legend dot, and the map dots |
+| status: trending | `#FF950C` | legend dot (effectively iOS system orange) |
+| status: popular | `#FF9ACE` | legend dot |
+| status: lowkey | violet, **unmeasured** | legend dot; the sample box missed it |
+| water | `#B8D9F2` | basemap |
+| park | `#B6DE97` | basemap |
+| land and roads | `#FFFFFF` on `#EFEFEF` | basemap: white roads, pale grey land |
+| sheet surfaces | `#EBF0F4` sheet, `#F1F1F1` rows, `#FFFFFF` pills | every floating card |
+| quiet text | `#787878` | the dismiss line under a CTA |
+
+The typography is one gesture repeated: **lowercase, very bold, tight** headlines at 40-56 px
+("give us your number", "be the one with the best spots", "don't miss our invite-only corner
+parties"), and **fully rounded pills** for anything pressable - black pill with white label for the
+primary action, white pill with a black label for a chip or tag. Emoji carry the iconography
+(🎧 tiktok, 🔔 stay in the loop, 👀 don't miss). There is no chrome: no borders, no dividers, no
+navigation bar. A pill or a card or nothing.
+
+### The map and its pins - the part that matters most to us
+
+This is the transferable core. On the final map every place is a **white circular disc with a soft
+drop shadow**, and inside the disc sits a small, lit, 3D-rendered object that reads as the
+category - a pizza slice, a bowl of matcha, a cocktail glass, an armchair, a paper bag, headphones,
+a yoga figure. Not a teardrop marker, not a glyph: an object. Under each disc, two lines: the name
+in bold black, and a category in smaller grey ("tuscan thin-crust", "new matcha cafe", "lowkey
+social art gallery"). Places that are not yet worth a disc are **small coloured dots** in the
+status palette above, so the map carries a second, denser layer of information at a glance.
+
+Around it: floating white circular buttons at the top (friends, compass, bell), filter pills at the
+bottom left ("everyone", "open now"), a **category rail of the same 3D objects** as tabs (top
+picks, eat, cafes, bars, events, go out, shops), a white bottom nav pill, and a separate round "+"
+FAB. A blue mascot - a rounded blob with two big eyes - sits on the map and can hold a speech
+bubble ("your map will ✨personalize✨ when you add places").
+
+### The event pattern
+
+The invite card is the reference's answer to our events question, and it is small enough to copy
+wholesale: a white sheet over the map; a large lowercase headline with a leading emoji; a collage
+of three overlapping photos; then a **notification row** - app icon, sender, the word "now" right
+aligned in grey, and the body "you've been invited… 12/88 spots left."; then a **gradient CTA**
+pill ("🔔 stay in the loop") whose gradient runs blue into violet into magenta; then, in quiet grey,
+the refusal as plain text: "i'll miss out". Scarcity is stated as a count of remaining places, and
+refusal is a text button rather than a second pill - the card never shows two equal choices.
+
+### The motion vocabulary
+
+Read off the filmstrips:
+
+1. **Kinetic type.** The onboarding headline is not one sentence but four, swapped in place:
+   "no ads." → "no stress." → "no BS." → "sound good?". Elsewhere a sentence builds word by word
+   ("tell us what you like" … "…or don't like" … "we'll show you wher[e]"), and a card header
+   arrives with a blur that resolves letter by letter.
+2. **Cards do not slide, their contents crossfade.** In `motionD` the sheet stays anchored on
+   screen while the title row and body swap under a blur, and the new pills spring up into place.
+   The stable container with morphing contents is the single most distinctive motion decision here.
+3. **One continuous world.** The photographic sky and its floating 3D objects persist across the
+   splash and several onboarding screens; only the copy changes. Onboarding cards then appear over
+   the live map rather than over a placeholder.
+4. **Objects fall into place.** The splash rains chrome letters and food objects that settle; the
+   map's category objects are lit renders, consistent across pin, rail tab and legend.
+5. **A marquee of taste chips** scrolls horizontally while the map is being personalised, with the
+   caption "learning what you like…" beneath it - work-in-progress made visible.
+6. **A map fly-in** during onboarding, from a world map down to the user's city.
+
+### What is directly applicable, and what is not
+
+Applicable without a founder ruling: the pin-as-object idea (a disc with a lit object, a bold name,
+a grey category), the status dot layer, the lowercase-bold-huge type gesture, the fully rounded
+pill as the only pressable shape, the notification row plus scarcity count for an event, the
+content-morph-in-a-stable-card motion, and the refusal-as-quiet-text rule.
+
+Not applicable as-is: the 3D object icons need rendered assets we do not have; the app is a
+social discovery product with no safety surface, so nothing here speaks to the SOS ladder, the
+trust boundary or the mock-labelling duty - those stay ours. Every value above is a reference
+observation from another product and **enters our code only as a grounded fact with an amendment
+behind it, never as a copied literal**.
+
+### Still owed
+
+The synthesis: the six questions (smoothness, surroundings, partner buildings, events, character
+choice, overall feel) answered as a plan, with the two research workflows' findings folded in.
+That plan is the next thing in this file.
+
+
+## 2026-09-23 - She was not dressed, and the haze seam fills in as the world arrives
+
+### The defect found by looking at the product
+
+The live-movement work was verified and green, so the capture was checked as a picture rather
+than as a measurement - and she was **rendering in the underwear the base body bakes in**. The
+hoodie and the jeans were in the scene, in the right place, in their own colours, and almost
+invisible: her torso carried a scatter of warm-grey specks where the hoodie should be, and the
+hips a scatter of lavender-blue where the jeans and the skirt should be. The scarf and the hair,
+meanwhile, rendered perfectly.
+
+### The measurement that explains it
+
+`garmentgap.py` measures every part against `body_base` - the distance from each vertex of a part
+to the nearest vertex of the body:
+
+| part | median gap | p90 | renders? |
+|---|---|---|---|
+| `top_hoodie` | **0.0000 m** | 0.0057 | speckles |
+| `top_jacket` | **0.0000 m** | 0.0025 | speckles |
+| `top_tee` | **0.0000 m** | 0.0066 | speckles |
+| `bottom_jeans` | **0.0000 m** | 0.0017 | speckles |
+| `bottom_shorts` | **0.0000 m** | 0.0058 | speckles |
+| `bottom_skirt` | **0.0000 m** | 0.0348 | partial - its hem only |
+| `hair_long` | 0.0203 m | 0.0557 | clean |
+| `acc_scarf` | 0.0240 m | 0.0494 | clean |
+| `acc_bag` | 0.0389 m | 0.0549 | clean |
+| `acc_glasses` | 0.0113 m | 0.0306 | clean |
+
+Every garment's median vertex sits at **exactly zero distance** from the body's surface: the six
+tops and bottoms are copies of that surface, so the two are drawn at one depth and the depth test
+resolves them fragment by fragment. The parts that render cleanly have 11 mm to 39 mm of
+clearance - that is the size of gap a working part has. The skirt is the one garment whose hem
+flares away from the leg (p90 34.8 mm), which is why its hem was the single clean band in the
+broken frame - the observation that made the explanation checkable.
+
+### The fix
+
+`liftOffSkin` in `walkCharacter.ts` moves a part's vertices outward along their own normals, and
+`isBodyCoveringPart` in `characterParts.ts` says which parts need it - the tops and the bottoms,
+by axis. The stand-off is **14 mm**: 8 mm cleared most of it but left the jeans mottled, 14 mm
+renders all six garments solid, and 14 mm sits inside the 11-39 mm band that the parts needing no
+help already occupy. It is `GROUNDED-EXEMPT` as a depth separation between two surfaces, the same
+kind of constant as `LAYER_HEIGHT_STEP_M`, which separates the coplanar ground layers.
+
+Verified on the frame for three wardrobes (hoodie/jeans, jacket/skirt/scarf, tee/shorts), each
+captured and read at 4x. The remaining exposed skin is the garments' own cut: the hoodie's
+geometry ends at y 1.460 against a body that continues to 1.767, so its neckline and its
+three-quarter sleeves are the mesh's design, not a rendering fault.
+
+### The haze seam is real but it fills in over time, and that had to be measured
+
+The seam was measuring 1.896-1.955% of frame in some captures and 0.474% in others at the same
+`FOG_FAR_M = 200`. `seamtime.mjs` settles it by sampling one page as it runs: the band is small
+while the far tiles are still arriving and then stops changing. Measured at 3 s intervals from
+9.6 s to 38 s on one page, it is **33 rows (1.955%) at every sample**, min luma **46.22** - against
+the audit's target of 1.99-2.01% and `color.walk.haze`'s own luma of 46.6. A capture taken early
+in a run measures the seam as 0.474% because it measures less world, not less fog. `MAP_SPEC.md`
+now states the settled figure and says why the earlier readings differ.
+
+### Gates
+
+`npx tsc --noEmit` clean; `npx vitest run` **46 files, 321 tests**, all passing (313 before, plus
+the 8 new ones for `liftOffSkin` and `isBodyCoveringPart`); the grounded check **150 files, 0
+ungrounded literals** (396 live facts, 165 distinct values, 32 superseded). The new test file
+carries its own fixtures as named constants with `GROUNDED-EXEMPT`, the house pattern.
+
+### Still owed
+
+The horizon band's zone tint (violet luma 57 against the reference's plain haze at 45-46) is
+unchanged and still a founder decision, recorded in `MAP_SPEC.md`. The reference's sky measures
+66-72 where ours measures 48, so even with the seam at the right luma ours reads as a subtler
+transition than the reference's - that is a palette question over frozen colour facts, so it is
+reported rather than changed.
+
+
+## 2026-09-23 - The synthesis: the six questions, answered as a plan
+
+### Where these answers come from
+
+Three bodies of evidence, none of them opinion:
+
+1. **The corner recording**, read three ways - five contact sheets at 0.5 fps for coverage,
+   nine full-resolution stills for design, four 20 fps filmstrips for motion - with its palette
+   measured rather than described (entries above, 2026-09-22).
+2. **A six-surface audit of our own walk view** (six agents, 361 tool uses, no errors), each
+   surface reporting state, the facts it reads, the levers it may lawfully pull, what blocks it
+   and what data is missing. Only lawful levers appear below; every blocker is named.
+3. **The reference-gap audit** already in this file: eight findings, four closed (the ground
+   seam, the haze seam, the wall shading, and one refuted), one not a defect, and one checked
+   again here because the answer changes the plan: **the star field is real.** `starcheck.py`
+   sampled seven frames of the reference and found a bright band at rows 0-52 of every single
+   one - that is the phone's status bar, red, with the carrier, the clock and the battery in it.
+   Below it, the night map's sky is a flat dark teal (luma 37) carrying **five four-pointed
+   sparkle glints** in the frame at 60 s, fixed to the world. The status bar and the stars are
+   two different things at two different heights, and item 6 stands as "Do now".
+
+### One defect was fixed before the plan was written
+
+The walk view's **degradation ladder was dead code**, and it is now live. `applyFrameBudget`
+asked whether the last frame exceeded `perf.frame` (32 ms), but the loop handed it the delta
+*already clamped to 32 ms* (`walkScene.ts:797-800`), so the question could never answer yes: the
+score could only fall to 0, `qualityLevel` stayed 0 forever, and rungs 1-4 of the five-rung
+ladder could not be reached by any device. The fix separates the two readers - **the guard sees
+the true frame time, the ease keeps the clamp** - so a frame that missed the ceiling is now
+exactly what the guard exists to see, while a tab returning from the background still cannot
+report seconds and lurch her. No literal moved, no fact changed; this is `perf.frame`'s own
+number doing the job it was written for. `npx tsc --noEmit` clean, `npx vitest run` 46 files /
+321 tests passing, grounded check unchanged.
+
+**Recorded as the thing to watch, not tuned.** Four consecutive over-budget frames now climb the
+score to the detail boundary, where `applyQuality` (`walkScene.ts:660-671`) drops and re-queues
+every resident tile - so a device whose frame times straddle the band (16.67 ms to 32 ms) can
+cross that boundary back and forth and pay a full world rebuild each time. The first seconds of
+a load, when tiles decode on the render thread, are exactly that kind of sustained stretch. The
+hysteresis band is the gap between two frozen facts, so widening the dwell to stop it flapping is
+an amendment, not a tweak. It is reported here rather than pre-empted.
+
+### Q1 - How the interaction becomes buttery smooth
+
+Seven levers, in the order they should be pulled. None needs a founder ruling; the first is done.
+
+| # | Lever | Why it matters | Lands in |
+|---|---|---|---|
+| 1 | **The guard reads the true frame time** | The ladder is the only thing that can save a device that cannot hold 60 fps. It was inert. **Done.** | `walkScene.ts:797-806` |
+| 2 | **Stop the per-frame DOM work in the label path** | Every rendered frame today: two canvas box reads that force layout, up to 19 `transform` writes, 19 fresh objects, one template string, and a React call. Skip the write when the placement has not changed; cache the box on resize. | `WalkView.tsx:132-182`, `walkScene.ts:765-766` |
+| 3 | **Take the tile decode off the render tick** | One tile is decoded and built synchronously inside the frame callback. `MAP_SPEC`'s streaming table already says "decode off the render thread where the browser allows it" and "never more than one tile decoded per frame" - so moving the decode to an idle callback or a worker **implements the spec rather than changing it**. This is the largest single-frame spike in normal walking. | `walkScene.ts` `pumpQueue`, 631-651 |
+| 4 | **Merge the meshes that share a material** | Up to 8 meshes per tile across a 25-tile window, all drawn from seven materials: ~259 draw calls a frame by code-derived upper bound. The ground-seam mesh and the road casing are already the *same* material, so they can be one geometry per tile with no visual change at all. | `walkTiles.ts:393-499` |
+| 5 | **Couple the walk cycle to her ground speed** | `WALK_SPEED_MPS` (fact `walk.speed`, 1.4 m/s) is exported and read nowhere; the rig's mixers run at `timeScale` 1 regardless, so her feet slide whenever the ease and the fix disagree. Feeding the fact into the mixer is the lawful fix and needs no new number. | `walkCharacter.ts:224-226`, `walkFacts.ts:28` |
+| 6 | **Reuse, don't allocate, per frame** | 19 label objects and a window key string rebuilt every frame. Micro, same file, no behaviour change. | `walkScene.ts:777-784`, 607 |
+| 7 | **Idle without redrawing** | A dirty flag plus a still-camera check would let a stationary phone stop drawing identical frames. The reduced-motion path already proves the pattern. Needs care: label DOM updates stop with the loop, which is correct only while nothing moves. | `walkScene.ts` `frame`, 792-818 |
+
+**What "smooth" cannot be claimed on yet.** `perf.fps` and `perf.frame` name the budget for a
+2 GB device, and the only frame times this project has ever measured came from SwiftShader on
+this machine (83-133 ms), not from hardware. There is no draw-call or frame-time telemetry in
+the app and no performance harness in `scripts/`. Any further tuning done on frame-time grounds
+before that data exists would be guessing. A repeatable in-repo measurement is itself owed work.
+
+### Q2 - How the surroundings are represented
+
+The world is drawn as flat unlit colour: one 5120 m ground plane, up to ten coplanar ribbon and
+fill layers stacked 0.01 m apart, and extruded building prisms - walls and roofs are the only
+three-dimensional scenery. There is no sun and no sky geometry; the sky is the renderer's clear
+colour. **What reads as "flat surroundings" is structural, not a tuning miss: the baked asset
+carries four layers - roads, buildings, green, water - and no landuse or parcel layer at all**,
+so all land between roads is one continuous ground plane. That is the largest remaining gap
+against the reference, and this file already says so.
+
+**Two ways to close it, and one discovery that makes the cheaper one much cheaper.**
+
+The bake tree outside the repo still holds every intermediate: `roads.json`, `buildings.json`,
+`green.json`, `water.json` and `world_raw.json`, all dated 11 Sep, beside `bake2.py` and
+`tile.py`. **A re-bake therefore does not require re-fetching OSM at all** - it can be re-run
+from the intermediates already on disk, which is what keeps it inside the "never regenerate the
+Vizag dataset" rule. Only a genuinely new query would need `fetch.py`, and that must be a
+**landuse-only** fetch: re-running the existing queries would pull today's OSM and move
+per-road risk values, which is forbidden.
+
+- **Path A, derived parcels (no new data, no fetch).** Inset the existing road ribbons and fill
+  the land between them as parcels with pale outlines. The mosaic the reference shows is a
+  *derived* shape here, not a fetched one. Its tone can follow the road casing's own pattern -
+  `lighten(COLOR_ROAD_SURFACE, 3.1)` is computed in hex, not named as a literal - so a parcel
+  tone may be derived from an existing fact the same way. Lands in `walkGeometry.ts`'s
+  `LAYER_ORDER` and `walkTiles.ts`'s per-tile build. **No founder ruling needed to prototype it.**
+- **Path B, a real landuse layer (new data, one new query).** Richer and truer - real parcels,
+  real park and industrial shapes - but it needs a new query, a new emit loop, a new layer key,
+  a rebake of the asset and a new colour fact. This one is a founder decision.
+
+**Also absent by data, not by rendering:** footpaths, fences and parking. `fetch.py` never asks
+for `highway=footway`, `barrier=*` or `amenity=parking`, and no pedestrian fragments were
+returned. Footpaths are what make a world read as *walkable* - they are the cheapest single
+addition to the surroundings' credibility, and they carry the same re-bake path as Path B.
+
+**Pure scenery, buildable today with no facts and no ruling:** a star field and a horizon lift,
+which this file lists as gap item 6 marked "Do now" and which remains unbuilt - the sky is still
+only a clear colour. Every literal in it would be `GROUNDED-EXEMPT` scenery, exactly as
+`LAYER_HEIGHT_STEP_M` and the fog range are.
+
+**Recorded but not taken:** fogging the zone fill alone would restore the reference's dark
+horizon seam at no near-field cost, because fog begins at 45 m. It is the cheapest closure in
+the audit. It changes what a zone looks like, so it waits on the ruling already noted above.
+
+### Q3 - How a Saaya partner building is highlighted
+
+This is the question with the most honest difficulty in it, so it is answered in the order the
+obstacles actually sit.
+
+**The hard blocker is not rendering, it is identity.** `RawBuilding` is `{h, t, v}` - quantised
+height, type, vertices - and the shipped asset carries no id and no name for any of its 12,690
+fragments. Names and OSM ids *do* exist upstream: the out-of-repo `buildings.json` holds 545
+named buildings and 12,292 ids, and the bake drops them before `world_raw.json`. So **no partner
+list can be matched to a building today**, and `t: 'commercial'` is a type, not an identity -
+using it as a partner proxy would invent a partnership claim.
+
+**Three further collisions, all real:**
+
+- `COMPLIANCE.md:83` - "Nothing implies approval, partnership or affiliation." A highlight
+  labelled *partner* is literally that claim. If the list is synthetic it must be labelled as a
+  mock everywhere it appears; if it is real, it asserts a real-world relationship with real
+  entities. **Only the founder can decide which.**
+- `MAP_SPEC.md:710-725` - "No collectibles and no discoverables." A partner highlight must not
+  read as something to collect, and must not compete with the risk layer.
+- **Degradation order fights it.** Buildings are the *first* scenery the ladder drops at low
+  detail, so a highlight painted on a building mesh disappears exactly when the device is
+  struggling. The fix is architectural: the highlight belongs on its own layer above the detail
+  gate, beside `zoneGlow`, not on the building geometry.
+
+**Mechanically it is cheap when it does come.** Per-building vertex colour in the existing white
+walls material, plus the matching roof mesh, adds **no draw calls and no per-frame work** -
+which matters because `perf.bundle.walk` is 190 KB and the tile build is one mesh per layer per
+tile by design. That rules out naive per-partner marker objects at city scale, and it is why the
+layer approach is the right one.
+
+**What it should look like is already measured.** Corner's pin is a white circular disc with a
+soft shadow containing a small lit object that reads as the category, with a bold name and a grey
+category beneath it; a second, denser layer of small status-coloured dots; and the same lit
+objects reused as the bottom rail. In its social mode the identical pin is re-skinned to a
+friend's photo avatar - "@name saved" / "@name liked" - which is the closest thing in the
+reference to how a Saaya partner could read: **a disc over a real building, a name, a category,
+and a tap that opens a sheet.** We have no rendered object art and cannot generate any, so the
+disc's centre would carry our own mark rather than a food render.
+
+**What this question needs, in order:** a founder ruling on real versus synthetic; an
+`FEATURES.md` entry, since that file is the contract and a partner dataset is a second dataset
+its "deliberately absent" list currently bans; a highlight treatment written into `MAP_SPEC.md`
+and then graphed as a fact - **nothing anywhere states one, so this is a real BLOCKED, not a
+citation**; an id or name restored to the bake so a list can join to a building; EN and TE copy
+including the mock disclosure line; and a definition of what a partner place *is* for this
+product, which no document currently gives.
+
+### Q4 - How events are surfaced
+
+**There is no consumer dashboard.** "Dashboard" appears only in the brand bible for the cut B2G
+police view; the surface the question means is Home and its walk twin, which shares the pill,
+the dock, the ladder and SOS.
+
+**The pattern is already cleared.** Corner's event card is a white sheet over the map with an
+emoji-led lowercase headline, a three-photo collage, a notification row (icon, sender, a
+right-aligned grey "now", and the scarcity sentence "you've been invited… 12/88 spots left."),
+a gradient call to action, and the refusal as quiet grey text - "i'll miss out". This file
+already records the notification row plus scarcity count and the refusal-as-quiet-text rule as
+applicable **without** a founder ruling. Scarcity as a count is data, not a literal, so it needs
+no fact either.
+
+**What we cannot copy:** the photo collage (there is no imagery in the repo and the no-AI rule
+bars generating any - the character parts are the only art pipeline), and the blue-violet-magenta
+gradient call to action, which is barred as a copied literal.
+
+**What is blocked:** no event model, no dataset, no copy keys in either language, no colour fact
+(the palette's semantics are exhausted - amber is escalation, danger is SOS and the high tier,
+brand is the accent, and the tier colours are frozen to the data), and no ruling on whether an
+event card may sit over, under or beside a live ladder rung when the ladder makes one timed rung
+"the one foreground surface". A drive or camp attributed to any body also collides with the same
+compliance line as partners, and every event would be synthetic and so must carry a mock
+disclosure - which sits awkwardly on something that presents itself as live.
+
+**The lawful first step, and it needs nobody's permission:** build the card as a **labelled mock
+in the dev-only component gallery** (`app/component-gallery`, absent in production), composed
+from existing components - a section header, the existing disclosure banner for the mock label -
+with existing CSS variables. The founder can then judge the real thing rather than a description,
+and no product surface, fact or string is touched.
+
+### Q5 - How the character is chosen
+
+**This already exists, end to end, and is more complete than the question assumes.** Seven axes
+(brows, top, bottom, accessory, plus two single-option axes), 18 option ids, one `.glb` per
+option fetched from `/assets/character/`, a runtime-assembled skinned group scaled so its
+measured height equals `walk.character.height`, and two clips - `Walk_Loop` and `Idle_Loop` -
+cross-faded over `motion.400ms`. The selection persists in the `character` key of the settings
+database, and `parseCharacterSelection` rejects stale ids rather than silently defaulting.
+
+**Adding a choice is already open:** drop a `.glb` into `public/assets/character/` named after
+the option id, add that id to the axis in `characterParts.ts`, and the bidirectional test is the
+enforcement. No amendment. Re-ordering an axis changes the default, because the first option *is*
+the default.
+
+**What is missing against the reference, in value order:**
+
+- **She casts no shadow.** There is no shadow map anywhere in the scene, and `HANDOVER.md` §9
+  step 5 already lists a shadow or heading marker as the next step. A blob shadow under the
+  existing ground-layer convention is a new mesh and a `GROUNDED-EXEMPT` constant - **lawful
+  today, no ruling**, and the single highest-value change to how the character reads.
+- **There is no preview.** `COMPONENT_LIBRARY.md` already specifies C15 AxisPicker and C16
+  CharacterPreview and the spec already requires reusing the same rig rather than a second
+  implementation. Unbuilt. The reference's answer to this question is a bottom rail of the very
+  same objects it uses as pins, which is the pattern to copy here.
+- **The customiser is an overlay, not the route `SCREENS.md` describes**, and `HANDOVER.md`
+  logs that divergence as unresolvable from the repo. The docs need a ruling before they can be
+  trusted on this surface.
+- **Two axes in the docs no longer exist in code** (Skin, Outfit, Colours in `MAP_SPEC.md` and
+  `COPY.md`), while the four shipped axes have no recorded ruling. The axis set is a data
+  migration as much as a spec change: `parseCharacterSelection` requires every axis present, so
+  removing one would fail every stored character and force every user back through the first-run
+  prompt.
+- **She is small on screen.** At the amended camera she is roughly 35-55 px. Making her larger
+  means moving frozen camera facts, so it is a ruling, not a tweak.
+- **No unlocks, no rarity, no progression** - barred by the anti-gamification section. A chooser
+  that gates options is out.
+
+### Q6 - How the overall feeling is raised
+
+**Corner's motion vocabulary, and which parts we can take:**
+
+1. **Cards do not slide; their contents crossfade inside a stable container**, with the new
+   pills springing in and headers resolving letter by letter. This is the most distinctive thing
+   in the reference and it maps directly onto our sheet grammar.
+2. **One continuous world.** Their sky and floating objects persist across screens. Ours is two
+   worlds behind a switch - a raster Leaflet map and a WebGL scene. The map lifting into the walk
+   view would be our version of the gesture, and it is the largest single feel change available.
+3. **Objects fall into place** rather than appearing.
+4. **Work-in-progress made visible** - their taste-chip marquee runs with "learning what you
+   like…" beneath it while the map personalises.
+
+**Facts already frozen that have no surface at all.** `motion.300ms` (screen push/pop, 24 px from
+the end plus fade, on `motion.curve.spring`), `motion.250ms` (toast, slide up and fade) and
+`motion.1200ms` (skeleton shimmer, linear, between the two shimmer alphas) are all in the graph
+and **nothing in the app uses them**. Building those surfaces moves no fact and needs no ruling -
+the companion step is a `COMPONENT_LIBRARY` row for each, through the spec's own governance.
+Two type facts are stranded the same way: `type.h2` and the 2.0 text-scale ceiling.
+
+**What cannot be touched:** the escalation accent never animates and SOS is instant, both of
+which are already implemented faithfully; springs cannot be re-tuned without amending
+`motion.spring.damping` first; and haptics and audio are round-two by spec - Lite has no sound or
+haptic performer, and the recorded web limits (no silent-switch override, `navigator.vibrate`
+absent on iOS Safari) are why.
+
+**The only ambient motion in the product today** is the location marker's breathing halo. The
+walk world has none by authoring decision - no bob, no sway, no props - so scenery life is an
+authoring task, and any new tunable in it needs a fact before it can be written.
+
+### What needs the founder, gathered in one place
+
+1. **The horizon seam's zone tint.** It carries the city's own risk tint (violet, luma 57) where
+   the reference's seam is plain haze (45-46). The frozen rule forbids fogging zone tints;
+   fogging the fill *alone* closes it at no near-field cost but changes what a zone looks like.
+2. **Real or synthetic partners**, and if synthetic, the exact mock labelling that keeps the word
+   "partner" from reading as endorsement. Also what a partner place *is* for this product.
+3. **Events**: whether a new product surface is in scope at all, its accent colour, and whether it
+   may be visible beside a live ladder rung.
+4. **The parcel decision**: derived parcels (no new data, buildable now) or a real landuse layer
+   (one new query, re-bake, new fact).
+5. **The far field's storey rule** - whether it may read as an open pale plane instead of an
+   opaque building wall. There is no fact id for the 3.2 m storey height; it lives only in the
+   asset's `meta.storeyM` and in `MAP_SPEC` prose.
+6. **The character customiser's divergences**: overlay versus route, and the two documented axes
+   that no longer ship.
+7. **Whether the frame guard's dwell may be widened** if the live ladder turns out to flap across
+   the detail boundary.
+
+### What can be built now, with no ruling and no new data
+
+In the order I would take them:
+
+1. **The label path and the canvas box read** (Q1 levers 2 and 6) - removes forced layout and 19
+   allocations from every frame. Small, contained, measurable.
+2. **The tile decode off the render tick** (Q1 lever 3) - the spec already asks for it.
+3. **The seam-and-casing merge** (Q1 lever 4) - one fewer draw call per resident tile, and the
+   file's own "seven meshes" comment becomes true again.
+4. **The mixer driven by `walk.speed`** (Q1 lever 5) - ends foot-slide using a fact that already
+   exists and is currently unread.
+5. **The blob shadow** (Q5) - the highest-value change to how she reads.
+6. **The star field and horizon lift** (Q2) - already marked "Do now" in this file and untouched.
+7. **The stranded motion surfaces** (Q6) - screen push/pop, toast and shimmer, with their
+   component-library rows.
+8. **The dev-only event card mock** (Q4) - so the founder judges the object, not a paragraph.
+9. **Derived parcels, prototyped** (Q2 Path A) - no fetch, no new layer key, no new colour fact.
+
+### Still owed
+
+The eight-dimension research pass (Pokemon GO's own mechanics, web smoothness technique, and the
+juice layer) is still running; its verified findings fold into Q1 and Q6 when it lands, as a
+further entry rather than a rewrite of this one. The in-repo performance harness is owed before
+any further frame-time tuning, and the two instruments this project has relied on live in `/tmp`,
+not in `scripts/`.
+
+## 2026-09-23 - The production deploy: prepared and verified, stopped at the permission gate
+
+The ask: put this tree on the main Vercel link (`saaya-lite.vercel.app`) so it can be tried live.
+
+**What the check turned up.** The clone at `/tmp/saaya-land` now carries the project link
+(`.vercel/project.json` copied in; the canonical iCloud checkout untouched), and the CLI is authed
+as `abhishaivardhan21-5578`. Two facts make a CLI deploy different from the git-connected one this
+project has used so far:
+
+1. `app/page.tsx` throws unless `NEXT_PUBLIC_SAAYA_VERSION_NAME` and an integer
+   `NEXT_PUBLIC_SAAYA_VERSION_CODE` are present, and `next.config.mjs` derives those from
+   `SAAYA_VERSION_NAME`/`SAAYA_VERSION_CODE`, falling back to `git rev-parse`/`git rev-list` when
+   unset. A CLI upload carries no `.git`, so that fallback would fail the build on Vercel's side.
+   The deploy must pass both values explicitly: `-b SAAYA_VERSION_NAME=m4 -b SAAYA_VERSION_CODE=1`
+   (and the same as `-e`).
+2. The Vercel project holds no environment variables at all (production included), consistent
+   with the git-connected build taking its metadata from the checkout's own git.
+
+**Verified before any upload.** The production build was run in a scratch copy
+(`/tmp/saaya-buildcheck`, `node_modules` symlinked) with exactly those env values: compiled
+successfully, types valid, 6 static pages, `/` at 31.5 kB / 140 kB First Load. The scratch copy is
+removed. With the gates already green (tsc, 46 files / 321 tests, 0 ungrounded literals) the tree
+is deployable as it stands.
+
+**Blocked.** `vercel deploy --prod` was denied by the auto-mode classifier ("Production Deploy"),
+and a preview `vercel deploy` was denied as well ("Create Public Surface"). Nothing was uploaded;
+production still serves the last main deployment. The prepared command, for the founder's shell or
+a session where the permission is granted:
+
+    cd /tmp/saaya-land && vercel deploy --prod --yes -b SAAYA_VERSION_NAME=m4 -b SAAYA_VERSION_CODE=1 -e SAAYA_VERSION_NAME=m4 -e SAAYA_VERSION_CODE=1
+
+This route deliberately leaves `main` alone: the rule "Never push to main. Branch and preview
+only." stays intact, and the production alias moves by the CLI rather than by a push. Also cleaned
+up this entry: the unused `/tmp/saaya-land/.claude/launch.json` is gone.
+
+**Still owed.** The live verification on the deployed URL - the same SwiftShader browser harness,
+pointed at the production link - once the deploy runs.
+
+## 2026-09-23 - The ladder, revived, empties the world on a slow device
+
+Three things: a correction to the posture of this whole line of work, a fix that worked, and an
+experiment that shows the fix exposes a worse problem underneath it.
+
+### The posture, corrected by the founder
+
+Mid-turn the founder stopped the framing this file has been using: *"We are not re-creating as is.
+We are taking inspiration for Saaya and creating a similar 3D view."*
+
+Nothing above changes as a fact. The measurements, the mechanism studies, the six-surface audit
+and the corner study all stand, and the references remain the best evidence available for how a
+walk view behaves. What changes is the target. Not similarity to another product - **Saaya's own
+view**, built with Saaya's own trust boundary, anti-gamification rules and synthetic data, informed
+by what those products learned. Where a reference does something Saaya forbids, the answer is
+Saaya's lawful equivalent, not a workaround. The plan's remaining items are read under that light
+from here on.
+
+### The star field is built
+
+Item 6 of the reference-gap audit - "no sky, no star field" - is no longer open. `walkSky.ts`
+carries a `three.Points` layer: 64 deterministic four-pointed glints on a 400 m shell, additive,
+unfogged, `sizeAttenuation` off so they read as being at no distance, travelling with the camera
+so the sky does not slide past as she walks. The generated glint sprite is drawn to canvas rather
+than shipped as art, so there is no new asset.
+
+The band the glints occupy is **derived from the camera's own facts** - `fov / 2` above an axis
+depressed by the angle its aim point sits below it - rather than named, so an amendment to any of
+the four camera facts moves the sky with it instead of leaving it floating in the wrong strip.
+Seven tests in `walkSky.test.ts` solve that arithmetic independently and assert the band, the
+shell, the forward-facing side and the determinism; they pass. Every literal is scenery and
+carries a same-line `GROUNDED-EXEMPT` reason, so the grounded check stays at zero.
+
+### The ladder fix works, and its floor is catastrophic
+
+The fix recorded above is correct and stays. What the fix exposed had been invisible while the
+code was dead: **the ladder's floor renders an empty world.**
+
+The A/B is unambiguous. Same place (17.7217, 83.3071), same `--walk --wait-ms 9000`, same
+instrument, only the guard differing:
+
+| capture | guard | what renders |
+| --- | --- | --- |
+| `sky1.png` | reads the true frame time (the fix) | one flat plane, the sky's glints, 2 labels, **no city** |
+| `sky2.png` | pinned to the clamped delta (ladder inert) | green ground, roads carrying their risk bands, the white ground-seam network, building silhouettes at the horizon, a road at her own depth, the star field above, 19 labels |
+
+Why: SwiftShader's frames measure 83-133 ms, every one of them far over the 32 ms trigger, so the
+ladder steps down on every frame, pins at its floor - ring 0, no detail, no ambient - and **cannot
+climb back**, because recovery needs a frame under `1/perf.fps` (16.67 ms), which a software
+renderer never produces. The floor is not a rare state. It is the permanent state of any device
+below roughly 31 fps.
+
+That makes a design question load-bearing that never was while the code was dead. The ladder's
+order is spec'd and its floor is that order's end, so both candidate fixes are amendments:
+
+- **A gentler floor** - stop dropping the world at ring 1 with detail off, so a slow device still
+  sees the city around her, just simpler. Cost: the last rung saves less.
+- **Entry hysteresis** - require several consecutive over-budget frames before stepping down. Cost:
+  a new number, and a brief stall no longer costs the world.
+
+**What this instrument cannot answer.** SwiftShader is not the target phone. Every frame time this
+project has ever measured comes from it, so the floor question is answerable now - the floor is
+catastrophic independent of which device reaches it - but tuning the trigger or the dwell is not,
+and doing it on this evidence would be tuning a real phone's budget to a software renderer's.
+
+**State of the tree.** `applyFrameBudget(frameMs)` is restored; the A/B revert is gone.
+
+### Two per-frame costs removed while the world was in pieces
+
+Both were found by the six-surface audit and neither needs a ruling.
+
+**The label path did layout reads and 19 writes every frame.** `projectLabels` read
+`canvas.clientWidth`/`clientHeight` inside the frame callback - a forced reflow, the one thing in
+that path that can cost one - and `WalkView` allocated a fresh array and wrote 19 `transform`
+strings per frame whether or not anything had moved. Now the box is read on resize and reused, the
+producer reuses its label objects instead of allocating one per anchor per frame, and a node is
+written only when its transform actually differs from the last one written. On a still frame the
+DOM work is now zero.
+
+**Her legs ran at one rate through every kind of movement.** The clip is authored for `walk.speed`
+(1.4 m/s, a fact that was exported and read nowhere), so an ease that starts fast and finishes
+slow had her skating, and a fix landing far away had her gliding. `setWalkRate` now scales the
+mixers by the ground she actually covered this frame over what that frame's `walk.speed` would
+have covered, capped at 2x so a distant fix cannot spin her. The idle keeps the rate it was
+authored at, so a pause is not a freeze.
+
+**Gates after all of it.** `npx tsc --noEmit` clean, `npx vitest run` 47 files / 328 tests passing,
+grounded check at zero ungrounded literals.
+
+## 2026-09-23 - The deploy ran: live, and verified in two renderers
+
+The permission gate opened; the production deploy ran from `/tmp/saaya-land` at 00:39 IST with the
+build metadata passed explicitly, built in 38 s on Vercel, and the alias moved. Verified on the
+live URL: HTTP 200, `m4` in the served HTML, `body_base.glb` served at 947 KB. GitHub `main` is
+untouched, as the branch-and-preview rule requires.
+
+**What the live URL renders, in two renderers.** The walk view was driven on production by the
+same harnesses used in dev:
+
+| renderer | what production shows |
+| --- | --- |
+| SwiftShader Chromium (83-133 ms frames) | the ladder's floor: one flat plane, the sky's glints, 2 labels, no city |
+| WebKit, Apple GPU (real hardware) | the full world: green ground, the risk-banded road, the white ground-seam network, building silhouettes, the star field, 19 labels |
+
+So the floor state is not a production defect but the ladder behaving as the planning session's A/B
+records: a device below roughly 31 fps pins at the floor and cannot climb back. A real GPU renders
+the city. The new instrument for the second row is `/tmp/walk-verify/capture-webkit.mjs` (Playwright
+WebKit; webkit-2248 installed into the Playwright cache for it), and it reports
+`Apple GPU` for the live link's WebGL. One transient `ChunkLoadError` appeared in that run; the
+chunk URL answers 200, so it was a network flake, not a deployment fault.
+
+**One thing the deploy log says that outlives this deploy:** Vercel warns that Node.js 20.x is
+deprecated and deployments created on or after 2026-10-01 will fail to build unless `package.json`
+sets `"engines": { "node": "24.x" }`. Eight days out; flagged, not yet changed.
+
+**The tree moved during the deploy.** A parallel session ("Saaya 3D Planning") is editing the same
+clone: `walkSky.ts` (00:40), `walkScene.ts` (00:43) and the label-path and mixer-rate work landed
+after the 00:39 upload. Production therefore serves a snapshot slightly behind the tree. I am
+subscribed to that session's idle and will redeploy its final state when it settles.
+
+## 2026-09-23 - The white key: the walk view takes Corner's map language in Saaya's colours
+
+**The ruling.** *"Make as many amendments as needed. We want a high quality aesthetic and UI which
+matches Corner's aesthetic. They used white and black for the map. Let us use White and dark
+violet."* Blanket authorisation to amend the spec, plus a new palette direction. It replaces the
+2026-09-22 ruling that took the walk palette from the reference video's own measurements. Corner
+was measured from its App Store screenshots for the **mechanism** - a near-white land of
+`#ededed` carrying white roads and blocks, i.e. a white map, dark chrome - and none of its
+colours are copied. The mechanism taken is the *plane*: the map is a lit sheet, and everything
+around it goes dark.
+
+**Nine facts amended, one of them new.** Recorded in each fact's own `means` and `sourced_from`,
+never worked around in code:
+
+| fact | was | now | relation |
+| --- | --- | --- | --- |
+| `color.walk.ground` | `#578BAE` | `#EDE9F7` | the white plane, luma 235 (Rec. 709) |
+| `color.tile.road` | `#3E466C` | `#4B3A70` | luma 66, **3.6x darker than the land** |
+| `color.tile.casing` | (new) | `#B4A3DE` | luma 171, between the road and the land |
+| `color.tile.building` | `#3A4160` | `#D9D1F0` | 0.91 of the land, a mass standing on it |
+| `color.tile.building.roof` | `#8792B7` | `#FFFFFF` | 1.09 of the land, `color.white` itself |
+| `color.tile.green` | `#4A7C74` | `#D5C9F7` | 0.88 of the land, the most saturated large area |
+| `color.tile.water` | `#1F3A5C` | `#9E8FD0` | 0.64 of the land, between land and road |
+| `color.walk.sky` | `#183498` | `#2B1B5E` | luma 35, 0.15 of the land |
+| `color.walk.haze` | `#192F6B` | `#120C24` | luma 15, the seam below the sky |
+
+The sky and the haze are the brand's own darkest violet - `color.icon.ground.mid`'s family - so
+the seam and the icon share one darkness. `count` 428 -> 429.
+
+**The road stays dark, and that is a safety decision before it is a taste one.** Corner's own
+roads are its brightest surface; that part is deliberately not taken. The risk bands are read
+against the road's luma, and at the new road every frozen band gains separation: `#FF3B30` 1.52x
+against the night key's 1.41x, `#FF9500` 2.44x against 2.27x, `#FFCC00` 3.03x against 2.82x. A
+white road puts the highest tier at 1.29x and makes a HIGH band dimmer than the land it warns
+about. The inversion is the land, not the road.
+
+**The casing had to become a fact of its own.** It used to be `color.tile.road` `lighten`ed by
+`ROAD_CASING_LIGHTNESS` 3.1. No multiplier on a dark road reaches a line that must sit above the
+road and below a white land, so the derivation stopped being possible rather than stopped being
+right, and `ROAD_CASING_LIGHTNESS` is deleted. The new fact is placed by relation, not measured:
+above the road at 66, below the land at 235. It is the closest thing on our map to Corner's own
+soft outline around roads and blocks.
+
+**The blue/cyan rule is retired, and the replacement is stated.** `MAP_SPEC.md` carried a rule
+that "the ground must stay blue/cyan under all three tier tints", derived from a census of the
+*reference video's* daylight map. The new land is `#EDE9F7`, hue 257, and any red-orange tint over
+a violet-white land lands warm - there is no violet-white land on which the frozen tier family
+leaves the ground blue. The rule is not quietly dropped; it is replaced by the property it was
+protecting, in the terms this key is built from: **the tint is a cast, never a repaint.** Under
+the dataset's own scaled alpha the strongest tint gives rgb(240,209,219) at luma 216, **0.92 of
+the land**, and under all three tints the land stays above the casing and the road.
+
+**The tests were rewritten as relations, not chased to thresholds.** `walkComposition.test.ts`
+had four assertions that encoded the night key: the ground/sky band, `road/ground toBeCloseTo(0.56)`,
+a casing luma band, and the tint test's assertion that the land stays blue-dominant - which was a
+property of the *old blue* land and cannot hold for a violet-white one. Each is now the relation
+it was protecting: ground/sky clears 2.45, road/ground is under 0.35, the casing is strictly
+between the road and the land, and the tint keeps 0.9 of the land's luma at the dataset's alpha
+while falling under 0.85 at full opacity. The first attempt at this failed twice with
+`ReferenceError: ground is not defined` - the constant was scoped to the palette describe block.
+
+**The band reasoning is confirmed by pixel census, and the harness had to lie about the clock.**
+SwiftShader renders this scene at 83-133 ms per frame, which walks the ladder to its floor and
+drops buildings, roofs, seams, green and water - so no capture of the full palette was possible
+until `capture.mjs` gained `--fast-clock`, which feeds the render loop a fixed 16.6 ms step per
+frame. With it, the rung-0 frame measures `#EDE9F7` at 39.48%, wall tones at 7.67%, `#FFCC00` at
+4.98%, `#4B3A70` at 3.99%, `#B4A3DE` at 1.79%, and the sky and seam present; the wider capture
+measures the land at 49.93%, sky 9.89%, `#FF9500` 2.20%, `#FF3B30` 1.63%. Every literal renders
+at its exact fact value. The dark violet road on white land with bright bands behaves exactly as
+the band arithmetic predicted.
+
+### The zone tint and the ladder, isolated but not explained
+
+**A rendering defect, found by the same pixel census, reported with its reproduction rather than
+a guessed cause.** At the top rung of the quality ladder the zone fill does not render at all; at
+the floor rung, at the same coordinate, scale and wait, it renders at 33-50% of the frame. Four
+captures isolate it - same place (17.7217, 83.3071), same 3 s wait, only the rung differing:
+
+| capture | clock | tint coverage | wall tones |
+| --- | --- | --- | --- |
+| `t3.png` | fixed 16.6 ms (ladder climbs, `detail: true`) | **0.00%** | 16.84% |
+| `r3.png` | real (ladder floors) | **33.17%** | 0.01% |
+
+Nothing in `walkScene.ts` (`applyQuality` and `pumpQueue` never touch the zone layer),
+`walkZones.ts` (the fill opacity is a constant, and only `applySelection` rewrites it),
+`walkTiles.ts` (`buildTileMeshes` draws no land fill at all) or `walkGeometry.ts` (`zoneFill` sits
+above green and water, below the seam ribbons) accounts for it. Recorded in `MAP_SPEC.md` in the
+same words.
+
+**The tint's strength is now an open founder question, and the key is what made it one.** The
+tint covers the land she is standing on at the dataset's own opacity scaled by
+`ZONE_FILL_ALPHA_SCALE` (0.4), which on the white land gives a rose frame at rgb(240,209,219). It
+is 100% coverage and it always was - sampling the night-key capture at the same coordinate gives
+rgb(111,128,156), the same 0.14 composite over the old land - so only the hue flip is new. What
+cannot be tuned away: **any alpha above 0.046 flips a violet-white land's cast**, so the wash
+cannot be softened into invisibility without ceasing to read as a warning. The question put to
+the founder is the same one the fog section already owed a ruling on, asked twice: how loud the
+risk wash should be on a white map, and whether the zone fill should be fogged like the rest of
+the scenery so the horizon seam can close over a zone.
+
+### The ladder's own amendments, written into the spec
+
+Both fixes the A/B called for are in, and `MAP_SPEC.md`'s Performance section now names the floor
+it previously left unstated.
+
+**The floor is ring 1, not nothing.** A capture of the rung-0 state renders one flat plane, the
+sky's glints, two labels and no city - and that state is permanent for any device below roughly
+31 fps, because climbing back needs a frame under `1/perf.fps`. The floor now holds
+`RESIDENT_RING - 1`: the last step costs detail and ambient motion, not the world. Draw distance
+is still first and still the largest saving.
+
+**A rung change waits for a run of frames.** `LADDER_DWELL_FRAMES` 8 - a quarter second of
+sustained over-budget frames - gates a step down, and the same run gates the climb back, so a
+device hovering at the threshold cannot cross the detail boundary and rebuild the world every few
+frames. It is a rendering responsiveness and is not a fact; `perf.frame` and `perf.fps` fix the
+thresholds and are unchanged.
+
+**What a slow device renders is not what the palette is judged on.** SwiftShader is not the
+target phone and never was; the floor question was answerable on it because the floor is
+catastrophic independent of device, but the palette had to be captured with the clock lied to
+precisely so the palette and the floor question could be read separately.
+
+### Documents updated
+
+`docs/spec/MAP_SPEC.md`: the palette section rewritten as the two inversions, with the road's
+safety reason and Corner's measured mechanism; the hue-family section restated as what replaced
+its rule; both stale `#192F6B` haze passages corrected, with the fog-range table kept as the
+measurement that fixed the distance and its luma columns marked as the night key's; the casing
+passage rewritten for `color.tile.casing` as its own fact; the zone-tint question and the rung
+defect recorded with their reproductions; and the Performance section amended with the floor and
+the dwell.
+
+`docs/spec/DESIGN_SYSTEM.md`: one amendment to the Colour section, because "dark only" would
+otherwise read as contradicted by a white map. The rule is about the chrome; the walk view's map
+is the single exception, governed by `MAP_SPEC.md`, and the app is arranged the way Corner's is -
+dark chrome, white map.
+
+**Gates.** `npx tsc --noEmit` clean; `npx vitest run` 47 files / 328 tests passing; the grounded
+check at `152 file(s), 0 ungrounded literals (397 live facts -> 164 distinct values)`.
+
+### Correction, 2026-09-23: the "rendering defect" was a measurement error
+
+The rung/tint finding recorded above was wrong, and it is corrected the same day with the
+measurement that replaces it. It said the zone fill does not render at the top rung. It does.
+
+**Why the first reading failed.** The four captures behind it were two separate page loads, and
+tiles stream independently, so the tint was compared against two different grounds. `t3` and `r3`
+also differed in more than the rung: one was seeded with a fast clock, the other real. The
+row-by-row dominant-colour comparison that "confirmed" it had the same flaw - identical
+percentages across rows, with rose at one rung and land at the other, looked like a compositing
+failure but was two worlds, not two rungs.
+
+**The measurement that replaces it.** One session, the ladder pinned through a temporary hook so
+the frame guard could not move under the measurement, and the tile stream settled at each rung
+before capture (`calls` unchanged for 6 s). Pinning level 3, then 0, then 3 again in the same
+page:
+
+| capture | rung | tint over green | tint over ground | seam | sky |
+|---|---|---|---|---|---|
+| floor a | 3 (1, false, false) | 0.00% | 49.71% | 0.03% | 11.67% |
+| top | 0 (2, true, true) | 42.65% | 2.04% | 4.77% | 9.94% |
+| floor b | 3 (1, false, false) | 0.00% | 49.71% | 0.03% | 11.67% |
+
+Floor a and floor b are byte-identical after a round trip through the top rung, so the effect is
+the rung and nothing else.
+
+**Both composites are exact, and the arithmetic is what identifies the layer.** `#FF3B30` at the
+dataset's own 0.14 (`ZONE_FILL_ALPHA_SCALE` 0.4 x a 0.35 zone) over `color.walk.ground`
+`#EDE9F7` gives (240,209,219) = `#F0D1DB`; over `color.tile.green` `#D5C9F7` gives (219,181,219)
+= `#DBB5DB`. Hiding the meshes whose material colour is `d5c9f7` converts the 42.65% back to
+`#F0D1DB` exactly, and hiding `b4a3de` returns the remaining 4.77% - so the layers are identified,
+not inferred.
+
+**The geometry was checked, not assumed.** Every mesh's summed triangle area was matched against
+the bake's own polygon area for the same tile, reading `world_tiled.json` and the live scene in
+one run: 23 of 24 green meshes and every water mesh agree **to the square metre** (tile 0,0:
+14,821 m^2 both sides). The 42.65% is a park the dataset contains, 10-19 m from the camera. A
+raycast grid over the ground band returns `d5c9f7` at y 0.02 m at every sample but the centre
+column, where a seam at y 0.04 m crosses - which is the road through that park.
+
+**What is actually true, and is now in the spec.** The zone fill renders at every rung; the rung
+coupling is that `detail` gates the tile's green and water, so at the floor the ground under the
+tint is the placeholder plane. The ground's luma therefore swings 207 -> 235 across 42.65% of the
+frame at the founder's origin. That is a consequence of the floor's design, not a defect - but it
+is a visible colour change, and it is what makes a full-palette capture need the clock lied to.
+`MAP_SPEC.md` carries both: the corrected section with its table and the check, and a sentence in
+the Performance amendment naming the colour cost.
+
+**Temporary instrumentation removed.** The debug hooks (`__walkDebug`, `__walkDebugSet`,
+`__walkDebugHide`, `__walkDebugPick`, `__walkDebugMeshInfo`, the `forcedLevel` pin and the two
+three.js imports they needed) are out of `src/platform/walk/walkScene.ts`; zero occurrences
+remain and the file is free for the peer session's merge. Gates re-run after the revert: `npx tsc
+--noEmit` clean, 47 files / 328 tests passing, grounded `152 file(s), 0 ungrounded literals`.
+
+## 2026-09-23 - The eight-dimension research pass: what it found and what it corrects
+
+The pass the "Still owed" note above was waiting on has landed. Eight dimensions, thirteen agents,
+every claim carrying its own confidence grade and source, and the doubtful ones put through an
+adversarial check. This is the fold the note promised: a further entry, not a rewrite of Q1-Q6.
+
+The `map-look` and `corner-app` dimensions were read when they landed and are already reflected in
+the Q1-Q6 sections above. The six folded here are `movement-feel`, `avatar`, `events-ui`,
+`partner-pois`, `web-smoothness` and `juice`.
+
+### The one correction that matters most: our 32 ms frame budget is not a 60 fps budget
+
+Two dimensions arrived at this independently, from opposite directions, and they agree.
+
+- Niantic's own platform write-up (Diana Hu and Ed Wu, Feb 2019) states 60 fps as about 16 ms
+  per frame. Pokemon GO **shipped** with iOS capped at 30 fps - 33.3 ms per frame - until app
+  version 1.191.0 in December 2021 added an off-by-default native refresh rate toggle. Android ran
+  above 30 fps throughout.
+- RAIL puts about 10 ms of app work inside each 16.6 ms frame, with the browser taking about 6 ms,
+  and sets the long-animation-frame threshold at 50 ms.
+
+`perf.frame` is 32 ms. That is **one dropped frame at 60 fps, and almost exactly one whole frame at
+Pokemon GO's own shipped 30 fps**. It is not a 60 fps budget and was never meant to be one, but the
+coincidence is worth recording because it is the honest calibration: our floor of acceptable is the
+reference's own shipped frame time, not the target it advertises.
+
+The second half of the correction is iOS behaviour, and it is not tunable: **rAF for ordinary web
+content is capped at 60 fps even on a 120 Hz ProMotion display, and drops to 30 fps in Low Power
+Mode** (WebKit's own animation-frame-rate explainer: 15 ms full speed, 30 ms half speed, 10 s
+aggressive). In Low Power Mode a 30 fps frame is 33.3 ms, so `perf.frame` at 32 ms is essentially
+the entire frame. That is the state a phone drops into when its battery is low, which is when
+someone walking home at night is most likely to be using this.
+
+No change to `perf.frame` is proposed here. It is a frozen fact and a change to it goes through
+the spec's own governance like any other.
+
+### movement-feel
+
+- The camera is avatar-anchored with exactly **two documented gestures**, both starting near her:
+  rotate (a finger circling her) and zoom (double-tap and hold, then vertical drag). **No pan, no
+  tap-to-recentre, no user tilt.** The compass is the only orientation control. (sourced; Niantic
+  help faq/126 and faq/84; the tilt claim is inferred from absence.)
+- **No Niantic publication gives the camera's pitch, follow distance or height.** The closest
+  documented GO-style rig is the Mapbox Unity SDK's `CameraSystem.md`: pitch scale "90 = looking
+  straight down, 15 = near the horizon", Distance Scale default 2, Zoom Sensitivity default 0.25,
+  Rotation Speed default 50. (sourced.)
+- The sharpest usable mechanism is the smoothing patent **US11847750B2**: each per-frame correction
+  is capped by an **angular threshold** (worked example 15 degrees - a 30-degree error gets a
+  partial correction, a 10-degree error snaps directly), plus a motion threshold tied to the
+  distance the object covers in a timestep, plus a pixel threshold; and **the timestep shortens
+  while the object is moving** (sourced; an AR-object patent, so not a confirmed GO map constant).
+  This is a sharper version of our own no-teleport-on-a-GPS-jump requirement.
+- Distance in the reference is credited from **GPS sample-to-sample straight-line displacement, not
+  steps**: treadmill walking credits zero, and drift credits phantom distance (reported; Kotaku
+  2016 and one runner's experiment - the ~13.3-minute figure is a single observation, not a
+  measured interval).
+- The community speed ladder, none of it published by Niantic: **10.5 km/h** egg/buddy cap,
+  **~30 km/h** passenger warning, **~35 km/h** stop-spin lock, **40 km/h** spawn/catch lock,
+  **~100 km/h** soft ban. Rings: spawn ~40 m, interaction ~80 m. (reported; asterisked values the
+  compiler itself flags as untested.)
+- **Native-only, stated plainly:** there is no fused location or dead-reckoning API on the web.
+  `DeviceMotion` is permission-gated on iOS and too coarse for pedestrian dead reckoning, so any
+  filtering or interpolation is ours to write in JS. No face-down detection (`visibilitychange` is
+  the nearest equivalent), no step counter, and the refresh rate is the display's, not ours.
+
+**What it changes for us.** The anti-teleport clamp is the one to take: an angular and pixel cap on
+each frame's correction, scaled by how far she is actually moving, with a shortening timestep. Our
+easing does plain per-frame interpolation today. The other finding to weigh is that the reference
+has **no free pan and no recentre**; if the walk view allows either, that is our departure to make
+deliberately rather than by accident.
+
+### avatar
+
+- The reference draws **two concentric ground rings**, and they are **strokes, not fills**: a white
+  ring for the wild-spawn area and a pink ring for the interaction distance, with the pulse
+  implemented as a scale-and-fade on a second stroke. (sourced; Niantic Map View help.)
+- The pink ring's gameplay meaning is an **80 m base interaction radius**, doubled from 40 m during
+  2020 and made permanent on 25 August 2021. (sourced; pokemongo.com task-force post.)
+- **The avatar is drawn hugely out of scale against a 1:1 world.** Community measurement puts the
+  proximity circle at its brightest at exactly **40 m radius**, with roughly 500 m visible looking
+  down and about 700 m looking forward when zoomed in. There is **no sourced figure for the
+  avatar's model height in metres.** (reported; Arqade.)
+- The rendering philosophy stated by Niantic's own art lead is **"amorphous, even lighting"**,
+  chosen for low-end phones: soft, directionless ambient treatment rather than a directional shadow
+  rig. (sourced; GDC 2017 Dennis Hwang talk.)
+- The April 2024 "Rediscover Yourself" overhaul deleted the male/female body choice and made all
+  clothing unisex; the hidden cost was deforming the entire back catalogue of clothing onto one
+  mutable body. (sourced.)
+
+**What it changes for us.** Three things, and one of them is a settled item.
+
+1. **The ring finding corroborates our own open item.** We draw her ground ring as a filled
+   translucent disc; the reference draws a thin unfilled stroke. This does not settle the stroke
+   width or the fill opacity - the file never states either - but it does settle the shape.
+2. **The out-of-scale avatar is the established behaviour, not a compromise we invented.** That is
+   licence for the billboard/fixed-screen-size approach, and it means the ring should carry the
+   honest metres while the character does not need to.
+3. **The shadow question is not answered anywhere in the pass.** The only adjacent datum is
+   "amorphous, even lighting", which is about lighting, not ground contact. The blob shadow stays
+   an authoring decision.
+4. **A guardrail:** the 80 m figure is Pokemon GO's gameplay number. Copying it into our ring would
+   break the never-invent-a-value rule unless a Saaya spec-graph fact backs it.
+
+### events-ui
+
+- The core pattern is **"schedule in a list, urgency on the map"**: a calendar control at the
+  bottom right opens a list of current and upcoming events with duration and bonuses, while the map
+  keeps its own live-events indicator. (sourced; Niantic help FAQ 5501 and FAQ 84.)
+- **Raid eggs are the map's own countdown**: a timed egg sits on a Gym, then the boss is
+  battleable for **45 minutes**; tiers are tier 1, tier 3, tier 5, Mega Raids and Mega Legendary
+  Raids, with colour and shape carrying egg identity. (sourced; FAQ 2187.)
+- Live social state rides the map, not a menu: a raid lobby indicator showing trainer counts up to
+  **"5" and then "5+"**. (sourced.)
+- The Nearby radar is a **bottom-right panel** spanning several categories, with unencountered
+  species appearing as **silhouettes**. No numeric radius is published. (sourced; FAQ 84.)
+- Cadence: seasons rotate every **three months**; a fixed 2026 weekday schedule runs Double-Time
+  Sunday through Friendship Friday, **12:00 a.m. to 11:59 p.m. local time**; Community Day is a
+  **three-hour local Saturday window** (2:00 p.m. to 5:00 p.m. in the June 2025 example); Field
+  Research is one task per PokéStop per day, up to four at a time, seven Stamps for a breakthrough.
+  (sourced.)
+
+**What it changes for us.** The card anatomy is plain data and can be built on synthetic rows now:
+title, duration as start and end timestamps, a bonuses row, one primary action, in the bottom
+third, with the mock label inside the card. The map trigger ports to a Leaflet `L.control` at the
+bottom right opening a bottom sheet, and a single timestamp per place drives a countdown and a
+marker state change. Two hard limits: **countdowns must be text or a static width driven by a
+timestamp, never a pulsing ring**, because the escalation accent never animates; and **lobby and
+RSVP counts must be omitted or labelled as mock**. A fabricated count of people nearby is fabricated
+social proof on a safety product, and it is the one pattern here we should not fake.
+
+### partner-pois
+
+- **The reference does not distinguish a partner place on the map at all.** The only documented
+  tell is a **"SPONSORED" tag on the stop-details sheet**, plus the sponsor's branding replacing
+  the landmark photo. The world model is unchanged: no new geometry, no branded characters on the
+  map. (sourced; Niantic help and 2016 hands-ons that found sponsored stops looked identical.)
+- The sourced marker grammar that does exist: unvisited stops are "surrounded by rings"; a spun
+  stop turns pink/purple for a **5 minute** cooldown and fades back to blue; the marker's top box
+  opens when in range. The 5-minute figure is community-sourced; official help gives no duration.
+- Business numbers, for the record: **$30 per month per PokéStop, $60 per month per Gym**, one per
+  physical location, up to 30 per chain, and each sponsored location **at least 40 meters apart**
+  from another in-game location. Sponsors get aggregate analytics only. (sourced; TechCrunch 2019
+  and the sponsorship terms.)
+
+**What it changes for us.** This is the answer to the founder's open question, and the answer is
+narrower than we assumed: **the reference's own grammar is a badge in the detail view, not a
+treatment on the building.** Our plan to tint the partner building exceeds it. Because references
+are inspiration and not spec, that is allowed - but it is **invention, not parity**, and under
+never-invent-a-value it needs an explicit fact and an amendment behind it. The cheapest treatment
+that stays inside the sourced grammar and the bake we already have is a **heavier or brighter
+violet stroke on the partner building's existing ring**, or a flat ground decal inside the
+footprint: no new geometry, no extrusion, no new fetch. A **glow or shader pulse would be
+invention** - no source describes one. And the reference's gym-height-scales-with-CP mechanic is
+vertical extrusion, which our own rule bans outright.
+
+### web-smoothness
+
+- **iOS rAF is capped at 60 fps for ordinary web content even on 120 Hz**, and drops to 30 fps in
+  Low Power Mode. There is no API to request a target frame rate (whatwg/html#5025, open since
+  2019). (sourced.)
+- **Safari has no main-thread scheduling escape hatch**: no `scheduler.yield`, `requestIdleCallback`
+  disabled by default through 26.x, no `isInputPending`. `OffscreenCanvas` 2D arrived at iOS 16.4
+  and WebGL at 17.0. (sourced.) **Worker-based decode is supported on our targets**; what is
+  missing is the idle-callback fallback, so warm-up chunking must fall back to `setTimeout(0)` or
+  rAF slices.
+- **Fixed timestep with an accumulator**, dt = 1/60 or 1/100, render interpolated by
+  `alpha = accumulator / dt`, with the frame time **clamped at 0.25**. Without interpolation the
+  result is, in the source's words, "a subtle but visually unpleasant stuttering". (sourced;
+  gafferongames.) This is the direct answer to our own rAF-delta loop, and it also absorbs the huge
+  delta iOS hands a suspended tab when it resumes, which is exactly our `tabLifecycle` path.
+- **Memory and compile stalls break first, not shader math.** iOS caps canvas memory at about
+  256 MB on iPad and 288 MB on iPhone X, and unbounded runtime WebGL growth force-reloads the tab
+  **silently**. About 7 MB per full-resolution RGBA render target. (reported.)
+- iOS renderer defaults worth taking: **cap `devicePixelRatio` at 2, `antialias: false`,
+  `powerPreference: 'default'`**. R3F's high DPR plus MSAA caused context loss on iPadOS 17.5.1.
+  (reported.) **`compileAsync` (r158+) after a measured 49 ms compile stall.**
+- **Mobile three.js is draw-call bound: under 50 draw calls mobile, under 100 desktop.**
+  `InstancedMesh` should be allocated at its maximum count up front. (reported.)
+- Leaflet: prefer `CircleMarker` with `preferCanvas` over `L.Marker` icons, cluster above about 100
+  markers, and **never `will-change` on `.leaflet-tile`, which causes 1 px seams.** Do not
+  `drawImage` the map canvas into the three.js canvas; composite with CSS stacking. (sourced.)
+- Sustained mobile performance is **thermally limited and no browser can read the temperature**, so
+  throttling has to be inferred from 1% low FPS, frame-time stability and drop-frame ratio, and
+  tuned **after a soak**: the first 30-60 s on a cool phone are misleading. (reported.)
+
+**What it changes for us.** The ranking the source gives is memory and stalls first, pixels later,
+which reorders our own ladder intuition. Concretely: the off-tick tile decode moves to a **Web
+Worker with transferable typed arrays** rather than main-thread chunking; the rAF loop gains an
+accumulator; the renderer gains the DPR-2 cap and `antialias: false`; every material is built
+behind the loading screen and `compileAsync` is awaited before the first frame; and draw calls get
+counted live against the sub-50 budget. Our ladder drops draw distance then detail, which is a
+different order from the researched one (pixel ratio, then post-processing, then shadow maps) - but
+our ladder is a frozen design and this is an observation, not a proposal to reorder it.
+
+### juice
+
+- **Web haptics are Chromium-only.** `navigator.vibrate()` is the sole API; WebKit formally opposes
+  it (issue #267), iOS Safari has none, and Firefox removed it in v129. It needs sticky user
+  activation. (sourced; MDN "Limited availability".)
+- **Material 3's published durations bracket two of our three stranded motion facts and not the
+  third**: Short1 50 through ExtraLong4 1000 in 50 ms steps, with **Medium1 250** and
+  **Medium2 300**. The easing literals are **EmphasizedDecelerate (0.05, 0.7, 0.1, 1.0)** for entry
+  and **Standard (0.2, 0, 0, 1)** for taps. Motion's own defaults are tween 0.3 s and spring
+  stiffness 100, damping 10, mass 1, bounce 0.25. (sourced.)
+- **Nothing in the pass supplies 1200 ms.** The ladder tops out at ExtraLong4 1000, and AOSP caps
+  haptic feedback at `MAX_HAPTIC_FEEDBACK_DURATION` 1000 ms. `motion.1200ms` is therefore
+  **uncorroborated by any external standard** - which is not a defect, because it is our own
+  authored fact for the skeleton shimmer and is frozen as such. What it means is that the shimmer's
+  duration has no outside precedent to check it against.
+- Thresholds: **under 0.1 s reads as instant**, 1.0 s is the flow limit, 10 s the attention limit,
+  and **skeletons should be skipped entirely under 1 s**. (sourced; NN/g response-times.)
+- The cautionary finding, and it is the one to heed: **Pokemon GO's default-on haptics on a
+  high-frequency action (every throw) were widely turned off**, and AOSP's cap means routine
+  actions should not buzz. Apple's HIG adds that a failure pattern must never be reused for a
+  success, and that haptics must be optional. (sourced.)
+- One signature moment per loop, not constant animation - Pikmin Bloom's ditty and pop, Strava's
+  save-screen path morph, Waze's voices. (reported.)
+
+**What it changes for us.** `motion.250ms` and `motion.300ms` now have sourced backing for exactly
+the jobs they were authored for (taps and confirmations; card and overlay entry), so building those
+surfaces moves no fact and needs no ruling - only their `COMPONENT_LIBRARY` rows, through the
+spec's own governance. Both are **safe only on non-safety surfaces**: check-in confirmed, the demo
+panel, map chips. Nothing may buzz or animate the ladder or SOS, which is unchanged. Audio and
+haptics stay round-two by spec, and this pass does not disturb that: the web limits it would have
+to work inside are now recorded with their sources.
+
+### What must not enter the spec graph
+
+The pass dropped these as unsourced or fabricated, and it names them so they cannot drift in later:
+the 2048x2048 texture ceiling (the only checkable number in its thread is Apple's 4096x4096), the
+`devicePixelRatio` 2.625-3 range, MSAA "4 samples by default", a Starbucks Mewtwo wave, a
+`#F5C24A` gold from an unverified community breakdown, and a "notoriously glitchy" marker
+descriptor the verifier found fabricated. Two quotes attributed to Mapbox were dropped as
+fabricated. The colour-blind rationale sometimes given for the marker colours is **not** to be
+cited; it is a Stack Exchange answer, not a source.
+
+### What this changes in the build-now list
+
+Nothing is removed. Three items gain a sharper shape and one gains a caution.
+
+1. The tile decode off the render tick is now specifically a **Worker with transferable typed
+   arrays**, with the main-thread fallback as `setTimeout(0)`/rAF slices because Safari has no idle
+   callback. Its expected payoff is still unquantified - no measurement in the pass shows the
+   1.17 MB bake decode is the dominant stall, only that stalls beat pixels.
+2. The stranded motion surfaces keep their order, and `motion.1200ms` keeps its place in the list
+   with the note that it has no external precedent.
+3. The dev-only event card mock now has a concrete anatomy to build against, and a hard limit: no
+   live-looking counters, ever.
+4. **The ring** joins the build-now list as a settled shape - a stroke, not a filled disc - at
+   whatever width the spec graph ends up carrying.
+5. The caution: the blob shadow is still unbacked by anything in this pass, so it stays an
+   authoring decision to be made on its own merits, not one the research can settle.
+
+## 2026-09-23 - The capture instrument is in the repo, and `--scale` is not cosmetic
+
+### `scripts/walk_capture.mjs`
+
+The walk view is judged on captures, and until today the instrument that takes them lived in
+`/tmp`. It did not survive a clean, nobody else could re-run it, and a verification loop whose
+instrument is not in the repo is not a loop. This is that instrument, added to the repo today.
+
+It installs nothing. Playwright is not a dependency of this project and `package.json` is
+untouched; the script resolves it from `PLAYWRIGHT_PATH`, then a normal `require("playwright")`,
+then the gstack skill install, and prints each candidate it tried if all three fail. `WALK_URL`
+defaults to `http://localhost:3120` and points the same script at production for the deploy check.
+Two things it does that are load-bearing and non-obvious:
+
+- It **hard-stops** if the character customiser overlay is present, because the customiser seed
+  failing silently produces a screenshot that looks like a valid walk capture and has been
+  mistaken for one before.
+- The IndexedDB seed is **deliberately double-encoded**: `characterStore.read()` returns a value
+  only when `typeof value === "string"`, so the character record must be stored as a JSON *string*.
+  Seeding an object routes the app to the customiser instead of the map.
+
+Verified against the live dev server: 19 labels, 2 visible (`Old Town`, `Soldierpet`), viewMode
+`WALK`. The SwiftShader launch args are mandatory and are in the file; without them every WebGL
+context is null and a capture is a blank canvas rather than a failure.
+
+### `--scale` changes which layers render
+
+This is a correction to a claim that was in the `/tmp` harness and that I had carried into the new
+repo script, so it is named here as mine.
+
+`--scale` is Playwright's `deviceScaleFactor`. It is not cosmetic. Measured today at the founder's
+origin, everything held equal - same clock, same 12000 ms settle, same seed, same location:
+
+| scale | ground colour | rose-over-ground | read as |
+|---|---|---|---|
+| 2 | `#F0D1DB` | **58.521%** | the zone tint over `color.walk.ground` |
+| 1 | `#EDE9F7` | **0.000%** | untinted; the tint is absent from the frame entirely |
+
+The scale-2 run reproduced the existing `ab-floor.png` exactly (`#F0D1DB` 58.52%, `#2B1B5E` 12.11%,
+`#302D2E` 6.44%, `#FF9500` 2.92%, ground 0.214%). **So the tint measurement recorded earlier in
+this file and in `MAP_SPEC.md` stands, and the scale-1 captures were the anomaly, not the
+measurement.** A `--scale 1` capture cannot be used to judge the palette, and a palette claim
+measured at 2 must not be "re-checked" at 1. The default stays 2, because that is the DPR a phone
+actually has and it is the setting every recorded palette measurement was taken at.
+
+Corroboration that scale 1 is doing less work, from this file's own movement measurements around
+line 2193: the same jog captured at `--scale 1` ran at **83 ms** p50 against **117 ms** at scale 2.
+Fewer layers, faster frame, same direction. That run was a movement measurement, not a palette one,
+so it stands as recorded.
+
+**DPR is genuinely doing this, and it is not the rung.** Once the fast clock was understood, the
+same comparison was run with `--fast-clock` on *both* sides: at scale 2 the ground composites to
+`#DBB5DB` at 42.65% with casings at 4.77%, and at scale 1 the ground is plain `color.walk.ground`
+`#EDE9F7` at 49.91% with no tint and casings at 0.02%. The rest of the world renders identically -
+same building, same road, same sky, same character, same position - so it is specifically the two
+**ground overlays** that go missing: the zone tint and the seam grid. That removes the rung as an
+explanation and leaves DPR itself.
+
+**Not established: why.** The frame loop and `applyFrameBudget` were read and are correct; settle
+time makes no difference; the peer's branch is not merged; the dev server is serving the right tree.
+The next step is to read the tint's draw path - `walkZones.ts` draws it - rather than to keep
+measuring. This is worth solving because the same mechanism could be hiding other DPR-dependent
+behaviour, and because those two overlays are exactly the ones that carry the palette ruling.
+
+The rule is settled regardless: **scale 1 may not be used to judge the palette or the ground
+overlays at all.** The default stays 2.
+
+### The fast clock DOES select a rung, and this was got wrong twice
+
+This supersedes what this section said an hour earlier, and the superseded version is worth
+recording because the mistake is repeatable.
+
+What the earlier version claimed: that `--fast-clock` does not move the quality ladder, on the
+evidence that `ab-top.png` and `ab-floor.png` were histogram-identical, both on the floor. The
+original `/tmp` harness had claimed the opposite - that the flag lifts the ladder to the top - and
+that claim had been carried into the new repo script; the "correction" replaced it with a second
+wrong claim.
+
+**The matched A/B.** Two captures per mode, every input held equal but the flag, at the founder's
+origin, 9000 ms settle, DPR 2:
+
+| mode | ground reads | green composite | casings |
+|---|---|---|---|
+| natural clock | `#F0D1DB` **49.71%** (tint over `color.walk.ground`) | 0.00% | 0.03% |
+| `--fast-clock` | `#DBB5DB` **42.65%** (the same tint over `color.tile.green`) | - | **4.77%** |
+
+Both modes reproduced to two decimals on the repeat run, so this is deterministic, not a load
+artefact. `#DBB5DB` is exactly `#FF3B30` at 0.14 over `#D5C9F7`, and `#B4A3DE` is
+`color.tile.casing` - **both only exist when `detail: true`.** So the flag demonstrably lifts the
+ladder off its floor, and the original `/tmp` claim was right while both of my own versions were
+wrong.
+
+The lesson, recorded so it is not relearned: a pair of old captures is not an experiment. Those two
+were never a matched A/B - nothing establishes they differed only by the flag - and I treated their
+agreement as evidence anyway, twice, in opposite directions.
+
+**What this changes, and it is the largest thing in this entry.** The floor rung is
+`{1,false,false}`: `detail: false` drops walls, roofs, ground seams, green and water. Every capture
+this project has judged the walk view's *look* from was taken on the natural clock, which lands on
+that floor reproducibly. **So every aesthetic verdict recorded so far was a verdict on the floor
+rung, with exactly the things a look judgement is about deleted from the frame.** `--fast-clock` is
+not a timing instrument; it is how the walk view has to be captured.
+
+Not established: whether the flag's rung is the top one (index 0, resident ring 2) or the one below
+(index 1, resident ring 1). They differ only in draw distance and no measurement separates them yet,
+so a capture may be described as showing `detail`, not as showing the top rung. Pinning the level
+inside the app was the only way to be certain, and the shipped code no longer offers it.
+
+### The first real look judgement: the detail rung, 2026-09-23
+
+`loop-02-fast.png` is the first capture this project has taken that shows what the walk view
+actually looks like. Against the ruling - Corner's white-and-black map language, rendered in
+Saaya's white and dark violet - the honest verdict is **not yet at the bar**, with a small ordered
+list of what is wrong:
+
+1. **The ground is pink, not white.** The zone tint covers the whole visible plane, so 42.65% of the
+   frame is `#DBB5DB`. The ruling's white half is essentially absent from the frame; violet survives
+   only in the sky and in the thin seam lines. This is the largest gap and it is a palette
+   problem, not a modelling one.
+2. **The road is orange.** The most saturated object in a white-and-violet scene is a wide
+   `#FF9500` band. Whatever it encodes, at this size it reads as "orange road" and it out-shouts
+   every violet in the frame.
+3. **The building is a featureless box.** Flat, hard-edged, one shaded face, no windows or
+   articulation. Against a Corner-level bar this is the weakest object in the frame.
+4. **The horizon carries a striated dark-red band** that reads as debris or z-fighting rather than
+   as a seam. It is visible in every capture so far and it looks like damage.
+5. **She does not match the palette** - cream top, blue jeans, grey hair, and a pink filled ellipse
+   where the reference draws a thin unfilled ring. The other session is already recolouring the
+   garments and has been told the map's own violet is `color.tile.road` `#4B3A70`.
+
+What is already right and should not be disturbed: the sky, stars and haze band read well and are
+the best-composed part of the frame; the horizon height, her feet row and her head row match the
+reference's own measurements; and the ground seams give the plane structure rather than leaving it
+blank.
+
+### Unchanged and not to be "fixed"
+
+Nothing in the walk scene, the palette facts, or the spec graph changed as a result of this
+investigation. `walkFacts.ts` is byte-identical to its committed state
+(sha256 `508efcc482cf2ae92c199785da46e03ce9665caabc5ab3dc0d7f300f48d5a362`, camera dist 13.0 /
+look_at 3.21) and all three gates are green: `tsc --noEmit` clean, `vitest run` 47 files / 328
+tests, grounded `152 file(s), 0 ungrounded literals`.
+
+### The violet for the peer's garment pair
+
+The other session asked which violet the map's own strokes use, for the character garments it is
+recolouring (`#A19790` over a nude base texture reads as warm grey at phone size - that is skin,
+not clothing). Answered: **`color.tile.road` `#4B3A70`**, the deep violet the map already draws its
+roads with, Rec.709 luma 66. The neighbouring violets in the graph are `color.walk.sky` `#2B1B5E`
+(luma 35, and the colour she is silhouetted against at the horizon, so garments in it would lose her
+top half against the sky), `color.tile.casing` `#B4A3DE` (luma 171, too light for a garment on a
+white map) and `color.brand` `#A78BFA` (the chrome lavender, which is chrome and not map). There are
+**no `walk.garment.*` facts in the graph yet** - the namespace is empty - so the pair being added is
+genuinely new and collides with nothing. It goes in as a grounded fact with an amendment behind it,
+per the standing rule that reference colours enter our code as grounded facts, never as copied
+literals.

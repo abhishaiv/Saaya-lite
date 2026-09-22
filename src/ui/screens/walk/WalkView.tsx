@@ -8,7 +8,7 @@ import type { HourBand, SessionState } from "../../../domain/model/session";
 import type { LiveLocationFix, LocationStatus } from "../../../platform/locationWatch";
 import type { CharacterSelection } from "../../../platform/walk/characterParts";
 import {
-  COLOR_TILE_LAND,
+  COLOR_WALK_GROUND,
   COLOR_ZONE_ELEVATED,
   COLOR_ZONE_HIGH,
   COLOR_ZONE_MODERATE,
@@ -20,6 +20,12 @@ import type {
 import { SectionHeader } from "../../components/SectionHeader";
 import { localizedRiskBand } from "../../copy/riskBandLabel";
 import { formatCopy, type M4Copy } from "../../copy/strings";
+import {
+  type LabelAnchor,
+  type LabelBounds,
+  type LabelBoxSize,
+  placeLabels,
+} from "./labelPlacement";
 
 export interface WalkViewProps {
   readonly character: CharacterSelection;
@@ -37,17 +43,27 @@ export interface WalkViewProps {
 /**
  * The ramp the bands are cut from, low to high.
  *
- * The low end is the land colour rather than a fourth band, because that is what the
+ * The low end is the ground colour rather than a fourth band, because that is what the
  * world does with it: `bandColorForRisk` returns nothing below the low threshold, so a
  * quiet area is drawn unshaded. The legend says "fewer records" at that end, which is the
  * same statement.
+ *
+ * It is `color.walk.ground` and not the flat map's `color.tile.land`. The walk view draws
+ * its own land, and a legend whose low swatch is a colour that appears nowhere in the view
+ * is a legend describing a different picture. Amended 2026-09-22 with the palette.
  */
 const LEGEND_STOPS: readonly string[] = [
-  COLOR_TILE_LAND,
+  COLOR_WALK_GROUND,
   COLOR_ZONE_MODERATE,
   COLOR_ZONE_ELEVATED,
   COLOR_ZONE_HIGH,
 ];
+
+/** How far inside the frame a zone name is kept. `--screen-padding`, read as a number. */
+const LABEL_FRAME_INSET_PX = 20; // GROUNDED-EXEMPT: structural frame inset, the pixel value of --screen-padding.
+
+/** The gap between two zone names that had to be stacked. `--space-4`, read as a number. */
+const LABEL_GAP_PX = 4; // GROUNDED-EXEMPT: structural label gap, the pixel value of --space-4.
 
 /**
  * The walk view: a canvas, the zone labels drawn over it, and the reading she needs to
@@ -103,7 +119,35 @@ export function WalkView({
   const zonesRef = useRef(mapZones);
   zonesRef.current = mapZones;
 
+  /**
+   * Each label's own box, measured once.
+   *
+   * `offsetWidth` costs a layout flush, and this runs inside the scene's frame callback - so
+   * measuring every name every frame would charge her phone a reflow per name per frame for
+   * a number that only changes when the text does, which is never. The first sighting of a
+   * node measures it; after that the size is read back.
+   */
+  const labelSizes = useRef(new Map<string, LabelBoxSize>());
+  // The canvas box, kept rather than read. `clientWidth` inside the scene's frame callback
+  // is a layout read, and it returns the same number on every frame that is not a resize.
+  const boundsRef = useRef<LabelBounds | null>(null);
+  // The transform last written to each node, so a frame that moved nothing writes nothing.
+  const lastTransforms = useRef(new Map<HTMLButtonElement, string>());
+
   const handleLabels = useCallback((labels: readonly WalkScreenLabel[]) => {
+    const frame = canvasRef.current;
+    let bounds = boundsRef.current;
+    if (bounds === null) {
+      const widthPx = frame?.clientWidth ?? 0;
+      const heightPx = frame?.clientHeight ?? 0;
+      bounds = { heightPx, insetPx: LABEL_FRAME_INSET_PX, widthPx };
+      // A zero box means the canvas has not been laid out yet, so it is not worth keeping.
+      if (widthPx !== 0 && heightPx !== 0) boundsRef.current = bounds;
+    }
+
+    const anchors: LabelAnchor[] = [];
+    const sizes: LabelBoxSize[] = [];
+    const nodes: HTMLButtonElement[] = [];
     for (const label of labels) {
       const node = labelRefs.current.get(label.stationId);
       if (node === undefined || node === null) continue;
@@ -112,9 +156,28 @@ export function WalkView({
         continue;
       }
       node.hidden = false;
-      // The second translate centres the label on its anchor, so the scene reports one
-      // point and this does not have to know how wide the words turned out to be.
-      node.style.transform = `translate3d(${label.xPx}px, ${label.yPx}px, 0) translate(-50%, -50%)`;
+      let size = labelSizes.current.get(label.stationId);
+      if (size === undefined || size.widthPx === 0 || size.heightPx === 0) {
+        // Visible before it is measured, or the box comes back zero.
+        size = { heightPx: node.offsetHeight, widthPx: node.offsetWidth };
+        labelSizes.current.set(label.stationId, size);
+      }
+      anchors.push({ xPx: label.xPx, yPx: label.yPx });
+      sizes.push(size);
+      nodes.push(node);
+    }
+
+    const placed = placeLabels(anchors, sizes, bounds, LABEL_GAP_PX);
+    for (let index = 0; index < nodes.length; index += 1) {
+      const node = nodes[index];
+      const spot = placed[index];
+      if (node === undefined || spot === undefined) continue;
+      // The second translate centres the label on the spot, so placement works in centres
+      // and never has to know how wide the words turned out to be.
+      const transform = `translate3d(${spot.xPx}px, ${spot.yPx}px, 0) translate(-50%, -50%)`;
+      if (lastTransforms.current.get(node) === transform) continue;
+      lastTransforms.current.set(node, transform);
+      node.style.transform = transform;
     }
     // The set of zones does not change while she walks, so this settles on the first
     // frame and reports no update again. Returning the previous array is React's bail-out.
@@ -186,7 +249,10 @@ export function WalkView({
   }, [character]);
 
   useEffect(() => {
-    const onResize = () => controllerRef.current?.resize();
+    const onResize = () => {
+      boundsRef.current = null;
+      controllerRef.current?.resize();
+    };
     globalThis.addEventListener("resize", onResize);
     return () => globalThis.removeEventListener("resize", onResize);
   }, []);
@@ -267,6 +333,15 @@ export function WalkView({
 
       <style jsx>{`
         .walk-view {
+          /* The right edge of the frame belongs to the home screen's own rail - the
+             settings button at the top, the control stack at the bottom - which is a fixed
+             48 px column at --screen-padding, and stays put whichever view is showing. This
+             view owns the whole frame, so its own chrome has to stop short of that column
+             or the rail lands on top of it. Measured before this: the legend's last line ran
+             under the control stack and "Change your character" was cut to "Change your
+             cha". One clearance, used by both edges of this view's chrome. */
+          --walk-view-rail: calc(var(--minimum-touch-target) + var(--space-8));
+
           position: absolute;
           inset: 0;
           overflow: hidden;
@@ -313,7 +388,7 @@ export function WalkView({
         .walk-view__top {
           position: absolute;
           inset-block-start: var(--space-12);
-          inset-inline: var(--screen-padding);
+          inset-inline: var(--screen-padding) calc(var(--screen-padding) + var(--walk-view-rail));
           display: flex;
           align-items: flex-start;
           justify-content: space-between;
@@ -360,10 +435,15 @@ export function WalkView({
           text-align: center;
         }
 
+        /* Clears the action dock rather than sitting under it. At --space-20 the card's
+           closing sentence was buried under the dock's opaque slab; --home-action-dock-
+           clearance is the space the dock occupies, declared on .home-screen and inherited
+           here, so the card clears it by the same margin the right-edge control stack does
+           and the two line up. The capture's own numbers are in MAP_SPEC.md. */
         .walk-view__legend {
           position: absolute;
-          inset-block-end: var(--space-20);
-          inset-inline: var(--screen-padding);
+          inset-block-end: var(--home-action-dock-clearance);
+          inset-inline: var(--screen-padding) calc(var(--screen-padding) + var(--walk-view-rail));
           padding: var(--space-12);
           border-radius: var(--radius-small);
           background: rgb(from var(--color-card-fill) r g b / 0.92);

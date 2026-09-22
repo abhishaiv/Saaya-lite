@@ -115,6 +115,26 @@ export function partsForSelection(
   );
 }
 
+/** The axes whose parts are worn over the body rather than set beside it. */
+const BODY_COVERING_AXIS_IDS: readonly string[] = ["top", "bottom"];
+
+/**
+ * Whether a part clothes the body, and so draws against the skin's own surface.
+ *
+ * Every top and every bottom is authored as a region of the body mesh copied out, so
+ * the two surfaces are drawn at one depth and the depth test resolves them per
+ * fragment - she renders in the underwear the base body bakes in, with the garment
+ * showing as speckles. Measured against `body_base`, the median vertex of all six
+ * parts sits **0.0000 m** from the nearest body vertex. `hair_long` sits 0.0203 m
+ * away, `acc_scarf` 0.0240 m, `acc_bag` 0.0389 m and `acc_glasses` 0.0113 m, and all
+ * four render cleanly - that clearance is the gap `walkCharacter.ts` reproduces.
+ */
+export function isBodyCoveringPart(partId: string): boolean {
+  return CHARACTER_AXES.some(
+    (axis) => BODY_COVERING_AXIS_IDS.includes(axis.id) && axis.options.includes(partId),
+  );
+}
+
 /** Replace one axis, leaving the rest. Out-of-list values are ignored. */
 export function withAxis(
   selection: CharacterSelection,

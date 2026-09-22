@@ -23,6 +23,7 @@ import {
   Group,
   LoopRepeat,
   Mesh,
+  Object3D,
   type AnimationAction,
   type AnimationClip,
   type Material,
@@ -32,6 +33,7 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import {
   CHARACTER_CLIP_IDLE,
   CHARACTER_CLIP_WALK,
+  isBodyCoveringPart,
   partFileUrl,
   partsForSelection,
   type CharacterSelection,
@@ -50,6 +52,13 @@ export interface CharacterRig {
   idle(fadeSec: number): void;
   /** Advance every part's mixer by the same delta, so the rigs stay in step. */
   update(deltaSec: number): void;
+  /**
+   * How fast the cycle plays, as a multiple of the ground speed it was authored for.
+   *
+   * The clip is drawn for `walk.speed`, so 1 is her walking at that speed. Anything else
+   * is her legs keeping up with the ground rather than skating over it.
+   */
+  setWalkRate(rate: number): void;
   dispose(): void;
 }
 
@@ -62,6 +71,47 @@ export interface CharacterRig {
  * shows up as a character walking backwards, which is easy to spot and easy to fix.
  */
 const CHARACTER_FACING_RADIANS = 0;
+
+/**
+ * How far a garment is lifted off the skin, in metres.
+ *
+ * Sized from measurement and then confirmed on the frame. The parts that need no help
+ * - the hair and the accessories - carry 11 mm to 39 mm of clearance from `body_base`
+ * and render cleanly; the garments carry none, their median vertex sitting exactly
+ * 0.0000 m from the nearest body vertex. 8 mm cleared most of that but left the jeans
+ * mottled where the body pokes through, and 14 mm renders every garment solid, so 14 mm
+ * is the value the frames chose. GROUNDED-EXEMPT: a depth separation between two
+ * surfaces, not a product value - the same kind of constant as `LAYER_HEIGHT_STEP_M`,
+ * which separates the coplanar ground layers, and for the same reason.
+ */
+const GARMENT_STANDOFF_M = 0.014; // GROUNDED-EXEMPT: depth separation between the skin and what she wears, not a product value.
+
+/**
+ * Move every vertex of a part outward along its own normal.
+ *
+ * The parts are skinned, and skinning transforms whatever position the geometry
+ * holds, so lifting the bind-pose vertices lifts the drawn figure with it. Normals
+ * are unit length in these files, so `metres` is the stand-off exactly.
+ */
+export function liftOffSkin(part: Object3D, metres: number): void {
+  part.traverse((object) => {
+    if (!(object instanceof Mesh)) return;
+    const position = object.geometry.getAttribute("position");
+    const normal = object.geometry.getAttribute("normal");
+    if (position === undefined || normal === undefined) return;
+    for (let vertex = 0; vertex < position.count; vertex += 1) {
+      position.setXYZ(
+        vertex,
+        position.getX(vertex) + normal.getX(vertex) * metres,
+        position.getY(vertex) + normal.getY(vertex) * metres,
+        position.getZ(vertex) + normal.getZ(vertex) * metres,
+      );
+    }
+    position.needsUpdate = true;
+    // The bounds moved with the vertices, and the renderer culls against them.
+    object.geometry.computeBoundingSphere();
+  });
+}
 
 /** Raised when `anims.glb` is missing a clip the view requires. */
 export class MissingClipError extends Error {}
@@ -107,6 +157,10 @@ export async function loadCharacter(
   for (const { partId, file } of partFiles) {
     const scene = file.scene;
     scene.name = `part:${partId}`;
+    // What she wears is a copy of the skin's own surface, so it is drawn at the same
+    // depth as the skin and loses the depth test fragment by fragment. Lifting it is
+    // what turns the speckles back into a garment.
+    if (isBodyCoveringPart(partId)) liftOffSkin(scene, GARMENT_STANDOFF_M);
     root.add(scene);
 
     const mixer = new AnimationMixer(scene);
@@ -177,6 +231,9 @@ export async function loadCharacter(
     },
     update(deltaSec: number) {
       for (const mixer of mixers) mixer.update(deltaSec);
+    },
+    setWalkRate(rate: number) {
+      for (const mixer of mixers) mixer.timeScale = rate;
     },
     dispose() {
       for (const mixer of mixers) {

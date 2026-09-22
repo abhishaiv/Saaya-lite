@@ -5,6 +5,7 @@ import { layerHeight } from "./walkGeometry";
 import type { WorldMeta } from "./walkProjection";
 import { parseWorldMeta } from "./walkProjection";
 import {
+  COLOR_WALK_GROUND,
   COLOR_ZONE_ELEVATED,
   COLOR_ZONE_HIGH,
   COLOR_ZONE_MODERATE,
@@ -20,6 +21,9 @@ import {
   decodeTile,
   disposeGroup,
   disposeTileMaterials,
+  ROAD_CASING_M,
+  ROAD_CLASS_WIDTH_MULTIPLIER,
+  ROAD_HALF_WIDTH_M,
   type RawRoad,
   type TileMaterials,
 } from "./walkTiles";
@@ -191,23 +195,24 @@ describe("buildTileMeshes", () => {
     expect(colors?.getZ(0)).toBeCloseTo(expected.b);
   });
 
-  it("draws a primary road three times as wide as a residential one", () => {
-    const residential = buildTileMeshes(
-      decodeTile(TILE_ZERO, { roads: [road({ c: "residential" })] }, meta),
-      materials,
-      true,
+  it("draws every highway class the bake emits at its own multiple of the residential width", () => {
+    // Amended 2026-09-22 with the road widths. It used to pin one ratio (primary at three
+    // times a residential street); the table is the thing that decides every class, so this
+    // reads it rather than restating one of its entries.
+    for (const [highwayClass, multiplier] of Object.entries(ROAD_CLASS_WIDTH_MULTIPLIER)) {
+      const built = buildTileMeshes(
+        decodeTile(TILE_ZERO, { roads: [road({ c: highwayClass })] }, meta),
+        materials,
+        true,
+      );
+      const surface = meshWith(built, materials.roadSurface);
+      if (surface === null) throw new Error(`no road layer for ${highwayClass}`);
+      expect(zSpan(surface)).toBeCloseTo(2 * ROAD_HALF_WIDTH_M * multiplier, 6);
+    }
+    // A trunk road still reads wider than a lane, which is the whole point of the table.
+    expect(ROAD_CLASS_WIDTH_MULTIPLIER.primary).toBeGreaterThan(
+      ROAD_CLASS_WIDTH_MULTIPLIER.residential ?? 0,
     );
-    const primary = buildTileMeshes(
-      decodeTile(TILE_ZERO, { roads: [road({ c: "primary" })] }, meta),
-      materials,
-      true,
-    );
-    const residentialMesh = meshWith(residential, materials.roadSurface);
-    const primaryMesh = meshWith(primary, materials.roadSurface);
-    expect(residentialMesh).not.toBeNull();
-    expect(primaryMesh).not.toBeNull();
-    if (residentialMesh === null || primaryMesh === null) return;
-    expect(zSpan(primaryMesh) / zSpan(residentialMesh)).toBeCloseTo(3);
   });
 
   it("falls back to the residential width for a class the bake never emitted", () => {
@@ -250,10 +255,48 @@ describe("buildTileMeshes", () => {
       "buildingRoof",
       "green",
       "roadBand",
+      "roadCasing",
       "roadSurface",
       "water",
     ]);
-    expect(layerNames(reduced, materials)).toEqual(["roadBand", "roadSurface"]);
+    // The casing travels with the road, for the same reason the band does: it is what the
+    // road is drawn with, not scenery that can be given up.
+    expect(layerNames(reduced, materials)).toEqual([
+      "roadBand",
+      "roadCasing",
+      "roadSurface",
+    ]);
+  });
+
+  it("draws the casing wider than the road it edges, and beneath it", () => {
+    const tile = decodeTile(TILE_ZERO, { roads: [road()] }, meta);
+    const group = buildTileMeshes(tile, materials, true);
+    const casing = meshWith(group, materials.roadCasing);
+    const surface = meshWith(group, materials.roadSurface);
+    if (casing === null || surface === null) throw new Error("no road layer");
+    // An edge only reads if it stands proud of the surface it edges.
+    expect(zSpan(casing)).toBeGreaterThan(zSpan(surface));
+    expect(zSpan(casing)).toBeCloseTo(zSpan(surface) + 2 * ROAD_CASING_M);
+    expect(casing.geometry.getAttribute("position").getY(0)).toBeCloseTo(
+      layerHeight("roadCasing"),
+    );
+  });
+
+  it("holds the casing's colour between the road it edges and the land it seams", () => {
+    // Amended 2026-09-23. The casing used to be derived - the road's own fact multiplied up -
+    // and this asserted the ratio. The key inverted, and no factor on a dark road can reach a
+    // line that has to sit above the road and below the white land, so the casing became its
+    // own fact. What is asserted now is the relation that made it necessary: a line strictly
+    // between the two surfaces it separates, so it reads against both.
+    const luma = (color: Color): number => {
+      const hex = color.getHex();
+      return 0.299 * ((hex >> 16) & 0xff) + 0.587 * ((hex >> 8) & 0xff) + 0.114 * (hex & 0xff); // GROUNDED-EXEMPT: the Rec. 601 luma coefficients, the standard the reference frames were sampled in.
+    };
+    const casing = luma(materials.roadCasing.color);
+    const road = luma(materials.roadSurface.color);
+    const land = luma(new Color(COLOR_WALK_GROUND));
+    expect(casing).toBeGreaterThan(road);
+    expect(casing).toBeLessThan(land);
   });
 
   it("keeps every road fragment in one mesh rather than one mesh per fragment", () => {
