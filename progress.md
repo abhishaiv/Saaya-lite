@@ -4355,3 +4355,75 @@ What the bare-ground signature would require is `color.walk.ground` visible - so
 dropped (that is `detail: false`) *and* the zone fill absent or empty, since the floor alone keeps
 the tint. The one channel still standing is the zone layer being empty in those runs: a
 load-state question, not a resolution one.
+
+## 2026-09-23 - The bare-ground frame is a depth-ordering failure, and the required separation scales with the drawing buffer
+
+The two entries above this one reach the conclusion that the buffer-size reading was a scare and that
+the bare-ground frame is a load-state question. **Both are withdrawn: a matched A/B, a five-value
+sweep and a live-build control, run against `/tmp/saaya-land` on 3120 and reproduced by the parallel
+session's own `devices.mjs` with the canvas size asserted from the live DOM, show it is a depth-ordering
+failure and that the buffer size is the variable that decides it.**
+
+**The evidence, instrument by instrument.** The parallel session's driver, unmodified, land on 3120:
+
+- DPR 1, canvas `390x844` -> `97.89% walk.ground #EDE9F7` (bare ground; `0.09%` tint over green).
+- DPR 2, canvas `780x1688` -> `90.59% tint over green #DBB5DB` + `7.46% casing #B4A3DE`.
+
+Same tree, same pose, same clock, same CSS size; DPR is the only variable and the outcome tracks the
+**buffer**, not the DPR. The 90.59% is the number to note: the four captures recorded above as
+"390x844@1, tinted 90.33-90.38%" match the **780x1688** arm to within a quarter of a point, and the
+390x844 buffer is not a similar number but an opposite frame at `97.89%` bare. Those captures were
+labelled by CSS viewport rather than by the canvas the driver actually produced - the same DPR/buffer
+conflation already recorded in `scripts/walk_capture.mjs`, arriving from the other side.
+
+**Why it is not a load state.** At a `390x844` buffer, raising `LAYER_HEIGHT_STEP_M` alone makes the
+tint appear in the same frame under the same run parameters: `0.02` -> `0.30%` bare, `0.04` -> `0.30%`,
+`0.06` -> `0.30%`, `0.12` -> `0.30%`, against `83.80%` bare at the product value of `0.01`. A zone layer
+that never loaded cannot be revealed by changing a depth-separation constant. `WAIT_MS` is not the
+variable either: these captures hold 9000 ms, four times the longest early-frame wait.
+
+**The requirement, measured.** At a `390x844` buffer it is between **40 and 50 mm** of separation, and
+the recovery is graded and ordered rather than binary - step `0.02` leaves the tint over *bare* ground
+(`#F0D1DB`), so `zoneFill` at 0.06 m won while `green` at 0.04 m still lost; step `0.04` leaves it over
+*green* (`#DBB5DB`), so `green` at 0.08 m won and only `water` at 0.04 m kept losing. One pair of
+`LAYER_ORDER` at a time, in order.
+
+**The projection is not the lever.** `NEAR_M` 0.5 -> 4.0 changed nothing: `83.79%` against `83.80%`
+bare. Control: `NEAR_M` 100 empties the frame to the background colour, so the edit reached the
+renderer and the negative is real. Whatever sets the requirement, it is not a near/far depth-precision
+term, and the arithmetic agrees - a 16-bit buffer at `near` 0.5 / `far` 5120 resolves about 5 mm at
+13 m, which cannot produce a 45 mm requirement at that range. **Do not re-derive a near/far fix from
+this finding.**
+
+**The ground plane is the occluder, and the failure is pairwise.** `depthWrite: false` on the ground
+material alone, nothing else changed, restores the stack to `99.70%` - so the ground's depth is what
+wins over the low layers. But the frame it restores is `#D5C9F7`, *untinted* green at 70%, with the
+tint reaching only `3.87%`: the tint still loses to the green 10 mm beneath it. The statement to carry
+is not "the ground covers the layers" but **adjacent stacked surfaces cannot resolve a 10 mm order at
+this buffer size**, and the ground is only the first such pair.
+
+**Why raising the step is not the fix.** The requirement is renderer- and buffer-dependent and is
+calibrated only on SwiftShader; a step of 0.06 puts `zoneOutline` 60 mm up and `characterMark` 100 mm
+up, and at pitch 32.4 a layer that high parallaxes its own boundary by `height / tan(32.4)`, about
+1.58x its height - misregistering exactly the line `MAP_SPEC.md` says must be legible, and
+misregistering it differently at every step value. The robust family is `polygonOffset` per layer
+(units are depth-resolution steps, so it self-scales to the renderer in front of it) or painter order
+(`depthWrite: false` on the stack plus `renderOrder` from `LAYER_ORDER`, keeping `depthTest` so
+buildings and the character still occlude).
+
+**Everything here is SwiftShader** (`--use-angle=swiftshader`). The 40-50 mm figure is that renderer's
+requirement and must not be quoted as a phone's. The structural finding transfers regardless: the
+stack's whole z-order rests on 10 mm of world Y resolving through a depth comparison, and the comment
+on `LAYER_HEIGHT_STEP_M` claiming it "only has to be larger than the depth buffer's resolution at the
+camera's distance" was never measured. At a `390x844` buffer - the shape a 2 GB device has - it is not
+larger.
+
+**Separately:** `FOG_FAR_M = 200` in both trees contradicts its own comment, which derives 410 m from
+the reference's fog-band thickness and records the 800 and 510 measurements that led there. One of the
+two has to move.
+
+**Instruments.** `/tmp/walk-verify/step_metric.py` counts a named colour over a chosen band and prints
+the top six by area, so a threshold shows up as a curve; `/tmp/walk-verify/dpr_scan.py` gives exact
+run-lengths per row; `dpr_matrix.mjs` still crosses viewport against scale. `charfix/devices.mjs`
+(copy, do not edit) is the parallel session's and asserts the canvas size from the DOM - prefer a
+driver that prints the buffer it actually got over one that is told which buffer to assume.
