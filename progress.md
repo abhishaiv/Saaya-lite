@@ -3964,3 +3964,25 @@ ground.
 against the card's 11% that the founder flagged - a ruling is still owed on whether the open or
 folded state should be the default. The bare feet, the anatomical silhouette and the speckled
 waist seam are asset work, not colour.
+
+**Verified on the union, live, after it deployed.** The branch preview carries the merge
+(`saaya-lite-git-m4-walk-view-...vercel.app`, deployment `saaya-lite-pm6b0te8d`) and both motion
+findings were re-run against it, not against a local tree:
+
+- **Item 1, movement.** `walklive.mjs` in WebKit, 1.4 m/s for 45 s: 63 m walked, 47 fixes
+  delivered, and the world moved on **46 of 46** one-second samples with the longest frozen stretch
+  **0 s**. Against the same harness on production before the fix: the world moved on 3 of 41
+  samples with a 24 s freeze. The view now follows every fix while the evidence cadence is
+  untouched (`forwardEveryFix`).
+- **Item 2, turning.** `walkheading.mjs` against the same URL, synthetic compass readings at
+  0/90/180/270: four distinct world-band hashes, frame changes of meanAbs 14-29 (31-49% of pixels)
+  per turn, and the turn eases over the product's own ~400 ms rather than snapping. Her head row
+  (1035 device px) and feet row (1262) are **identical at every heading** - the camera rotates and
+  does not re-position - and the composition rows hold against the recorded expectations
+  (horizon 0.1646, head 0.6121, feet 0.7361). Refusals hold: no dispatch changes nothing (0.00%),
+  a rotated screen at its natural angle changes nothing, a relative-only reading changes 0.01%, and
+  an absolute `alpha` reading is honoured (3.15%).
+- Items 3-6 are visible in the deployed capture: mark-only brand, glyph character control, glyph
+  dock (Demo/SUS/SOS), and the 224 px chip legend over the white-and-violet key. The only control
+  on the frame that is not ours is Vercel's own preview-toolbar badge, which appears on preview
+  deployments and not in production.
