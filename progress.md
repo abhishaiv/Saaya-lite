@@ -4129,3 +4129,85 @@ Instruments: `/tmp/walk-verify/charfix/refblob.cjs` (avatar flood fill from her 
 `annotate.cjs` / `seatcrop.cjs` (row-ticked 6x crops), `jeansnorm.cjs`, `hipgap.cjs`, `mats.cjs`,
 `darkscan.cjs`, `nohud.mjs` (Chromium no-HUD captures), `/tmp/walk-verify/walkheading.mjs` (WebKit
 heading probe).
+
+## 2026-09-23 - The pale band is the top's hem: the isolation render that corrects the entry above
+
+The entry above ends by calling the pale scalloped band across her hips "the jeans, not an
+artefact". That is now also disproved, in the other direction, and the correction changes what
+the fix even is - so it is recorded here rather than edited in place.
+
+### A viewer of our own, outside the app
+
+The walk view cannot answer "which surface is this pixel" because everything is painted,
+hazed and lit together. So the parts were put on their own: `/tmp/walk-verify/meshview/`, a
+static page that loads one or more of the shipped `.glb`s with three.js - the same build, loader
+and utils copied out of `node_modules/three` - under three modes:
+
+- `mode=normal` paints the view-space normal, so a surface whose normals disagree with its
+  neighbours shows as a colour patch;
+- `mode=flat` / `mode=paint` are unlit and give each part a **flat identity colour**, so every
+  pixel says which part owns it and shading is removed as a variable;
+- `mode=texture` keeps the shipped material.
+
+Driven by `shot.mjs`, and the camera takes the app's own angles (`yaw=180` is behind her, she
+faces +Z). `lift=0.014` applies the shipped stand-off to the raw geometry, so a capture here is
+the app's geometry at the app's stand-off with none of its lighting.
+
+### What the renders say
+
+- **The unlit jeans are a plain smooth tube.** No lace, no frill, no scalloped band anywhere in
+  the geometry; the normal field over the waistband is smooth and continuous. So there is no
+  modelled frill on either garment to find - and the hoodie's unlit silhouette shows a *wavy
+  hem*, which is the only scalloped edge in the two files.
+- **`body_base` carries a painted black bra and panties** (the "baked underwear"), with the lace
+  edge painted into the texture - which is why the 0 mm capture reads as underwear with violet
+  fringes.
+- **Painted one colour each at 14 mm, the band is yellow.** In `paint` mode with the top yellow
+  and the jeans magenta, a zoom of the waist shows: yellow torso, a magenta band dipping across
+  the back, then a **wide scalloped yellow band across the seat**, then magenta below. The yellow
+  is the top. The scallops are the hem's own modelled waves.
+- **Nothing is inside anything.** `insidecheck.cjs` walks every garment vertex against every body
+  vertex and reports the signed distance along the body's normal there: at 14 mm, **0 of 1288**
+  jeans vertices and **0 of 1750** hoodie vertices sit inside the skin. Depth is not the
+  mechanism, and the 553-to-0 underwear measurement above stands as a property of 0 mm only.
+
+### Why the hem wins at the waist
+
+`hemline.cjs` profiles the two garments' edges and the body's radius bin by bin around the
+model's axis. At the back centre (the bin at 270 degrees, her back, since she faces +Z):
+
+| surface | radius from the axis |
+| --- | --- |
+| jeans waistband top edge (y 1.000) | 120 mm |
+| body hip surface at that height | 143-146 mm |
+| top's hem (y 0.922-0.949) | 148 mm |
+
+The trouser waistband's rim **curls inward** to 120 mm - inside both the hip it is supposed to
+cover and the hem hanging over it. The hem is the only one of the three outside the body, so the
+hem is drawn in front, over the jeans' upper hip, in the shape of its wavy edge. It survives 14,
+22 and 35 mm because a uniform lift moves both garments by the same amount: it cannot change
+either one's position relative to the other, only their shared distance from the skin. That also
+explains the 0 mm capture - at 0 mm the *body* joins them at the same depth, which is why the
+skin's painted underwear wins there and the garments only fringe.
+
+Colour confirms the ownership on the app's own frame: read down a column of her back
+(`backline.cjs`, `v14i-f0.png`), the band is `#b093ff`-`#b396ff`, an RGB distance of ~37 from the
+top's painted violet (lit hoodie `#b4a3de`) against ~75 from the trousers' (`#8667d2`), with the
+top's own lit colour appearing as a separate strip between the two bright bands.
+
+### What this changes
+
+- The doc comment in `walkCharacter.ts` claimed the band was the jeans' waistband; it is
+  rewritten with this basis.
+- **No stand-off value and no depth trick fixes it** - the band is not a depth artefact, it is two
+  garments that genuinely overlap. What makes it read badly is that both are violet: a light
+  violet hem over a darker violet trouser reads as a pale frill. Giving the two garments
+  deliberate contrast is a palette decision and belongs to the founder (the palette ruling is
+  white + violet, and `GARMENT_TOP_COLOR` / `GARMENT_BOTTOM_COLOR` are `color.brand` /
+  `color.brandDark`, facts).
+- The trouser rim curling inside the hip is a **modelling mismatch in the pack**, not something
+  the runtime created: at the back waist nothing in the pack covers the hip cleanly, and the hem
+  is what does.
+
+Instruments: `/tmp/walk-verify/meshview/{index.html,shot.mjs,crop.cjs}`, `insidecheck.cjs`,
+`hemline.cjs`, `backline.cjs` in `/tmp/walk-verify/charfix/`.

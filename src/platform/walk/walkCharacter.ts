@@ -95,10 +95,18 @@ const CHARACTER_FACING_RADIANS = 0;
  * the eight captures, against 553 in the same window at 0 mm. The lift is along each
  * vertex's own normal, so this is a stand-off, not an inflation.
  *
- * What 14 mm does not fix, and 22 mm does not either: the pale scalloped band across her
- * hips. That band is the jeans' own modelled waistband, and it is the same at 14, 22 and
- * 35 mm - which is how it was shown to be the garment rather than a stand-off artefact.
- * Raising the standoff to chase it only holds the garments further off the body.
+ * What 14 mm does not fix, and 22 mm or 35 mm do not either: the pale scalloped band across
+ * her hips. An earlier note here called that band the jeans' own waistband. That was wrong,
+ * and the correction came from an isolation render of the two garments alone with one flat
+ * colour each: the band is **the top's hem**, drawn over the upper hip of the trousers in the
+ * shape of the hem's modelled wavy edge. It survives every standoff for the same reason it is
+ * not a depth artefact at all - a uniform lift moves both garments by the same amount and so
+ * cannot change either one's position relative to the other, only their shared distance from
+ * the skin. The rim measurements say why the hem wins there: at the back the jeans' waistband
+ * rim curls inward to 120 mm from the axis, the body's hip surface at that height is 143-146
+ * mm, and the hem hangs at 148 mm. The hem is the only one of the three outside the body, so
+ * it is drawn in front. Raising the standoff to chase the band only holds the garments further
+ * off the body.
  * GROUNDED-EXEMPT: a depth separation between two surfaces, not a product value - the
  * same kind of constant as `LAYER_HEIGHT_STEP_M`, which separates the coplanar ground
  * layers, and for the same reason.
