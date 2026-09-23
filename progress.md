@@ -5283,3 +5283,13 @@ file is a fourth, additive asset, not an amendment to them.
 founder's coordinates stay with the founder. Next: Part 3c, the home chrome - and its
 pin budget (the nearest-N fact) must be proposed and spliced into the graph before the
 pins are built, per the work order.
+
+## 2026-09-23 - Part 3b preview verified, not assumed
+
+The Vercel build for a0da2cc went green (deployment 6609779546,
+https://saaya-lite-26k83ohx9-abhishai-vardhans-projects.vercel.app), and both world
+assets were fetched from the live preview rather than trusted locally:
+`/assets/world/places.json` -> 200, 167,501 bytes, and
+`/assets/world/world_tiled.json` -> 200, 1,173,802 bytes. Part 3b changes no UI, so
+there is no before/after still to judge; the reproduction is the counts (in the
+section above) and the asset serving beside the world.
