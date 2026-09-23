@@ -5147,3 +5147,10 @@ research session and the founder.
 
 **Tree.** This record sits on top of the research session's `9de8580`; the branch `m4-walk-view` is
 pushed for the two preview addresses with this record. Production is untouched.
+
+**Preview verified, not assumed.** The Vercel preview for `07dccfd` completed, and the capture
+instrument ran against the branch alias itself: `?roads=a` draws the bright violet band on the dark
+street and the default draws the dark violet band on the white street, both at the signal spot with
+the new legend ramp (`preview-branch-{a,b}-signal.png` in the same folder). The research session
+independently checked the commit set, the supersession quotes and the two touched test files, and
+took both instrument findings into the work order's Part 3a "As built".
