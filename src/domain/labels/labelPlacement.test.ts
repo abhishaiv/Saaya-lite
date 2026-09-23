@@ -112,6 +112,97 @@ describe("placeLabels", () => {
     }
   });
 
+  it("separates the whole ladder's worth of names on one anchor, nine of them", () => {
+    // Amended 2026-09-23: a capture of the walk view found "Bata", "Airtel" and
+    // "Pantaloons" printed in one box over one place, along with everything else that
+    // anchored near it. The ladder runs to STEP_LIMIT now, so the full ladder - nine
+    // candidates - has to separate nine names on one point.
+    const count = 9;
+    const anchors = Array.from({ length: count }, () => MIDDLE);
+    const sizes = Array.from({ length: count }, () => OLD_TOWN);
+    const placed = placeLabels(anchors, sizes, BOUNDS, GAP_PX);
+    for (let i = 0; i < placed.length; i += 1) {
+      for (let j = i + 1; j < placed.length; j += 1) {
+        expect(
+          overlaps(rect(centreOf(placed, i), OLD_TOWN), rect(centreOf(placed, j), OLD_TOWN)),
+        ).toBe(false);
+      }
+    }
+  });
+
+  it("spreads a dense block's names over the least covered spots, never burying one", () => {
+    // The capture of 2026-09-23, flat map, idle: twelve places on one block of Old Town
+    // whose anchors all sat inside a 27 x 30 px blob. The ladder cannot separate twelve by
+    // vertical steps alone, so rule 4 decides the last of them - and it used to decide the
+    // resting spot, which covered a pill by 64 x 21 of another. The least covered candidate
+    // is what it takes now, so no name is left more than a sliver under another.
+    const anchors = [
+      { xPx: 197, yPx: 417 }, // GROUNDED-EXEMPT: probe anchor, measured off the flat capture.
+      { xPx: 194, yPx: 416 }, // GROUNDED-EXEMPT: probe anchor, measured off the flat capture.
+      { xPx: 192, yPx: 429 }, // GROUNDED-EXEMPT: probe anchor, measured off the flat capture.
+      { xPx: 201, yPx: 414 }, // GROUNDED-EXEMPT: probe anchor, measured off the flat capture.
+      { xPx: 190, yPx: 413 }, // GROUNDED-EXEMPT: probe anchor, measured off the flat capture.
+      { xPx: 203, yPx: 431 }, // GROUNDED-EXEMPT: probe anchor, measured off the flat capture.
+      { xPx: 206, yPx: 426 }, // GROUNDED-EXEMPT: probe anchor, measured off the flat capture.
+      { xPx: 206, yPx: 427 }, // GROUNDED-EXEMPT: probe anchor, measured off the flat capture.
+      { xPx: 197, yPx: 436 }, // GROUNDED-EXEMPT: probe anchor, measured off the flat capture.
+      { xPx: 184, yPx: 412 }, // GROUNDED-EXEMPT: probe anchor, measured off the flat capture.
+      { xPx: 211, yPx: 427 }, // GROUNDED-EXEMPT: probe anchor, measured off the flat capture.
+      { xPx: 195, yPx: 406 }, // GROUNDED-EXEMPT: probe anchor, measured off the flat capture.
+    ];
+    const sizes = [
+      { widthPx: 64, heightPx: 26 }, // GROUNDED-EXEMPT: probe pill box, measured off the flat capture.
+      { widthPx: 64, heightPx: 26 }, // GROUNDED-EXEMPT: probe pill box, measured off the flat capture.
+      { widthPx: 68, heightPx: 26 }, // GROUNDED-EXEMPT: probe pill box, measured off the flat capture.
+      { widthPx: 82, heightPx: 26 }, // GROUNDED-EXEMPT: probe pill box, measured off the flat capture.
+      { widthPx: 64, heightPx: 26 }, // GROUNDED-EXEMPT: probe pill box, measured off the flat capture.
+      { widthPx: 55, heightPx: 26 }, // GROUNDED-EXEMPT: probe pill box, measured off the flat capture.
+      { widthPx: 140, heightPx: 26 }, // GROUNDED-EXEMPT: probe pill box, measured off the flat capture.
+      { widthPx: 82, heightPx: 26 }, // GROUNDED-EXEMPT: probe pill box, measured off the flat capture.
+      { widthPx: 113, heightPx: 26 }, // GROUNDED-EXEMPT: probe pill box, measured off the flat capture.
+      { widthPx: 99, heightPx: 26 }, // GROUNDED-EXEMPT: probe pill box, measured off the flat capture.
+      { widthPx: 73, heightPx: 26 }, // GROUNDED-EXEMPT: probe pill box, measured off the flat capture.
+      { widthPx: 64, heightPx: 26 }, // GROUNDED-EXEMPT: probe pill box, measured off the flat capture.
+    ];
+    const placed = placeLabels(anchors, sizes, BOUNDS, GAP_PX);
+    // No two names in one box, which is the reading the capture found: "Bata", "Airtel" and
+    // "Pantaloons" printed over one place.
+    for (let i = 0; i < placed.length; i += 1) {
+      for (let j = i + 1; j < placed.length; j += 1) {
+        expect(centreOf(placed, i)).not.toEqual(centreOf(placed, j));
+      }
+    }
+    // And what the tail of the ladder does take is a sliver: with the sideways columns and
+    // the least covered fallback the worst box in this block is a tenth of itself under a
+    // neighbour, where the resting-spot fallback covered one by 64 x 21 of a 64 x 26 pill.
+    for (let i = 0; i < placed.length; i += 1) {
+      const box = rect(centreOf(placed, i), sizes[i] as { widthPx: number; heightPx: number });
+      let worst = 0;
+      for (let j = 0; j < placed.length; j += 1) {
+        if (i === j) continue;
+        const other = rect(centreOf(placed, j), sizes[j] as { widthPx: number; heightPx: number });
+        const width = Math.min(box.right, other.right) - Math.max(box.left, other.left);
+        const height = Math.min(box.bottom, other.bottom) - Math.max(box.top, other.top);
+        if (width > 0 && height > 0) {
+          worst = Math.max(worst, (width * height) / (box.right - box.left) / (box.bottom - box.top));
+        }
+      }
+      expect(worst).toBeLessThanOrEqual(1 / 10);
+    }
+  });
+
+  it("keeps a name out of the chrome the caller has already drawn over the frame", () => {
+    // A band the caller reserved, wide enough that there is no way round it: a name under
+    // the category bar is not a name. The anchor sits in the band, so its box has to move.
+    const band = { topPx: 760, bottomPx: 812, leftPx: 20, rightPx: 370 }; // GROUNDED-EXEMPT: probe chrome band, a capture's own numbers.
+    const bandRect = { left: band.leftPx, right: band.rightPx, top: band.topPx, bottom: band.bottomPx };
+    const anchor = { xPx: 195, yPx: 786 }; // GROUNDED-EXEMPT: probe anchor, inside the probe band.
+    const placed = placeLabels([anchor], [OLD_TOWN], BOUNDS, GAP_PX, [band]);
+    const box = rect(centreOf(placed, 0), OLD_TOWN);
+    expect(overlaps(box, bandRect)).toBe(false);
+    expect(centreOf(placed, 0)).not.toEqual(anchor);
+  });
+
   it("gives the same answer for the same frame, so names never swap places as she walks", () => {
     const anchors = [OLD_TOWN_AT, SOLDIERPET_AT, MIDDLE];
     const sizes = [OLD_TOWN, SOLDIERPET, OLD_TOWN];
