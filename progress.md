@@ -5004,3 +5004,43 @@ implementer's to record.
 
 **Nothing in the product changed by the research session.** Tree: `/tmp/saaya-ui`, `m4-walk-view`,
 tip `affc605`.
+
+## 2026-09-23 - The founder called the main deploy for the onboarding: `saaya-lite.vercel.app` serves `affc605`
+
+**The instruction.** "Deploy to main, let me see." Part 1 was closed out with its own record section
+above, so the batch went to main.
+
+**Pre-flight on the tip.** `npx tsc --noEmit` clean; `npx vitest run` 50 files / 372 tests pass;
+grounded check over the four touched source files 0 ungrounded (402 live facts); `npx next build`
+exit 0 (`/` 35 kB route, 144 kB first load).
+
+**Committed and pushed.** `affc605` on `m4-walk-view`, 13 files, 1,045 insertions, 177 deletions -
+the onboarding sources (`OnboardingScreen.tsx`, `AppGate.tsx`, `WalkView.tsx`, `strings.ts`,
+`locationWatch.ts` with its test), the `walkTiles.ts` comment, the three amended docs, the graph's
+three facts, the new `onboardingFlow.test.ts`, and this file. Staged by explicit path
+(`node_modules` in this fork is the 0-byte symlink the `.gitignore` `node_modules/` pattern does
+not match, so it stays untracked, as before). `origin/m4-walk-view` `8849dba..affc605`;
+`origin/main` `8849dba..affc605` - local main was a strict ancestor, so a fast-forward with no
+merge commit and no divergence. The peer session was told before the push, per its standing ask.
+
+**Deploy verified, not assumed.** Vercel registered the Production deployment `6606932326` on ref
+`affc605` (created 05:17:35Z, state `success`, `environment_url`
+`saaya-lite-8q5ftdgt2-abhishai-vardhans-projects.vercel.app`); the production alias serves the same
+chunk set as that deployment URL, and the peer session confirmed it independently (the new promise
+copy is in the served chunk `511-8b0d844ac4068d7e.js`). Then the instrument of record ran the whole
+flow against the alias itself - `/tmp/walk-verify/onboarding/deployed/` (17 granted + 15 denied
+stills, no console errors): the splash's closing question, the favourite step, the permission ask,
+the street beat with the live walk render (`Old Town` / `Soldierpet` labels, the STREET SHADING
+legend, the one Continue), the PIN, the four tour cards and the celebration all render on
+production, and the denied pass skips the street exactly as it does locally.
+
+**One environment find while producing that record.** The capture was first blocked by a 500 on
+port 3130: an orphaned second dev server (port 3121, started 02:52, same tree) was writing the same
+`.next` directory, which interleaved `pages-manifest.json` into invalid JSON and raced the webpack
+cache. The orphan was stopped, the build cache cleared, one clean server restarted; the final
+capture had no console errors.
+
+**Tree state.** This record commit sits on top of the research session's `5bc961e`, and the same
+push carries both to `origin/main`, so main ends at the branch tip. The canonical iCloud checkout
+is untouched and sits behind `origin/main`. Owed rulings unchanged: the tour's in-card dot row, the
+legend chip default, the zone tint, the horizon-band palette, the occlusion rate, the floor rung.
