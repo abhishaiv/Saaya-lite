@@ -215,9 +215,10 @@ const COLOR_CASING = "#B4A3DE"; // fact: color.tile.casing
  * How much a building face's own tone may differ from `color.tile.building`.
  *
  * GROUNDED-EXEMPT: a rendering variation around a fact, not a colour of its own.
- * `color.tile.building` stays the wall colour and stays the mean of this; the factor is how far
- * a single face may sit from it, applied in the hex's own bytes so the spread is the one the eye
- * reads - the same space `lighten` works in.
+ * `color.tile.building` stays the wall colour and is the *brightest* tone this draws: the factor
+ * runs from 1 down to `1 - BUILDING_SHADE_SPREAD`, so the fact's own tone still lands, on the
+ * brightest wall of whatever street the hash puts it on. Applied in the hex's own bytes so the
+ * spread is the one the eye reads - the same space `lighten` works in.
  *
  * **Why the walls vary at all.** Every wall in the city was one colour, so a run of them read as
  * a single mass: measured under the night key, rows 0.20-0.22 of the frame were 84.9-100% one
@@ -229,8 +230,25 @@ const COLOR_CASING = "#B4A3DE"; // fact: color.tile.casing
  * `createTileMaterials` - and a face's tone here comes from its own position, not from its angle
  * to anything. That is what keeps it deterministic: the same wall is the same tone in every frame
  * and every session, and two clients showing the same street show the same street.
+ *
+ * **Why the variation only goes darker, and why 0.30.** `walkComposition.test.ts` holds the
+ * reference's relation that no wall the renderer can draw may rise above the ground it stands
+ * on - "a block would stop reading as a mass at its brightest wall". The fact sits at luma 213
+ * against the land's 236, so a *symmetric* spread can only reach about 0.11 before a bright face
+ * crosses that plane (a symmetric 0.22 was captured and fails the test at 250.3). That cap is
+ * also why the 0.08 this shipped at read as nothing: at the dense site (17.744174, 83.340164)
+ * the corner between the near building's two faces measured a 7-unit step across a 654 px face
+ * and the building read as one flat plane - the founder's "buildings should be in 3D". Darker
+ * faces cross no plane, so on 2026-09-23 the direction was flipped and the strength raised: the
+ * dense corner now measures 13, and the origin building's corner 11 -> 22 (row 310 of the same
+ * stationary frames). Downward also matches the palette's own light: the land is the lit plane,
+ * so a wall face falls away from it and never rises over it.
+ *
+ * **The mean moved with the direction.** With a downward-only factor the walls' mean tone is
+ * `1 - BUILDING_SHADE_SPREAD / 2` of the fact (0.85 at this strength), where the symmetric
+ * version kept the fact as the mean. The fact's value is unchanged and is still drawn.
  */
-const BUILDING_SHADE_SPREAD = 0.08; // GROUNDED-EXEMPT: a rendering variation around a fact.
+const BUILDING_SHADE_SPREAD = 0.3; // GROUNDED-EXEMPT: a rendering variation around a fact.
 
 /** Vertices per wall quad, which `appendBuilding` writes in one run. */
 const WALL_VERTEX_COUNT = 6; // GROUNDED-EXEMPT: a geometry count, not a product value.
@@ -272,7 +290,7 @@ function pushWallShades(colors: number[], walls: readonly number[]): void {
   for (let start = 0; start + WALL_STRIDE_FLOATS <= walls.length; start += WALL_STRIDE_FLOATS) {
     const midX = (at(start) + at(start + 3) + at(start + 6)) / WALL_VERTEX_COUNT;
     const midZ = (at(start + 2) + at(start + 5) + at(start + 8)) / WALL_VERTEX_COUNT;
-    const shade = 1 + BUILDING_SHADE_SPREAD * (hashUnit(midX, midZ) - 0.5) * 2;
+    const shade = 1 - BUILDING_SHADE_SPREAD * hashUnit(midX, midZ);
     const color = new Color(lighten(COLOR_BUILDING, shade));
     for (let i = 0; i < WALL_VERTEX_COUNT; i += 1) colors.push(color.r, color.g, color.b);
   }

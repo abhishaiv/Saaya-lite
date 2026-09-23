@@ -4817,3 +4817,61 @@ acceptable frame at the shipping boom.
 
 **Tree state at the time of writing.** `m4-walk-view` = `origin/main` = `origin/m4-walk-view` =
 `8849dba`; tree clean apart from untracked `node_modules`.
+
+## 2026-09-23 - Buildings get a 3D read at street level: the wall shade spread turns downward and stronger
+
+Worked from the 3D-buildings work order. Reproduction first: the defect reproduces in this
+session's own captures at both sites the order names - at the dense point (17.744174, 83.340164)
+the near building's wall read as one flat plane (and, walked further, filled the frame with the
+character lost behind it); at the origin (17.7217, 83.3071) the horizon buildings read as flat
+slabs. The cause is in the read, not the geometry: walls extrude and face outward correctly, but
+`BUILDING_SHADE_SPREAD` was 0.08 and symmetric, so the corner between two faces of one building
+measured a 7-unit tone step across a 654 px face - too small for the eye to take as a corner.
+
+**What changed.** One constant and the sign of one line in `src/platform/walk/walkTiles.ts`:
+`BUILDING_SHADE_SPREAD` 0.08 -> 0.30, and the factor now runs from 1 *down* to `1 - spread`
+(downward-only) instead of straddling the fact. No geometry, no material, no new literal, no fact
+touched.
+
+**Why downward-only, and why 0.30.** `walkComposition.test.ts` holds the reference's relation
+that no wall the renderer can draw may rise above the ground it stands on - "a block would stop
+reading as a mass at its brightest wall". The fact sits at luma 213 against the land's 236, so a
+symmetric spread can only reach about 0.11 before a bright face crosses that plane. That cap is
+why 0.08 read as nothing, and a symmetric 0.22 - captured and looked at before the test caught it
+- fails the test at 250.3. Darker faces cross no plane, so the direction was flipped; 0.30 was
+chosen against captures: at the dense site the corner step went 7 -> 13 and at the origin 11 -> 22
+(row 310 of matched stationary frames), and 0.44 was not taken because the wall family's mean tone
+would drift past the point where the violet still reads as the founder's wall colour.
+
+**Measured, with controlled pairs.** Stationary captures seeded at the walked destination, so both
+halves of each pair share one camera state and the only difference is the constant:
+- before 0.08: `buildings/dest08-dense.png`, `dest08-origin.png` (corner steps 7 and 11)
+- after 0.30 downward-only: `buildings/dest30d-dense.png`, `dest30d-origin.png` (13 and 22)
+- the rejected symmetric 0.22: `buildings/dest22-dense.png`, `dest22-origin.png` (19 and 29, fails
+  the palette test at 250.3, so not shippable however good the step)
+- the order's own `--walk --fast-clock` format, before -> after: `buildings/before-{dense,origin}.png`
+  -> `buildings/final-walk-{dense,origin}.png`
+The instrument is `buildings/facetones.mjs` (maximal same-RGB runs per row - the same shape of
+number the original 0.08 rationale used); `buildings/colprofile.mjs` and `buildings/refsteps.mjs`
+were written on the way and are kept.
+
+**Disclosed palette effect.** With a downward-only factor the walls' mean tone is
+`1 - spread / 2` of the fact - 0.85 at 0.30 - where the symmetric version kept the fact as the
+mean. `color.tile.building` is unchanged and is still drawn (it is now the brightest wall tone).
+The comment in `walkTiles.ts` carries the same note. If the founder wants the mean back at the
+fact, the spread must return to <= 0.11 and the read comes back to roughly today's.
+
+**Not addressed, for the founder.** (1) The close-range case where the camera sits inside a
+building and the wall fills the frame is unchanged - that is the measured 5.19% occlusion, and
+what an acceptable frame is stays open. (2) The floor rung still drops buildings entirely on a
+device that dwells there; reproducing that needs the founder's own phone at their live location,
+and changing the floor is a MAP_SPEC amendment. (3) A roof-edge read and orientation shading are
+the other candidates for a stronger 3D read; both are palette decisions not yet ruled, so they are
+proposed, not landed.
+
+**Gates.** `npx tsc --noEmit` clean; `npx vitest run` 49 files / 357 tests pass (the palette test
+that caught the symmetric 0.22 included); `grounded_check.py src/platform/walk/walkTiles.ts`
+0 ungrounded literals.
+
+**Tree state.** `m4-walk-view` = `87341a3` + this change; `origin/main` and `origin/m4-walk-view`
+are at `8849dba`. No push in this batch - the founder calls deploys.
