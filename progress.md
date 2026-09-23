@@ -5207,3 +5207,79 @@ planned", between Part 3g and Governance:
 **Hand-off.** The section was delivered to the implementer session ("Pokémon Go-style 3D view") with
 the founder instruction quoted; delivery confirmed. Order: 3b -> 3c -> 3d -> 3e -> 3f+3g, preview
 after each part. No code changed in this commit - it is the plan record only.
+
+## 2026-09-23 - Part 3b: the Vizag places bake, and the real counts
+
+Part 3b of the corner-layout work order is done: the places layer exists, baked from the
+same OSM extract as the world, served beside it, and loadable. The counts below are the
+bake's real output - the gate the work order set - and nothing in the UI has been built
+against them yet.
+
+**Sourcing.** `places.py` in `/Users/abhishai/saaya-lite-world/`, beside the world bake.
+Same Overpass mirrors, same retries, same cache discipline, same User-Agent family
+(`saaya-lite-osm-bake/1.1 (places)`), and exactly `fetch.py`'s fetch window
+(`17.68714,83.27025,17.75634,83.34402` S,W,N,E), so the places window is coextensive with
+the roads and buildings window. Overpass API 0.7.62.11, base timestamp 2026-09-23T08:28Z,
+1457 elements fetched, 237 KB raw. The OSM -> category mapping is a written table in the
+script, not an inference: amenity cafe -> cafes; restaurant / fast_food / food_court ->
+eat; bar / pub / biergarten -> bars; cinema / theatre / nightclub / arts_centre -> goOut;
+any `shop` -> shops; pharmacy -> shops; tourism=hotel -> hotels; a curated destination
+leisure set (park, garden, playground, sports centre, stadium, water park, fitness centre,
+bowling alley, amusement arcade/centre, dog park, horse riding) -> leisure. Elements that
+map to nothing are counted in the report and dropped from the file - none were (0).
+
+**The file.** `public/assets/world/places.json` (164 KB raw), beside `world_tiled.json`.
+It carries only what OSM has: id (OSM type letter + id), `cat` (the screen map's seven),
+`osm` (the raw tag mapped from, so search can match it too), lat/lon (6 dp), and name /
+Telugu name / opening_hours / addr / phone when OSM has them. No ratings, no reviews, no
+photos, no invented fields; an absent field is absent. Attribution travels in the file in
+the form the map already uses, `© OpenStreetMap contributors`, and the loader refuses a
+file without it. One dedupe rule, deterministic: the same place often exists as both a
+building way and a doorway node - same category, same casefolded name within 40 m keeps
+one (the row with more fields, then the stable id), so a pin is never two.
+
+**The real counts, from the bake:**
+
+```
+1444 places kept   (1314 named / 130 unnamed, 13 node+way pairs merged, 0 unmapped dropped)
+  eat     164   cafes    41   bars    31
+  goOut    23   hotels   78   leisure 103
+  shops  1004
+with opening_hours 17, with phone 42, with addr 43, with a Telugu name 10
+```
+
+Every one of the seven categories is non-zero, so the category bar may render all seven -
+derived from the file at load, never restated in code. Honest coverage notes the founder
+should see: shops dominate (1011 raw, `shop=clothes` 126 and `shop=jewelry` 46 the
+largest), `go out` is thin (23: cinema 18, theatre 4, arts centre 1, nightclub 0 - OSM
+maps no nightclubs in Vizag), and OSM holds only 100 named restaurants, which is OSM's
+coverage of Vizag, not the city's truth. The file carries what OSM has; it never
+invents what OSM missed. Sparse optional fields are real: only 17 places carry
+`opening_hours`, so the 3d "open now" rule will mostly read "no hours - not guessed".
+
+**The loader.** `src/platform/walk/walkPlaces.ts`, beside `walkWorld.ts`, following its
+pattern exactly: `PLACES_ASSET_URL = "/assets/world/places.json"` (pinned by test,
+like the world's), `parsePlaces` deriving `categoryCounts` from the file's own rows
+(a category the bake yielded nothing for reads zero), and `loadPlaces(url)` taking the
+url so a test can point at a fixture. No `three` import; the walk view will project the
+lat/lon with the world's own meta. `walkPlaces.test.ts` holds 11 tests: counts derived,
+zero stays zero, empty file stays empty, attribution surfaces, missing attribution
+refuses, absent fields stay absent (not empty strings), raw OSM tag carried beside the
+category, fetch pinned, non-ok status reported, path pinned.
+
+**Gates.** tsc clean; vitest 51 files / 381 tests, all passing (was 370; +11 are the
+places loader's); grounded check on both new files: 0 ungrounded literals. The real
+asset was parsed through the new loader and reproduces the bake's counts exactly
+(attribution, 1444, all seven counts).
+
+**Spec records.** `MAP_SPEC.md` gains "The places asset" (path, sourcing, field
+discipline, attribution rule, the counts above, and the derivation rule: the category
+bar and search chips come from what the file contains, never from a category with zero
+places). `DATA_MODEL.md` gains the `Place` interface (baked places asset row) with the
+verbatim-hours / no-guess rule. The three frozen data files were not touched; the places
+file is a fourth, additive asset, not an amendment to them.
+
+**Open, not blocking.** The variant A/B pick, the violet-spread question and the
+founder's coordinates stay with the founder. Next: Part 3c, the home chrome - and its
+pin budget (the nearest-N fact) must be proposed and spliced into the graph before the
+pins are built, per the work order.

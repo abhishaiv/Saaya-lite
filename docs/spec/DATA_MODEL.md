@@ -150,6 +150,32 @@ export interface PoliceStation {
 }
 ```
 
+### `Place` (baked places asset row)
+
+The walk view's place pins read `public/assets/world/places.json` (see `MAP_SPEC.md`,
+"The places asset"). The row carries **only what OSM has**; an optional field is absent,
+never an empty string. No ratings, no reviews, no photos, no invented fields.
+
+```typescript
+export interface Place {
+  readonly id: string;    // OSM type letter + id, e.g. "n123", "w456"
+  readonly cat: string;   // one of the screen map's seven: eat | cafes | bars | goOut | shops | hotels | leisure
+  readonly osm: string;   // the raw tag mapped from, e.g. "amenity=cafe", "shop=clothes"
+  readonly lat: number;
+  readonly lon: number;
+  readonly name?: string;
+  readonly te?: string;   // OSM's Telugu name, when OSM has one
+  readonly hours?: string;   // OSM `opening_hours`, verbatim
+  readonly addr?: string;
+  readonly phone?: string;
+}
+```
+
+The category counts the category bar and search chips show are derived from the file at
+load (`walkPlaces.ts`), never restated in code, and a category with zero places never
+renders. `opening_hours` is stored verbatim; parsing it is deterministic and a place with
+no hours reports no hours - it is never guessed.
+
 ---
 
 ## IndexedDB (on device, never uploaded)

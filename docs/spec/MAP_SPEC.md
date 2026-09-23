@@ -249,6 +249,34 @@ Building heights are the stated storey rule at **3.2 m per storey**, from real
 honest, not invented, and the character at `walk.character.height` scales against them
 correctly.
 
+## The places asset
+
+`public/assets/world/places.json`, built by the same bake (`places.py`, beside `fetch.py`).
+It sits beside the world asset so the pins the walk view draws are the same OSM extract the
+roads and buildings came from - not a second dataset.
+
+The file carries **only what OSM actually has**: id, name, category, lat/lon, and
+opening hours / address / phone when present. No ratings, no reviews, no photos, no
+invented fields. An absent field is absent, never an empty string, and a place without a
+name is still a place - the client decides how to show it, the bake does not drop it.
+OSM's attribution travels in the file in the form the map already uses
+(`© OpenStreetMap contributors`), and the loader refuses a file that does not carry it.
+
+The category vocabulary is the screen map's seven, mapped deterministically from the OSM
+tags (the mapping table lives in `places.py`). Counts from the 2026-09-23 bake, over the
+same fetch window as the roads and buildings:
+
+```
+1444 places kept   (1314 named / 130 unnamed, 13 node+way pairs merged)
+  eat     164   cafes    41   bars    31
+  goOut    23   hotels   78   leisure 103
+  shops  1004
+with opening_hours 17, with phone 42, with addr 43, with a Telugu name 10
+```
+
+**The category bar and search chips derive from what the file contains, never from a
+category with zero places.** The counts are read from the file at load, not restated here.
+
 ## The camera, and the frame it composes
 
 **Amendment 2026-09-22, and its correction the same day.** Founder ruling: *"We need perfection
