@@ -15,7 +15,7 @@ import {
 
 export type SaayaBottomSheetPosition = "peek" | "expanded";
 
-export type SaayaBottomSheetTone = "card" | "paper";
+export type SaayaBottomSheetTone = "board" | "card" | "paper";
 
 export type SaayaBottomSheetProps = Readonly<{
   /** The parent owns the snap point so screen state remains authoritative. */
@@ -26,7 +26,8 @@ export type SaayaBottomSheetProps = Readonly<{
   children: ReactNode;
   className?: string;
   /** `card` (the default, unchanged) is the interface's dark card; `paper` is the walk
-   * view's white, the same surface the map itself is drawn on. */
+   * view's white, the same surface the map itself is drawn on; `board` is the feed, the
+   * search and the profile's tinted paper, for a sheet that stands among them. */
   tone?: SaayaBottomSheetTone;
   onPositionChange: (position: SaayaBottomSheetPosition) => void;
   onDismiss: () => void;
@@ -141,7 +142,7 @@ export function SaayaBottomSheet({
       className={classes}
       data-dragging={drag === null ? undefined : "true"}
       data-position={position}
-      data-tone={tone === "paper" ? "paper" : undefined}
+      data-tone={tone === "card" ? undefined : tone}
       style={{ transform: renderedTransform }}
     >
       <div className="saaya-bottom-sheet__content">{children}</div>
@@ -182,6 +183,17 @@ export function SaayaBottomSheet({
            a white map does not look like a hole in the world. */
         .saaya-bottom-sheet[data-tone="paper"] {
           background: var(--color-text-primary);
+          color: var(--color-background);
+        }
+
+        /* The board's paper, the same mix the surfaces are drawn on, so a sheet opened
+           from one of them stands on the same ground rather than a fourth white. */
+        .saaya-bottom-sheet[data-tone="board"] {
+          background: color-mix(
+            in srgb,
+            var(--color-brand) 18%,
+            var(--color-text-primary)
+          ); /* fact: alpha.board.paper */
           color: var(--color-background);
         }
 

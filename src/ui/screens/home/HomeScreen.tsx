@@ -53,6 +53,18 @@ import {
   browserWakeLockApi,
   WakeLockController,
 } from "../../../platform/wakeLock";
+import { IndexedDbOnboardingRepository } from "../../../data/db/indexedDbOnboardingRepository";
+import { IndexedDbPersonalRepository } from "../../../data/db/indexedDbPersonalRepository";
+import { BrowserPinHasher } from "../../../platform/pinHash";
+import {
+  EMPTY_PERSONAL_STATE,
+  type PersonalState,
+} from "../../../data/repository/personalRepository";
+import {
+  BROWSE_ROWS_MAX,
+  placeRowFacts,
+  SEARCH_CHIP_MAX,
+} from "../../../platform/walk/placeBrowse";
 import {
   MapControlButton,
   MapControlButtonStack,
@@ -89,11 +101,18 @@ import {
 import { CharacterCustomiser } from "../walk/CharacterCustomiser";
 import { WalkView } from "../walk/WalkView";
 import {
+  CATEGORY_LABEL_KEY,
+  CategoryChips,
   HomeChrome,
+  type HomeChromeNavTab,
   pinLabel,
-  ZERO_CATEGORY_COUNTS,
 } from "./HomeChrome";
+import { FeedSurface } from "./FeedSurface";
+import { ImportSheet } from "./ImportSheet";
 import { PlaceSheet } from "./PlaceSheet";
+import { ProfileSurface } from "./ProfileSurface";
+import { SearchSurface } from "./SearchSurface";
+import type { PlaceListRow } from "./PlaceList";
 import {
   loadPlaces,
   PLACE_CATEGORIES,
@@ -174,12 +193,22 @@ export function HomeScreen({
   const [viewMode, setViewMode] = useState<ViewMode>("FLAT");
   // Corner's layout belongs to this view. Founder ruling, 2026-09-23: "These are the
   // reference screens I have provided. This is for normal view not the 3D view." The
-  // bake's places, the category she has filtered the pins to, and the place whose sheet
-  // is open are the flat map's own state; the walk view keeps its own copy of the same
-  // three, because its pills are drawn in the scene rather than as DOM.
+  // bake's places and the place whose sheet is open are the flat map's own state; the walk
+  // view keeps its own copy of both, because its pills are drawn in the scene rather than
+  // as DOM.
   const [places, setPlaces] = useState<Places | null>(null);
-  const [activeCategory, setActiveCategory] = useState<PlaceCategory | null>(null);
   const [sheetPlace, setSheetPlace] = useState<Place | null>(null);
+  /**
+   * Which tab of the dock is the page she is on. The four are the same list the nav draws,
+   * and `map` is the map itself: a surface is never a fifth state, it is one of the four.
+   *
+   * It sits here rather than in the chrome because opening a surface closes the place
+   * sheet and the demo panel, which are this screen's own state.
+   */
+  const [surface, setSurface] = useState<HomeChromeNavTab>("map");
+  /** Her own lists, read once on mount and re-read after every write. */
+  const [personal, setPersonal] = useState<PersonalState>(EMPTY_PERSONAL_STATE);
+  const [importOpen, setImportOpen] = useState(false);
   // The compass answer, taken on the tap that opens the walk view. False until then, which
   // is the recorded camera: a phone with no compass draws the frame the facts were solved
   // for rather than a frame that claims a heading it never had.
@@ -203,6 +232,9 @@ export function HomeScreen({
   });
   const mapControllerRef = useRef<LeafletMapController | null>(null);
   const locationRuntimeRef = useRef<PageLocationRuntime | null>(null);
+  // The personal store is opened lazily, on the first read, so a mount that never opens a
+  // surface never touches IndexedDB at all.
+  const personalRepositoryRef = useRef<IndexedDbPersonalRepository | null>(null);
   const commandListenerRef = useRef<
     (commands: readonly Command[], view: HomeEngineView) => void
   >(() => undefined);
@@ -279,29 +311,28 @@ export function HomeScreen({
   /**
    * The pills the flat map stands: the bake's own seven categories only.
    *
-   * The bake maps OSM tags onto that vocabulary and the category bar's counts come from
-   * the same file, so a row outside it is a row the product has no name for - a pin
-   * nothing can filter to. The category she picked narrows the set here rather than in
-   * the map, so the map's own pass only has to rank them. Which of them actually stand is
-   * the map's decision, under the product's own pin budget: the nearest N inside the
-   * frame, as she pans.
+   * The bake maps OSM tags onto that vocabulary and the feed's own chips read from the
+   * same file, so a row outside it is a row the product has no name for - a pin nothing
+   * can filter to. Which of them actually stand is the map's decision, under the product's
+   * own pin budget: the nearest N inside the frame, as she pans.
+   *
+   * The category filter that used to narrow this set is gone from the map with the bar
+   * that held it. Founder, on the shipped flat map (2026-09-23): "Too many things on
+   * screen. Very counter-intuitive to use." The map keeps "Search + nav only"; filtering a
+   * city by category is the feed's business now, where the board is.
    */
   const flatPins = useMemo<readonly MapPlacePin[]>(() => {
     if (places === null) return [];
     const vocabulary: readonly string[] = PLACE_CATEGORIES;
     return places.places
-      .filter(
-        (place) =>
-          vocabulary.includes(place.cat) &&
-          (activeCategory === null || place.cat === activeCategory),
-      )
+      .filter((place) => vocabulary.includes(place.cat))
       .map((place) => ({
         id: place.id,
         lat: place.lat,
         lon: place.lon,
         name: pinLabel(place, copy),
       }));
-  }, [activeCategory, copy, places]);
+  }, [copy, places]);
 
   /** The carded areas as outlines, for the sheet's area row. */
   const areaOutlines = useMemo(
@@ -316,9 +347,173 @@ export function HomeScreen({
   const handlePlaceSelected = useCallback(
     (placeId: string) => {
       const place = placesById.get(placeId);
-      if (place !== undefined) setSheetPlace(place);
+      if (place === undefined) return;
+      setSheetPlace(place);
+      // The board steps aside for the place. A sheet is the map's own detail, so a card
+      // tapped on the feed, in search or on her page brings the map back with that place
+      // open on it; the nav's tab carries her back to the list she came from. This also
+      // keeps the walk view honest, whose sheet is drawn inside its own frame.
+      setSurface("map");
+      setImportOpen(false);
     },
     [placesById],
+  );
+
+  const handlePlaceSheetDismiss = useCallback(() => setSheetPlace(null), []);
+
+  /** The boards deal in the places themselves; this screen keys them by id. */
+  const handleBoardPlaceSelected = useCallback(
+    (place: Place) => handlePlaceSelected(place.id),
+    [handlePlaceSelected],
+  );
+
+  const personalRepository = useCallback(() => {
+    personalRepositoryRef.current ??= new IndexedDbPersonalRepository();
+    return personalRepositoryRef.current;
+  }, []);
+
+  // Her name and her favourite are the onboarding's own record, read here the same way the
+  // family message reads them: the profile states what she set up, and this screen does not
+  // keep a second copy of either.
+  const identityRepositoryRef = useRef<IndexedDbOnboardingRepository | null>(null);
+  const [identity, setIdentity] = useState<{
+    readonly favouriteName: string | null;
+    readonly name: string | null;
+  }>({ favouriteName: null, name: null });
+
+  useEffect(() => {
+    identityRepositoryRef.current ??= new IndexedDbOnboardingRepository(
+      new BrowserPinHasher(),
+    );
+    const repository = identityRepositoryRef.current;
+    let cancelled = false;
+    void Promise.all([
+      repository.loadUserName(),
+      repository.loadPrimaryFavourite(),
+    ])
+      .then(([name, favourite]) => {
+        if (!cancelled) {
+          setIdentity({ favouriteName: favourite?.name ?? null, name });
+        }
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const readPersonal = useCallback(async () => {
+    setPersonal(await personalRepository().load());
+  }, [personalRepository]);
+
+  // Her first open, stamped once, then her lists. The stamp is what the profile's weeks
+  // counter reads, so it is written even if nothing else on the page is ever touched. A
+  // browser that refuses its own database is not an error state: everything else here
+  // works without it and no surface invents what it cannot read.
+  useEffect(() => {
+    let cancelled = false;
+    const repository = personalRepository();
+    void repository
+      .markFirstUse(browserClock.nowEpochMs())
+      .then(() => repository.load())
+      .then((state) => {
+        if (!cancelled) setPersonal(state);
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [personalRepository]);
+
+  const handleSavePlace = useCallback(
+    (placeId: string) => {
+      void personalRepository()
+        .savePlace(placeId, browserClock.nowEpochMs())
+        .then(readPersonal)
+        .catch(() => undefined);
+    },
+    [personalRepository, readPersonal],
+  );
+
+  const handleUnsavePlace = useCallback(
+    (placeId: string) => {
+      void personalRepository()
+        .unsavePlace(placeId)
+        .then(readPersonal)
+        .catch(() => undefined);
+    },
+    [personalRepository, readPersonal],
+  );
+
+  const handleToggleTopSpot = useCallback(
+    (placeId: string, starred: boolean) => {
+      void personalRepository()
+        .setTopSpot(placeId, starred)
+        .then(readPersonal)
+        .catch(() => undefined);
+    },
+    [personalRepository, readPersonal],
+  );
+
+  const categoryLabel = useCallback(
+    (category: string) => {
+      const key = CATEGORY_LABEL_KEY[category as PlaceCategory];
+      return key === undefined ? category : copy[key];
+    },
+    [copy],
+  );
+
+  /**
+   * One place as the board's own card. It is the same builder the feed and the search use
+   * for themselves, called from here because the profile's rows come from her lists rather
+   * than from a query - and a saved place whose id the bake no longer carries is dropped
+   * rather than drawn from a stub, because the bake is the only thing that says where a
+   * place is.
+   */
+  const personalRow = useCallback(
+    (place: Place): PlaceListRow => ({
+      facts: placeRowFacts(place, {
+        areas: areaOutlines,
+        currentPoint: location,
+        locale,
+        categoryLabel,
+      }),
+    }),
+    [areaOutlines, categoryLabel, locale, location],
+  );
+
+  const topSpotRows = useMemo<readonly PlaceListRow[]>(
+    () =>
+      personal.topSpots
+        .map((id) => placesById.get(id))
+        .filter((place): place is Place => place !== undefined)
+        .map(personalRow),
+    [personal.topSpots, personalRow, placesById],
+  );
+
+  const savedRows = useMemo<readonly PlaceListRow[]>(
+    () =>
+      personal.savedPlaces
+        .map(({ placeId }) => placesById.get(placeId))
+        .filter((place): place is Place => place !== undefined)
+        .map(personalRow),
+    [personal.savedPlaces, personalRow, placesById],
+  );
+
+  const savedPlaceIds = useMemo(
+    () => new Set(personal.savedPlaces.map(({ placeId }) => placeId)),
+    [personal.savedPlaces],
+  );
+
+  const handleToggleSavePlace = useCallback(
+    (placeId: string) => {
+      if (savedPlaceIds.has(placeId)) {
+        handleUnsavePlace(placeId);
+        return;
+      }
+      handleSavePlace(placeId);
+    },
+    [handleSavePlace, handleUnsavePlace, savedPlaceIds],
   );
 
   useEffect(() => {
@@ -603,7 +798,11 @@ export function HomeScreen({
       { kind: "OkTapped" },
       { nowEpochMs, zone: activeZone },
     );
-  }, [currentZone, engineView.activeZoneId, zones]);
+    // The profile's check-in counter is one per accepted tap: `handleCheckInOk` is the
+    // handler that means "she said she is fine", so the count is written here rather than
+    // anywhere the ladder's state could be read twice.
+    void personalRepository().recordCheckInAccepted().then(readPersonal).catch(() => undefined);
+  }, [currentZone, engineView.activeZoneId, personalRepository, readPersonal, zones]);
   const handleFamilyCancel = useCallback(() => {
     const nowEpochMs = browserClock.nowEpochMs();
     const activeZone =
@@ -785,6 +984,37 @@ export function HomeScreen({
     [copy],
   );
 
+  /**
+   * The dock's own tap: one of the four pages, and the map is one of them.
+   *
+   * Opening a surface closes the two things that float over the map on their own - the
+   * place sheet and the demo panel - because a surface is a page and a page is not a
+   * layer. The ladder is untouched: no rung of it changes because a page was opened, and
+   * the surfaces render above the map but below every safety control the home screen
+   * keeps.
+   */
+  const handleTabChange = useCallback((tab: HomeChromeNavTab) => {
+    setSurface(tab);
+    setSheetPlace(null);
+    setDemoPanelOpen(false);
+  }, []);
+
+  const handleSearchOpen = useCallback(() => {
+    setSurface("search");
+    setSheetPlace(null);
+    setDemoPanelOpen(false);
+  }, []);
+
+  /**
+   * The clock reading the profile opened with, for its weeks counter. Read when the
+   * surface changes rather than on every render: the counter is a statement about the
+   * moment she looked, and a value that ticks under her is not a statement.
+   */
+  const surfaceOpenedAtEpochMs = useMemo(
+    () => browserClock.nowEpochMs(),
+    [surface],
+  );
+
   const mapCopy = useMemo(
     () => ({
       ariaMap: copy.cdMap,
@@ -868,7 +1098,11 @@ export function HomeScreen({
           location={location}
           locationStatus={locationStatus}
           mapZones={mapZones}
+          onPlaceDismiss={handlePlaceSheetDismiss}
+          onSearchOpen={handleSearchOpen}
+          onTabChange={handleTabChange}
           onZoneSelected={handleZoneSelected}
+          selectedPlaceId={sheetPlace?.id ?? null}
           selectedZoneId={selectedZoneId}
           sessionState={engineView.state}
           showPlaces
@@ -893,10 +1127,10 @@ export function HomeScreen({
           />
 
           <HomeChrome
-            activeCategory={activeCategory}
-            categoryCounts={places?.categoryCounts ?? ZERO_CATEGORY_COUNTS}
+            activeTab={surface}
             copy={copy}
-            onCategoryChange={setActiveCategory}
+            onSearchOpen={handleSearchOpen}
+            onTabChange={handleTabChange}
           />
 
           {sheetPlace === null || places === null ? null : (
@@ -911,11 +1145,56 @@ export function HomeScreen({
               }
               locale={locale}
               onDismiss={() => setSheetPlace(null)}
+              onToggleSave={handleToggleSavePlace}
               place={sheetPlace}
+              saved={savedPlaceIds.has(sheetPlace.id)}
             />
           )}
         </>
       )}
+
+      {surface === "feed" ? (
+        <FeedSurface
+          areas={areaOutlines}
+          copy={copy}
+          currentPoint={location}
+          locale={locale}
+          onPlaceSelected={handleBoardPlaceSelected}
+          picks={personal.picks}
+          places={places}
+          rowsMax={BROWSE_ROWS_MAX}
+        />
+      ) : null}
+
+      {surface === "search" ? (
+        <SearchSurface
+          areas={areaOutlines}
+          chipsMax={SEARCH_CHIP_MAX}
+          copy={copy}
+          currentPoint={location}
+          locale={locale}
+          onPlaceSelected={handleBoardPlaceSelected}
+          places={places}
+          rowsMax={BROWSE_ROWS_MAX}
+        />
+      ) : null}
+
+      {surface === "profile" ? (
+        <ProfileSurface
+          copy={copy}
+          favouriteName={identity.favouriteName}
+          name={identity.name}
+          nowEpochMs={surfaceOpenedAtEpochMs}
+          onImportOpen={() => setImportOpen(true)}
+          onPlaceSelected={handleBoardPlaceSelected}
+          onRemoveSaved={handleUnsavePlace}
+          onSettingsOpen={() => setSettingsOpen(true)}
+          onToggleTopSpot={handleToggleTopSpot}
+          personal={personal}
+          savedRows={savedRows}
+          topSpotRows={topSpotRows}
+        />
+      ) : null}
 
       <HomeSessionSurface
         activeZoneDetail={activeZoneDetail}
@@ -935,14 +1214,31 @@ export function HomeScreen({
         onLocationHelpOpen={handleLocationHelpOpen}
         onManualArm={handleManualArm}
         onManualDisarm={handleManualDisarm}
-        onOpenDemo={() => setDemoPanelOpen(true)}
         onPinAccepted={handlePinAccepted}
         pageStoppedWarning={pageStoppedWarning}
         policeStations={policeStations}
       />
 
-      <div className="home-screen__top-rail">
-        <MapControlButtonStack>
+      {/* The map's top row: the view's own two controls, beside the search pill the chrome
+          draws.
+          * Founder ruling, 2026-09-23, choosing between five rendered directions: "A -
+          Light and quiet" - "the search pill, then two small circles: the walk view and the
+          recentre". The settings gear that stood in this corner is gone with it: the ruling
+          put the doc in the dock's Profile page, and the nav's own tab is the way to it
+          now.
+
+          The two slots hold the two controls the view actually has. On the flat map that is
+          the walk view and the recentre; in the walk view it is the way back to the map and
+          the character mark, because recentre exists only where the map can be panned off
+          her and the walk camera is pinned to her position. */}
+      <div className="home-screen__controls">
+        <MapControlButtonStack axis="row">
+          <MapControlButton
+            icon={viewMode === "WALK" ? "map" : "3d_rotation"}
+            label={copy.viewToggle}
+            onClick={handleViewToggle}
+            tone="light"
+          />
           {viewMode === "WALK" ? (
             // Founder instruction, 2026-09-23: the way into the customiser is a mark on the
             // right, not a wordy chip across the top. It is the walk view's control - the
@@ -955,40 +1251,16 @@ export function HomeScreen({
                 setCustomiserFirstRun(false);
                 setCustomiserOpen(true);
               }}
+              tone="light"
             />
-          ) : null}
-          <MapControlButton
-            icon="settings"
-            label={copy.cdSettings}
-            onClick={() => {
-              setSelectedZoneId(null);
-              setDemoPanelOpen(false);
-              setSettingsOpen(true);
-            }}
-          />
-        </MapControlButtonStack>
-      </div>
-
-      <div className="home-screen__controls">
-        <MapControlButtonStack>
-          {/* `MAP_SPEC.md`: the toggle sits above recentre, and it is a control rather
-              than a mode switch with its own screen. Its glyph is the view she would
-              arrive at, which is also what the announcement says. */}
-          <MapControlButton
-            icon={viewMode === "WALK" ? "map" : "3d_rotation"}
-            label={copy.viewToggle}
-            onClick={handleViewToggle}
-          />
-          {/* Only in the flat map. Recentre exists because the 2D map can be panned off
-              her; the walk camera is pinned to her position and always has been, so the
-              same button here would be a control that does nothing. */}
-          {viewMode === "FLAT" ? (
+          ) : (
             <MapControlButton
               icon="my_location"
               label={copy.cdRecentre}
               onClick={() => mapControllerRef.current?.recenter()}
+              tone="light"
             />
-          ) : null}
+          )}
         </MapControlButtonStack>
       </div>
 
@@ -1048,6 +1320,18 @@ export function HomeScreen({
         />
       ) : null}
 
+      {importOpen ? (
+        <ImportSheet
+          areas={areaOutlines}
+          copy={copy}
+          currentPoint={location}
+          locale={locale}
+          onDismiss={() => setImportOpen(false)}
+          onPlaceSelected={handleBoardPlaceSelected}
+          places={places}
+        />
+      ) : null}
+
       <style jsx>{`
         .home-screen {
           /* The dock's tallest control is the SOS mark, which stands one step over the
@@ -1056,14 +1340,21 @@ export function HomeScreen({
              height, so the legend chip clears the dock by the same margin either way. */
           --home-action-dock-height: calc(var(--minimum-touch-target) + var(--space-8));
 
-          /* The right edge of the frame: a fixed column of touch targets at
-             --screen-padding, the settings mark at the top and the control stack at the
-             bottom. Both views carry it and both views' own top row stops short of it.
+          /* The right edge of the frame's top row: the view's own two controls, side by
+             side at --screen-padding, with the search pill stopping short of them.
              * Amended 2026-09-23: it is the home screen's column rather than the walk
              view's, because the flat map's chrome needs the same number now - it was
              declared on .walk-view, whose claim to it was only that the walk view got
-             there first. */
-          --home-rail: calc(var(--minimum-touch-target) + var(--space-8));
+             there first.
+             * Amended again the same day, on the founder's ruling "A - Light and quiet":
+             the column is two controls wide, not one. The settings mark that used to hold
+             this corner alone is gone (the dock's Profile page is the way to the doc now),
+             and the walk view and the recentre stand here together. The arithmetic is the
+             control stack's own: two touch targets, the 12 px gap they are stacked with,
+             and the 8 px the pill keeps clear of them. */
+          --home-rail: calc(
+            var(--minimum-touch-target) * 2 + var(--space-12) + var(--space-8)
+          );
 
           /* HomeChrome owns the bottom of the frame in both view modes now: the nav pill
              on the bottom edge, then the category bar stacked one row above it. Everything
@@ -1076,9 +1367,16 @@ export function HomeScreen({
               var(--space-8) + var(--space-12) +
               (var(--space-8) * 2 + var(--type-label-line-height))
           );
+          /* What the map's own floating chrome - the legend, the attribution, the compact
+             notice - rises above at the bottom of the frame.
+             * Amended 2026-09-24, with the rail: the direct actions are marks on the right
+             edge now, vertically centred, so they no longer share this band. The band is
+             the chrome's alone, and the sum is the nav's own stack rather than the nav plus
+             a mark that is not there. The name is kept because it is the same clearance
+             every caller already reads - the walk view's legend, the flat map's, the
+             notice's - and the shape of it has not changed, only its height. */
           --home-action-dock-clearance: calc(
-            env(safe-area-inset-bottom) + var(--home-action-dock-height) +
-              var(--space-20) + var(--home-nav-stack)
+            env(safe-area-inset-bottom) + var(--space-20) + var(--home-nav-stack)
           );
 
           position: relative;
@@ -1088,11 +1386,14 @@ export function HomeScreen({
           isolation: isolate;
         }
 
+        /* The top row's own column, on the same line as the search pill the chrome draws.
+           It was the bottom-right control column until the founder's ruling put these two
+           beside the pill. */
         .home-screen__controls {
           position: fixed;
           z-index: 4;
+          inset-block-start: calc(env(safe-area-inset-top) + var(--space-12));
           inset-inline-end: var(--screen-padding);
-          inset-block-end: var(--home-action-dock-clearance);
         }
 
         .home-screen__announcement {
@@ -1107,12 +1408,13 @@ export function HomeScreen({
           white-space: nowrap;
         }
 
-        .home-screen__top-rail {
-          position: fixed;
-          z-index: 4;
-          inset-block-start: calc(env(safe-area-inset-top) + var(--space-12));
-          inset-inline-end: var(--screen-padding);
-        }
+        /* The top-right rail stood here: the fixed column that carried the WALK-only
+           character mark and the settings gear.
+           * Founder ruling, 2026-09-23, choosing between five rendered directions: "A -
+           Light and quiet" - the map keeps the
+           search pill and the view's own two controls beside it, and "the doc" moves to the
+           dock's Profile page. The character mark moved into that row with the toggle it
+           belongs to; the gear is reached from Profile now. */
 
         /* The top-left brand lockup stood here. Founder instruction, 2026-09-23: "Remove
            the Saaya logo from the top." The rule that stood here carried the earlier note

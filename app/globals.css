@@ -60,6 +60,15 @@ textarea {
   z-index: 7; /* GROUNDED-EXEMPT: above the walk view's chrome, below every ladder surface. */
 }
 
+/* The board's own sheet, opened from the Profile page. It takes the same rung as the place
+   sheet so every sheet in the product stands over the chrome: without one it would sit in
+   the auto layer under the nav, and its last row would be behind the tabs. */
+.import-sheet {
+  --sheet-expanded-height: 55dvh; /* sheet.expanded */
+
+  z-index: 7; /* GROUNDED-EXEMPT: above the walk view's chrome, below every ladder surface. */
+}
+
 .home-session-sheet {
   --sheet-expanded-height: 55dvh; /* sheet.expanded */
 

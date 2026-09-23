@@ -49,9 +49,13 @@ function render(
   target: Place,
   options: Readonly<{
     areas?: readonly AreaPolygon[];
+    /** `false` mounts the sheet the way the walk view does: with no store behind it. */
+    canSave?: boolean;
     currentPoint?: { latitude: number; longitude: number } | null;
+    saved?: boolean;
   }> = {},
 ): string {
+  const withStore = options.canSave !== false;
   return renderToStaticMarkup(
     <PlaceSheet
       areas={options.areas ?? []}
@@ -60,7 +64,9 @@ function render(
       currentPoint={options.currentPoint === undefined ? null : options.currentPoint}
       locale="en"
       onDismiss={() => undefined}
+      onToggleSave={withStore ? () => undefined : undefined}
       place={target}
+      saved={withStore ? (options.saved ?? false) : undefined}
     />,
   );
 }
@@ -129,5 +135,30 @@ describe("place sheet", () => {
   it("points directions at the place's own coordinates", () => {
     const html = render(place({ name: "Probe Cafe" }));
     expect(html).toContain(`destination=${PLACE_LAT},${PLACE_LON}`);
+  });
+
+  it("offers Save, and says Saved once she has, with the store's own answer behind it", () => {
+    // The saved state is handed in, not held here: the sheet renders the store's answer and
+    // its toggle reports the press. Profile's "tap Save" line depends on both halves.
+    const unsaved = render(place({ name: "Probe Cafe" }));
+    expect(unsaved).toContain(COPY.ctaSave);
+    expect(unsaved).toContain('aria-pressed="false"');
+    expect(unsaved).toContain(formatCopy(COPY.cdPlaceSave, "Probe Cafe"));
+
+    const saved = render(place({ name: "Probe Cafe" }), { saved: true });
+    expect(saved).toContain(COPY.ctaSaved);
+    expect(saved).toContain('aria-pressed="true"');
+    expect(saved).toContain(formatCopy(COPY.cdPlaceUnsave, "Probe Cafe"));
+    expect(saved).not.toContain(`>${COPY.ctaSave}<`);
+  });
+
+  it("shows no Save on the walk view's mount, which has no store behind it", () => {
+    // An action with nothing behind it is worse than an absent one: the walk view mounts
+    // this sheet from its own frame and writes nothing, so the row is not drawn there.
+    const html = render(place({ name: "Probe Cafe" }), { canSave: false });
+    expect(html).not.toContain(`>${COPY.ctaSave}<`);
+    expect(html).not.toContain(`>${COPY.ctaSaved}<`);
+    expect(html).not.toContain(formatCopy(COPY.cdPlaceSave, "Probe Cafe"));
+    expect(html).not.toContain("aria-pressed");
   });
 });

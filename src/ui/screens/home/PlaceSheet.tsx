@@ -32,6 +32,13 @@ export interface PlaceSheetProps {
   readonly areas: readonly AreaPolygon[];
   /** The bake's own attribution line, shown verbatim in the footer. */
   readonly attribution: string;
+  /**
+   * Whether she has this place saved, read from the on-device store, and the toggle that
+   * writes it. Optional together: the walk view mounts this sheet from its own frame with
+   * no store behind it, and a Save button there would be an action with nothing behind it.
+   */
+  readonly saved?: boolean;
+  readonly onToggleSave?: (placeId: string) => void;
   readonly onDismiss: () => void;
 }
 
@@ -55,6 +62,8 @@ export function PlaceSheet({
   currentPoint,
   areas,
   attribution,
+  saved,
+  onToggleSave,
   onDismiss,
 }: PlaceSheetProps) {
   const [dragRangePx, setDragRangePx] = useState(0);
@@ -164,6 +173,20 @@ export function PlaceSheet({
         )}
 
         <div className="place-sheet__actions">
+          {onToggleSave === undefined ? null : (
+            <button
+              aria-label={formatCopy(
+                saved === true ? copy.cdPlaceUnsave : copy.cdPlaceSave,
+                title,
+              )}
+              aria-pressed={saved === true}
+              className="place-sheet__action"
+              onClick={() => onToggleSave(place.id)}
+              type="button"
+            >
+              {saved === true ? copy.ctaSaved : copy.ctaSave}
+            </button>
+          )}
           <a
             aria-label={formatCopy(copy.cdPlaceDirections, title)}
             className="place-sheet__action"

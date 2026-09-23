@@ -218,7 +218,10 @@ export function CharacterCustomiser({
         .cust {
           position: fixed;
           inset: 0;
-          z-index: 40;
+          /* Above the ordinary chrome and the SOS/SUS rail, below every safety surface: the
+             walk view's own character mark reopens this at any time, so a ladder (10),
+             session truth (11) or the SOS overlay (20) must be able to stand over it. */
+          z-index: 8; /* GROUNDED-EXEMPT: local stack above Home chrome and below every safety surface. */
           display: flex;
           flex-direction: column;
           overflow-y: auto;

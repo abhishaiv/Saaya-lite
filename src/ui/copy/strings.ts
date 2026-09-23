@@ -30,6 +30,8 @@ export type M4Copy = Readonly<{
   annViewFlat: string;
   annViewWalk: string;
   appName: string;
+  browseEmpty: string;
+  browseLoading: string;
   catBars: string;
   catCafes: string;
   catEat: string;
@@ -47,10 +49,19 @@ export type M4Copy = Readonly<{
   cdPinBox: string;
   cdDemoReset: string;
   cdDemoZonePicker: string;
+  cdImportClose: string;
   cdMap: string;
   cdPlaceDirections: string;
+  cdPlaceSave: string;
   cdPlaceShare: string;
+  cdPlaceUnsave: string;
+  cdProfileRemove: string;
+  cdProfileStar: string;
+  cdProfileUnstar: string;
   cdRecentre: string;
+  cdSearchClear: string;
+  cdSearchField: string;
+  cdSearchResult: string;
   cdSettings: string;
   cdStationCall: string;
   cdStopSos: string;
@@ -65,6 +76,8 @@ export type M4Copy = Readonly<{
   ctaArmManually: string;
   ctaImHome: string;
   ctaOpenDemo: string;
+  ctaSave: string;
+  ctaSaved: string;
   ctaShare: string;
   custAxisAccessories: string;
   custAxisBody: string;
@@ -78,6 +91,7 @@ export type M4Copy = Readonly<{
   custSave: string;
   custStaysLocal: string;
   custTitle: string;
+  demoChip: string;
   demoJumpFamily: string;
   demoMissCheckin: string;
   demoModeActive: string;
@@ -101,9 +115,19 @@ export type M4Copy = Readonly<{
   familyNoContact: string;
   familySubjectFallback: string;
   familyTitle: string;
+  feedForYou: string;
+  feedNearYou: string;
+  feedNeedsFix: string;
+  feedWhyNearest: string;
+  feedWhyPick: string;
   homeArmBannerBody: string;
   homeArmBannerTitle: string;
   homeHourContext: string;
+  importBody: string;
+  importCta: string;
+  importDemoBody: string;
+  importDemoTitle: string;
+  importTitle: string;
   ctaRetry: string;
   ctaStopSos: string;
   checkin1Body: string;
@@ -160,11 +184,27 @@ export type M4Copy = Readonly<{
   pinNoRecovery: string;
   pinTitle: string;
   policeNoGovtLink: string;
+  profileCheckIns: string;
+  profileFavourite: string;
+  profileFavouriteUnset: string;
+  profileImport: string;
+  profileNameUnset: string;
+  profileSavedCount: string;
+  profileSavedCountOne: string;
+  profileSavedEmpty: string;
+  profileSavedTitle: string;
+  profileTopSpotsEmpty: string;
+  profileTopSpotsTitle: string;
+  profileWeeks: string;
+  profileWeeksOne: string;
   errNoStation: string;
   riskBandElevated: string;
   riskBandHigh: string;
   riskBandLow: string;
   riskBandModerate: string;
+  searchChipsLabel: string;
+  searchEmpty: string;
+  searchOpenNow: string;
   stateWorking: string;
   setAbout: string;
   setDemo: string;
@@ -248,6 +288,8 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     annViewFlat: "Map view.",
     annViewWalk: "Walk view. You can switch back any time.",
     appName: "Saaya Lite",
+    browseEmpty: "Nothing to list here yet.",
+    browseLoading: "Getting Visakhapatnam's places ready.",
     catBars: "bars",
     catCafes: "cafes",
     catEat: "eat",
@@ -265,10 +307,19 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     cdPinBox: "PIN digit %1$d of 4",
     cdDemoReset: "Reset the demo session. Nothing is sent.",
     cdDemoZonePicker: "Choose a zone to simulate entering",
+    cdImportClose: "Close the import sheet",
     cdMap: "Map of Visakhapatnam risk areas",
     cdPlaceDirections: "Open directions to %1$s in maps",
+    cdPlaceSave: "Save %1$s to your places",
     cdPlaceShare: "Share %1$s",
+    cdPlaceUnsave: "Remove %1$s from your places",
+    cdProfileRemove: "Remove %1$s from your places",
+    cdProfileStar: "Make %1$s a top spot",
+    cdProfileUnstar: "Take %1$s out of your top spots",
     cdRecentre: "Centre the map on your location",
+    cdSearchClear: "Clear the search field",
+    cdSearchField: "Search Visakhapatnam places",
+    cdSearchResult: "Open details for %1$s",
     cdSettings: "Open settings",
     cdStationCall: "Call %1$s",
     cdStopSos: "Stop the SOS. Needs your PIN.",
@@ -283,6 +334,8 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     ctaArmManually: "Start Shadow",
     ctaImHome: "I am home",
     ctaOpenDemo: "Open the demo",
+    ctaSave: "Save",
+    ctaSaved: "Saved",
     ctaShare: "Share",
     custAxisAccessories: "Accessories",
     custAxisBody: "Body",
@@ -296,6 +349,7 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     custSave: "Save",
     custStaysLocal: "This stays on your phone.",
     custTitle: "Your character",
+    demoChip: "demo",
     demoJumpFamily: "Jump to family escalation",
     demoMissCheckin: "Simulate a missed check-in",
     demoModeActive: "Demo speed is on. Timers are 6x faster than the real product.",
@@ -319,9 +373,19 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     familyNoContact: "You haven't added a favourite yet. Saaya can still open an SOS.",
     familySubjectFallback: "Someone using Saaya Lite",
     familyTitle: "What your favourite would receive",
+    feedForYou: "For you",
+    feedNearYou: "Near you",
+    feedNeedsFix: "Turn location on and Saaya can sort these by how close they are.",
+    feedWhyNearest: "Closest to where you are",
+    feedWhyPick: "You picked %1$s",
     homeArmBannerBody: "You are in %1$s and it is %2$s. You did not have to do anything.",
     homeArmBannerTitle: "Saaya woke by itself",
     homeHourContext: "Right now, %1$s reads %2$s",
+    importBody: "In the full Saaya you will bring your own places in from a list or a link. This beta reads nothing yet: nothing is uploaded, nothing is parsed, and this sheet ends on examples from Saaya's own Visakhapatnam data.",
+    importCta: "Import a list",
+    importDemoBody: "These are examples from Saaya's own Visakhapatnam data, labelled demo. They are not your places.",
+    importDemoTitle: "What you see next is demo",
+    importTitle: "Bring your places in",
     ctaRetry: "Try again",
     ctaStopSos: "Stop SOS",
     checkin1Body: "All good? Tap I'm OK and we'll keep quietly watching over you.",
@@ -378,11 +442,27 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     pinNoRecovery: "There is no way around this PIN. If there were, anyone holding your phone could use it.",
     pinTitle: "Enter your PIN to stop",
     policeNoGovtLink: "Saaya Lite is a prototype. It is not connected to AP Police, Shakthi, T-Safe, 112 or ERSS, and it is not a government product.",
+    profileCheckIns: "%1$d check-ins answered",
+    profileFavourite: "Favourite",
+    profileFavouriteUnset: "No favourite yet",
+    profileImport: "Import your places",
+    profileNameUnset: "Your name is not set yet",
+    profileSavedCount: "%1$d places saved",
+    profileSavedCountOne: "%1$d place saved",
+    profileSavedEmpty: "Nothing saved yet. Open a place and tap Save.",
+    profileSavedTitle: "Your places",
+    profileTopSpotsEmpty: "Star up to %1$d saved places and they come first.",
+    profileTopSpotsTitle: "Top spots",
+    profileWeeks: "%1$d weeks with Saaya",
+    profileWeeksOne: "%1$d week with Saaya",
     errNoStation: "No police station within 20 km.",
     riskBandElevated: "Elevated",
     riskBandHigh: "High",
     riskBandLow: "Low",
     riskBandModerate: "Moderate",
+    searchChipsLabel: "Try one of these",
+    searchEmpty: "Nothing matched that. Try another word.",
+    searchOpenNow: "Open now",
     stateWorking: "Working",
     setAbout: "About",
     setDemo: "Demo panel",
@@ -464,6 +544,8 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     annViewFlat: "మ్యాప్ వ్యూ.",
     annViewWalk: "వాక్ వ్యూ. ఎప్పుడైనా తిరిగి మారవచ్చు.",
     appName: "సాయ లైట్",
+    browseEmpty: "ఇక్కడ చూపించడానికి ఇంకా ఏమీ లేదు.",
+    browseLoading: "విశాఖపట్నం ప్రదేశాలు సిద్ధమవుతున్నాయి.",
     catBars: "బార్లు",
     catCafes: "కేఫ్‌లు",
     catEat: "తినడం",
@@ -481,10 +563,19 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     cdPinBox: "4 లో %1$d వ PIN అంకె",
     cdDemoReset: "డెమో సెషన్‌ను రీసెట్ చేయి. ఏదీ పంపబడదు.",
     cdDemoZonePicker: "ప్రవేశించినట్టు చూపించడానికి ఒక జోన్ ఎంచుకోండి",
+    cdImportClose: "ఇంపోర్ట్ షీట్ మూసివేయి",
     cdMap: "విశాఖపట్నం ప్రమాద ప్రాంతాల మ్యాప్",
     cdPlaceDirections: "మ్యాప్స్‌లో %1$s కి దారి చూపించు",
+    cdPlaceSave: "%1$s ని మీ ప్రదేశాల్లో దాచు",
     cdPlaceShare: "%1$s ని షేర్ చేయి",
+    cdPlaceUnsave: "%1$s ని మీ ప్రదేశాల నుంచి తీసివేయి",
+    cdProfileRemove: "%1$s ని మీ దాచిన ప్రదేశాల నుంచి తీసివేయి",
+    cdProfileStar: "%1$s ని టాప్ స్పాట్‌గా చేయి",
+    cdProfileUnstar: "%1$s ని మీ టాప్ స్పాట్ల నుంచి తీసివేయి",
     cdRecentre: "మీ స్థానం మీద మ్యాప్ కేంద్రీకరించు",
+    cdSearchClear: "సెర్చ్ ఫీల్డ్ ఖాళీ చేయి",
+    cdSearchField: "విశాఖపట్నం ప్రదేశాలను వెతుకు",
+    cdSearchResult: "%1$s వివరాలు తెరువు",
     cdSettings: "సెట్టింగ్స్ తెరువు",
     cdStationCall: "%1$s కి ఫోన్ చేయి",
     cdStopSos: "SOS ఆపు. మీ PIN అవసరం.",
@@ -499,6 +590,8 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     ctaArmManually: "షాడో ప్రారంభించు",
     ctaImHome: "నేను ఇంటికి చేరాను",
     ctaOpenDemo: "డెమో తెరువు",
+    ctaSave: "సేవ్ చేయి",
+    ctaSaved: "సేవ్ అయింది",
     ctaShare: "షేర్ చేయి",
     custAxisAccessories: "ఉపకరణాలు",
     custAxisBody: "శరీరం",
@@ -512,6 +605,7 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     custSave: "సేవ్ చేయి",
     custStaysLocal: "ఇది మీ ఫోన్‌లోనే ఉంటుంది.",
     custTitle: "మీ పాత్ర",
+    demoChip: "డెమో",
     demoJumpFamily: "ఆత్మీయుల దశకు వెళ్లు",
     demoMissCheckin: "చెక్-ఇన్ మిస్ అయినట్టు చూపించు",
     demoModeActive: "డెమో వేగం ఆన్‌లో ఉంది. టైమర్లు అసలు ఉత్పత్తి కంటే 6 రెట్లు వేగంగా ఉన్నాయి.",
@@ -535,9 +629,19 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     familyNoContact: "మీరు ఇంకా ఆత్మీయులను జోడించలేదు. అయినా సాయ SOS తెరవగలదు.",
     familySubjectFallback: "సాయ లైట్ ఉపయోగిస్తున్న వ్యక్తి",
     familyTitle: "మీ ఆత్మీయుడు పొందే సందేశం",
+    feedForYou: "మీ కోసం",
+    feedNearYou: "మీ దగ్గర",
+    feedNeedsFix: "లొకేషన్ ఆన్ చేస్తే, ఎంత దగ్గరగా ఉన్నాయో బట్టి సాయ ఇవి క్రమంగా చూపిస్తుంది.",
+    feedWhyNearest: "మీరు ఉన్న చోటికి దగ్గరగా",
+    feedWhyPick: "మీరు %1$s ఎంచుకున్నారు",
     homeArmBannerBody: "మీరు %1$s లో ఉన్నారు, ఇప్పుడు %2$s. మీరు ఏమీ చేయాల్సిన అవసరం లేదు.",
     homeArmBannerTitle: "సాయ దానంతట అదే మేల్కొంది",
     homeHourContext: "ప్రస్తుతం, %1$s %2$s గా ఉంది",
+    importBody: "పూర్తి సాయలో మీరు మీ సొంత ప్రదేశాలను లిస్ట్ లేదా లింక్ నుంచి తీసుకురాగలరు. ఈ బీటా ఇంకా ఏమీ చదవదు: ఏదీ అప్‌లోడ్ కాదు, ఏదీ పార్స్ కాదు. ఈ షీట్ సాయ సొంత విశాఖపట్నం డేటా నుంచి ఉదాహరణలతో ముగుస్తుంది.",
+    importCta: "లిస్ట్ ఇంపోర్ట్ చేయి",
+    importDemoBody: "ఇవి సాయ సొంత విశాఖపట్నం డేటా నుంచి తీసుకున్న ఉదాహరణలు, డెమో అని గుర్తించినవి. ఇవి మీ ప్రదేశాలు కావు.",
+    importDemoTitle: "తర్వాత కనిపించేది డెమో",
+    importTitle: "మీ ప్రదేశాలను తీసుకురండి",
     ctaRetry: "మళ్లీ ప్రయత్నించు",
     ctaStopSos: "SOS ఆపు",
     checkin1Body: "అంతా బాగుందా? \"నేను బాగున్నాను\" నొక్కండి, మేము నిశ్శబ్దంగా మిమ్మల్ని గమనిస్తూ ఉంటాం.",
@@ -594,11 +698,27 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     pinNoRecovery: "ఈ PIN ని దాటవేసే మార్గం లేదు. ఉంటే, మీ ఫోన్ పట్టుకున్న ఎవరైనా దాన్ని వాడగలరు.",
     pinTitle: "ఆపడానికి మీ PIN నమోదు చేయండి",
     policeNoGovtLink: "సాయ లైట్ ఒక ప్రోటోటైప్. ఇది AP పోలీస్, శక్తి, T-Safe, 112 లేదా ERSS తో అనుసంధానించబడలేదు, ఇది ప్రభుత్వ ఉత్పత్తి కాదు.",
+    profileCheckIns: "%1$d చెక్-ఇన్‌లకు సమాధానం",
+    profileFavourite: "ఆత్మీయుడు",
+    profileFavouriteUnset: "ఇంకా ఆత్మీయుడు లేరు",
+    profileImport: "మీ ప్రదేశాలను ఇంపోర్ట్ చేయి",
+    profileNameUnset: "మీ పేరు ఇంకా సెట్ కాలేదు",
+    profileSavedCount: "%1$d ప్రదేశాలు దాచారు",
+    profileSavedCountOne: "%1$d ప్రదేశం దాచారు",
+    profileSavedEmpty: "ఇంకా ఏమీ దాచలేదు. ఒక ప్రదేశం తెరిచి సేవ్ నొక్కండి.",
+    profileSavedTitle: "మీ ప్రదేశాలు",
+    profileTopSpotsEmpty: "%1$d వరకు దాచిన ప్రదేశాలకు స్టార్ పెట్టండి, అవి ముందు కనిపిస్తాయి.",
+    profileTopSpotsTitle: "టాప్ స్పాట్లు",
+    profileWeeks: "సాయతో %1$d వారాలు",
+    profileWeeksOne: "సాయతో %1$d వారం",
     errNoStation: "20 కి.మీ. లోపు పోలీస్ స్టేషన్ లేదు.",
     riskBandElevated: "ఎక్కువ",
     riskBandHigh: "అత్యధికం",
     riskBandLow: "తక్కువ",
     riskBandModerate: "మధ్యస్థం",
+    searchChipsLabel: "ఇవి ప్రయత్నించండి",
+    searchEmpty: "ఏదీ దొరకలేదు. వేరే పదం ప్రయత్నించండి.",
+    searchOpenNow: "ఇప్పుడు తెరిచి ఉంది",
     stateWorking: "పని జరుగుతోంది",
     setAbout: "గురించి",
     setDemo: "డెమో ప్యానెల్",

@@ -38,11 +38,20 @@ import {
   placeLabels,
 } from "../../../domain/labels/labelPlacement";
 import {
+  CategoryChips,
   HomeChrome,
+  type HomeChromeNavTab,
   pinLabel,
   ZERO_CATEGORY_COUNTS,
 } from "../home/HomeChrome";
 import { PlaceSheet } from "../home/PlaceSheet";
+
+/**
+ * What the chrome's handlers default to. The onboarding mount draws no chrome, so nothing
+ * on it can reach either one; the default is here so that mount does not have to name
+ * handlers it will never fire.
+ */
+const noChrome = () => undefined;
 
 export interface WalkViewProps {
   readonly character: CharacterSelection;
@@ -68,10 +77,20 @@ export interface WalkViewProps {
   readonly selectedZoneId: string | null;
   readonly sessionState: SessionState;
   /**
-   * The home screen's place layer: the search pill, the category bar, the nav and the
+   * The home screen's place layer: the search pill, the category chips, the nav and the
    * pins. Absent on the onboarding mount, whose view carries no chrome at all - the
-   * chrome is opt-in, never inherited.
+   * chrome is opt-in, never inherited, and the two handlers below are only ever read when
+   * it is on.
    */
+  readonly onSearchOpen?: () => void;
+  readonly onTabChange?: (tab: HomeChromeNavTab) => void;
+  /**
+   * A place the home screen has already chosen - a card tapped on one of the boards - which
+   * this view opens in its own sheet, the same one a pin opens. The sheet is drawn inside
+   * this view's frame, so the home screen tells the view rather than drawing a second one.
+   */
+  readonly onPlaceDismiss?: () => void;
+  readonly selectedPlaceId?: string | null;
   readonly showPlaces?: boolean;
 }
 
@@ -132,8 +151,12 @@ export function WalkView({
   location,
   locationStatus,
   mapZones,
+  onPlaceDismiss,
+  onSearchOpen = noChrome,
+  onTabChange = noChrome,
   onZoneSelected,
   onWorldSettled,
+  selectedPlaceId,
   selectedZoneId,
   sessionState,
   showPlaces = false,
@@ -176,6 +199,18 @@ export function WalkView({
     for (const place of places?.places ?? []) byId.set(place.id, place);
     return byId;
   }, [places]);
+
+  /** The home screen's pick, opened here: one sheet for the view, however it was chosen. */
+  useEffect(() => {
+    if (selectedPlaceId === undefined || selectedPlaceId === null) return;
+    const place = placesById.get(selectedPlaceId);
+    if (place !== undefined) setSheetPlace(place);
+  }, [placesById, selectedPlaceId]);
+
+  const handlePlaceSheetDismiss = useCallback(() => {
+    setSheetPlace(null);
+    onPlaceDismiss?.();
+  }, [onPlaceDismiss]);
 
   /**
    * The rows handed to the scene: the bake's own seven categories only.
@@ -622,10 +657,19 @@ export function WalkView({
 
       {showPlaces ? (
         <HomeChrome
-          activeCategory={activeCategory}
-          categoryCounts={places?.categoryCounts ?? ZERO_CATEGORY_COUNTS}
+          activeTab="map"
+          categories={
+            <CategoryChips
+              active={activeCategory}
+              copy={copy}
+              counts={places?.categoryCounts ?? ZERO_CATEGORY_COUNTS}
+              onChange={setActiveCategory}
+              tone="map"
+            />
+          }
           copy={copy}
-          onCategoryChange={setActiveCategory}
+          onSearchOpen={onSearchOpen}
+          onTabChange={onTabChange}
         />
       ) : null}
 
@@ -640,7 +684,7 @@ export function WalkView({
               : { latitude: location.latitude, longitude: location.longitude }
           }
           locale={locale}
-          onDismiss={() => setSheetPlace(null)}
+          onDismiss={handlePlaceSheetDismiss}
           place={sheetPlace}
         />
       )}
@@ -660,7 +704,12 @@ export function WalkView({
              that owns both rails, because the flat map's chrome stops short of the same
              column. The declaration that stood here read
              "--walk-view-rail: calc(var(--minimum-touch-target) + var(--space-8))" and is
-             superseded - same value, one owner. */
+             superseded - same value, one owner.
+
+             * Amended 2026-09-24, with the ruling's own rail: the column at the top is the
+             view's two controls beside the search pill, and the settings mark the sentence
+             above names is gone from the map - the doc lives on the dock's Profile page. The
+             reservation itself still holds for the same reason, one control wider. */
 
           position: absolute;
           inset: 0;
@@ -867,10 +916,14 @@ export function WalkLegend({ copy, onToggle, open }: WalkLegendProps) {
       ) : null}
 
       <style jsx>{`
-        /* Clears the action dock rather than sitting under it. --home-action-dock-clearance
-         * is the space the dock occupies, declared on .home-screen and inherited here, so
-         * the card clears it by the same margin the right-edge control stack does and the
-         * two line up. The capture's own numbers are in MAP_SPEC.md.
+        /* Clears the chrome's own bottom band rather than sitting under it.
+           --home-action-dock-clearance is that band, declared on .home-screen and inherited
+           here, so the card clears the nav by the same margin the map's other floating
+           rows do and the two line up. The capture's own numbers are in MAP_SPEC.md.
+         *
+         * Amended 2026-09-24, with the rail: the sum no longer includes the direct actions,
+         * because SUS and SOS are marks on the right edge now and this corner is free. The
+         * clause this replaced - "the space the dock occupies" - is superseded.
          *
          * Compacted 2026-09-23 on founder instruction ("taking up all the space"): the card
          * is a chip in the bottom-left corner. It lands folded - title, ramp and both ends -

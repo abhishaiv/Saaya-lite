@@ -39,7 +39,6 @@ export interface HomeSessionSurfaceProps {
   readonly onLocationHelpOpen: () => void;
   readonly onManualArm: () => void;
   readonly onManualDisarm: () => void;
-  readonly onOpenDemo: () => void;
   readonly onPinAccepted: () => void;
   readonly pageStoppedWarning: boolean;
   readonly policeStations: readonly PoliceStation[];
@@ -65,7 +64,6 @@ export function HomeSessionSurface({
   onLocationHelpOpen,
   onManualArm,
   onManualDisarm,
-  onOpenDemo,
   onPinAccepted,
   pageStoppedWarning,
   policeStations,
@@ -127,7 +125,7 @@ export function HomeSessionSurface({
       {state === "IDLE" || state === "SHADOW" || isMinimized ? (
         <div
           aria-label={copy.appName}
-          className="home-session-action-dock"
+          className="home-session-action-rail"
           data-demo-active={demoModeActive || undefined}
         >
           {demoModeActive && state !== "IDLE" ? (
@@ -144,47 +142,30 @@ export function HomeSessionSurface({
             >
               {minimizedLabel}
             </button>
-          ) : state === "IDLE" ? (
-            <>
-              <button
-                aria-label={copy.cdDemoPanel}
-                className="home-session-action home-session-action--icon home-session-action--demo"
-                data-home-action="demo"
-                onClick={onOpenDemo}
-                type="button"
-              >
-                <MaterialSymbol decorative fill="utility" name="visibility" size={24} />
-              </button>
-              <button
-                aria-label="SUS"
-                className="home-session-action home-session-action--icon home-session-action--sus"
-                data-home-action="sus"
-                onClick={onManualArm}
-                type="button"
-              >
-                <MaterialSymbol decorative fill="state" name="gpp_maybe" size={24} />
-              </button>
-            </>
           ) : (
             <button
-              aria-label="End SUS"
-              className="home-session-action home-session-action--sus"
+              aria-label={state === "IDLE" ? "SUS" : "End SUS"}
+              className="home-session-action home-session-action--mark home-session-action--sus"
               data-home-action="sus"
-              onClick={onManualDisarm}
+              onClick={state === "IDLE" ? onManualArm : onManualDisarm}
               type="button"
             >
-              End SUS
+              <MaterialSymbol decorative fill="state" name="gpp_maybe" size={24} />
+              <span className="home-session-action__label">
+                {state === "IDLE" ? "SUS" : "End SUS"}
+              </span>
             </button>
           )}
 
           <button
             aria-label={copy.cdHelpNow}
-            className="home-session-action home-session-action--icon home-session-action--sos"
+            className="home-session-action home-session-action--mark home-session-action--sos"
             data-home-action="sos"
             onClick={onHelpNow}
             type="button"
           >
-            <MaterialSymbol decorative fill="state" name="sos" size={32} />
+            <MaterialSymbol decorative fill="state" name="sos" size={24} />
+            <span className="home-session-action__label">SOS</span>
           </button>
         </div>
       ) : null}
@@ -266,22 +247,28 @@ export function HomeSessionSurface({
           outline-offset: 2px;
         }
 
-        /* Founder instruction, 2026-09-23: the direct actions are marks on the right, not
-           a full-width slab across the bottom of the map. The cluster is anchored to the
-           same right edge the map controls use, and sits on their baseline. */
-        .home-session-action-dock {
+        /* The direct actions are a rail on the right edge, vertically centred, where a
+           thumb already is.
+           * Founder ruling, 2026-09-23, choosing between five rendered directions: "A -
+           Light and quiet" - "SUS and SOS sit in a rail on the right, the
+           four-tab dock at the bottom".
+
+           * Amended the same day, from the same ruling: the rail replaced the bottom-right
+           cluster that stood here, and the demo mark is out of it - the founder's own
+           instruction, "Remove demo. We need SUS and SOS." The demo panel itself is still
+           opened from Settings while Part 3f takes it out of the product. A rail tile
+           carries its own word under the glyph, as the approved render drew it: a safety
+           control that is only an icon is a control she has to learn. */
+        .home-session-action-rail {
           position: fixed;
           z-index: 6; /* GROUNDED-EXEMPT: direct actions remain above the map and below an active ladder or SOS. */
-          /* Direct actions float above the walk view's nav and category bar when that
-             view is showing. The stack is zero on every other screen. */
-          inset-block-end: calc(
-            env(safe-area-inset-bottom) + var(--space-12) +
-              var(--home-nav-stack, 0px)
-          );
+          inset-block-start: 50%;
           inset-inline-end: var(--screen-padding);
+          translate: 0 -50%;
           display: flex;
+          flex-direction: column;
           align-items: flex-end;
-          gap: var(--space-8);
+          gap: var(--space-12);
         }
 
         .home-session-action {
@@ -301,29 +288,34 @@ export function HomeSessionSurface({
           text-align: center;
         }
 
-        /* The square marks. Text actions in the same cluster (resume, End SUS) keep the
-           base padding and stretch to their words. */
-        .home-session-action--icon {
-          inline-size: var(--minimum-touch-target);
-          block-size: var(--minimum-touch-target);
+        /* A rail mark: the square the rail is built from, one tile wide, with the glyph and
+           its word stacked. The text action in the same rail (resume) keeps the base
+           padding and stretches to its words. */
+        .home-session-action--mark {
+          inline-size: var(--home-action-dock-height);
+          block-size: var(--home-action-dock-height);
+          flex-direction: column;
+          gap: var(--space-4);
           padding: 0;
-          border-radius: var(--radius-control);
+          border-radius: var(--radius-card);
+        }
+
+        .home-session-action__label {
+          font-size: var(--type-label-size);
+          font-weight: var(--weight-semibold);
+          letter-spacing: var(--type-label-tracking);
+          line-height: var(--type-label-line-height);
+          text-transform: uppercase;
         }
 
         .home-session-action--sus {
           background: var(--color-brand);
+          color: var(--color-background);
         }
 
-        .home-session-action--demo,
         .home-session-action--resume {
           border-color: var(--color-brand);
           background: var(--color-card-fill);
-        }
-
-        .home-session-action-dock[data-demo-active="true"]
-          .home-session-action--demo {
-          border-color: var(--color-amber);
-          color: var(--color-amber);
         }
 
         .home-session-demo-badge {
@@ -341,14 +333,13 @@ export function HomeSessionSurface({
           line-height: var(--type-body-line-height);
         }
 
-        /* One step over the touch target: SOS is the action that must never be missed, and
-           it is the only control in the cluster that is bigger than the rest. --home-action-
-           dock-height is declared on .home-screen from this same sum, so the map's own
-           chrome clears the biggest mark in the dock. */
+        /* The rail's lower mark, and the one action that must never be missed: SOS carries
+           the danger fill and the interface's white on it. --home-action-dock-height is
+           declared on .home-screen from this mark's own height, so the map's chrome clears
+           the tallest tile in the rail. */
         .home-session-action--sos {
-          inline-size: var(--home-action-dock-height);
-          block-size: var(--home-action-dock-height);
           background: var(--color-danger);
+          color: var(--color-text-primary);
         }
       `}</style>
     </>

@@ -41,7 +41,6 @@ function render(
       onLocationHelpOpen={() => undefined}
       onManualArm={() => undefined}
       onManualDisarm={() => undefined}
-      onOpenDemo={() => undefined}
       onPinAccepted={() => undefined}
       pageStoppedWarning={false}
       policeStations={[]}
@@ -51,33 +50,37 @@ function render(
 }
 
 describe("M4 Home session surface", () => {
-  it("uses a compact direct-action dock instead of a persistent Home sheet", () => {
+  it("uses a compact direct-action rail instead of a persistent Home sheet", () => {
     const html = render("IDLE");
 
-    expect(html).toContain("home-session-action-dock");
+    expect(html).toContain("home-session-action-rail");
     expect(html).toContain('data-home-action="sus"');
-    expect(html).toContain('data-home-action="demo"');
     expect(html).toContain('data-home-action="sos"');
+    // The demo mark left the rail with the ruling. Founder instruction, 2026-09-23:
+    // "Remove demo. We need SUS and SOS." The panel itself is still opened from Settings
+    // until Part 3f takes it out of the product.
+    expect(html).not.toContain('data-home-action="demo"');
     expect(html).not.toContain("saaya-bottom-sheet");
     expect(html).not.toContain(M4_COPY.en.warnKeepOpenBody);
   });
 
-  it("makes every direct action a mark on the right, announced rather than spelled out", () => {
-    // Founder instruction, 2026-09-23: "Demo, SUS and SOS can be logos on the right." The
-    // words are gone from the dock, so the name each control still needs is the one it
-    // announces - a screen reader hears it, the map does not carry it.
+  it("gives each rail mark its own word under the glyph", () => {
+    // The instruction that stood here read "Demo, SUS and SOS can be logos on the right."
+    // It is superseded by the rail's own render, which the founder chose the same day from
+    // five directions ("A - Light and quiet"): a tile carries its glyph and its name, so a
+    // safety control is never an icon she has to learn. The words are back, and the aria
+    // name still travels with each button.
     const copy = M4_COPY.en;
     const html = render("IDLE");
 
-    // Three actions, all of them marks. The count is over the class attribute rather than
-    // the bare class name, because styled-jsx writes its own CSS into the same markup.
-    expect(html.match(/class="home-session-action /g)).toHaveLength(3);
+    // Two actions, both marks. The count is over the class attribute rather than the bare
+    // class name, because styled-jsx writes its own CSS into the same markup.
+    expect(html.match(/class="home-session-action /g)).toHaveLength(2);
     expect(html).toContain('aria-label="SUS"');
-    expect(html).toContain(`aria-label="${copy.cdDemoPanel}"`);
     expect(html).toContain(`aria-label="${copy.cdHelpNow}"`);
-    expect(html).not.toContain(">SUS<");
+    expect(html).toContain(">SUS<");
+    expect(html).toContain(">SOS<");
     expect(html).not.toContain(">Demo<");
-    expect(html).not.toContain(">SOS<");
   });
 
   it("shows automatic SHADOW with its transient acknowledgement and a compact end action", () => {
@@ -121,7 +124,7 @@ describe("M4 Home session surface", () => {
     expect(html).not.toContain(M4_COPY.en.warnKeepOpenBody);
   });
 
-  it("labels active Demo state on the compact dock without a full-width disclosure", () => {
+  it("labels active Demo state on the rail without a full-width disclosure", () => {
     const html = render("IDLE", { demoModeActive: true });
 
     expect(html).toContain('data-demo-active="true"');

@@ -5417,3 +5417,269 @@ done for 3c.
 - Next: Part 3d, the Search surface the search pill opens, then 3e, 3f (demo removal from the
   dock), 3g.
 
+## 2026-09-23 - The founder looked at 3c, and ruled on the chrome
+
+The founder opened the live build and said, in their own words: **"Too many things on screen. Very
+counter-intuitive to use."** That is about the shipped 3c flat map, and it is correct: the search
+pill, seven category chips, nav pill, settings rail, view toggle, risk legend, SOS/SUS dock and the
+announcement line were all on the screen at once.
+
+Asked what the map should keep, the founder chose **"Search + nav only"**: one search pill at the
+top, the four-tab nav at the bottom, and the map between them. The category chips move into the
+feed and search surfaces, where they already exist as suggestion chips; settings moves into the
+profile. On the dock and the gear the founder ruled: **"We'll have to redesign. Maybe SUS and SOS on
+the side and the dock in the bottom. But must look more aesthetic. Like a pinterest board."**
+
+So the shape of the next pass, in the founder's own terms:
+
+- the flat map carries the search pill, the pins, SUS and SOS down the side, and the nav dock at
+  the bottom - nothing else;
+- the surfaces are to be redesigned as a **board of cards**, Pinterest-style, rather than the
+  typographic list Part 3d had started with;
+- the bar is higher than "tidy": it has to be something the founder looks at and wants.
+
+Part 3d as it stood - the paper surfaces, the row list, the browse helpers, the personal
+repository, the copy keys and the three new facts - is not wasted and not yet shipped. The browse
+helpers, the store and the facts stand; the surfaces' look is what the founder has sent back. The
+design pass comes first this time, so the founder rules on how it looks before the code is wired up.
+
+In flight, uncommitted, when the ruling arrived: `personalRepository.ts` (with `weeksUsing`),
+`indexedDbPersonalRepository.ts`, `placeBrowse.ts` (with the rows and chips ceilings),
+`FeedSurface.tsx`, `SearchSurface.tsx`, `ProfileSurface.tsx`, `PlaceList.tsx`, `SurfacePanel.tsx`,
+the new copy keys in both languages, and the facts `home.topSpots.max`, `home.browse.rowsMax` and
+`home.search.chipMax`. `main` is still `b05c27d`; production still serves `f052c36`.
+
+## 2026-09-23 - The row controls get a column of their own, and the profile stops saying it twice
+
+Two defects in the in-flight surfaces, found while the design pass renders, fixed because they
+are wrong in any direction the founder picks rather than because of the look.
+
+- `PlaceList.tsx` now has a real `actions` slot. **`ProfileSurface.tsx` had drawn the profile's
+  star and remove inside an `aria-hidden="true"` block, which is an accessibility defect and a
+  duplication at once: the controls were on the screen to the eye and gone from the accessibility
+  tree, while the row that appeared to carry them carried nothing.** The row is a grid now - the
+  row button in the first column, the controls in the second - because a button cannot hold a
+  button, and the controls are drawn beside the row rather than inside it. A list with no per-row
+  controls passes no slot and the row spans the full width, which is what the feed and the search
+  do.
+- `ProfileSurface.tsx` printed `profileWeeks`, `profileSavedCount` and `profileCheckIns` as the
+  `<dt>` labels **and** formatted them again as the `<dd>` values, so every counter read twice.
+  The three counters are three statements now - "%1$d weeks with Saaya", "%1$d places saved",
+  "%1$d check-ins answered" - each of which already says what it counts, so there is no label to
+  print above it. No new copy key was needed and none was invented.
+- Typecheck is clean over the whole in-flight set (`npx tsc --noEmit`, no output).
+- The design pass is `/design-shotgun` on the founder's own ruling, five variants: three trimmed
+  map compositions (light and quiet, dark and premium, warm and airy) and two board treatments
+  (white cards with typographic tops, and flat colour-block posters). Nothing is decided until the
+  founder picks one off the comparison board; the code above stands either way.
+
+## 2026-09-23 - The flat view first, and why; the replay row checked to the end
+
+Two questions came in from the peer session "Saaya 3D Planning". Both answers are checked against
+the code and the commits, not recalled.
+
+**The replay-onboarding row is in the shipped 3c, and it is reachable.** Verified end to end:
+`app/page.tsx` renders `AppGate`, `AppGate` passes `onReplayOnboarding={() => setReplaying(true)}`
+into `HomeScreen` (`src/ui/screens/onboarding/AppGate.tsx:59`), `HomeScreen` opens
+`SettingsScreen` from its own settings control (`setSettingsOpen(true)`,
+`src/ui/screens/home/HomeScreen.tsx:966`) and hands it `onReplay`, and the row calls it
+(`src/ui/screens/settings/SettingsScreen.tsx:39`). The one condition is deliberate: the row is
+enabled only while the engine is quiet (`IDLE` or `RESOLVED`), because a live rung of the ladder
+may not be interrupted by a screen change. So the founder's "I will have a look" does not need a
+private tab - the gear on the map, then the replay row, runs the onboarding again over the
+session. When the settings move into the profile under the new ruling, the row moves with them.
+
+**The flat view first is a sequencing decision, and here is the reason it was the right one.**
+The founder's own words when they handed over the reference screens were "This is for normal view
+not the 3D view" - Corner's layout is the *flat* screen's layout, so the flat screen is where it
+belongs and where it shipped. The walk render as the ground with the chrome floating over it is
+not dropped and not weakened: it is the later part of this same order (3g, the ladder adopts the
+system). The flat view also carries the thing the walk view cannot yet show at a glance - 1444
+baked places as DOM overlays, which is where pins, labels and the sheet were proven. Putting the
+new chrome on the flat screen first means the system gets tested where the most content is, and
+the walk view then adopts a system that already works rather than being the place it is invented.
+
+## 2026-09-23 - The design board, rendered from the app's own tokens
+
+The image-generation path is blocked on this machine: the gstack design binary needs an OpenAI key
+(`~/.gstack/openai.json` or `OPENAI_API_KEY`) and neither exists, so all five variants failed
+identically before writing a single PNG. It needs `/Users/abhishai/.claude/skills/gstack/design/dist/design setup`
+run interactively with the key, or `{"api_key":"sk-..."}` written to `~/.gstack/openai.json`.
+
+Rather than stop there, the five directions were built as **real HTML** instead of generated
+pictures, which is the better artifact anyway: they link the app's own `src/ui/theme/tokens.css`,
+its own four font files (Poppins 400/600, Noto Sans Telugu, Material Symbols Rounded) and use real
+bake names. `/tmp/walk-verify/variants/index.html`, served at `http://localhost:3199`, captured to
+`/tmp/walk-verify/board-5.png`. The fonts were checked loaded, not assumed:
+`document.fonts.check` returns true for all three families.
+
+Two facts the board turned up that the code obeys and the docs do not yet say:
+
+- **The icon font is a pinned 19-glyph subset** (`src/ui/icons/materialSymbols.json`): verified_user,
+  gpp_maybe, shield, sos, my_location, call, settings, visibility, home, group, chevron_right,
+  close, check_circle, warning, cloud_off, lock, info, map, 3d_rotation. **There is no magnifier and
+  no person glyph**, which is *why* the shipped nav is four words and no icons. Any design that
+  wants a search icon or a profile icon has to add a glyph to the subset first, deliberately.
+- `src/ui/theme/fonts.css` declares a Poppins 700 face whose file is not in `public/fonts/`
+  (only 400 and 600 ship). Harmless - nothing renders at 700 - but it is a dead reference.
+
+The five directions: **A** light and quiet, **B** dark and premium (same screen as A, night
+palette), **C** warm and airy with the walk switch raised in the dock, **D** board of white cards,
+**E** board of flat colour blocks. A and B both carry the walk view as a small circle beside the
+recentre, because the ruling left the map with search and nav only and the walk view still has to
+be one tap away.
+
+
+## 2026-09-24 - Part 3d wiring: the chrome, the rail, the board tone
+
+The founder's two picks were built into the code this pass (both rendered in
+`/tmp/walk-verify/variants/index.html`, served at 3199 and captured to
+`/tmp/walk-verify/board-5.png`): chrome **"A - Light and quiet"** and surfaces **"D - Board of
+white cards"**. All uncommitted in `/tmp/saaya-ui`; `npx tsc --noEmit` clean; the full suite 56
+files / 436 tests green.
+
+**What changed**
+
+- `HomeChrome` is now the one chrome owner for both map views. The flat map passes no category
+  row - the founder's "Search + nav only (Recommended)" ruling is exactly that - and the walk view
+  fills the slot with `CategoryChips` (`tone="map"`). The former split (`activeCategory` /
+  `categoryCounts` / `onCategoryChange` props on the chrome) is gone; the chrome takes a
+  `categories` slot instead, so a view decides what stands under the pill.
+- `MapControlButton` gained the **light tone**: the interface's own white with ink and the card
+  radius, the pair the search pill and the nav are drawn in. The map's top row is now the search
+  pill and two small circles - the walk view and the recentre - and the settings gear that stood
+  in that corner is gone with the ruling. Settings and About are reached from the dock's Profile
+  page (`ProfileSurface` now carries the gear as its third section).
+- `HomeSessionSurface`'s bottom dock became the **right-edge rail**: `position: fixed`, vertically
+  centred, `z-index: 6`, SUS on the brand fill and SOS on the danger fill, each tile carrying its
+  own word under the glyph because a safety control that is only an icon is a control she has to
+  learn. The demo mark left the rail on the founder's own instruction ("Remove demo. We need SUS
+  and SOS."); the demo panel itself is still reachable from Settings until Part 3f takes it out.
+- `--home-action-dock-clearance` was **redefined**: the dock height left the sum (the direct
+  actions no longer live in the bottom band, so that band belongs to the chrome), the name stayed.
+  The superseded definition is quoted in the CSS comment beside the new one.
+- `SaayaBottomSheet` gained the **board tone** (`alpha.board.paper`: brand 18% mixed into the
+  interface's white, ink on top) and `SurfacePanel` **lost its `z-index: 2`**: no sheet in the repo
+  sets a z-index, so sheets live in the auto layer and paint in tree order. A surface is the last
+  ordinary overlay in tree order, which is what lets a sheet she opens from a board stand over it
+  while the nav (3), the view's controls (4) and the rail (6) keep their rungs.
+- `FeedSurface` filters by category in the board, in the board's own chips on the board's paper.
+  `ImportSheet` is new: two steps, the second a labelled demo with up to three real bake rows -
+  nothing the user pastes is read, parsed or sent anywhere.
+- Board selections route through `handleBoardPlaceSelected` (the boards deal in `Place`, the screen
+  keys by id), and a board selection closes the surface so the place sheet is never trapped under
+  it. `WalkView` takes the home screen's pick (`selectedPlaceId` / `onPlaceDismiss`) and opens its
+  own sheet there, so one sheet serves the view however the place was chosen.
+
+**The grounded gate, cleared.** `scripts/grounded_check.py` over the 13 changed files first
+reported 12 ungrounded literals - all date digits (`2026`, `23`) mid-line inside the new ruling
+comments, because the checker only skips lines that *begin* with a comment marker. Rephrased, no
+`GROUNDED-EXEMPT` needed for the dates and no edit to `TRIVIAL`: the date now starts a continuation
+line that begins with `*`. One genuine exempt followed the house convention for the fixture
+coordinate in `HomeChrome.test.tsx` ("a probe coordinate, not a product value"). Re-run:
+**13 files, 0 ungrounded**.
+
+**Superseded, kept for the record.** The bottom cluster of direct actions (the dock that stood at
+the bottom-right of the map, with the Demo mark) is replaced by the rail; the CSS comment quotes
+it. The 3c chrome - "Search bar top; category bar bottom" - is replaced by the pill plus the nav,
+with the category row moved into the view that filters by it.
+
+## 2026-09-24 - New tests for the 3d surfaces
+
+The five components the wiring pass touched had no tests of their own; they do now. All static
+markup, like the rest of the suite (node environment, no jsdom, effects do not run):
+`PlaceList.test.tsx` (6), `FeedSurface.test.tsx` (6), `SearchSurface.test.tsx` (5),
+`ProfileSurface.test.tsx` (7), `importSheet.test.tsx` (4), `surfacePanel.test.tsx` (3) - 31 new
+tests. Suite: **62 files, 467 tests, all passing**; `npx tsc --noEmit` clean.
+
+What the tests hold, in the work order's own terms:
+
+- **Every mock says so.** A card renders the demo chip only when it is a demo card.
+- **Nothing she pastes is parsed.** The import sheet's first step is words and one action: no
+  input, no textarea, no card, no demo chip until the press that reveals the examples. The step
+  after the press is not reachable in a static render, so what is guarded instead is the promise
+  itself - `importBody` must keep saying "nothing is uploaded, nothing is parsed".
+- **"For you" is deterministic from her picks.** With no picks, no card claims she picked
+  anything (the why line is absent, not borrowed).
+- **Search is text matching.** The chips are the bake's own strings, every category the bake
+  yielded nothing for draws no chip, and the surface offers open-now as a filter she sets rather
+  than a state it claims.
+- **The layering rule is pinned.** `SurfacePanel` must keep **no `z-index` declaration**, because
+  that is what lets a sheet opened from a surface stand over it while the nav (3), the two view
+  controls (4) and the rail (6) keep their rungs. This was the one trap found during the wiring
+  pass, so it is now a test rather than a comment.
+- **The rail is two marks with their own words.** SUS and SOS, each carrying its label under the
+  glyph; the demo mark is gone from it.
+
+The grounded gate ran over all 15 changed and new files: **0 ungrounded literals**. Probe
+fixtures follow the house convention (`GROUNDED-EXEMPT: a probe coordinate / a probe distance
+reading`), never an edit to `TRIVIAL`.
+
+## 2026-09-24 - The four defects the wiring pass left, and the Save the Profile promised
+
+The wiring pass shipped the three boards; walking them in the browser turned up four defects,
+three of them layering, and one dead-end instruction on her own page. All four are fixed, and
+the round trip the Profile points at now exists end to end.
+
+**1. The nav had a documented rung and no declaration, so three of the four tabs were
+unreachable.** `HomeChrome`'s comment said the nav stands above a surface at rung 3, and
+`SurfacePanel`'s comment relied on it, but no `z-index: 3` was ever written - so the nav sat in
+the auto layer, and a surface (later in tree order, also auto) painted over it. On the Feed, the
+Search and the Profile the tab bar was covered: the tap landed on the board. Diagnosed with
+`elementFromPoint` at the tab centre (it returned the panel, not the tab), fixed by writing
+`.home-chrome__nav { z-index: 3 }` with the comment naming why the rung is load-bearing, and
+re-verified: the tab centre now returns the tab, and all four tabs switch from every surface.
+
+**2. The new import sheet carried no rung, so its last row lived behind the tabs.** Every other
+sheet in the product takes a rung in the `globals.css` table; the import sheet did not, which put
+it under the nav (3) in tree order. Added `.import-sheet { z-index: 7 }` - the place sheet's own
+rung - in the same table, and corrected the two comments that stated the old rule.
+
+**3. The character maker stood above the SOS overlay.** It was at `z-index: 40`, over the SOS
+overlay (20) and even over the AppGate (20) - and the walk view's own character mark can reopen
+it mid-walk, so a safety surface could be hidden by a wardrobe. Lowered to 8: above the ordinary
+chrome and the SOS/SUS rail (6), below the ladder (10), session truth (11) and every safety
+surface. The two comments that claimed the old order were corrected with it.
+
+**4. Her own page said "1 weeks with Saaya".** `profileWeeksOne` and `profileSavedCountOne` are
+new in both locales, and `ProfileSurface` branches on the count, so the page never reads back at
+her in the plural. Guarded by a test that pins the boundary (inside the first week reads as one,
+which is also what `weeksUsing` returns for it).
+
+**The Save the Profile promised did not exist.** `ProfileSurface` said "Nothing saved yet. Open a
+place and tap Save." while `handleSavePlace` was defined in `HomeScreen` and passed to nothing,
+and `ctaSave` / `ctaSaved` / `cdPlaceSave` / `cdPlaceUnsave` sat unused in both locales. The
+affordance is wired: the place sheet's first action is now Save / Saved, an `aria-pressed` toggle
+whose label is the place's own name, backed by `personalRepository`. The props are **optional
+together** (`saved?`, `onToggleSave?`): the walk view mounts this same sheet from its own frame
+with no store behind it, and a Save there would be an action with nothing behind it - the sheet's
+own doctrine, an absent field is an absent row. The walk view gains the store in Part 3g, when it
+adopts the system. A test pins the no-store mount: no Save, no `aria-pressed`.
+
+**The round trip, held in the browser** (390x844, the dev server on 3130): a Feed card opens the
+sheet reading "Save"; the press flips it to "Saved" and the label to "Remove ... from your
+places"; the sheet reopened reads back "Saved" - the store's answer, not local state; the Profile
+reads "1 week with Saaya" and "1 place saved" with the place in "Your places"; the second press
+returns it to "Save", and the Profile reads "0 places saved" with "Nothing saved yet". Stills:
+`/tmp/walk-verify/shots-3d/12` through `15`.
+
+**Verified:** suite 62 files / 470 tests passing, `npx tsc --noEmit` clean (the walk view's own
+`PlaceSheet` mount was the one type error the new props raised, and is what made the props
+optional), grounded gate 0 ungrounded over all 11 changed files.
+
+**Superseded, kept for the record.** The earlier entry's "no sheet in the repo sets a z-index, so
+sheets live in the auto layer and paint in tree order" is superseded: the sheet rungs live in the
+`globals.css` table (`.home-session-sheet` 5, `.zone-detail-sheet` 6, `.place-sheet` 7,
+`.import-sheet` 7, `.demo-panel-sheet` and `.location-help-sheet` 8), because a sheet that
+carries no rung lands under the nav (3) and its last row is hidden behind the tabs - which is how
+the import sheet behaved until this pass.
+
+**Open, for the founder, not changed unilaterally:** the browse and import sheets carry no scrim,
+so their top edge is invisible against the board's paper (the design system's depth model names a
+card over a scrim, but the written rule is scoped to the safety card); the map's two control
+circles and the SOS/SUS rail float over the boards by design; an unnamed bake place reads "BARS /
+bars / MVP Colony", the tag and title duplicating the category; the walk view reports "Streets
+will not load without a connection" when the real cause is a missing WebGL context; and the walk
+view itself is dense (pill, two circles, rail, street-shading bar, chips row, nav). The 3D canvas
+could not be verified in the browse browser at all - WebGL is unavailable there - so the walk
+view's own sheet mount is covered by tests and the type check, not by an eye.

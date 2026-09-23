@@ -2312,6 +2312,17 @@
    "platform": "any"
   },
   {
+   "id": "alpha.board.paper",
+   "kind": "number",
+   "value": 0.18,
+   "unit": "alpha",
+   "means": "The board's paper: color.brand mixed into paper white, at one weight for the feed, the search and the profile. White cards sit on it, so the paper is the only surface in the product that is neither white nor the map.",
+   "sourced_from": "proposed by the implementer 2026-09-23 under the corner-layout work order. The founder chose the look from five rendered directions: 'D - Board of white cards' for 'the Feed / Find / You surfaces'. The figure is the direction's own board paper (#EDE9F7 over white) read back as a mix of color.brand into color.textPrimary: 18% brand lands on #EFEAFE, one step off the render, and it is the same arithmetic the product already uses wherever a token is tinted (color-mix, as in ZoneChip's fill). Proposed openly for the founder's review alongside the rest of Part 3d.",
+   "governs": "DESIGN_SYSTEM.md",
+   "frozen": true,
+   "platform": "web"
+  },
+  {
    "id": "alpha.chip.fill",
    "kind": "number",
    "value": 0.2,
@@ -4847,6 +4858,39 @@
    "governs": "MAP_SPEC.md",
    "frozen": true,
    "was": "#578BAE",   "platform": "web"
+  },
+  {
+   "id": "home.topSpots.max",
+   "kind": "number",
+   "value": 3,
+   "unit": "places",
+   "means": "How many of her saved places the profile may star as top spots. A ceiling on the shortlist, never on saving: any number of places can be saved, and only the starred ones are capped. Starring is hers and local; nothing ranks, sorts or suggests which three.",
+   "sourced_from": "proposed by the implementer 2026-09-23 under the corner-layout work order, which requires the profile's shortlist before it is built - 'Part 3d, profile: her name, favourite, the stats that exist, top spots (starred from saved places), the saved list with remove'. Chosen, not measured: three is the shortlist a person holds in mind and reads at a glance, and it is the size the reference flow the founder asked the layout to copy uses. Proposed openly for the founder's review alongside the rest of Part 3d.",
+   "governs": "SCREENS.md",
+   "frozen": true,
+   "platform": "web"
+  },
+  {
+   "id": "home.browse.rowsMax",
+   "kind": "number",
+   "value": 20,
+   "unit": "places",
+   "means": "How many place rows a browse surface renders in one pass - the feed's two tabs, the search results and the saved list all share this ceiling. The bake holds 1444 browsable places, so this is a deliberate cut: the surface shows the nearest 20, and the search field is how she reaches past them.",
+   "sourced_from": "proposed by the implementer 2026-09-23 under the corner-layout work order for Part 3d's feed, search and profile surfaces. Chosen, not measured: it is what a thumb will scroll through in one sitting on a phone, and it keeps the rendered list small enough that the surfaces open without a visible pause. The number 20 already existed in the graph as MAX_STATION_DISTANCE_KM; this fact is the browse surface's own meaning of it and is not that one, which is why the id is stated here rather than the literal left to match the station fact. Proposed openly for the founder's review alongside the rest of Part 3d.",
+   "governs": "SCREENS.md",
+   "frozen": true,
+   "platform": "web"
+  },
+  {
+   "id": "home.search.chipMax",
+   "kind": "number",
+   "value": 8,
+   "unit": "chips",
+   "means": "How many suggestion chips the search surface shows at once: first the categories the product has names for and places in, then the areas holding the most places. Every chip is a string the bake actually contains, so a chip always lands on results, and the ceiling is what keeps the row to about two lines on a phone.",
+   "sourced_from": "proposed by the implementer 2026-09-23 under the corner-layout work order for Part 3d's search surface - 'suggestion chips derived from real categories and areas so every chip lands on results'. Chosen, not measured: seven categories plus one area is two lines of chips at the smallest supported viewport, and it is the point past which the row stops reading as a suggestion and starts reading as a wall. Proposed openly for the founder's review alongside the rest of Part 3d.",
+   "governs": "SCREENS.md",
+   "frozen": true,
+   "platform": "web"
   }
  ]
 }
