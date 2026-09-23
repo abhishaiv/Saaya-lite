@@ -5392,3 +5392,28 @@ before and is `20,714 350x54` now - 714 + the 12 px padding is 726, so the chips
 pixel. Probes unchanged (flat IDLE 0/0; flat cafes 0 chrome, 2 slivers; walk 0 chrome, 2 slivers).
 `tsc` clean, 418/418 across 55 files, 0 ungrounded across 29 changed files.
 
+## 2026-09-23 - Part 3c shipped to main, and production serves it
+
+The founder's standing order - "Continue. Finish and deploy to main. I will have a look." - is
+done for 3c.
+
+- `423585f` Part 3c: Corner's layout on the flat map, with Vizag's places on it, pushed to
+  `m4-walk-view`, then `f052c36` Part 3c: the placement pass itself, left out of the previous
+  commit. **The first commit was incomplete: `git mv` had staged the rename and the follow-up
+  `git add` named only the other paths, so `423585f` carried the pre-3c `labelPlacement` beside
+  callers expecting the new one. Vercel's preview build for it failed, which is how the gap
+  surfaced; the follow-up commit staged the real content and the build went green.** Both commits
+  are on `m4-walk-view`; `main` fast-forwarded to `f052c36` and was pushed
+  (`0955efb..f052c36`).
+- Peer "Saaya 3D Planning" was notified before the push, per the guardrail.
+- Production deploy for `f052c36`: deployment `6620429481`, status success, live at
+  `saaya-lite.vercel.app`. Verified against the live build, not the build log: the served CSS
+  hash changed (`a28ec...` -> `9a18bcd...`), the app-page chunk carries `home-chrome__search`,
+  `home-chrome__nav` and `home-chrome__category`, the category rule carries
+  `minimum-touch-target`, and the place sheet ships. The "Where to?" search copy is in the live
+  chunk.
+- The stills for the founder: `3c-flat-idle.png`, `3c-flat-filter.png`, `3c-flat-sheet.png`,
+  `3c-flat-shadow.png`, `3c-walk-idle.png`, all in /tmp/walk-verify.
+- Next: Part 3d, the Search surface the search pill opens, then 3e, 3f (demo removal from the
+  dock), 3g.
+
