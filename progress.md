@@ -5061,3 +5061,27 @@ Part 3c's acceptance, in a before/after still.
 
 **Nothing in the product changed by the research session.** Tree: `/tmp/saaya-ui`, `m4-walk-view`,
 tip `0955efb`.
+
+## 2026-09-23 - The founder removes the demo and moves the whole ladder to the new vibe
+
+Founder, verbatim, the same day as the section above: "Remove demo. We need SUS and SOS. The
+checkin cards during SUS activation should also match the new aesthetic and vibe we are shifting
+to."
+
+**Superseding the section above:** the earlier reading - "the Demo / SUS / SOS cluster keeps its
+visible place on the Corner-styled Home ... Part 3c's acceptance" - is superseded. The cluster is
+SUS and SOS only; the demo does not stay. The founder ruled, asked and answered: remove the demo
+entirely (panel, speed toggle and divisors, the Home logo, the Settings row, the onboarding's "Open
+the demo" CTA, all demo copy and tests), and the whole ladder adopts the new system in one pass
+(check-in cards, family escalation, SOS active, PIN entry) with behaviours untouched. Consequences
+the founder chose knowingly: SUS at real speed becomes the only path to the ladder, and there is no
+desk walkthrough any more.
+
+The work order now carries this as a rewritten addendum plus Part 3f (the demo leaves; every mock
+stays labelled on its own) and Part 3g (the ladder adopts the system), with the order 3a, 3b, 3c,
+3d, 3e, then 3f and 3g together; the implementer has been sent both rulings. The standing "Demo,
+SUS and SOS can be logos on the right" instruction (`homeSessionSurface.test.tsx:66`) is superseded
+in the work order and must be quoted and marked so in the test.
+
+**Nothing in the product changed by the research session.** Tree: `/tmp/saaya-ui`, `m4-walk-view`,
+tip `e77a6e5`.
