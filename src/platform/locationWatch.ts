@@ -315,3 +315,44 @@ export function lastKnownFixForMapCentering(
 export function browserGeolocation(): GeolocationLike {
   return navigator.geolocation;
 }
+
+export const ONBOARDING_FIX_MAX_AGE_SEC = 60; // fact: onboarding.fix.max_age
+export const ONBOARDING_FIX_READ_TIMEOUT_SEC = 10; // fact: onboarding.fix.read_timeout
+
+/**
+ * One read of the current position, for a moment that needs the fix once.
+ *
+ * Onboarding's street moment needs a position to draw before it mounts the walk view, and
+ * the watch is the wrong tool there: it is a cadence with statuses and callbacks, and the
+ * moment ends when the view has been shown. The options are the point of this function.
+ * The browser's own default timeout is infinite, and setup cannot wait on a cold GPS
+ * behind a working state forever; a minute-old cached fix is the right answer here, because
+ * in setup the only fix on the device is the one the permission ask just produced.
+ */
+export function readCurrentPositionFix(
+  geolocation: GeolocationLike = browserGeolocation(),
+  options: PositionOptions = {
+    enableHighAccuracy: false,
+    maximumAge: secondsToEpochMs(ONBOARDING_FIX_MAX_AGE_SEC),
+    timeout: secondsToEpochMs(ONBOARDING_FIX_READ_TIMEOUT_SEC),
+  },
+): Promise<LiveLocationFix | null> {
+  return new Promise((resolve) => {
+    try {
+      geolocation.getCurrentPosition(
+        (position) =>
+          resolve({
+            source: "LIVE_WATCH",
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            accuracyM: position.coords.accuracy,
+            observedAtEpochMs: position.timestamp,
+          }),
+        () => resolve(null),
+        options,
+      );
+    } catch {
+      resolve(null);
+    }
+  });
+}

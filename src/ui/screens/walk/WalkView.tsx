@@ -44,6 +44,12 @@ export interface WalkViewProps {
   readonly locationStatus: LocationStatus;
   readonly mapZones: readonly MapZone[];
   readonly onZoneSelected: (stationId: string) => void;
+  /**
+   * Whether the world became drawable or gave up, reported once. Optional: the home
+   * screen's view says so in its own status line, and onboarding holds a loading moment
+   * on this instead, because its loading moment is a full screen of its own.
+   */
+  readonly onWorldSettled?: (outcome: "ready" | "failed") => void;
   readonly selectedZoneId: string | null;
   readonly sessionState: SessionState;
 }
@@ -96,6 +102,7 @@ export function WalkView({
   locationStatus,
   mapZones,
   onZoneSelected,
+  onWorldSettled,
   selectedZoneId,
   sessionState,
 }: WalkViewProps) {
@@ -134,6 +141,10 @@ export function WalkView({
   latest.current = { character, location, selectedZoneId, sessionState };
   const zonesRef = useRef(mapZones);
   zonesRef.current = mapZones;
+  // The mount effect runs exactly once, so it reads the callback through a ref for the
+  // same reason it reads the character through one.
+  const settledRef = useRef(onWorldSettled);
+  settledRef.current = onWorldSettled;
 
   /**
    * Each label's own box, measured once.
@@ -221,11 +232,15 @@ export function WalkView({
         const view = latest.current;
         controller = await mountWalkScene(canvas, zonesRef.current, view.character, {
           onError: () => {
-            if (!cancelled) setFailed(true);
+            if (cancelled) return;
+            setFailed(true);
+            settledRef.current?.("failed");
           },
           onLabels: handleLabels,
           onWorldReady: () => {
-            if (!cancelled) setReady(true);
+            if (cancelled) return;
+            setReady(true);
+            settledRef.current?.("ready");
           },
         });
         if (cancelled) {
@@ -243,7 +258,9 @@ export function WalkView({
           sessionState: current.sessionState,
         });
       } catch {
-        if (!cancelled) setFailed(true);
+        if (cancelled) return;
+        setFailed(true);
+        settledRef.current?.("failed");
       }
     })();
 

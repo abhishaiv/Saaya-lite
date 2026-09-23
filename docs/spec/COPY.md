@@ -18,6 +18,10 @@ demo video.
 | **Onboarding** | | |
 | `onb_welcome_title` | You do not have to press anything | మీరు ఏదీ నొక్కాల్సిన అవసరం లేదు |
 | `onb_welcome_body` | Saaya watches the stretch, not you. It wakes on its own when you enter an area that has a record, at an hour that matters. | సాయ మిమ్మల్ని కాదు, మార్గాన్ని గమనిస్తుంది. రికార్డు ఉన్న ప్రాంతంలోకి, ముఖ్యమైన సమయంలో మీరు ప్రవేశించినప్పుడు అది దానంతట అదే మేల్కొంటుంది. |
+| `onb_promise_watch_title` | It watches the stretch, not you. | సాయ మిమ్మల్ని కాదు, మార్గాన్ని గమనిస్తుంది. |
+| `onb_promise_favourites_title` | Your favourites stay on your phone. | మీ ఆత్మీయులు మీ ఫోన్‌లోనే ఉంటారు. |
+| `onb_promise_ready_title` | Shall we set it up? | ఇప్పుడు సెటప్ చేసుకుందామా? |
+| `onb_promise_ready_body` | Nothing here is rushed. | ఇక్కడ ఏదీ తొందరలో లేదు. |
 | `onb_beta_vizag` | Beta: tuned to Vizag data only. | బీటా: విశాఖపట్నం డేటాకే సర్దుబాటు చేయబడింది. |
 | `onb_name_label` | Your name | మీ పేరు |
 | `onb_name_hint` | So the local message has a subject | ఈ స్థానిక సందేశం ఎవరి గురించో చూపించడానికి |
@@ -30,6 +34,7 @@ demo video.
 | `onb_location_title` | Saaya needs to know where the stretch is | మార్గం ఎక్కడ ఉందో సాయకు తెలియాలి |
 | `onb_location_body` | Location is how Saaya wakes without you pressing anything. In this beta, it stays on your phone. | మీరు ఏదీ నొక్కకుండా సాయ మేల్కొనేది లొకేషన్ ద్వారానే. ఈ బీటాలో ఇది మీ ఫోన్‌లోనే ఉంటుంది. |
 | `onb_location_partial` | Saaya watches only while this page is open. Keep it open for the stretch you are on. | ఈ పేజీ తెరిచి ఉన్నప్పుడు మాత్రమే సాయ గమనిస్తుంది. మీరు వెళ్తున్న మార్గం వరకు దీన్ని తెరిచి ఉంచండి. |
+| `onb_street_caption` | This is the area around you. | మీ చుట్టూ ఉన్న ప్రాంతం ఇది. |
 | `onb_pin_title` | Set a PIN | ఒక PIN సెట్ చేయండి |
 | `onb_pin_body` | Four digits. You will need it to stop a live SOS. Set it now, calmly, because you may need it when you are not calm. | నాలుగు అంకెలు. ప్రత్యక్ష SOS ఆపడానికి ఇది అవసరం. ప్రశాంతంగా ఉన్నప్పుడే దీన్ని సెట్ చేయండి. |
 | `onb_tour_title` | See the safety flow first | ముందుగా భద్రతా ప్రయాణాన్ని చూడండి |
@@ -37,6 +42,11 @@ demo video.
 | `onb_tour_shadow` | Open the demo, turn on Demo speed, and choose a zone to see Shadow start. | డెమో తెరిచి, డెమో వేగాన్ని ఆన్ చేసి, షాడో ఎలా ప్రారంభమవుతుందో చూడటానికి ఒక జోన్ ఎంచుకోండి. |
 | `onb_tour_checkins` | Miss a check-in to see the timed reminders and family escalation. | సమయంతో కూడిన గుర్తింపులు, ఆత్మీయుల దశ చూడటానికి ఒక చెక్-ఇన్ మిస్ అయినట్టు చూపించండి. |
 | `onb_tour_sos` | Tap I need help now at any point to open SOS, then choose Call 112 to use your phone's dialler. | ఎప్పుడైనా నాకు ఇప్పుడే సహాయం కావాలి నొక్కి SOS తెరిచి, మీ ఫోన్ డయలర్‌లో 112కి కాల్ చేయండి. |
+| `onb_tour_shadow_title` | Shadow starts on its own. | షాడో దానంతట అదే మొదలవుతుంది. |
+| `onb_tour_checkins_title` | Miss a check-in, and the reminders start. | ఒక చెక్-ఇన్ మిస్ అయితే, గుర్తింపులు మొదలవుతాయి. |
+| `onb_tour_sos_title` | SOS opens instantly. Your PIN stops it. | SOS వెంటనే తెరుచుకుంటుంది. మీ PIN దాన్ని ఆపుతుంది. |
+| `onb_celebrate_title` | You are set up. | మీ సెటప్ పూర్తయింది. |
+| `onb_celebrate_body` | The demo is open on the map. Run it once, calmly, before you need it. | డెమో మ్యాప్‌లో తెరిచి ఉంది. అవసరం రాకముందే ఒకసారి ప్రశాంతంగా నడపండి. |
 | `cta_open_demo` | Open the demo | డెమో తెరువు |
 | **Home** | | |
 | `status_idle` | Not watching | గమనించడం లేదు |

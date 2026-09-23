@@ -92,6 +92,50 @@ language selector or extra-contact flow ships in Lite.
 - Primary `cta_open_demo` lands on Home with the existing labelled `DemoPanel` already open. The panel remains replayable from Home and Settings.
 - The tour tells her which control begins Shadow, how a missed check-in reaches the family stage, and where the direct SOS control leads. It never claims anything is sent by the prototype.
 
+### Amendment 2026-09-23: the onboarding is rebuilt on the reference's craft, and she sees her own street on the way in
+
+Founder's order, relayed 2026-09-23 with the reference recording (`ScreenRecording_09-22-2026
+23-35-50_1.mov`, 150.8 s): *"WE also want on-boarding like this. Also the building around us
+should be in 3D view."* The recording is craft to reproduce, not a spec to copy: the moments
+were read off it frame by frame and rebuilt in Saaya's own voice.
+
+**The five spec'd moments are unchanged in substance and in order.** Welcome, favourite,
+location, PIN and tour still say what S2.1 to S2.5 says they say, and `onboarded = true` is
+still written only when she opens the demo. The ruling added the craft around them and four
+moments of its own.
+
+| Beat | What it is | Why it is there |
+|---|---|---|
+| Splash | the mark, then three promises in her own voice, 2.4 s each (`onb_promise_watch_title`, `onb_promise_favourites_title`, and the welcome line), ending on a question with one button (`onb_promise_ready_title`) | the reference's opening calm, and the last thing on screen is a question she answers |
+| Splash, reduced motion | the same promises as a static list, rotation stopped | the rotation is a JS timer, which the global reduced-motion rule cannot reach, so it stops itself - the walk view's precedent |
+| Street | the walk view of her own neighbourhood, drawn from the fix the permission ask just produced (`onb_street_caption`) | the founder's second clause, in the only 3D render the product has; `FEATURES.md` Amendment 1 clause 1 binds it, so the legend chip is present and states the derivation |
+| Street, no fix | no street beat: the flow continues straight to PIN | never draw her standing somewhere she is not. The flat map sets the precedent: no fix means no marker |
+| Loading | `walk_loading`, the walk view's own line, held over the walk view's sky colour (`color.walk.sky`) | the world arrives into a sky already on screen; the loading copy is not duplicated |
+| Tour | the ladder's four ideas, one per card, over the rows S2.5 lists, with a dot row showing position within the tour | one idea per screen, per the ruling |
+| Celebration | `onb_celebrate_title`, `onb_celebrate_body`, one button that opens the demo | the flow ends on what she has, not on a form |
+
+**Not copied from the reference:** phone-number auth, "here from" attribution, friends and
+vibe-check, contact import, photo-library access, "import your places", the age gate,
+invite-only parties, and invented stats. Every Lite constraint holds unchanged: no AI calls,
+no analytics, no government branding, nothing invented, every mock labelled.
+
+**Budget.** About 55 to 60 s from opening the app to the first tour card on the happy path:
+splash ~8 s, favourite ~20 s, location ~10 s, street ~8 to 12 s, PIN ~10 s. Under the 90 s
+target in the heading above.
+
+**Three facts carry the new numbers.** `onboarding.fix.max_age` (60 s): the age of the
+position the street moment accepts, because the browser may answer the permission ask from
+its own cache rather than making her wait for a cold acquisition. `onboarding.fix.read_timeout`
+(10 s): the deadline on that one-shot read, after which the flow continues without the street
+moment; the browser's own default is no deadline at all, and setup is never held on a
+position. `motion.2400ms`: the promise dwell, in `MOTION_SPEC.md`'s catalogue. The sheets take
+`--sheet-expanded-height` and the heading's body takes `--color-text-secondary`, so neither
+needs a number of its own.
+
+**One question left open for the founder.** The dots in the tour mark position inside the
+tour. "No progress dots" above means no setup-wide progress indicator, and the flow still has
+none. Confirm the in-tour dots or strip them.
+
 ## S3. Home (F6, F9, F11, F12, F13, F14)
 
 Full-bleed dark map, controls floating over it.

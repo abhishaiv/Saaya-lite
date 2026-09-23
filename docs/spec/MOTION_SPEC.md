@@ -63,6 +63,16 @@ the only exception in the product, and it changes none of the rules above it.
 | SOS exit | correct PIN | fade `standard` | 200 ms |
 | Toast or snackbar | any | slide up + fade, `spring` | ~250 ms |
 | Skeleton shimmer | loading | 1200 ms loop, `linear`, opacity 0.06 to 0.12 | loop |
+| Onboarding promise rotation | 2.4 s dwell | straight swap of the promise text, no tween | 2400 ms per promise |
+| Onboarding sheet rise (PIN, tour, celebration) | step change | translate up 16 px + fade, `spring` | 320 ms |
+| Onboarding street interstitial dots | while the world loads | 1000 ms loop, `standard`, opacity 0.3 to 1 | loop |
+
+**The onboarding's three entries, added 2026-09-23.** The sheet rise is the check-in card's
+own shape (16 px and a `spring`, 320 ms) rather than a new one. The promise rotation is the
+only motion in the product driven by a JS timer instead of a CSS transition, so the global
+reduced-motion rule below cannot reach it: it checks the media query itself and stops,
+showing the promises as a static list. That is the walk view's own precedent, and the list is
+information rather than decoration, so nothing is lost when it stops.
 
 ## Reduced motion
 

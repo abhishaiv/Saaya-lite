@@ -4892,3 +4892,82 @@ and the drawn-tone variation is a rendering detail that lives in `walkTiles.ts` 
 
 Docs-only change: no code, no tests, no facts. `npx tsc --noEmit` clean; suite re-run green after
 the doc edit (nothing in the suite reads MAP_SPEC's palette table).
+
+## 2026-09-23 - The onboarding is rebuilt: a splash that asks one question, her own street in the walk render, the tour in cards
+
+The founder's work order (relayed 2026-09-23) asked for two things; Part 2, the buildings' 3D read,
+landed first (`aefd5bf`, `10b4e2c`). This batch is Part 1: Saaya's onboarding rebuilt in the craft of
+the Corner app's recording (`/Users/abhishai/Downloads/ScreenRecording_09-22-2026 23-35-50_1.mov`,
+150.8 s; frames in `/tmp/walk-verify/ref-0922/`), reproductions and captures under
+`/tmp/walk-verify/onboarding/`. The five spec'd moments keep their substance and their order -
+welcome, the one favourite person with her phone staying on the device, the location rationale with
+the permission ask, the PIN in one entry with no confirmation row, and the safety-flow tour - and
+the ruling is recorded in `SCREENS.md` S2 under its own dated amendment. `onboarded = true` is still
+written only when she opens the demo, and the flow reaches the tour in about 55-60 s against the
+founder's 90 s budget (per-beat arithmetic in the SCREENS.md amendment).
+
+**The flow now.** A splash: the Saaya mark and three promises in Saaya's own voice, each holding
+2.4 s and swapping straight, ending on a question with one button. Reduced motion gets the promises
+as one static list - the rotation checks the media query itself, the walk-view precedent. Then the
+favourite person ("one person is enough"), then the location rationale and the permission ask.
+Granted: a "loading your new map" interstitial while `readCurrentPositionFix` takes one read, then
+the street moment - the same grounded walk render of her own Vizag neighbourhood that Home will give
+her, with her standing in it and one Continue. Declined: the permission screen itself carries the
+way forward and the street moment is skipped rather than shown empty; the record's denied pass
+captures exactly that. Then the PIN, the tour in one-idea-per-screen cards, and a celebration whose
+one button opens the demo. Not copied from the reference: the phone auth, "here from" attribution,
+friends and vibe checks, contact import, photo access, "import your places", the age gate,
+invite-only parties, and every invented stat.
+
+**Two defects, both found in a real browser with an instrument rather than by looking.** (1) The
+street beat's Continue was untappable: `elementFromPoint` at the button's centre returned the walk
+view's canvas. Cause: the beat is `pointer-events: none` with the re-enable done through a `> *`
+child rule, and styled-jsx scopes a `> *` rule to elements declared in the same file - `SaayaButton`
+carries its own component hash onto its root, so the one button in the beat stayed `none` and the
+canvas took the tap. Fixed with an explicit rule naming the beat's own controls, and a wrapper div
+that exists for the same reason. (2) The same wrapper stands in the grid's last row: with two
+children and `auto 1fr auto` rows, the button landed in the middle row (measured
+`gridTemplateRows: "70px 694px 0px"`, button at y=106 against a 768 floor). Both verified with the
+same instrument afterwards - button at y=768, hit inside, click lands, `.pin-entry__input` present.
+
+**Facts and grounded numbers.** Three new facts spliced textually into `graph/spec_graph.json`
+(3-space keys, one-space steps; 434 ids, all unique): `motion.2400ms` (the promise dwell, now timed
+in MOTION_SPEC.md rather than exempted in code), `onboarding.fix.max_age` 60 s and
+`onboarding.fix.read_timeout` 10 s, with the `means` carrying why - the browser's own default
+timeout is infinite, setup is never held on a cold GPS behind a working state, and in setup the only
+fix on the device is the one the permission ask just produced, so a minute-old cached fix is the
+right answer. Two numbers already had grounded homes and reuse them: the sheet's cap became
+`var(--sheet-expanded-height)` (was `76dvh`) and the onboarding heading tone became
+`var(--color-text-secondary)` (was a `rgb(from ...)` blend). `scripts/grounded_check.py` over the
+four touched files: 0 ungrounded literals. The onboarding's three motion entries are catalogued in
+MOTION_SPEC.md; the ten new copy rows (en + te) are in COPY.md.
+
+**Record.** `after/` holds both passes - granted (17 stills) and denied (15, no street shots) -
+captured by `/tmp/walk-verify/onboarding/shots-after.mjs` (SwiftShader args, fresh contexts,
+390x844@2x, en-IN, a Vizag fix), log in `shots-after.log`; `before/` is the pre-change flow. The
+regeneration was first blocked by a corrupted `.next` manifest - an orphaned second dev server
+(port 3121, started 02:52, same tree, same `.next`) was writing alongside the 3130 server; the
+orphan was stopped, the build cache cleared, and one clean server produced the record with no
+console errors.
+
+**Flagged, not fixed in this batch.** (1) The demo-speed note reads "Timers run 1x faster. The full
+ladder takes 210 seconds instead of 210." with the toggle off (`DemoPanel.tsx:52-61` x
+`strings.ts:274`), visible in `09-home-demo.png`; pre-existing, spun off as its own task. (2) The
+walk view's no-fix path (permission prompt left unanswered) renders a silent violet void with
+`status: null` and `notice: null`; onboarding sidesteps it by skipping the beat, but Home can still
+reach it, and what that frame should say is the founder's call.
+
+**Gates.** `npx tsc --noEmit` clean; `npx vitest run` 50 files / 372 tests pass; grounded check 0
+ungrounded (402 live facts -> 168 distinct values). The location-watch tests still assert the
+one-shot options `{enableHighAccuracy: false, maximumAge: 60_000, timeout: 10_000}` - the constants
+are named now, the values unchanged.
+
+**Owed to the founder.** The tour's in-card dot row wants a confirm-or-strip ruling (the standing
+"no progress dots" line; SCREENS.md carries the open question). The street beat shows the walk
+view's legend chip in its default (expanded) state; that default sits on the owed list with the zone
+tint, the horizon-band palette, the 5.19% occlusion rate and the floor-rung change. Part 2's
+remainder is unchanged: occlusion acceptance, the floor rung, roof-edge read and orientation
+shading.
+
+**Tree state.** `/tmp/saaya-ui`, branch `m4-walk-view` = `10b4e2c` + this batch (11 modified files,
+`onboardingFlow.test.ts` new). No commit, no push in this batch - the founder calls deploys.

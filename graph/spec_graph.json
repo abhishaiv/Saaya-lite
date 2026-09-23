@@ -1503,6 +1503,17 @@
    "platform": "any"
   },
   {
+   "id": "motion.2400ms",
+   "kind": "number",
+   "value": 2400,
+   "unit": "ms",
+   "means": "onboarding promise dwell: each of the splash's three promises holds this long before the next takes its place, and the question with its one button follows the last",
+   "sourced_from": "SCREENS.md S2 amendment, 2026-09-23",
+   "governs": "MOTION_SPEC.md",
+   "frozen": true,
+   "platform": "web"
+  },
+  {
    "id": "motion.sos",
    "kind": "number",
    "value": 0,
@@ -4416,6 +4427,28 @@
    "unit": "digits",
    "means": "exact number of digits required after the fixed India prefix during onboarding",
    "sourced_from": "SCREENS.md:56,61",
+   "governs": "SCREENS.md",
+   "frozen": true,
+   "platform": "web"
+  },
+  {
+   "id": "onboarding.fix.max_age",
+   "kind": "number",
+   "value": 60,
+   "unit": "s",
+   "means": "age of the position the onboarding's street moment accepts, in seconds. The only fix that moment may draw is the one the permission ask just produced, and the browser is allowed to answer that ask from its own cache within this window rather than making her wait for a fresh acquisition",
+   "sourced_from": "SCREENS.md S2 amendment, 2026-09-23",
+   "governs": "SCREENS.md",
+   "frozen": true,
+   "platform": "web"
+  },
+  {
+   "id": "onboarding.fix.read_timeout",
+   "kind": "number",
+   "value": 10,
+   "unit": "s",
+   "means": "deadline on the onboarding's one-shot position read, in seconds. When it passes the flow continues without the street moment; the browser's own default is no deadline at all, and setup is never held on a position",
+   "sourced_from": "SCREENS.md S2 amendment, 2026-09-23",
    "governs": "SCREENS.md",
    "frozen": true,
    "platform": "web"

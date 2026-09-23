@@ -119,11 +119,21 @@ export type M4Copy = Readonly<{
   onbNameLabel: string;
   onbPinBody: string;
   onbPinTitle: string;
+  onbPromiseFavouritesTitle: string;
+  onbPromiseReadyBody: string;
+  onbPromiseReadyTitle: string;
+  onbPromiseWatchTitle: string;
+  onbStreetCaption: string;
   onbBetaVizag: string;
+  onbCelebrateBody: string;
+  onbCelebrateTitle: string;
   onbTourBody: string;
   onbTourCheckins: string;
+  onbTourCheckinsTitle: string;
   onbTourShadow: string;
+  onbTourShadowTitle: string;
   onbTourSos: string;
+  onbTourSosTitle: string;
   onbTourTitle: string;
   onbWelcomeBody: string;
   onbWelcomeTitle: string;
@@ -304,11 +314,21 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     onbNameLabel: "Your name",
     onbPinBody: "Four digits. You will need it to stop a live SOS. Set it now, calmly, because you may need it when you are not calm.",
     onbPinTitle: "Set a PIN",
+    onbPromiseFavouritesTitle: "Your favourites stay on your phone.",
+    onbPromiseReadyBody: "Nothing here is rushed.",
+    onbPromiseReadyTitle: "Shall we set it up?",
+    onbPromiseWatchTitle: "It watches the stretch, not you.",
+    onbStreetCaption: "This is the area around you.",
     onbBetaVizag: "Beta: tuned to Vizag data only.",
+    onbCelebrateBody: "The demo is open on the map. Run it once, calmly, before you need it.",
+    onbCelebrateTitle: "You are set up.",
     onbTourBody: "Before you need it, run the guided demo on the map.",
     onbTourCheckins: "Miss a check-in to see the timed reminders and family escalation.",
+    onbTourCheckinsTitle: "Miss a check-in, and the reminders start.",
     onbTourShadow: "Open the demo, turn on Demo speed, and choose a zone to see Shadow start.",
+    onbTourShadowTitle: "Shadow starts on its own.",
     onbTourSos: "Tap I need help now at any point to open SOS, then choose Call 112 to use your phone's dialler.",
+    onbTourSosTitle: "SOS opens instantly. Your PIN stops it.",
     onbTourTitle: "See the safety flow first",
     onbWelcomeBody: "Saaya watches the stretch, not you. It wakes on its own when you enter an area that has a record, at an hour that matters.",
     onbWelcomeTitle: "You do not have to press anything",
@@ -487,11 +507,21 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     onbNameLabel: "మీ పేరు",
     onbPinBody: "నాలుగు అంకెలు. ప్రత్యక్ష SOS ఆపడానికి ఇది అవసరం. ప్రశాంతంగా ఉన్నప్పుడే దీన్ని సెట్ చేయండి.",
     onbPinTitle: "ఒక PIN సెట్ చేయండి",
+    onbPromiseFavouritesTitle: "మీ ఆత్మీయులు మీ ఫోన్‌లోనే ఉంటారు.",
+    onbPromiseReadyBody: "ఇక్కడ ఏదీ తొందరలో లేదు.",
+    onbPromiseReadyTitle: "ఇప్పుడు సెటప్ చేసుకుందామా?",
+    onbPromiseWatchTitle: "సాయ మిమ్మల్ని కాదు, మార్గాన్ని గమనిస్తుంది.",
+    onbStreetCaption: "మీ చుట్టూ ఉన్న ప్రాంతం ఇది.",
     onbBetaVizag: "బీటా: విశాఖపట్నం డేటాకే సర్దుబాటు చేయబడింది.",
+    onbCelebrateBody: "డెమో మ్యాప్‌లో తెరిచి ఉంది. అవసరం రాకముందే ఒకసారి ప్రశాంతంగా నడపండి.",
+    onbCelebrateTitle: "మీ సెటప్ పూర్తయింది.",
     onbTourBody: "అవసరం రాకముందే మ్యాప్‌లో గైడెడ్ డెమో నడపండి.",
     onbTourCheckins: "సమయంతో కూడిన గుర్తింపులు, ఆత్మీయుల దశ చూడటానికి ఒక చెక్-ఇన్ మిస్ అయినట్టు చూపించండి.",
+    onbTourCheckinsTitle: "ఒక చెక్-ఇన్ మిస్ అయితే, గుర్తింపులు మొదలవుతాయి.",
     onbTourShadow: "డెమో తెరిచి, డెమో వేగాన్ని ఆన్ చేసి, షాడో ఎలా ప్రారంభమవుతుందో చూడటానికి ఒక జోన్ ఎంచుకోండి.",
+    onbTourShadowTitle: "షాడో దానంతట అదే మొదలవుతుంది.",
     onbTourSos: "ఎప్పుడైనా నాకు ఇప్పుడే సహాయం కావాలి నొక్కి SOS తెరిచి, మీ ఫోన్ డయలర్‌లో 112కి కాల్ చేయండి.",
+    onbTourSosTitle: "SOS వెంటనే తెరుచుకుంటుంది. మీ PIN దాన్ని ఆపుతుంది.",
     onbTourTitle: "ముందుగా భద్రతా ప్రయాణాన్ని చూడండి",
     onbWelcomeBody: "సాయ మిమ్మల్ని కాదు, మార్గాన్ని గమనిస్తుంది. రికార్డు ఉన్న ప్రాంతంలోకి, ముఖ్యమైన సమయంలో మీరు ప్రవేశించినప్పుడు అది దానంతట అదే మేల్కొంటుంది.",
     onbWelcomeTitle: "మీరు ఏదీ నొక్కాల్సిన అవసరం లేదు",

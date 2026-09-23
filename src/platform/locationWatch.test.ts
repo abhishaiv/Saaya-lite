@@ -12,6 +12,7 @@ import { minutesToEpochMs, secondsToEpochMs } from "./clock";
 import {
   BrowserLocationWatch,
   lastKnownFixForMapCentering,
+  readCurrentPositionFix,
   type GeolocationLike,
   type LiveLocationFix,
   type LocationStatus,
@@ -65,6 +66,7 @@ class FakeScheduler {
 class FakeGeolocation implements GeolocationLike {
   initialSuccess: PositionCallback | null = null;
   initialError: PositionErrorCallback | null = null;
+  readonly oneShotOptions: (PositionOptions | undefined)[] = [];
   readonly watchOptions: PositionOptions[] = [];
   readonly cleared: number[] = [];
   private nextWatchId = 1; // GROUNDED-EXEMPT: opaque fake browser handle seed.
@@ -76,9 +78,11 @@ class FakeGeolocation implements GeolocationLike {
   getCurrentPosition(
     success: PositionCallback,
     error?: PositionErrorCallback | null,
+    options?: PositionOptions,
   ): void {
     this.initialSuccess = success;
     this.initialError = error ?? null;
+    this.oneShotOptions.push(options);
   }
 
   watchPosition(
@@ -331,5 +335,59 @@ describe("browser location watch", () => {
     expect(
       lastKnownFixForMapCentering(stored, nowEpochMs + 1),
     ).toBeNull();
+  });
+});
+
+describe("readCurrentPositionFix", () => {
+  it("reads one live fix from the position the browser hands back", async () => {
+    const coordinate = bundledZoneData.zones[0]?.centroid;
+    if (coordinate === undefined) throw new Error("Frozen zone centroid is missing");
+    const geolocation = new FakeGeolocation();
+    const read = readCurrentPositionFix(geolocation);
+    geolocation.initialSuccess?.(position(0));
+
+    await expect(read).resolves.toEqual({
+      source: "LIVE_WATCH",
+      latitude: coordinate.latitude,
+      longitude: coordinate.longitude,
+      accuracyM: MAX_CONTAINMENT_ACCURACY_M,
+      observedAtEpochMs: 0,
+    });
+  });
+
+  it("gives the browser a deadline and accepts the fix the permission ask just took", () => {
+    const geolocation = new FakeGeolocation();
+    void readCurrentPositionFix(geolocation);
+
+    expect(geolocation.oneShotOptions.at(-1)).toMatchObject({
+      enableHighAccuracy: false,
+      maximumAge: 60_000,
+      timeout: 10_000,
+    });
+  });
+
+  it("resolves null on a failed read rather than holding setup on it", async () => {
+    const geolocation = new FakeGeolocation();
+    const read = readCurrentPositionFix(geolocation);
+    geolocation.initialError?.({
+      code: 2,
+      message: "unavailable",
+    } as GeolocationPositionError);
+
+    await expect(read).resolves.toBeNull();
+  });
+
+  it("resolves null when geolocation throws instead of calling back", async () => {
+    const throwing: GeolocationLike = {
+      getCurrentPosition() {
+        throw new Error("no geolocation");
+      },
+      watchPosition() {
+        return 0; // GROUNDED-EXEMPT: opaque fake browser handle.
+      },
+      clearWatch() {},
+    };
+
+    await expect(readCurrentPositionFix(throwing)).resolves.toBeNull();
   });
 });

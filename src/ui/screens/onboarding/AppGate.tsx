@@ -35,11 +35,14 @@ export function AppGate(props: HomeScreenProps) {
     return (
       <OnboardingScreen
         copy={M4_COPY[props.locale]}
+        mapZones={props.mapZones}
         onCompleted={() => {
           setOpenDemoOnFirstHome(true);
           setRoute("HOME");
         }}
+        policeStations={props.policeStations}
         repository={repository}
+        zoneDetails={props.zoneDetails}
       />
     );
   }

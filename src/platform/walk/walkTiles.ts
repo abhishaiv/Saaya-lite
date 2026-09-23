@@ -196,7 +196,7 @@ function lighten(hex: string, factor: number): string {
 /** Road surface. Dark against the white land, so the risk bands read on it and the street reads as a surface. */
 const COLOR_ROAD_SURFACE = "#4B3A70"; // fact: color.tile.road
 
-/** Building face. Below the land, so a block reads as a mass standing on it. */
+/** Building face: the brightest tone the shade spread below draws. Every face stays under the land, so a block reads as a mass. */
 const COLOR_BUILDING = "#D9D1F0"; // fact: color.tile.building
 
 /** Building roof, above the land: from a camera below the rooflines, the roofs are the pale plane. */
