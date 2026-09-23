@@ -5085,3 +5085,65 @@ in the work order and must be quoted and marked so in the test.
 
 **Nothing in the product changed by the research session.** Tree: `/tmp/saaya-ui`, `m4-walk-view`,
 tip `e77a6e5`.
+
+## 2026-09-23 - Part 3a: the ramp retires from roads, unsafe reads as violet
+
+Founder, verbatim: "The unsafe places will be violet highlighted roads." Both readings of that
+sentence are built and the founder rules between them from their own phone; the part after this one
+waits on that ruling.
+
+**Superseded clause, kept as the record of what was retired** (quoted from `walkFacts.ts`, which
+carried it): "A road is drawn no safer than its zone, so the band's colour is the colour of the tier
+that value falls in ... a band at 0.8 is the same red as a HIGH zone on the flat map". The red,
+orange and yellow tier colours are unchanged facts and still paint the zones on the flat map and the
+walk view's zone tint, which both read them from the frozen geojson's own `colorHex`. No walk-view
+code names them any more. The retired text is quoted and marked in `walkFacts.ts`, `walkTiles.ts`,
+`WalkView.tsx` and the two test files.
+
+**The two readings**, selected by address so both live on one preview. `?roads=a` keeps the dark
+key: the base road stays `color.tile.road` #4B3A70 and the band is the brighter violet
+`color.brand` #A78BFA over it. The default draws the guide-map reading: the base street goes
+`color.white` and the band is the only dark mark on it, drawn in `color.tile.road`. Either way the
+band's strength is the road's own `r`: it fades in from the base surface at `risk.threshold.low`
+(below which a road carries no band at all, so bands mean "worth noticing" rather than tinting every
+street) and reaches the full signal at the risk clamp's top. `mixHex` does the mixing in hex-byte
+space, the house rationale `lighten` already uses, and returns uppercase so a mix at the ends of `t`
+compares equal to the fact it started from. The legend's ramp follows the variant, four stops from
+the ground to the signal, and its copy, including "It is not a count for any one street.", is
+untouched.
+
+**Scope.** The road tier colours retire; the zone tint and the flat map's zone fills are untouched
+and still show the ramp. Flagged, not changed: the zone tint is now the remaining place the old ramp
+appears in the walk view. Owed once the founder rules: the winning reading's street colour and
+signal as facts in the graph, spliced the textual way.
+
+**Gates.** `npx tsc --noEmit` exit 0. `grounded_check.py` on the six changed files: 0 ungrounded
+literals (402 live facts, 168 distinct values, 32 superseded and excluded). `npx vitest run`: 50
+files, 370 tests, all passing. The band tests read the mix per variant; the casing test now holds
+each reading's own key; the composition relations (sky under the signal, the casing between street
+and land) read per variant, with the light reading's ground-to-signal ratio asserted at a floor of
+the recorded 3.6x.
+
+**Captures** at `/tmp/walk-verify/roads3a/`, the harness at 390x844 DPR 2 against the union dev
+server. Before: `before-{street,origin,dense,signal}.png`; after: `after-a-*` and `after-b-*`.
+`signal` is a fourth spot added to the work order's three, because none of the three shows a band:
+the strongest road signal in the bake is r=0.99 at 17.72192, 83.3233 (Maharani Peta), and that is
+the frame where the ruling itself is visible - before, a red band on the dark street; reading A, a
+bright violet band on the same street; reading B, a dark violet band on a white street.
+
+**Two instrument findings, recorded rather than left implicit.** (1) The dense spot's tile exists in
+the bake and carries 151 roads and 1700 buildings, but every road in it is at r 0.11 to 0.22, under
+the low threshold, so no band draws there in either reading or in the old code: the work order's
+"dense" spot is dense in the flat map's records, not for the walk view's road bands. (2)
+`--fast-clock` cannot render a spot outside the window the world builds at startup: with fixed
+steps the tiles at the dense spot never arrive and the frame reads as ground and zone tint only,
+while the real clock renders the same spot. The dense frames are recorded both ways
+(`--fast-clock` and `dense-realclock`); any capture of a spot outside the startup window needs the
+real clock.
+
+**The founder's location is not recorded numerically** in the handoff or in any harness; the
+onboarding street fix (17.7231, 83.3012) stands in for it in this set, and the question goes to the
+research session and the founder.
+
+**Tree.** This record sits on top of the research session's `9de8580`; the branch `m4-walk-view` is
+pushed for the two preview addresses with this record. Production is untouched.

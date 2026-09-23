@@ -76,9 +76,8 @@ export const ZONE_SELECTED_ALPHA_RAISE = 0.1; // fact: alpha.map.zone.selected.r
 
 // --- the risk ramp, for road bands only. ---
 //
-// A road is drawn no safer than its zone, so the band's colour is the colour of the
-// tier that value falls in, and the thresholds are the product's own. Nothing new is
-// chosen here: a band at 0.8 is the same red as a HIGH zone on the flat map.
+// A road is drawn no safer than its zone, so a band is cut from the road's own baked
+// risk, and the thresholds are the product's own. Nothing new is chosen here.
 //
 // The band values the bake writes are already clamped to [risk.clamp.min,
 // risk.clamp.max] and already carry walk.risk.falloff_m and walk.risk.falloff_floor,
@@ -89,19 +88,129 @@ export const RISK_THRESHOLD_LOW = 0.25; // fact: risk.threshold.low
 export const RISK_THRESHOLD_MODERATE = 0.5; // fact: risk.threshold.moderate
 export const RISK_THRESHOLD_ELEVATED = 0.75; // fact: risk.threshold.elevated
 
-// Tier colours. These are the exact hexes the frozen geojson gives the 19 drawn
-// zones, so a band and a zone at the same tier are the same colour.
+// --- the violet signal, for road bands only. ---
 //
-// Note the tier-to-hue order is not a mistake here: the frozen data paints ELEVATED
-// #FFCC00 and MODERATE #FF9500. The walk view follows the data rather than inventing
-// a second, better-ordered ramp, so the two views cannot disagree.
-export const COLOR_ZONE_HIGH = "#FF3B30"; // fact: color.zone.high
-export const COLOR_ZONE_ELEVATED = "#FFCC00"; // fact: color.zone.elevated
-export const COLOR_ZONE_MODERATE = "#FF9500"; // fact: color.zone.moderate
+// Amended 2026-09-23 by founder ruling: "The unsafe places will be violet highlighted
+// roads." The clause this replaced is superseded, kept here as the record of what was
+// retired - "A road is drawn no safer than its zone, so the band's colour is the colour
+// of the tier that value falls in ... a band at 0.8 is the same red as a HIGH zone on
+// the flat map": the red/orange/yellow ramp retires from roads. The three tier colours
+// are unchanged facts and still paint the zones on the flat map and the walk view's own
+// zone tint, which both read them from the frozen geojson's own `colorHex`; no walk-view
+// code names them any more.
+//
+// Both readings of the ruling are built, for the founder to rule between on the branch
+// preview; `?roads=a` draws the first and everything else the default, the second.
+//
+//   a - the dark key kept: the base road stays `color.tile.road`, and the band is a
+//       brighter violet highlight over it, drawn in `color.brand`.
+//   b - the guide-map reading: the base street goes `color.white`, and the band is the
+//       only dark mark on the street, drawn in `color.tile.road`.
+//
+// Either way the band's strength is the road's own risk: it fades in from the base
+// surface at `risk.threshold.low` - below which a road carries no band at all, so a road
+// under the product's own low threshold is drawn as an ordinary street and the bands
+// mean "this one is worth noticing" rather than tinting every street in the city - and
+// reaches the full signal at `risk.clamp.max`.
 
-// Below RISK_THRESHOLD_LOW a road carries no band at all. That is deliberate: a road
-// under the product's own low threshold is drawn as an ordinary road, so the bands
-// mean "this one is worth noticing" rather than tinting every street in the city.
+/** The dark violet the streets are drawn in: the road surface in A, the full signal in B. */
+export const COLOR_TILE_ROAD = "#4B3A70"; // fact: color.tile.road
+
+/** Which of the two readings of the violet ruling the view draws. */
+export type RoadSignalVariant = "a" | "b";
+
+/** The reading an unprefixed URL draws. Temporary, until the founder's ruling lands. */
+export const ROAD_SIGNAL_DEFAULT_VARIANT: RoadSignalVariant = "b";
+
+/** Read the variant out of a search string, so both readings live on one preview. */
+export function roadSignalVariantFromSearch(search: string): RoadSignalVariant {
+  // Temporary: the founder rules between the two readings from their own phone.
+  return new URLSearchParams(search).get("roads") === "a"
+    ? "a"
+    : ROAD_SIGNAL_DEFAULT_VARIANT;
+}
+
+/** The variant this page draws. Nothing switches it mid-session. */
+export function roadSignalVariant(): RoadSignalVariant {
+  return roadSignalVariantFromSearch(globalThis.location?.search ?? "");
+}
+
+/**
+ * Mix two hexes in the space their bytes are written in.
+ *
+ * The same space `lighten` in `walkTiles.ts` works in, and for the same reason: a mix
+ * done in the renderer's linear space does not land on the colour the numbers read as.
+ */
+export function mixHex(from: string, to: string, t: number): string {
+  const fromValue = Number.parseInt(from.slice(1), 16);
+  const toValue = Number.parseInt(to.slice(1), 16);
+  const channel = (shift: number): number => {
+    const start = (fromValue >> shift) & 0xff;
+    const end = (toValue >> shift) & 0xff;
+    return Math.round(start + (end - start) * t);
+  };
+  // Uppercase, the case every hex in this codebase is written in, so a mix at the ends of
+  // `t` compares equal to the fact it started from rather than differing by letter case.
+  return `#${((channel(16) << 16) | (channel(8) << 8) | channel(0)).toString(16).padStart(6, "0").toUpperCase()}`;
+}
+
+/** The base surface a street is drawn in, per variant. */
+export function roadSurfaceColor(variant: RoadSignalVariant): string {
+  return variant === "a" ? COLOR_TILE_ROAD : COLOR_WHITE;
+}
+
+/** The band's colour at full strength, per variant. */
+export function roadSignalColor(variant: RoadSignalVariant): string {
+  return variant === "a" ? COLOR_BRAND : COLOR_TILE_ROAD;
+}
+
+/** How far up the signal a road's own risk draws its band: 0 at the low threshold, 1 at the clamp's top. */
+export function roadSignalStrength(risk: number): number {
+  const span = RISK_CLAMP_MAX - RISK_THRESHOLD_LOW;
+  const strength = (risk - RISK_THRESHOLD_LOW) / span;
+  return Math.min(RISK_CLAMP_MAX, Math.max(RISK_CLAMP_MIN, strength));
+}
+
+/**
+ * The colour a road band is drawn in, or `null` for "this road carries no band".
+ *
+ * At `risk.threshold.low` the band's colour is the base surface's own, so the mark fades
+ * in from nothing, and the road's own risk is the strength of its mark.
+ */
+export function bandColorForRisk(
+  risk: number,
+  variant: RoadSignalVariant,
+): string | null {
+  if (risk < RISK_THRESHOLD_LOW) return null;
+  return mixHex(
+    roadSurfaceColor(variant),
+    roadSignalColor(variant),
+    roadSignalStrength(risk),
+  );
+}
+
+/** The legend's two inner stops, as fractions of the signal's strength. */
+const RAMP_STOP_ONE_THIRD = 1 / 3; // GROUNDED-EXEMPT: a legend step, not a product value.
+const RAMP_STOP_TWO_THIRDS = 2 / 3; // GROUNDED-EXEMPT: a legend step, not a product value.
+
+/**
+ * The legend's ramp, low to high, in the colours the map draws.
+ *
+ * The low end is the ground colour rather than the base street, because that is what the
+ * world does below the low threshold: `bandColorForRisk` returns nothing there, so a quiet
+ * area is drawn unshaded. The three stops above it are the band at a third, two thirds and
+ * the whole of the signal's strength, so the ramp is the picture the shading is cut from.
+ */
+export function roadSignalRamp(variant: RoadSignalVariant): readonly string[] {
+  const surface = roadSurfaceColor(variant);
+  const signal = roadSignalColor(variant);
+  return [
+    COLOR_WALK_GROUND,
+    mixHex(surface, signal, RAMP_STOP_ONE_THIRD),
+    mixHex(surface, signal, RAMP_STOP_TWO_THIRDS),
+    signal,
+  ];
+}
 
 // --- scene palette ---
 export const COLOR_BACKGROUND = "#0B0B0F"; // fact: color.background

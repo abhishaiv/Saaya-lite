@@ -35,12 +35,10 @@ import {
 import type { GroundPoint, TileId, WorldMeta } from "./walkProjection";
 import { decodePath } from "./walkProjection";
 import {
-  COLOR_ZONE_ELEVATED,
-  COLOR_ZONE_HIGH,
-  COLOR_ZONE_MODERATE,
-  RISK_THRESHOLD_ELEVATED,
-  RISK_THRESHOLD_LOW,
-  RISK_THRESHOLD_MODERATE,
+  bandColorForRisk,
+  roadSignalVariant,
+  roadSurfaceColor,
+  type RoadSignalVariant,
 } from "./walkFacts";
 
 /** A road fragment as the bake writes it. */
@@ -147,7 +145,10 @@ export const ROAD_CASING_M = 0.25; // GROUNDED-EXEMPT: a rendering width, not a 
  * one flat colour from the horizon down. The band is now a spine down the middle of the
  * road: the tier colour is still on the road surface at every point the risk applies to,
  * still at `color.zone.*`, still drawn over everything the risk layer outranks, and the
- * road it describes stays visible on both sides of it.
+ * road it describes stays visible on both sides of it. Amended 2026-09-23: the mark on the
+ * surface is the violet signal now rather than a tier colour, so the clause "the tier colour
+ * is still on the road surface at every point the risk applies to, still at `color.zone.*`"
+ * is superseded by the violet ruling; the spine's geometry is unchanged.
  */
 export const ROAD_BAND_WIDTH_FRACTION = 0.55; // GROUNDED-EXEMPT: a rendering fraction, not a product value.
 
@@ -185,16 +186,19 @@ function lighten(hex: string, factor: number): string {
  * under it, water under that - so the city keeps its depth and every value keeps the relation to
  * the land the reference taught.
  *
- * **The road stays dark, and that is a safety decision, not a taste one.** The frozen tier
- * colours are drawn as bands on the road surface. A white road would put `#FFCC00` at 1.29x
- * against its own surface - the ELEVATED band would stop being a band - where the dark violet
- * road on white land lifts all three frozen bands above the contrast they had in the night key
- * (`#FF3B30` 1.52x, `#FF9500` 2.44x, `#FFCC00` 3.03x). The road is therefore the one element of
- * Corner's recipe that does not become white, and `color.tile.road` carries the arithmetic.
+ * **The road's colour is a safety decision, not a taste one.** Retired 2026-09-23 by the
+ * violet ruling, and kept here as the record: "The road stays dark, and that is a safety
+ * decision, not a taste one. The frozen tier colours are drawn as bands on the road surface.
+ * A white road would put `#FFCC00` at 1.29x against its own surface - the ELEVATED band would
+ * stop being a band - where the dark violet road on white land lifts all three frozen bands
+ * above the contrast they had in the night key (`#FF3B30` 1.52x, `#FF9500` 2.44x, `#FFCC00`
+ * 3.03x). The road is therefore the one element of Corner's recipe that does not become
+ * white, and `color.tile.road` carries the arithmetic." The ruling puts the ramp out of the
+ * streets and makes violet the signal, so the band no longer has to read against a dark road
+ * in the tier colours; what that measurement stood for - the band has to read on whatever
+ * surface carries it - is what each variant is built to hold. The surface and the band are
+ * `roadSurfaceColor` and `bandColorForRisk`, in `walkFacts.ts`.
  */
-
-/** Road surface. Dark against the white land, so the risk bands read on it and the street reads as a surface. */
-const COLOR_ROAD_SURFACE = "#4B3A70"; // fact: color.tile.road
 
 /** Building face: the brightest tone the shade spread below draws. Every face stays under the land, so a block reads as a mass. */
 const COLOR_BUILDING = "#D9D1F0"; // fact: color.tile.building
@@ -296,21 +300,6 @@ function pushWallShades(colors: number[], walls: readonly number[]): void {
   }
 }
 
-/**
- * The colour a road band is drawn in, or `null` for "this road carries no band".
- *
- * The band's colour is the colour of the tier its risk falls in, so a band at 0.8 is
- * the same red as a HIGH zone on the flat map. Below `risk.threshold.low` a road is
- * drawn as an ordinary road: the bands mean "this one is worth noticing" rather than
- * tinting every street in the city.
- */
-export function bandColorForRisk(risk: number): string | null {
-  if (risk >= RISK_THRESHOLD_ELEVATED) return COLOR_ZONE_HIGH;
-  if (risk >= RISK_THRESHOLD_MODERATE) return COLOR_ZONE_ELEVATED;
-  if (risk >= RISK_THRESHOLD_LOW) return COLOR_ZONE_MODERATE;
-  return null;
-}
-
 /** Shared materials, created once for the whole world and disposed once. */
 export interface TileMaterials {
   readonly roadCasing: MeshBasicMaterial;
@@ -328,8 +317,13 @@ export interface TileMaterials {
  * `MeshBasicMaterial` on purpose: this view shows where risk is, and a lit material
  * would shade a road by its angle to a sun that means nothing. Flat colour also keeps
  * the frame cost predictable on the 2 GB device `perf.fps` is written for.
+ *
+ * `variant` is the reading of the violet ruling the street surface is cut for, from
+ * `walkFacts`; `buildTileMeshes` must draw the bands with the same one.
  */
-export function createTileMaterials(): TileMaterials {
+export function createTileMaterials(
+  variant: RoadSignalVariant = roadSignalVariant(),
+): TileMaterials {
   const flat = (color: string | Color): MeshBasicMaterial =>
     new MeshBasicMaterial({ color: new Color(color), side: DoubleSide });
   /**
@@ -349,7 +343,7 @@ export function createTileMaterials(): TileMaterials {
     // Its own fact since 2026-09-23 — see `COLOR_CASING`. Before that it was the road
     // lightened, because the road was the only line colour the spec stated.
     roadCasing: flat(COLOR_CASING),
-    roadSurface: flat(COLOR_ROAD_SURFACE),
+    roadSurface: flat(roadSurfaceColor(variant)),
     // The scene's distance haze is switched off for the band, not tuned down for it. `MAP_SPEC.md`:
     // "A distant road band faded into haze would be the risk information degrading with draw
     // distance." Every other material here is scenery and is fogged.
@@ -411,11 +405,15 @@ export function decodeTile(id: TileId, raw: RawTile, meta: WorldMeta): DecodedTi
  * expensive layer, and then green and water. **Roads are never dropped**, whatever
  * `detail` says: they are the risk carrier, and the spec's degradation rule is that the
  * risk information never degrades.
+ *
+ * `variant` is the reading of the violet ruling the band is drawn in, from `walkFacts`;
+ * it must be the one the materials' street surface was cut for.
  */
 export function buildTileMeshes(
   tile: DecodedTile,
   materials: TileMaterials,
   detail: boolean,
+  variant: RoadSignalVariant = roadSignalVariant(),
 ): Group {
   const group = new Group();
   group.name = `tile:${tile.id.tx},${tile.id.ty}`;
@@ -431,7 +429,7 @@ export function buildTileMeshes(
     appendRibbon(roadCasing, path, halfWidth + ROAD_CASING_M, layerHeight("roadCasing"));
     appendRibbon(roadBase, path, halfWidth, layerHeight("roadBase"));
 
-    const band = bandColorForRisk(road.r);
+    const band = bandColorForRisk(road.r, variant);
     if (band === null) continue;
     const before = roadBandPositions.length;
     // The spine, not the road: see `ROAD_BAND_WIDTH_FRACTION`.

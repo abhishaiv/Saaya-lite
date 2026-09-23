@@ -9,10 +9,8 @@ import { DeviceHeadingWatch } from "../../../platform/deviceHeading";
 import type { LiveLocationFix, LocationStatus } from "../../../platform/locationWatch";
 import type { CharacterSelection } from "../../../platform/walk/characterParts";
 import {
-  COLOR_WALK_GROUND,
-  COLOR_ZONE_ELEVATED,
-  COLOR_ZONE_HIGH,
-  COLOR_ZONE_MODERATE,
+  roadSignalRamp,
+  roadSignalVariant,
   WALK_LEGEND_WIDTH_PX,
 } from "../../../platform/walk/walkFacts";
 import type {
@@ -57,21 +55,22 @@ export interface WalkViewProps {
 /**
  * The ramp the bands are cut from, low to high.
  *
- * The low end is the ground colour rather than a fourth band, because that is what the
- * world does with it: `bandColorForRisk` returns nothing below the low threshold, so a
- * quiet area is drawn unshaded. The legend says "fewer records" at that end, which is the
- * same statement.
- *
- * It is `color.walk.ground` and not the flat map's `color.tile.land`. The walk view draws
+ * Amended 2026-09-23 by the violet ruling. The clause this replaced - the ramp was the
+ * ground plus "the flat map's tier colours" - is superseded: the ramp retires from roads,
+ * and the three stops above the ground are now the signal at a third, two thirds and the
+ * whole of its strength, cut by `walkFacts.roadSignalRamp` from the same values the map
+ * draws with. What was ever true of the ramp is kept: it is the picture the shading is
+ * made of, and its low end is the ground colour rather than a fourth band, because
+ * `bandColorForRisk` returns nothing below the low threshold and a quiet area is drawn
+ * unshaded - the legend says "fewer records" at that end, which is the same statement.
+ * It is `color.walk.ground` and not the flat map's `color.tile.land`: the walk view draws
  * its own land, and a legend whose low swatch is a colour that appears nowhere in the view
- * is a legend describing a different picture. Amended 2026-09-22 with the palette.
+ * is a legend describing a different picture.
+ *
+ * The variant is the one the world is being drawn in (`?roads=a|b` on the preview), so
+ * the chip and the map cannot show different readings.
  */
-const LEGEND_STOPS: readonly string[] = [
-  COLOR_WALK_GROUND,
-  COLOR_ZONE_MODERATE,
-  COLOR_ZONE_ELEVATED,
-  COLOR_ZONE_HIGH,
-];
+const LEGEND_STOPS: readonly string[] = roadSignalRamp(roadSignalVariant());
 
 /** How far inside the frame a zone name is kept. `--screen-padding`, read as a number. */
 const LABEL_FRAME_INSET_PX = 20; // GROUNDED-EXEMPT: structural frame inset, the pixel value of --screen-padding.

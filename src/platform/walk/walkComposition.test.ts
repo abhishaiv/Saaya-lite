@@ -5,9 +5,8 @@ import {
   COLOR_WALK_GROUND,
   COLOR_WALK_HAZE,
   COLOR_WALK_SKY,
-  COLOR_ZONE_ELEVATED,
-  COLOR_ZONE_HIGH,
-  COLOR_ZONE_MODERATE,
+  ROAD_SIGNAL_DEFAULT_VARIANT,
+  roadSignalColor,
   WALK_CAMERA_DIST_M,
   WALK_CAMERA_FOV_DEG,
   WALK_CAMERA_LOOK_AT_M,
@@ -185,7 +184,10 @@ describe("the amended camera composes the measured frame", () => {
 });
 
 describe("the amended palette keeps the reference's luminance relations", () => {
-  const materials = createTileMaterials();
+  // The variant is pinned to the default rather than read from the URL, so the file's own
+  // relations hold whatever address a test run happens to carry.
+  const variant = ROAD_SIGNAL_DEFAULT_VARIANT;
+  const materials = createTileMaterials(variant);
   const ground = lumaOf(COLOR_WALK_GROUND);
   const sky = lumaOf(COLOR_WALK_SKY);
   /** The colour a material actually renders, which is the thing the frame is made of. */
@@ -201,33 +203,49 @@ describe("the amended palette keeps the reference's luminance relations", () => 
     // and the pair is at least as strong as the reference's own, so the inversion deepens
     // the figure/ground the composition rests on rather than weakening it.
     expect(ground / sky).toBeGreaterThan(2.45); // GROUNDED-EXEMPT: the upper end of the band the reference frames' own land:sky ratio was measured in, kept as the floor the inversion has to clear.
-    // And the sky stays darker than the darkest thing drawn on the map, so the map reads as
+    // And the sky stays darker than the darkest mark drawn on the map, so the map reads as
     // something in a world rather than as the whole of the frame. The night key's sky was
     // darker than its road too (53 against 71); the inversion moves both and keeps the order.
-    expect(sky).toBeLessThan(luma(materials.roadSurface));
+    // Amended 2026-09-23 with the violet ruling: the darkest mark is the signal now - in the
+    // default reading the street it is drawn on goes white, so the road surface is no longer
+    // the thing to read it against.
+    expect(sky).toBeLessThan(lumaOf(roadSignalColor(variant)));
   });
 
-  it("keeps the road dark against the ground, the surface the risk bands are read on", () => {
-    // Amended 2026-09-23. The old assertion was the reference's own 0.56, which is the road's
-    // value in the night key. The inversion moves it to about 0.29 - `color.tile.road` records
-    // the same move as 3.6x darker than the land - so a ratio to the land is no longer the
-    // thing to hold. What the ratio was standing in for is: the road is the surface the risk
-    // bands are read against, so it has to be dark, and every band has to read on it.
-    expect(luma(materials.roadSurface) / ground).toBeLessThan(0.35); // GROUNDED-EXEMPT: the top of the band the inverted road sits in, stated so a later edit that lightened the road fails here.
-    for (const tier of [COLOR_ZONE_HIGH, COLOR_ZONE_MODERATE, COLOR_ZONE_ELEVATED]) {
-      expect(lumaOf(tier)).toBeGreaterThan(luma(materials.roadSurface));
-    }
+  it("holds each reading's key: the mark reads on the surface it is drawn on", () => {
+    // Amended 2026-09-23 by the violet ruling, which moved this test's subject. The clause it
+    // replaced - the road dark against the ground at under 0.35 so "every band has to read on
+    // it" - is superseded: the ramp retires from roads and the surface itself is the reading's
+    // own. What the clause stood for is kept: in both readings the band has to read against
+    // the surface under it, and the land stays the brighter half of the pair.
+    //
+    // Reading A keeps the inverted key: the road stays the dark plane, and the signal is a
+    // lit violet on it.
+    const aMaterials = createTileMaterials("a");
+    expect(luma(aMaterials.roadSurface) / ground).toBeLessThan(0.35); // GROUNDED-EXEMPT: the top of the band the inverted road sits in, stated so a later edit that lightened it fails here.
+    expect(lumaOf(roadSignalColor("a"))).toBeGreaterThan(luma(aMaterials.roadSurface));
+    // Reading B is the guide map: the street rises to the land's own plane and the signal is
+    // the only dark mark on it. `color.tile.road` is that mark, and the measurement its fact
+    // records - 3.6x darker than the land - is what the pair still clears.
+    const bMaterials = createTileMaterials("b");
+    expect(luma(bMaterials.roadSurface)).toBeGreaterThan(ground);
+    expect(ground / lumaOf(roadSignalColor("b"))).toBeGreaterThan(3); // GROUNDED-EXEMPT: the floor of the recorded 3.6x, stated so an edit that lightened the signal fails here.
   });
 
-  it("keeps the line network between the road it edges and the land it seams", () => {
-    // Amended 2026-09-23. The band this held - luma 190-250 over a land of 110-140 - was the
-    // reference's own bright edge lines drawn on its own dark map, and the white land makes it
-    // impossible rather than merely wrong: a line at 190-250 on a plane of 235 is a line that
-    // disappears into the plane. The rule that replaced the derivation is what the derivation
-    // was for: a line strictly between the two things it separates. Brighter than the road,
-    // so a street has an edge; darker than the land, so a block has a seam.
-    expect(luma(materials.roadCasing)).toBeGreaterThan(luma(materials.roadSurface));
-    expect(luma(materials.roadCasing)).toBeLessThan(ground);
+  it("keeps the line network doing the job its fact records, per reading", () => {
+    // Amended 2026-09-23 with the violet ruling. In reading A the relation is the one the
+    // fact was written for: brighter than the road it edges, darker than the land it seams,
+    // replacing the derivation the reference's own bright lines no longer allow. In reading B
+    // the street rises to the land's own plane, so the line sits below the street - it is what
+    // draws a street's edge on a light map - below the land, and above the signal, so a band
+    // still outranks the line it crosses.
+    const aMaterials = createTileMaterials("a");
+    expect(luma(aMaterials.roadCasing)).toBeGreaterThan(luma(aMaterials.roadSurface));
+    expect(luma(aMaterials.roadCasing)).toBeLessThan(ground);
+    const bMaterials = createTileMaterials("b");
+    expect(luma(bMaterials.roadCasing)).toBeLessThan(luma(bMaterials.roadSurface));
+    expect(luma(bMaterials.roadCasing)).toBeLessThan(ground);
+    expect(luma(bMaterials.roadCasing)).toBeGreaterThan(lumaOf(roadSignalColor("b")));
   });
 
   /**

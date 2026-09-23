@@ -5,17 +5,19 @@ import { layerHeight } from "./walkGeometry";
 import type { WorldMeta } from "./walkProjection";
 import { parseWorldMeta } from "./walkProjection";
 import {
+  bandColorForRisk,
   COLOR_WALK_GROUND,
-  COLOR_ZONE_ELEVATED,
-  COLOR_ZONE_HIGH,
-  COLOR_ZONE_MODERATE,
+  mixHex,
+  RISK_CLAMP_MAX,
   RISK_CLAMP_MIN,
   RISK_THRESHOLD_ELEVATED,
   RISK_THRESHOLD_LOW,
   RISK_THRESHOLD_MODERATE,
+  roadSignalColor,
+  roadSignalStrength,
+  roadSurfaceColor,
 } from "./walkFacts";
 import {
-  bandColorForRisk,
   buildTileMeshes,
   createTileMaterials,
   decodeTile,
@@ -94,37 +96,57 @@ function zSpan(mesh: Mesh): number {
 }
 
 describe("bandColorForRisk", () => {
+  // Amended 2026-09-23 by the violet ruling. The clause these replaced - the band is "the
+  // colour of the tier its risk falls in", tested against the flat map's tier colours - is
+  // superseded: the ramp retires from roads, the band is the violet signal, and its strength
+  // is the road's own risk. Every assertion below holds in both variants.
+  const VARIANTS = ["a", "b"] as const;
+
   it("gives a road under the product's low threshold no band at all", () => {
-    expect(bandColorForRisk(RISK_CLAMP_MIN)).toBeNull();
+    for (const variant of VARIANTS) {
+      expect(bandColorForRisk(RISK_CLAMP_MIN, variant)).toBeNull();
+    }
   });
 
-  it("bands a road at the exact low threshold in the moderate colour", () => {
-    expect(bandColorForRisk(RISK_THRESHOLD_LOW)).toBe(COLOR_ZONE_MODERATE);
+  it("fades the band in from the surface itself at the exact low threshold", () => {
+    // The mark's strength starts at nothing: at the low threshold its colour *is* the base
+    // surface's, so a band grows out of its own street rather than switching on.
+    for (const variant of VARIANTS) {
+      expect(bandColorForRisk(RISK_THRESHOLD_LOW, variant)).toBe(
+        roadSurfaceColor(variant),
+      );
+    }
   });
 
-  it("bands a road at the exact moderate threshold in the elevated colour", () => {
-    expect(bandColorForRisk(RISK_THRESHOLD_MODERATE)).toBe(COLOR_ZONE_ELEVATED);
+  it("draws the full signal at the top of the risk clamp", () => {
+    for (const variant of VARIANTS) {
+      expect(bandColorForRisk(RISK_CLAMP_MAX, variant)).toBe(roadSignalColor(variant));
+    }
   });
 
-  it("bands a road at the exact elevated threshold in the high colour", () => {
-    expect(bandColorForRisk(RISK_THRESHOLD_ELEVATED)).toBe(COLOR_ZONE_HIGH);
-  });
-
-  it("reads each threshold as an inclusive lower bound", () => {
-    // A value one tier down is still below the next threshold, so it must fall to the
-    // tier beneath rather than rounding up.
-    expect(bandColorForRisk(RISK_THRESHOLD_MODERATE)).not.toBe(COLOR_ZONE_HIGH);
-    expect(bandColorForRisk(RISK_THRESHOLD_LOW)).not.toBe(COLOR_ZONE_ELEVATED);
-  });
-
-  it("uses the flat map's tier colours rather than a second ramp", () => {
-    const ramp = [
-      COLOR_ZONE_HIGH,
-      COLOR_ZONE_ELEVATED,
-      COLOR_ZONE_MODERATE,
+  it("makes the road's own risk the strength of its mark", () => {
+    // Monotone: a riskier road draws a mark further along the surface-to-signal mix, and
+    // every threshold sits between the fade-in and the top of the clamp.
+    const strengths = [
+      roadSignalStrength(RISK_THRESHOLD_LOW),
+      roadSignalStrength(RISK_THRESHOLD_MODERATE),
+      roadSignalStrength(RISK_THRESHOLD_ELEVATED),
+      roadSignalStrength(RISK_CLAMP_MAX),
     ];
-    for (const risk of [RISK_THRESHOLD_LOW, RISK_THRESHOLD_MODERATE, RISK_THRESHOLD_ELEVATED]) {
-      expect(ramp).toContain(bandColorForRisk(risk));
+    for (let index = 1; index < strengths.length; index += 1) {
+      expect(strengths[index]).toBeGreaterThan(strengths[index - 1] ?? 0);
+    }
+    // And the colour the mesh gets is exactly the mix at that strength - read through the
+    // same `mixHex` the legend uses, so the two cannot drift.
+    for (const variant of VARIANTS) {
+      const risk = RISK_THRESHOLD_MODERATE;
+      expect(bandColorForRisk(risk, variant)).toBe(
+        mixHex(
+          roadSurfaceColor(variant),
+          roadSignalColor(variant),
+          roadSignalStrength(risk),
+        ),
+      );
     }
   });
 });
@@ -178,21 +200,31 @@ describe("buildTileMeshes", () => {
     expect(meshWith(group, materials.roadBand)).toBeNull();
   });
 
-  it("draws the band in the tier colour of the road's own risk", () => {
-    const tile = decodeTile(
-      TILE_ZERO,
-      { roads: [road({ r: RISK_THRESHOLD_ELEVATED })] },
-      meta,
-    );
-    const group = buildTileMeshes(tile, materials, true);
-    const band = meshWith(group, materials.roadBand);
-    expect(band).not.toBeNull();
-    const expected = new Color(COLOR_ZONE_HIGH);
-    const colors = band?.geometry.getAttribute("color");
-    expect(colors?.count).toBeGreaterThan(0);
-    expect(colors?.getX(0)).toBeCloseTo(expected.r);
-    expect(colors?.getY(0)).toBeCloseTo(expected.g);
-    expect(colors?.getZ(0)).toBeCloseTo(expected.b);
+  it("draws the band in the signal's strength for the road's own risk, per variant", () => {
+    // Amended 2026-09-23 by the violet ruling: the assertion used to read the band as the
+    // tier colour of the road's risk. What it held - the band's colour is decided by the
+    // road's own `r`, carried per vertex on the mesh rather than through the material - is
+    // kept, and the variant has to reach both the surface and the band together.
+    for (const variant of ["a", "b"] as const) {
+      const variantMaterials = createTileMaterials(variant);
+      const risk = RISK_THRESHOLD_ELEVATED;
+      const tile = decodeTile(TILE_ZERO, { roads: [road({ r: risk })] }, meta);
+      const group = buildTileMeshes(tile, variantMaterials, true, variant);
+      const band = meshWith(group, variantMaterials.roadBand);
+      expect(band).not.toBeNull();
+      const expected = new Color(
+        mixHex(
+          roadSurfaceColor(variant),
+          roadSignalColor(variant),
+          roadSignalStrength(risk),
+        ),
+      );
+      const colors = band?.geometry.getAttribute("color");
+      expect(colors?.count).toBeGreaterThan(0);
+      expect(colors?.getX(0)).toBeCloseTo(expected.r);
+      expect(colors?.getY(0)).toBeCloseTo(expected.g);
+      expect(colors?.getZ(0)).toBeCloseTo(expected.b);
+    }
   });
 
   it("draws every highway class the bake emits at its own multiple of the residential width", () => {
@@ -282,21 +314,28 @@ describe("buildTileMeshes", () => {
     );
   });
 
-  it("holds the casing's colour between the road it edges and the land it seams", () => {
-    // Amended 2026-09-23. The casing used to be derived - the road's own fact multiplied up -
-    // and this asserted the ratio. The key inverted, and no factor on a dark road can reach a
-    // line that has to sit above the road and below the white land, so the casing became its
-    // own fact. What is asserted now is the relation that made it necessary: a line strictly
-    // between the two surfaces it separates, so it reads against both.
+  it("holds the casing's colour doing its job in each reading of the violet ruling", () => {
+    // Amended 2026-09-23, twice. First with the white key: the casing used to be derived - the
+    // road's own fact multiplied up - and this asserted the ratio; the key inverted, no factor
+    // on a dark road could reach a line that has to sit above the road and below the white
+    // land, so the casing became its own fact. Then with the violet ruling: in reading A the
+    // relation is that same one, a line strictly between the street and the land; in reading B
+    // the street rises to the land's own plane, so the line sits below both - it is what draws
+    // a street's edge on a light map - and above the signal, so a band outranks the line.
     const luma = (color: Color): number => {
       const hex = color.getHex();
       return 0.299 * ((hex >> 16) & 0xff) + 0.587 * ((hex >> 8) & 0xff) + 0.114 * (hex & 0xff); // GROUNDED-EXEMPT: the Rec. 601 luma coefficients, the standard the reference frames were sampled in.
     };
-    const casing = luma(materials.roadCasing.color);
-    const road = luma(materials.roadSurface.color);
     const land = luma(new Color(COLOR_WALK_GROUND));
-    expect(casing).toBeGreaterThan(road);
-    expect(casing).toBeLessThan(land);
+    const aMaterials = createTileMaterials("a");
+    const aCasing = luma(aMaterials.roadCasing.color);
+    expect(aCasing).toBeGreaterThan(luma(aMaterials.roadSurface.color));
+    expect(aCasing).toBeLessThan(land);
+    const bMaterials = createTileMaterials("b");
+    const bCasing = luma(bMaterials.roadCasing.color);
+    expect(bCasing).toBeLessThan(luma(bMaterials.roadSurface.color));
+    expect(bCasing).toBeLessThan(land);
+    expect(bCasing).toBeGreaterThan(luma(new Color(roadSignalColor("b"))));
   });
 
   it("keeps every road fragment in one mesh rather than one mesh per fragment", () => {

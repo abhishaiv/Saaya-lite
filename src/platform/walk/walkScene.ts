@@ -46,6 +46,7 @@ import {
   COLOR_WALK_SKY,
   COLOR_WHITE,
   FRAME_BUDGET_MS,
+  roadSignalVariant,
   TARGET_FPS,
   WALK_CAMERA_DIST_M,
   WALK_CAMERA_FOV_DEG,
@@ -474,7 +475,10 @@ export async function mountWalkScene(
   let world: WalkWorld | null = null;
   let meta: WorldMeta | null = null;
   let zones: ZoneLayer | null = null;
-  const materials = createTileMaterials();
+  // One read of the violet ruling for the whole world, so the street surface and the
+  // bands drawn over it are always the same reading.
+  const roadVariant = roadSignalVariant();
+  const materials = createTileMaterials(roadVariant);
   let rig: CharacterRig | null = null;
 
   const resident = new Map<string, ResidentTile>();
@@ -741,6 +745,7 @@ export async function mountWalkScene(
         decodeTile(tile.id, raw, meta),
         materials,
         step.detail,
+        roadVariant,
       );
       scene.add(group);
       resident.set(tile.key, { group, droppedAtMs: null });
