@@ -4732,3 +4732,33 @@ section now carries these numbers beside the superseded caveat. The bake is byte
 **Instruments.** `roadocclude.mjs` (2 m road sampling over the bake, 80-sample sightlines, the
 shortest-clear-boom banding) and `enclosedexact.mjs` (the ring-exact version with the
 depth-inside histogram) - both now `DIST`/`PITCH`-parameterised and self-printing.
+
+## 2026-09-23 - The founder called a main deploy: `saaya-lite.vercel.app` now serves the walk view
+
+**The instruction.** "If we have finished working, deploy to main, let me see too." The branch was
+complete (gates green, nothing pending that a ruling would change), so it went to main.
+
+**Gates on `372a83a`, the deployed tip.** `npx tsc --noEmit` clean; `npx vitest run` 49 files /
+357 tests all passing; grounded check over every source file changed since old main, 42 files,
+0 ungrounded literals; `npx next build` exit 0 (`/` 33 kB route, 142 kB first load).
+
+**Pushed.** `origin/m4-walk-view` `67695c8..372a83a`; `origin/main` `e34d32e..372a83a` - a
+fast-forward, main was a strict ancestor of the tip, so no merge commit and no divergence. Main is
+unprotected and its history is linear/direct-push, so this follows the repo's own pattern rather
+than inventing a flow. The peer session was told before the push, per its standing ask.
+
+**Deploy verified three ways.** Vercel registered the deployments on the repo (Preview
+03:53:17Z; Production deployment `6605991145` created 03:54:08Z, state `success`,
+`environment_url` `saaya-lite-7wolmix74-...vercel.app`), and the alias serves the same chunk set as
+that deployment URL. Then the instrument of record (`charfix/devices.mjs`, SwiftShader, 390x844
+@ DPR 2, geolocation 17.7217/83.3071, seeded onboarded + character) captured the alias itself:
+`charfix/main-deploy.png` shows the walk view live on production - pale-violet ground with the
+tint-over-green census **90.27%**, casing 8.79%, road 0.37%, the character in the fitted outfit,
+the icon HUD, the STREET SHADING legend card with its caveat text, the `Old Town` / `Soldierpet`
+zone labels, and SOS. Old main (`e34d32e`) had no walk view at all - `walkFacts.ts` does not exist
+in that tree; the 27 commits add it whole (43 source files, 8,555 insertions, incl. `WalkView.tsx`
+and `CharacterCustomiser.tsx`).
+
+**Open, unchanged.** The founder's rulings still pending: the legend chip default, promoting the
+branch preview, the horizon-band palette. The canonical iCloud checkout is untouched; it now sits
+behind `origin/main` and is brought forward by the founder's own path.
