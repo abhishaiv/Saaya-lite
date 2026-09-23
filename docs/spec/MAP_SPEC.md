@@ -441,11 +441,26 @@ land brighter than the sky while everything stayed dark; this one makes the land
 | Casing | `color.tile.casing` | luma 171: strictly **between the road and the land** it separates |
 | Green | `color.tile.green` | luma 207: 0.88 of the land, the most saturated large area on it |
 | Water | `color.tile.water` | luma 151: 0.64 of the land - a river does not outshine its bridge |
-| Building wall | `color.tile.building` | luma 213: 0.91 of the land, so a block reads as a mass standing on it |
+| Building wall | `color.tile.building` | luma 213: 0.91 of the land; each *drawn* face is 0.70-1.00 of that fact, mean 0.85 - see below |
 | Building roof | `color.tile.building.roof` | `color.white` itself: 1.09x the land, the brightest fill there is |
 | Distance haze | `color.walk.haze` | `#120C24` luma 15: the horizon **seam, below the sky** - see below |
 
 The lumas are Rec. 709, the convention the facts' own prose uses.
+
+**The wall's drawn tone is the fact run through a downward spread (2026-09-23).** `walkTiles.ts`'s
+`pushWallShades` multiplies each face by `1 - BUILDING_SHADE_SPREAD * hashUnit(midpoint)`, so the
+family runs **0.70-1.00** of `color.tile.building` and averages **0.85** of it - about **0.77 of the
+land**, where the fact alone is 0.91. The palette row above used to say "luma 213: 0.91 of the land,
+so a block reads as a mass standing on it"; that clause is **superseded**, and the measurement is
+recorded so it is not repeated. With the fact's 0.91 in place and a symmetric 0.08 spread, the dense
+site's wall face - a 654 px run on the row - stepped only **7** luma units to its neighbour, and the
+corner read as one flat wall. The mass read comes from the spread, not from the tone relation alone:
+at 0.30, downward-only, the same row measures a **13**-unit step. What the relation still does is
+bind the spread's ceiling - `walkComposition.test.ts` pins that no wall the renderer can draw rises
+above the ground it stands on, which caps a symmetric spread at about **0.11** - hence downward-only,
+which has no such ceiling. The mean moved with the direction: a symmetric spread keeps the mean at
+the fact, where the downward form takes it to `1 - spread / 2`; returning the mean to the fact needs
+a spread of 0.11 or less.
 
 **The inversion is the point, in both keys.** In the reference the ground is brighter than the
 sky, and the roads and buildings are darker than the ground; in Corner's map a white plane

@@ -4875,3 +4875,20 @@ that caught the symmetric 0.22 included); `grounded_check.py src/platform/walk/w
 
 **Tree state.** `m4-walk-view` = `87341a3` + this change; `origin/main` and `origin/m4-walk-view`
 are at `8849dba`. No push in this batch - the founder calls deploys.
+
+## 2026-09-23 - MAP_SPEC's palette row stops describing the fact as if it were the drawn tone
+
+The verification pass on `aefd5bf` (peer session, "Saaya 3D Planning") found one governance gap
+rather than a code defect: `MAP_SPEC.md`'s palette table still said of the building wall "luma 213:
+0.91 of the land, **so a block reads as a mass standing on it**" - a causal clause the measurement
+above falsifies, since at the fact's own 0.91 with a symmetric 0.08 spread the dense corner stepped
+7 units and read flat. The fact value is unchanged, so the row keeps its Fact column; the clause is
+now quoted and marked **superseded** in a paragraph under the table (house convention, the same
+move as the casing's "Superseded 2026-09-23" note), with the measured range (`0.70-1.00` of the
+fact, mean `0.85`, about `0.77` of the land), the 7 -> 13 dense-row step pair, and the symmetric
+cap of about 0.11 that `walkComposition.test.ts` enforces. `graph/spec_graph.json` is **not**
+touched: the node's `means` describes the fact's own 0.91 relation, which is unchanged and frozen,
+and the drawn-tone variation is a rendering detail that lives in `walkTiles.ts` and MAP_SPEC.
+
+Docs-only change: no code, no tests, no facts. `npx tsc --noEmit` clean; suite re-run green after
+the doc edit (nothing in the suite reads MAP_SPEC's palette table).
