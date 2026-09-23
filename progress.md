@@ -5044,3 +5044,20 @@ capture had no console errors.
 push carries both to `origin/main`, so main ends at the branch tip. The canonical iCloud checkout
 is untouched and sits behind `origin/main`. Owed rulings unchanged: the tour's in-card dot row, the
 legend chip default, the zone tint, the horizon-band palette, the occlusion rate, the floor rung.
+
+## 2026-09-23 - The founder keeps SUS and SOS on screen, in Corner's vibe
+
+Founder, verbatim: "Send this work order to implementer: Full work order:
+handoff-corner-layout-and-places.md. Ensure we have some place for SUS and SOS screens buttons on
+screen. It must match the aesthetic vibe or corner." (Spelling kept as sent.)
+
+`/tmp/walk-verify/handoff-corner-layout-and-places.md` now carries this as an addendum, and the
+implementer has been sent it directly. The Demo / SUS / SOS cluster keeps its visible place on the
+Corner-styled Home - the standing instruction "Demo, SUS and SOS can be logos on the right" - and
+is restyled to the vibe with behaviour untouched: SOS appears instantly, the escalation accent
+never animates, SUS arms and disarms exactly as today, and the SUS record rules stand (snap to
+zone, no session id, no coordinate, written only at ladder step 3). The cluster's place is part of
+Part 3c's acceptance, in a before/after still.
+
+**Nothing in the product changed by the research session.** Tree: `/tmp/saaya-ui`, `m4-walk-view`,
+tip `0955efb`.
