@@ -1,6 +1,11 @@
 import type * as Leaflet from "leaflet";
 
 import type { MapZone } from "../data/repository/zoneRepository";
+import {
+  type LabelBoxSize,
+  type LabelRect,
+  placeLabels,
+} from "../domain/labels/labelPlacement";
 import type { HeatmapHotspot } from "../domain/model/heatmapHotspot";
 import type { SessionState } from "../domain/model/session";
 import type { LiveLocationFix } from "./locationWatch";
@@ -10,8 +15,18 @@ export type TileAvailability = "loading" | "online" | "offline";
 export interface LeafletMapCallbacks {
   ariaZone(areaName: string, riskLevel: string): string;
   onReady(): void;
+  /** A place pill was tapped. The id is the bake's own. */
+  onPlaceSelected(placeId: string): void;
   onTileAvailability(status: TileAvailability): void;
   onZoneSelected(zoneId: string | null): void;
+}
+
+/** A baked place reduced to what the flat map's own pill needs to stand. */
+export interface MapPlacePin {
+  readonly id: string;
+  readonly name: string;
+  readonly lat: number;
+  readonly lon: number;
 }
 
 export interface LeafletMapView {
@@ -23,6 +38,22 @@ export interface LeafletMapView {
 export interface LeafletMapController {
   destroy(): void;
   recenter(): void;
+  /**
+   * The place pills to draw, already filtered to the active category, the ceiling on how
+   * many stand at once, and the chrome boxes over the map that no pill may land under.
+   *
+   * The map keeps the ranking rule itself: a pill stands only for a place inside the frame,
+   * and the budget goes to the nearest of those to the centre of the frame - the same
+   * reading the walk view takes, in the flat map's own terms. Where a pill stands once it is
+   * drawn is `placeLabels`' decision, the same pass the walk view places its own with, so a
+   * cluster of places reads the same in both views. The rectangles are in the map
+   * container's own pixels.
+   */
+  setPlaces(
+    pins: readonly MapPlacePin[],
+    budget: number,
+    chrome: readonly LabelRect[],
+  ): void;
   update(view: LeafletMapView): void;
 }
 
@@ -80,6 +111,7 @@ const MAP_CAMERA_DURATION_MS = 400; // fact: motion.400ms
 const MILLISECONDS_PER_SECOND = 1_000; // GROUNDED-EXEMPT: SI unit conversion.
 const TILE_TIMEOUT_MS = TILE_TIMEOUT_SEC * MILLISECONDS_PER_SECOND;
 const HALF = 2; // GROUNDED-EXEMPT: radius and anchor are half the specified diameter.
+const DEGREES_PER_HALF_TURN = 180; // GROUNDED-EXEMPT: geometry conversion, degrees to radians.
 
 export const OPEN_STREET_MAP_TILE_URL =
   "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
@@ -204,6 +236,176 @@ export async function mountLeafletMap(
     hotspotLayers.push({ fill, glow, hotspot });
   }
 
+  // --- the place layer. The bake ships 1444 rows and the flat map can pan anywhere inside
+  // a window that covers Visakhapatnam, so the pills are not "the nearest N full stop":
+  // they are the nearest N *inside the frame*, re-chosen on every settle. A pill stands for
+  // a place she can see, which is the same ceiling the walk view's own budget reads.
+  //
+  // The same two placement inputs the walk view uses, read as numbers rather than from the
+  // stylesheet because this side of the app has no CSS to read: `--screen-padding` and
+  // `--space-4`. Named here rather than inlined so the family is visible.
+  const PLACE_FRAME_INSET_PX = 20; // GROUNDED-EXEMPT: structural frame inset, the pixel value of --screen-padding.
+  const PLACE_LABEL_GAP_PX = 4; // GROUNDED-EXEMPT: structural label gap, the pixel value of --space-4.
+
+  let placePins: readonly MapPlacePin[] = [];
+  let placePinBudget = 0;
+  let placeChrome: readonly LabelRect[] = [];
+  interface StandingPin {
+    readonly element: HTMLButtonElement;
+    readonly marker: Leaflet.Marker;
+  }
+  const placeMarkers = new Map<string, StandingPin>();
+  /** Each pill's painted box, measured once and kept: it only changes with its words. */
+  const placeSizes = new Map<string, LabelBoxSize>();
+
+  /** The pill's own box, measured the first time it stands. */
+  function placeSize(pin: MapPlacePin, element: HTMLButtonElement): LabelBoxSize {
+    const cached = placeSizes.get(pin.id);
+    if (cached !== undefined) return cached;
+    const size: LabelBoxSize = {
+      heightPx: element.offsetHeight,
+      widthPx: element.offsetWidth,
+    };
+    // A zero box means the pill has not been laid out yet, so it is not worth keeping.
+    if (size.heightPx !== 0 && size.widthPx !== 0) placeSizes.set(pin.id, size);
+    return size;
+  }
+
+  /**
+   * The shell's own anchor, which is what puts a pill where the pass placed it.
+   *
+   * Leaflet hangs the icon off its point with a margin of minus the anchor, so an anchor of
+   * half the pill puts the pill's centre on the place; anything else moves it by the
+   * difference. The pill inside keeps its own intrinsic size - the box the anchor speaks of
+   * is the shell's, not the words'.
+   */
+  function placeIcon(
+    element: HTMLButtonElement,
+    size: LabelBoxSize,
+    displacement: { readonly xPx: number; readonly yPx: number },
+  ): Leaflet.DivIcon {
+    return L.divIcon({
+      className: "saaya-place-pin-shell",
+      html: element,
+      iconAnchor: [
+        size.widthPx / 2 - displacement.xPx,
+        size.heightPx / 2 - displacement.yPx,
+      ],
+      iconSize: [size.widthPx, size.heightPx],
+    });
+  }
+
+  function addPlacePin(pin: MapPlacePin): StandingPin {
+    // Built as nodes rather than markup: the name is OSM's own text, and a string of it
+    // interpolated into innerHTML would be the one place external data becomes script.
+    const element = document.createElement("button");
+    element.className = "saaya-place-pin";
+    element.type = "button";
+    const dot = document.createElement("span");
+    dot.className = "saaya-place-pin__dot";
+    dot.setAttribute("aria-hidden", "true");
+    const name = document.createElement("span");
+    name.className = "saaya-place-pin__name";
+    name.textContent = pin.name;
+    element.append(dot, name);
+    element.addEventListener("click", (event) => {
+      event.stopPropagation();
+      callbacks.onPlaceSelected(pin.id);
+    });
+    const marker = L.marker([pin.lat, pin.lon], {
+      bubblingMouseEvents: false,
+      icon: L.divIcon({
+        className: "saaya-place-pin-shell",
+        html: element,
+        iconAnchor: [0, 0],
+        iconSize: [0, 0],
+      }),
+      // The pill is the control and takes its own focus; a marker that also claims the
+      // keyboard would put two stops on one place.
+      keyboard: false,
+    }).addTo(map);
+    return { element, marker };
+  }
+
+  /** Choose the pills that stand, and stand them. Cheap enough to run on every settle. */
+  function drawPlacePins(): void {
+    const frame = map.getCenter();
+    // East-west degrees are shorter than north-south ones away from the equator, so the
+    // ranking scales longitude by the cosine of the frame's own latitude. This is an
+    // ordering, never a distance claim - every distance the product shows is haversine.
+    const eastScale = Math.cos((frame.lat * Math.PI) / DEGREES_PER_HALF_TURN);
+    const bounds = map.getBounds();
+    const ranked = placePins
+      .filter((pin) => bounds.contains([pin.lat, pin.lon]))
+      .map((pin) => {
+        const north = pin.lat - frame.lat;
+        const east = (pin.lon - frame.lng) * eastScale;
+        return { pin, rank: north * north + east * east };
+      })
+      .sort((left, right) => left.rank - right.rank)
+      .slice(0, Math.max(0, placePinBudget));
+
+    const keep = new Set(ranked.map((entry) => entry.pin.id));
+    for (const [id, standing] of placeMarkers) {
+      if (keep.has(id)) continue;
+      standing.marker.remove();
+      placeMarkers.delete(id);
+    }
+    for (const entry of ranked) {
+      if (placeMarkers.has(entry.pin.id)) continue;
+      placeMarkers.set(entry.pin.id, addPlacePin(entry.pin));
+    }
+
+    // Every pill that is going to stand is in the DOM now, so each has a box to place with.
+    // The anchors are the places' own points, the sizes are the pills' own, and the chrome
+    // rectangles are what the caller measured over the map.
+    const points = ranked.map((entry) =>
+      map.latLngToContainerPoint([entry.pin.lat, entry.pin.lon]),
+    );
+    const sizes = ranked.map((entry) => {
+      const standing = placeMarkers.get(entry.pin.id);
+      return standing === undefined
+        ? { heightPx: 0, widthPx: 0 }
+        : placeSize(entry.pin, standing.element);
+    });
+    const container = map.getSize();
+    const placed = placeLabels(
+      points.map((point) => ({ xPx: point.x, yPx: point.y })),
+      sizes,
+      {
+        heightPx: container.y,
+        insetPx: PLACE_FRAME_INSET_PX,
+        widthPx: container.x,
+      },
+      PLACE_LABEL_GAP_PX,
+      placeChrome,
+    );
+
+    ranked.forEach((entry, index) => {
+      const standing = placeMarkers.get(entry.pin.id);
+      const spot = placed[index];
+      const point = points[index];
+      const size = sizes[index];
+      if (
+        standing === undefined ||
+        spot === undefined ||
+        point === undefined ||
+        size === undefined
+      ) {
+        return;
+      }
+      standing.marker.setIcon(
+        placeIcon(standing.element, size, {
+          xPx: spot.xPx - point.x,
+          yPx: spot.yPx - point.y,
+        }),
+      );
+    });
+  }
+
+  map.on("moveend", drawPlacePins);
+  map.on("zoomend", drawPlacePins);
+
   let currentView: LeafletMapView = {
     location: null,
     selectedZoneId: null,
@@ -289,6 +491,12 @@ export async function mountLeafletMap(
           duration: MAP_CAMERA_DURATION_MS / MILLISECONDS_PER_SECOND,
         },
       );
+    },
+    setPlaces(pins, budget, chrome) {
+      placePins = pins;
+      placePinBudget = budget;
+      placeChrome = chrome;
+      drawPlacePins();
     },
     update(view) {
       currentView = view;

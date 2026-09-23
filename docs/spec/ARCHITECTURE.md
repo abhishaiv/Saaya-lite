@@ -16,6 +16,9 @@ src/
   domain/                 THE PURE ENGINE. zero DOM, zero React, zero browser API.
     model/                SessionState, SessionEvent, Command, PersistedSession, Rules
     engine/               SessionEngine, ArmingEvaluator, IntervalCalculator
+    labels/               labelPlacement: where a name goes once its anchor is on screen.
+                          Called by the flat map and the walk view both, which is why it
+                          sits here rather than in either one's folder.
   data/
     db/                   IndexedDB via idb: schema, stores, migrations
     zone/                 zone loading from public/assets

@@ -15,6 +15,8 @@ import {
 
 export type SaayaBottomSheetPosition = "peek" | "expanded";
 
+export type SaayaBottomSheetTone = "card" | "paper";
+
 export type SaayaBottomSheetProps = Readonly<{
   /** The parent owns the snap point so screen state remains authoritative. */
   position: SaayaBottomSheetPosition;
@@ -23,6 +25,9 @@ export type SaayaBottomSheetProps = Readonly<{
   ariaLabel: string;
   children: ReactNode;
   className?: string;
+  /** `card` (the default, unchanged) is the interface's dark card; `paper` is the walk
+   * view's white, the same surface the map itself is drawn on. */
+  tone?: SaayaBottomSheetTone;
   onPositionChange: (position: SaayaBottomSheetPosition) => void;
   onDismiss: () => void;
 }>;
@@ -43,6 +48,7 @@ export function SaayaBottomSheet({
   ariaLabel,
   children,
   className,
+  tone = "card",
   onPositionChange,
   onDismiss,
 }: SaayaBottomSheetProps) {
@@ -135,6 +141,7 @@ export function SaayaBottomSheet({
       className={classes}
       data-dragging={drag === null ? undefined : "true"}
       data-position={position}
+      data-tone={tone === "paper" ? "paper" : undefined}
       style={{ transform: renderedTransform }}
     >
       <div className="saaya-bottom-sheet__content">{children}</div>
@@ -168,6 +175,14 @@ export function SaayaBottomSheet({
 
         .saaya-bottom-sheet[data-dragging="true"] {
           transition: none;
+        }
+
+        /* The walk view's places read off the map itself: the same white the streets are
+           drawn on, with the text tokens inverted on this surface only, so a sheet over
+           a white map does not look like a hole in the world. */
+        .saaya-bottom-sheet[data-tone="paper"] {
+          background: var(--color-text-primary);
+          color: var(--color-background);
         }
 
         .saaya-bottom-sheet__drag-target {

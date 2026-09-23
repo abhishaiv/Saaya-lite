@@ -288,3 +288,28 @@ and would have passed anything. Found on 2026-08-19 while self-testing a differe
 | Fixed a duplicate | `## Gate G6's own regression test` appeared **twice**, with the second copy's eight fixture rows identical to the first. Removed the second copy. Pre-existing, unrelated to the walk view, found while editing. |
 | Moved to an appendix | It sat mid-document, straight after Layer 4, which read as though it were a sixth layer. It tests a build tool rather than the product, so it now sits at the foot with its own heading. |
 | Added Layer 5 | The walk view's tests. Mostly Layer 1, because its logic is arithmetic. |
+
+---
+
+## Appendix: what the places layer and the home chrome added, 2026-09-23
+
+Part 3c of the work order. All of it is Layer 1 - pure functions and static markup - plus one
+manual capture, because the thing that broke was a picture, not a value.
+
+| File | What it pins |
+|---|---|
+| `labelPlacement.test.ts` (moved to `src/domain/labels/`, 13 tests) | The four rules: a box that fits keeps its anchor; an edge box is pulled back whole; a box steps clear of one already placed, below before above; the whole ladder separates nine names on one anchor; the dense block of twelve places captured off the flat map never buries one (worst box under a tenth of itself); the reserved chrome band is never landed on; the same frame places the same way twice; an over-wide box is centred rather than flung; an empty frame costs nothing; a missing size is skipped rather than placed blind. The last two encode the two 2026-09-23 amendments, so a regression breaks the test that was written from the capture that caused them. |
+| `walkPins.test.ts` (11 tests) | The pin budget is a ceiling, not a floor; holds on a dense set; draws fewer when the category is thin; measures from where she stands now; the nearest anchors win the budget; rows pass through unchanged. |
+| `openingHours.test.ts` (9 tests) | A weekly rule open inside its span and closed outside; a span exactly at its start; 24/7; several rules on a line; a day range wrapping the week; a span crossing midnight; **text it cannot parse is refused rather than guessed**; a minute outside the day is refused rather than wrapped; her wall clock resolves on the session's own clock. |
+| `PlaceSheet.test.tsx` (7 tests) | **Invents nothing for a place with no hours or phone** - no row, not an empty one; a parseable rule shows open/closed, an unparseable one shows OSM's words verbatim and no state; the category's own name stands in when the bake has no name; the call row only with a phone; the distance row drops when there is no fix; the area name comes from the carded area she stands in; directions point at the place's own coordinates. |
+| `HomeChrome.test.tsx` (3 tests) | A category pill renders only for a category the bake yielded places for; the active category reads pressed; the chrome opens on the map tab with the search pill and the other three tabs disabled. |
+| `settingsScreens.test.tsx`, `homeSessionSurface.test.tsx` | The replay row runs the flow and returns to the surface; it ships disabled while any rung of the ladder is live; the `AppGate` first-run path is untouched. |
+
+**The manual capture: `capture-3c.mjs`** (playwright, webkit, 390 x 844, real bake). Before and
+after stills of the flat map in IDLE, filtered, sheet-open and SHADOW, plus the walk view. The
+probe that mattered was `probe-overlap.mjs`: every pill's box against the measured chrome and
+against every other pill, in both views, run after every change to the pass. Its readings are
+the acceptance evidence - flat IDLE 0 chrome hits and 0 label hits, flat cafes and walk each 0
+chrome hits and two slivers no larger than 12 x 19 px, against 12 label-pair overlaps of up to
+64 x 21 px before the amendment.
+

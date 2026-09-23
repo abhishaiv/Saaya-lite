@@ -37,7 +37,11 @@ import {
   markDemoArmedSession,
   saveDemoSpeedEnabled,
 } from "../../../platform/demoModeStore";
-import type { LeafletMapController, TileAvailability } from "../../../platform/leafletMap";
+import type {
+  LeafletMapController,
+  MapPlacePin,
+  TileAvailability,
+} from "../../../platform/leafletMap";
 import type { LiveLocationFix, LocationStatus } from "../../../platform/locationWatch";
 import { PageLocationRuntime } from "../../../platform/pageLocationRuntime";
 import {
@@ -84,6 +88,21 @@ import {
 } from "../../../platform/walk/characterStore";
 import { CharacterCustomiser } from "../walk/CharacterCustomiser";
 import { WalkView } from "../walk/WalkView";
+import {
+  HomeChrome,
+  pinLabel,
+  ZERO_CATEGORY_COUNTS,
+} from "./HomeChrome";
+import { PlaceSheet } from "./PlaceSheet";
+import {
+  loadPlaces,
+  PLACE_CATEGORIES,
+  PLACES_ASSET_URL,
+  type Place,
+  type PlaceCategory,
+  type Places,
+} from "../../../platform/walk/walkPlaces";
+import { PLACE_PIN_BUDGET } from "../../../platform/walk/walkFacts";
 
 export interface BuildVersion {
   readonly code: number;
@@ -107,8 +126,19 @@ export interface HomeScreenProps {
   readonly heatmapHotspots: readonly HeatmapHotspot[];
   readonly locale: SaayaLocale;
   readonly mapZones: readonly MapZone[];
+  /**
+   * Launches the onboarding flow over the session she is already in, from its Settings
+   * row. Absent on a mount that has no gate above it to own that flow.
+   */
+  readonly onReplayOnboarding?: () => void;
   readonly openDemoOnMount?: boolean;
   readonly policeStations: readonly PoliceStation[];
+  /**
+   * True while the replay flow covers this session. The watch stops for the flow, which
+   * mounts its own onboarding walk view, and resumes when she returns - consent is on
+   * record, so nothing is asked again and nothing about the ladder changes.
+   */
+  readonly suspendedForReplay?: boolean;
   readonly zoneDetails: readonly ZoneDetail[];
 }
 
@@ -119,8 +149,10 @@ export function HomeScreen({
   heatmapHotspots,
   locale,
   mapZones,
+  onReplayOnboarding,
   openDemoOnMount = false,
   policeStations,
+  suspendedForReplay = false,
   zoneDetails,
 }: HomeScreenProps) {
   const copy = M4_COPY[locale];
@@ -140,6 +172,14 @@ export function HomeScreen({
   const [demoSpeedEnabled, setDemoSpeedEnabled] = useState(false);
   const [demoSessionActive, setDemoSessionActive] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>("FLAT");
+  // Corner's layout belongs to this view. Founder ruling, 2026-09-23: "These are the
+  // reference screens I have provided. This is for normal view not the 3D view." The
+  // bake's places, the category she has filtered the pins to, and the place whose sheet
+  // is open are the flat map's own state; the walk view keeps its own copy of the same
+  // three, because its pills are drawn in the scene rather than as DOM.
+  const [places, setPlaces] = useState<Places | null>(null);
+  const [activeCategory, setActiveCategory] = useState<PlaceCategory | null>(null);
+  const [sheetPlace, setSheetPlace] = useState<Place | null>(null);
   // The compass answer, taken on the tap that opens the walk view. False until then, which
   // is the recorded camera: a phone with no compass draws the frame the facts were solved
   // for rather than a frame that claims a heading it never had.
@@ -229,6 +269,77 @@ export function HomeScreen({
       ),
     );
   }, [copy, demoSessionActive, engineView, locale, zoneDetails]);
+
+  const placesById = useMemo(() => {
+    const byId = new Map<string, Place>();
+    for (const place of places?.places ?? []) byId.set(place.id, place);
+    return byId;
+  }, [places]);
+
+  /**
+   * The pills the flat map stands: the bake's own seven categories only.
+   *
+   * The bake maps OSM tags onto that vocabulary and the category bar's counts come from
+   * the same file, so a row outside it is a row the product has no name for - a pin
+   * nothing can filter to. The category she picked narrows the set here rather than in
+   * the map, so the map's own pass only has to rank them. Which of them actually stand is
+   * the map's decision, under the product's own pin budget: the nearest N inside the
+   * frame, as she pans.
+   */
+  const flatPins = useMemo<readonly MapPlacePin[]>(() => {
+    if (places === null) return [];
+    const vocabulary: readonly string[] = PLACE_CATEGORIES;
+    return places.places
+      .filter(
+        (place) =>
+          vocabulary.includes(place.cat) &&
+          (activeCategory === null || place.cat === activeCategory),
+      )
+      .map((place) => ({
+        id: place.id,
+        lat: place.lat,
+        lon: place.lon,
+        name: pinLabel(place, copy),
+      }));
+  }, [activeCategory, copy, places]);
+
+  /** The carded areas as outlines, for the sheet's area row. */
+  const areaOutlines = useMemo(
+    () =>
+      mapZones.map((zone) => ({
+        areaName: zone.areaName,
+        polygon: zone.zone.polygon,
+      })),
+    [mapZones],
+  );
+
+  const handlePlaceSelected = useCallback(
+    (placeId: string) => {
+      const place = placesById.get(placeId);
+      if (place !== undefined) setSheetPlace(place);
+    },
+    [placesById],
+  );
+
+  useEffect(() => {
+    if (viewMode !== "FLAT") return undefined;
+    let cancelled = false;
+    // The bake's own file, fetched for the flat map's pins and category bar. A failure
+    // here is not a failure of the view: she keeps the map, the nav and the search pill,
+    // and gets no pins and no category bar. Nothing stands in for the missing places,
+    // because nothing could. The walk view loads the same file for itself, so switching
+    // views at worst fetches it twice, the second time from the browser's own cache.
+    void loadPlaces(PLACES_ASSET_URL)
+      .then((loaded) => {
+        if (!cancelled) setPlaces(loaded);
+      })
+      .catch(() => {
+        // Silence is the honest report: the chrome renders exactly what it has.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [viewMode]);
 
   useEffect(() => {
     const engine = engineRef.current;
@@ -397,6 +508,20 @@ export function HomeScreen({
     // containment or the ladder changes. Founder finding, 2026-09-23.
     locationRuntimeRef.current?.setWalkViewVisible(viewMode === "WALK");
   }, [viewMode]);
+
+  useEffect(() => {
+    if (!suspendedForReplay) return undefined;
+    // The replay flow mounts its own onboarding over this session, and that mount has a
+    // walk view reading her position for itself. Two readers of one watch is a question
+    // this runtime does not have to answer, so this session's watch stops while the flow
+    // covers it and resumes on her return. Consent is already on record: nothing is asked
+    // again, and the ladder this session is in the middle of is untouched - the Settings
+    // row that starts a replay is only offered from a quiet engine.
+    locationRuntimeRef.current?.stop();
+    return () => {
+      locationRuntimeRef.current?.resumePreviouslyConsented();
+    };
+  }, [suspendedForReplay]);
 
   useEffect(() => {
     if (engineView.state !== "IDLE") return;
@@ -713,6 +838,17 @@ export function HomeScreen({
             setSettingsOpen(false);
             setDemoPanelOpen(true);
           }}
+          // Replay is offered only from a quiet engine: a live rung of the ladder is the
+          // one thing on this screen that may never be interrupted by a screen change.
+          onReplay={
+            onReplayOnboarding !== undefined &&
+            (engineView.state === "IDLE" || engineView.state === "RESOLVED")
+              ? () => {
+                  setSettingsOpen(false);
+                  onReplayOnboarding();
+                }
+              : null
+          }
         />
       </>
     );
@@ -728,37 +864,58 @@ export function HomeScreen({
           copy={copy}
           headingAllowed={headingAllowed}
           hourBand={hourBandAtEpochMs(browserClock.nowEpochMs())}
+          locale={locale}
           location={location}
           locationStatus={locationStatus}
           mapZones={mapZones}
           onZoneSelected={handleZoneSelected}
           selectedZoneId={selectedZoneId}
           sessionState={engineView.state}
+          showPlaces
         />
       ) : (
-        <HomeMap
-          copy={mapCopy}
-          location={location}
-          hotspots={heatmapHotspots}
-          mapZones={mapZones}
-          onController={handleMapController}
-          onTileAvailability={handleTileAvailability}
-          onZoneSelected={handleZoneSelected}
-          selectedZoneId={selectedZoneId}
-          sessionState={engineView.state}
-          tileAvailability={tileAvailability}
-        />
-      )}
+        <>
+          <HomeMap
+            copy={mapCopy}
+            hideAttribution={sheetPlace !== null}
+            location={location}
+            hotspots={heatmapHotspots}
+            mapZones={mapZones}
+            onController={handleMapController}
+            onPlaceSelected={handlePlaceSelected}
+            onTileAvailability={handleTileAvailability}
+            onZoneSelected={handleZoneSelected}
+            pinBudget={PLACE_PIN_BUDGET}
+            pins={flatPins}
+            selectedZoneId={selectedZoneId}
+            sessionState={engineView.state}
+            tileAvailability={tileAvailability}
+          />
 
-      {engineView.state === "IDLE" || engineView.state === "RESOLVED" ? (
-        // Founder instruction, 2026-09-23: the supplied compact v2 mark is the production
-        // brand asset and it is the whole lockup - the wordmark beside it was taking the
-        // top of the frame. The mark carries the name as its alt text.
-        <div className="home-screen__brand-lockup">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img alt={copy.appName} src="/assets/icons/saaya-icon-v2-small.svg" />
-        </div>
-      ) : null}
+          <HomeChrome
+            activeCategory={activeCategory}
+            categoryCounts={places?.categoryCounts ?? ZERO_CATEGORY_COUNTS}
+            copy={copy}
+            onCategoryChange={setActiveCategory}
+          />
+
+          {sheetPlace === null || places === null ? null : (
+            <PlaceSheet
+              areas={areaOutlines}
+              attribution={places.attribution}
+              copy={copy}
+              currentPoint={
+                location === null
+                  ? null
+                  : { latitude: location.latitude, longitude: location.longitude }
+              }
+              locale={locale}
+              onDismiss={() => setSheetPlace(null)}
+              place={sheetPlace}
+            />
+          )}
+        </>
+      )}
 
       <HomeSessionSurface
         activeZoneDetail={activeZoneDetail}
@@ -898,9 +1055,30 @@ export function HomeScreen({
              lands on. The clearance the map's own chrome keeps is declared from that
              height, so the legend chip clears the dock by the same margin either way. */
           --home-action-dock-height: calc(var(--minimum-touch-target) + var(--space-8));
+
+          /* The right edge of the frame: a fixed column of touch targets at
+             --screen-padding, the settings mark at the top and the control stack at the
+             bottom. Both views carry it and both views' own top row stops short of it.
+             * Amended 2026-09-23: it is the home screen's column rather than the walk
+             view's, because the flat map's chrome needs the same number now - it was
+             declared on .walk-view, whose claim to it was only that the walk view got
+             there first. */
+          --home-rail: calc(var(--minimum-touch-target) + var(--space-8));
+
+          /* HomeChrome owns the bottom of the frame in both view modes now: the nav pill
+             on the bottom edge, then the category bar stacked one row above it. Everything
+             the home screen floats in that band - the control stack, the action dock, the
+             compact notice - rises above the whole stack rather than crossing it. The
+             arithmetic mirrors HomeChrome's own rows in the same tokens: the nav's offset,
+             its height, the gap above it, then one category pill. */
+          --home-nav-stack: calc(
+            var(--space-12) + var(--minimum-touch-target) + var(--space-8) +
+              var(--space-8) + var(--space-12) +
+              (var(--space-8) * 2 + var(--type-label-line-height))
+          );
           --home-action-dock-clearance: calc(
             env(safe-area-inset-bottom) + var(--home-action-dock-height) +
-              var(--space-20)
+              var(--space-20) + var(--home-nav-stack)
           );
 
           position: relative;
@@ -936,23 +1114,12 @@ export function HomeScreen({
           inset-inline-end: var(--screen-padding);
         }
 
-        .home-screen__brand-lockup {
-          position: fixed;
-          z-index: 4;
-          display: grid;
-          inline-size: var(--minimum-touch-target);
-          block-size: var(--minimum-touch-target);
-          place-items: center;
-          inset-block-start: calc(env(safe-area-inset-top) + var(--space-12));
-          inset-inline-start: var(--screen-padding);
-          border-radius: var(--radius-control);
-          background: var(--color-card-fill);
-        }
-
-        .home-screen__brand-lockup img {
-          inline-size: var(--space-30);
-          block-size: var(--space-30);
-        }
+        /* The top-left brand lockup stood here. Founder instruction, 2026-09-23: "Remove
+           the Saaya logo from the top." The rule that stood here carried the earlier note
+           "the supplied compact v2 mark is the production brand asset and it is the whole
+           lockup" - superseded: the mark is no longer the top of the frame in either view.
+           The asset and the name still stand where they are the subject (About, onboarding);
+           the map's own top row is Corner's now, and Corner's map carries no logo. */
 
       `}</style>
       </main>

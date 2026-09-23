@@ -2,6 +2,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
 import { bundledZoneRepository } from "../../../data/repository/zoneRepository";
+import { PLACE_PIN_BUDGET } from "../../../platform/walk/walkFacts";
 import { HomeMap } from "./HomeMap";
 import { projectMapHotspots } from "./mapProjection";
 
@@ -64,8 +65,11 @@ describe("M4 localized hotspot map", () => {
         location={null}
         mapZones={snapshot.mapZones}
         onController={() => undefined}
+        onPlaceSelected={() => undefined}
         onTileAvailability={() => undefined}
         onZoneSelected={() => undefined}
+        pinBudget={PLACE_PIN_BUDGET}
+        pins={[]}
         selectedZoneId={null}
         sessionState="IDLE"
         tileAvailability="offline"
@@ -95,8 +99,11 @@ describe("M4 localized hotspot map", () => {
         location={null}
         mapZones={snapshot.mapZones}
         onController={() => undefined}
+        onPlaceSelected={() => undefined}
         onTileAvailability={() => undefined}
         onZoneSelected={() => undefined}
+        pinBudget={PLACE_PIN_BUDGET}
+        pins={[]}
         selectedZoneId={selectedHotspot.zone.stationId}
         sessionState="IDLE"
         tileAvailability="online"

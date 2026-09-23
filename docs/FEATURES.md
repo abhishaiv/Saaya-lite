@@ -84,6 +84,7 @@ Without this stage there is no product, only an engine. Nobody installs an engin
 | F12 | Quiet persistent status | A calm always-visible banner while armed | The page holds a wake lock and watches position, and she can always see that it is doing so. She is never watched secretly. | Real |
 | F13 | Manual arm | A button, for a road not on our map | Coverage outside flagged zones. This is a press, and it is the fallback, never the path. | Real |
 | F14 | One-tap disarm | "I am home" | She will do this constantly. Friction here gets the app uninstalled. Note this stops Shadow and SUS only, never a live SOS. | Real |
+| F30 | **The places layer** (added 2026-09-23) | Vizag's real cafes, restaurants and shops stand as pins on the map, filterable by category, each opening a sheet with what OSM holds for it and nothing more | Founder direction: *"we are going with the vibe of a friend on your phone who helps you go everywhere in the city with confidence."* A map she opens for a coffee on a calm day is how the app is still installed on the night it matters. **See Amendment 2** for the bound on what a pin may say. | Real |
 
 ## Stage 4: SUS, the check-in ladder
 
@@ -185,3 +186,29 @@ be presented as a road-level record:
 
 **Unchanged by this amendment:** no live police feed, no live incident reporting, no
 per-road data from any authority, and no government branding.
+
+---
+
+## Amendment 2 - the places layer (added 2026-09-23)
+
+**Founder ruling.** *"Let's copy the layout. We want to highlight the restaurants and cafes from
+Vizag in a similar way. The unsafe places will be violet highlighted roads. We are not trying to
+be a safety app, we are going with the vibe of a friend on your phone who helps you go everywhere
+in the city with confidence."*
+
+Stage 2's map stops being a risk map with pins on it and becomes a city map. F30 is that change.
+
+| What it adds | What it does not |
+|---|---|
+| The same OSM extract the roads and buildings come from, mapped to seven categories and drawn as pins | A second dataset. `public/assets/world/places.json` is a bake of the same fetch window, and the pin sits on the same coordinates as the world under it. |
+| A category bar whose pills derive from the bake's own counts, so a category with zero places never renders | A fixed category list. Shops dominate the bake (1004 of 1444); `go out` is thin (23). The bar shows what Vizag's OSM actually holds rather than what a product deck wished it held. |
+| A sheet with the place's name, its category, its area, its distance, and hours or a phone **only where OSM carries them** | Ratings, reviews, photos, price, "popular times". None exist in the file, so none can render. An absent field is an absent row, never a placeholder. |
+| A pin that is a place she can walk to | A safety claim. **A pin says nothing about whether an area is safe.** Risk is the zone tint under the pin, from the frozen heatmap, and the two layers keep their separate provenance. A cafe pin inside a high band is a cafe in a high band. |
+
+**What leaves her phone is unchanged.** The places layer is a read of a public file: no location
+leaves, no search is recorded, no pin tap is sent anywhere. It changes what she sees.
+
+**The pin budget is a fact, not a taste.** `walk.places.pinBudget` (12) is the ceiling on pins at
+once, and the pins shown are the nearest N to where she is. A city block can hold a hundred shops;
+a hundred pills is not a map.
+

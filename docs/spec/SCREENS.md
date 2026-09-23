@@ -160,6 +160,48 @@ Full-bleed dark map, controls floating over it.
 Map must render usably on a 720x1280 device at 2 GB RAM. Derive circles once at load; do not
 rebuild map geometry on every frame.
 
+### Amendment 2026-09-23: the layout is Corner's, and the places are Vizag's
+
+Founder direction: *"Let's copy the layout. We want to highlight the restaurants and cafes from
+Vizag in a similar way. The unsafe places will be violet highlighted roads. We are not trying to
+be a safety app, we are going with the vibe of a friend on your phone who helps you go everywhere
+in the city with confidence."* On where that layout lives: *"These are the reference screens I
+have provided. This is for normal view not the 3D view."* This is the **flat** view's chrome.
+
+| Region | What it is |
+|---|---|
+| Search pill | Top of the ground. A **slot, not an input**: `walk_search_hint` renders as placeholder copy inside a control that opens the Search surface. Never a live text input over the map - a keyboard over the streets is the map gone. |
+| Category bar | Horizontally scrolling pills above the nav. Categories derive strictly from the bake's own counts, so a category with zero places never renders. Selection filters the pins. |
+| Place pins | Small white pills, the place's name and a violet accent, and a tap opens the place sheet. Budget: the nearest N by active category, N = `walk.places.pinBudget` (12). |
+| Bottom nav | map / feed / search / profile, white floating pill, Corner's shape. Map is this screen. Feed, Search and Profile are surfaces of their own and **ship disabled until they exist** - a dead tab is worse than an absent one, the same rule as S10's missing row. |
+| SOS + SUS dock | Floating above the nav, right side. SOS starts an SOS instantly, is never buried in the nav, and no safety control animates. The SUS mark arms SUS and reads **End SUS**, exactly as `M1` built it. |
+| Licence chip | `© OpenStreetMap contributors`, white chip, bottom-left, so the licence reads over any tile. While the place sheet is up the chip stands down and the sheet's footer carries it: the licence reads once, never twice. |
+
+**A pin is placement, not decoration.** Twenty names on one block of Old Town will not all fit,
+so where each pill stands is decided by `src/domain/labels/labelPlacement.ts` - one pass, shared
+with the walk view, so a cluster of places reads the same in both. It steps a box clear of what is
+already placed, then of the chrome, and when the frame is dense it takes the least covered spot
+rather than printing one name over another. `MAP_SPEC.md` carries the pass and its two 2026-09-23
+amendments.
+
+**The place sheet** (`SaayaBottomSheet`, opened by a pin tap). Rows, in this order, each present
+only when the bake carries it:
+
+| Row | Source |
+|---|---|
+| Name | `name`, or the category's own word when OSM has none (91% of the bake is named) |
+| Category chip | the bake's `cat`, through the chrome's own category copy |
+| Open state and hours | only when OSM carries `opening_hours`; the open/closed line only when that string is readable as times, otherwise OSM's words verbatim |
+| Area | `area_name` - never `station_name`, which is an approximation of the locality |
+| Distance | haversine from her fix, the same reading the zone sheet takes |
+| Directions | an external maps link on the place's own lat/lon |
+| Call | only when OSM carries a phone |
+| Share | always |
+
+**An absent field is an absent row.** No placeholder, no invented value, no ratings, no reviews,
+no photos. The bake is 1444 rows and only 17 carry hours and 42 a phone, so most sheets show
+neither and that is the correct sheet.
+
 ## S4. Zone detail sheet (F7, F8)
 
 Opens on zone tap, **at C8's expanded state (55% of screen height), not the 160 px peek.**
@@ -266,7 +308,15 @@ Title `set_title`. Rows, in this order, each a `COPY.md` key:
 | Row | Key | Sub-label |
 |---|---|---|
 | About | `set_about` | |
+| Replay onboarding | `set_replay` | `set_replay_sub` |
 | Demo panel | `set_demo` | `set_demo_sub` |
+
+**Replay onboarding (added 2026-09-23).** Runs the first-run flow again over the session she is
+in: the flow mounts over Home, the watch stops for its duration, and on completion she returns to
+the surface she came from. It keeps her data - favourites, PIN, name, character - and never
+touches the `AppGate` first-run path, which only fires when no onboarding record exists. The row
+ships **disabled while the engine is not quiet**, because a replay is a screen change and no rung
+of the ladder takes one.
 
 **Settings is a shell three nodes fill.** It had no owning node at all, which is why the
 demo panel was unreachable. Ownership:
@@ -397,15 +447,23 @@ bottom sheet, the ladder and the SOS button exactly where they are. Full spec in
 | no WebGL | `EmptyState`, and the control is **disabled rather than hidden** so the view is not a mystery | stays on the flat map |
 
 **The legend and the derivation note are part of the view, not an optional extra.**
-`walk_legend_title`, the ramp, both of its end labels and the derivation sentence,
-`walk_risk_note`, all render as the view opens; on a phone they are the whole of the chip.
-`FEATURES.md` Amendment 1 clause 1 requires the derivation to be *stated* in the UI rather than
-implied, and a sentence behind a tap states it only on request, so the chip opens whole rather
-than folded. Clause 2 requires a band to be a band: the ramp and its two ends render in both of
-the chip's states, so no state of it is a legend without its picture. The chip can be folded -
-that is the answer to the founder's "taking up all the space", not a way to hide the statement -
-and folding takes the sentence and nothing else. `MAP_SPEC.md`'s 2026-09-23 amendment, "the
-legend is a chip, not a card", carries the full reasoning.
+
+> Superseded 2026-09-23: *"`walk_legend_title`, the ramp, both of its end labels and the
+> derivation sentence, `walk_risk_note`, all render as the view opens; on a phone they are the
+> whole of the chip... a sentence behind a tap states it only on request, so the chip opens whole
+> rather than folded."*
+
+The founder read that on his own phone and asked twice for the bar to stop taking the space:
+*"make the street shading bar collapsible or something, because it is taking too much space."*
+The chip now **opens folded** - title, ramp and both ends - and one tap states the derivation.
+
+`walk_legend_title`, the ramp and both of its end labels render in both of the chip's states,
+which is what `FEATURES.md` Amendment 1 clause 2 requires: a band is a band, so no state of the
+chip is a legend without its picture. `walk_risk_note` renders when the chip is open, which is
+where clause 1's statement lives now - in the UI, one tap away, never implied. Clause 1's rule is
+that the derivation is stated rather than implied; the founder's instruction decides where on the
+screen that statement sits, and the chip states it on the tap. `MAP_SPEC.md`'s 2026-09-23
+amendment, "the legend is a chip, not a card", carries the full reasoning.
 
 **Session overlays render over the walk view unchanged.** While any rung is live the render
 loop is paused, so `SOS_ACTIVE` sits on a still frame. See `MOTION_SPEC.md`.

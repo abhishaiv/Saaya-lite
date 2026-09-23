@@ -54,6 +54,12 @@ textarea {
   z-index: 6; /* GROUNDED-EXEMPT: local stacking order above map controls. */
 }
 
+.place-sheet {
+  --sheet-expanded-height: 55dvh; /* sheet.expanded */
+
+  z-index: 7; /* GROUNDED-EXEMPT: above the walk view's chrome, below every ladder surface. */
+}
+
 .home-session-sheet {
   --sheet-expanded-height: 55dvh; /* sheet.expanded */
 
@@ -93,6 +99,73 @@ textarea {
 .saaya-location-marker-shell {
   border: 0;
   background: transparent;
+}
+
+/* The flat map's place pill, the walk view's pin in the flat map's terms: one white
+   pill per place, its violet dot the mark, the name beside it. Leaflet injects this
+   markup itself, so it is global rather than a styled-jsx rule, exactly as the location
+   dot above is. The pill is centred by the shell's own `iconAnchor`, which
+   `leafletMap.ts` computes from the placement pass's output, so nothing here offsets it -
+   a `translate` on top of that anchor would move it twice. */
+.saaya-place-pin-shell {
+  border: 0;
+  background: transparent;
+}
+
+.saaya-place-pin {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin: 0;
+  max-inline-size: 140px; /* fact: walk.places.pinWidth */
+  white-space: nowrap;
+  padding: var(--space-4) var(--space-8);
+  border: 0;
+  border-radius: var(--radius-small);
+  appearance: none;
+  background: var(--color-text-primary);
+  color: var(--color-background);
+  font-family: inherit;
+  font-size: var(--type-caption-size);
+  font-weight: var(--weight-semibold);
+  line-height: var(--type-caption-line-height);
+  text-align: start;
+  animation: none;
+  transition: none;
+}
+
+/* The pill paints small - it is a mark on the map, not a button in a row - so the finger
+   gets the product's own target as an expansion rather than by growing the mark.
+   DESIGN_SYSTEM.md: "Minimum touch target 48 x 48 px, no exceptions", and the interface's
+   own chips read the same rule: pad the touch target, do not grow the visual. The
+   percentage is the pill's own painted box, because a positioned element's percentages
+   resolve against its own padding box. */
+.saaya-place-pin::after {
+  content: "";
+  position: absolute;
+  inset-block: calc((var(--minimum-touch-target) - 100%) / -2);
+  inset-inline: calc(var(--space-8) * -1);
+}
+
+/* The name is its own box so the pill's width cap truncates it: a flex child will not go
+   under its own content width without `min-inline-size`. The whole name lives in the place
+   sheet the pill opens. */
+.saaya-place-pin__name {
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.saaya-place-pin__dot {
+  flex: none;
+  inline-size: var(--space-4);
+  block-size: var(--space-4);
+  border-radius: var(--radius-small);
+  background: var(--color-brand);
 }
 
 .saaya-location-marker {

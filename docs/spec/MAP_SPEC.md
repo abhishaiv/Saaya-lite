@@ -277,6 +277,31 @@ with opening_hours 17, with phone 42, with addr 43, with a Telugu name 10
 **The category bar and search chips derive from what the file contains, never from a
 category with zero places.** The counts are read from the file at load, not restated here.
 
+### The place pills, flat and in the walk view (added 2026-09-23)
+
+Both views draw the same bake, filtered to the active category, under the same budget and the
+same placement pass. The budget is the fact `walk.places.pinBudget` (12).
+
+| | Flat map (`leafletMap.ts`) | Walk view |
+|---|---|---|
+| Which pins | the nearest N **inside the frame**, re-chosen on every settle, ranked by squared ground distance to the frame's centre with longitude scaled by the cosine of the frame's latitude - an ordering, never a distance claim | the nearest N to the walk position, the same ordering in the world's own frame |
+| The pill | a white pill: a violet dot plus the place's name, `walk.places.pinWidth` (140 px) wide with the name ellipsised | the same pill |
+| Where it stands | `placeLabels`, against the map container's own pixels, with the chrome the screen measured as `reserved` | `placeLabels`, against the canvas, with the chrome measured from the screen |
+| Tap | opens the place sheet | opens the place sheet |
+
+**The pill's shell is the map library's, the pill is ours.** A Leaflet marker hangs its icon off
+its point by minus the icon's anchor, so `placeIcon` computes an anchor of half the pill, moved by
+the displacement the pass chose - the pill's centre lands where the pass placed it and the words
+keep their intrinsic width. The name is set as a text node, never interpolated into markup: it is
+OSM's own text, and a string of it in an `innerHTML` would be the one place external data becomes
+script. The measured box is cached per pill, because it only changes with its words.
+
+**The chrome is measured, not assumed.** Each view measures the search pill, the category bar, the
+nav, the top rail, the control stack, the action dock and the licence chip into the frame's own
+pixels and hands them to the pass as `reserved`; a re-measure happens on resize, not on every
+settle, because a `getBoundingClientRect` inside the map's own draw is a layout flush the pan does
+not need.
+
 ## The camera, and the frame it composes
 
 **Amendment 2026-09-22, and its correction the same day.** Founder ruling: *"We need perfection
@@ -853,10 +878,32 @@ origin position measured what that costs:
 | Two zone names | printed over each other - Old Town and Soldierpet overlapping 33.9 x 24.7 px |
 | A name at the frame edge | cut in half - Soldierpet 10.7 px past the right edge |
 
-A point is not a name. `labelPlacement.ts` places the box, in four rules: centred on its
-anchor; pulled back inside the frame if centring would push it out; stepped clear of any name
-already placed, below first then above; and, if nothing fits, the clamped centre - because a
-name overlapping another is still a tap target, and the risk reading must not disappear.
+A point is not a name. `labelPlacement.ts` places the box, in four rules.
+
+> Superseded 2026-09-23: *"centred on its anchor; pulled back inside the frame if centring would
+> push it out; stepped clear of any name already placed, below first then above; and, if nothing
+> fits, the clamped centre - because a name overlapping another is still a tap target, and the
+> risk reading must not disappear."*
+
+The rules as they stand now, each amendment driven by a capture:
+
+1. The box is centred on its anchor, and 2. pulled back inside the frame if centring would push
+it out - unchanged.
+3. Stepped clear of anything already placed **or of the chrome the caller reserved**: down the
+anchor's own column first, then the same ladder one box to the right, then one box to the left,
+to `STEP_LIMIT` (four) strides each way. Two amendments landed here on 2026-09-23. The first, on
+a capture of the walk view: "Bata", "Airtel" and "Pantaloons" were found printed in one box over
+one place, because the ladder was five candidates and a coincident cluster exhausted it. The
+second, on a capture of the flat map: twelve places anchored inside one 27 x 30 px blob of Old
+Town, which rows alone cannot separate because they share nearly one x - hence the sideways
+columns. The same day the pass took its `reserved` argument: rectangles the caller has already
+drawn over the frame - the search pill, the category bar, the nav, the rails, the action dock,
+the licence chip - which no candidate may land on, because a name under the chrome is not a name.
+4. If nothing fits, the **least covered candidate on the ladder**, preferring one that misses the
+chrome entirely: a name slightly overlapping another is still worth more than no name, because
+the label is a tap target, not decoration, but the previous fallback took the clamped centre,
+which in the twelve-place block was the worst of the nine candidates and buried a pill under
+64 x 21 px of its neighbour.
 
 **This is not the label system the flat map refuses.** "No hotspot-label collision system"
 above is about the flat map's circles, where a dense ring of locality names would obscure the
@@ -865,6 +912,14 @@ inside the frame, so its problem is the opposite one: two names landing on each 
 is illegible rather than dense. Nothing here decides *which* names are worth showing - the
 scene's projection decides that, and this decides only where a name that is already showing
 sits.
+
+**One pass, both views (2026-09-23).** The pass moved out of the walk view's own folder and into
+`src/domain/labels/labelPlacement.ts`, because the flat map's place pills have exactly the same
+problem and a cluster of places must read the same in both views. It is a pure function - anchors,
+box sizes, the frame, the gap, the reserved rectangles - so the walk view and `leafletMap.ts` call
+the same code, and a placement that depended on anything else would make names swap places as she
+walks. What each view feeds it differs: the walk view places zone names, the flat map places place
+pills.
 
 **The same amendment gives the view a rail.** The frame's right edge belongs to the home
 screen's own rail: the settings button above, the control stack below, a fixed 48 px column
@@ -884,20 +939,30 @@ phone it read as the largest object in a view whose subject is a person walking.
 
 It is now a chip in the bottom-left corner, `walk.legend.width` (224 px) wide, anchored to
 the left edge at `--screen-padding` and still clear of the action dock by
-`--home-action-dock-clearance`. What renders as the view opens, and what the fold takes away:
+`--home-action-dock-clearance`.
 
-| Rendered as the view opens | Folded away on a tap |
+> Superseded 2026-09-23, second founder pass: the table that stood here read "Rendered as the
+> view opens | Folded away on a tap" with the title, the ramp, both end labels **and the
+> derivation sentence** as what renders as the view opens, and this paragraph: *"A sentence
+> behind a tap states it only on request... So the chip opens whole. The fold answers the
+> founder's space complaint instead: one tap clears the chip down to the ramp without a build
+> ever hiding the statement by default."* The founder, reading the chip on his own phone,
+> asked a second time: *"make the street shading bar collapsible or something, because it is
+> taking too much space."*
+
+What renders as the view opens, and what the fold takes away:
+
+| Rendered as the view opens | Stated on a tap |
 |---|---|
-| the title, the colour ramp, both of the ramp's end labels, and the derivation sentence (`walk_risk_note`) | the derivation sentence, and only it |
+| the title, the colour ramp and both of the ramp's end labels | the derivation sentence (`walk_risk_note`), and only it |
 
-**Why the sentence still renders by default, and why the fold exists at all.** FEATURES.md
-Amendment 1 clause 1 requires the walk view to *state* that per-road risk is derived from zone
-data. A sentence behind a tap states it only on request, and `SCREENS.md`'s own sentence on
-this - "Neither is a tooltip she has to find" - was written about exactly this risk. So the
-chip opens whole. The fold answers the founder's space complaint instead: one tap clears the
-chip down to the ramp without a build ever hiding the statement by default. Clause 2 requires
-a band to be a band, so the ramp and both of its end labels render in **both** states - the
-fold never takes those, and no state of this chip is a legend without its picture.
+**The statement moved one tap away, on the founder's instruction.** `FEATURES.md` Amendment 1
+clause 1 still binds: the view *states* that per-road risk is derived from zone data rather
+than implying it, and `walk_risk_note` is where it states it - on the tap that opens the chip.
+The founder's direction decides where on the screen that statement sits; it never removes it,
+so the chip cannot be built without the sentence. Clause 2 requires a band to be a band, so the
+ramp and both of its end labels render in **both** states - the fold never takes those, and no
+state of this chip is a legend without its picture.
 
 **This is the one place the compaction deliberately gives space back.** The card was measured
 at 824 px against a dock top at 784 px, and the founder read it as "taking up all the space".

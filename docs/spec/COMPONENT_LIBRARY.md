@@ -287,3 +287,47 @@ has to be honest about what she will get.
 **A change to an axis swaps one part and re-assembles.** It does not reload the whole
 character, and it does not re-fetch a file already loaded for this session. Switching back to
 a previously chosen option is instant, because the part is already in memory.
+
+---
+
+## C17. `HomeChrome` (added 2026-09-23)
+
+The flat view's chrome, in one component so its rows are measured from one place:
+`.home-chrome__search`, `.home-chrome__categories`, `.home-chrome__nav`. It renders no
+mapping of its own - it takes the counts, the labels and the handlers.
+
+| Row | Built from | Notes |
+|---|---|---|
+| Search pill | `walk_search_hint` | **A slot, not an input.** It opens the Search surface; there is never a live text field over the map. Full width, `--screen-padding` each side. |
+| Category bar | the bake's own counts | One pill per category with a non-zero count, horizontally scrolling. A category with zero places cannot render. The active pill reads `aria-pressed="true"`. |
+| Bottom nav | `nav_map`, `nav_feed`, `nav_search`, `nav_profile` | A white floating pill, Corner's shape. Map is the built surface; **the other three ship `disabled` until their surfaces exist** - a dead tab is worse than an absent one. |
+
+**Every row is a touch target at least 48 x 48 px.** The visual pill is smaller than that
+where the design wants it small, and the target is padded out to the floor the same way
+C1's controls are - the documented "pad the touch target, do not grow the visual". The
+category pills are the case that made this explicit: a 26 px pill is a 26 px pill.
+
+**The chrome is measured, not assumed.** `HomeMap` and `WalkView` both read these rows'
+boxes, convert them to the frame's own pixels and hand them to `placeLabels` as `reserved`,
+so no place pin or zone name ever lands under a control. Measured on resize, not on every
+settle.
+
+---
+
+## C18. `PlacePin` (added 2026-09-23)
+
+One pill per place, drawn by the flat map (`leafletMap.ts`) and by the walk view
+(`WalkView.tsx`) from the same bake, the same budget and the same placement pass.
+
+| | |
+|---|---|
+| Shape | a white pill: a small violet dot, then the place's name, `--radius-control` |
+| Width | `walk.places.pinWidth` (140 px), and the name ellipsises rather than the pill growing |
+| Colour | white fill, dark text - the same dark-on-light treatment as C6, because it stands on a light raster |
+| Budget | `walk.places.pinBudget` (12), the nearest N in the active category |
+| Touch target | padded to 48 x 48 px behind the pill |
+| Tap | opens `SaayaBottomSheet` with the place sheet (C8) |
+
+**The name is a text node, never interpolated markup.** It is OSM's own text, and a string of
+it in an `innerHTML` would be the one place external data becomes script.
+

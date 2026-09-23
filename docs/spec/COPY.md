@@ -128,7 +128,13 @@ demo video.
 | `set_police` | State view (round two) | రాష్ట్ర వ్యూ (రెండో రౌండ్) |
 | `set_about` | About | గురించి |
 | `set_demo` | Demo panel | డెమో ప్యానెల్ |
-| `set_demo_sub` | Prototype controls, not product features | ప్రోటోటైప్ నియంత్రణలు, ఉత్పత్తి ఫీచర్లు కావు |
+| `set_demo_sub` | Prototype controls, not product features | ప్రొటోటైప్ నియంత్రణలు, ఉత్పత్తి ఫీచర్లు కావు |
+| `set_replay` | Replay onboarding | ఓన్బోర్డింగ్ మళ్ళీ చూడండి |
+| `set_replay_sub` | See the first-run flow again. Nothing you saved is lost. | మొదటిసారి ప్రక్రియను మళ్ళీ చూడండి. మీరు సేవ్ చేసినవి ఏవీ పోవు. |
+
+**`set_replay_sub` says what happens to her data before she taps**, because the fear behind the
+row is losing a PIN or a favourite. The flow runs over the current session and keeps everything;
+`SCREENS.md` S11 carries the row and the return rule.
 
 ### About (S13)
 
@@ -327,3 +333,64 @@ rarity.**
 | `cust_reset` | Start again | మళ్లీ మొదలుపెట్టు |
 | `cust_stays_local` | This stays on your phone. | ఇది మీ ఫోన్‌లోనే ఉంటుంది. |
 | `ann_cust_saved` | Character saved | పాత్ర సేవ్ అయింది |
+
+## The home chrome and the places layer (added 2026-09-23)
+
+The founder set this layout against Corner's own screens: *"Let's copy the layout. We want to
+highlight the restaurants and cafes from Vizag in a similar way."* The words below are the whole
+of what the chrome and the place sheet say. **Nothing here describes a place**: every value on
+the sheet is the bake's own, and a field OSM did not carry is a row that does not render - never
+a placeholder, never an invented value. No ratings, no reviews, no photos.
+
+### The chrome
+
+| Key | English | తెలుగు |
+|---|---|---|
+| `walk_search_hint` | Where to? | ఎక్కడికి? |
+| `nav_map` | Map | మ్యాప్ |
+| `nav_feed` | Feed | ఫీడ్ |
+| `nav_search` | Search | సెర్చ్ |
+| `nav_profile` | Profile | ప్రొఫైల్ |
+| `cat_eat` | eat | తినడం |
+| `cat_cafes` | cafes | కేఫ్‌లు |
+| `cat_bars` | bars | బార్లు |
+| `cat_go_out` | go out | తిరగడం |
+| `cat_hotels` | hotels | హోటళ్లు |
+| `cat_leisure` | leisure | వినోదం |
+| `cat_shops` | shops | షాపులు |
+| `cd_walk_search` | Open search | సెర్చ్ తెరువు |
+
+**The search pill is a slot, not an input.** `walk_search_hint` renders as a placeholder inside a
+control that opens the Search surface (`SCREENS.md` S3, part 3d). There is never a live text input
+floating over the map: a keyboard over the streets is the map gone.
+
+**The categories are the bake's own words, lower case, exactly as OSM spells them.** They are not
+copy in the brand's voice and that is deliberate: they are labels on OSM's data, and
+`MAP_SPEC.md` holds the derivation rule - the bar renders a category only when the bake's own
+count for it is non-zero, so a category with zero places never appears.
+
+### The place sheet
+
+| Key | English | తెలుగు |
+|---|---|---|
+| `place_area` | Area | ప్రాంతం |
+| `place_hours` | Hours | తెరిచే వేళలు |
+| `place_open_now` | Open now | ఇప్పుడు తెరిచి ఉంది |
+| `place_closed_now` | Closed now | ఇప్పుడు మూసివేయబడింది |
+| `place_directions` | Directions | దారి చూపించు |
+| `cta_share` | Share | షేర్ చేయి |
+| `cd_place_directions` | Open directions to %1$s in maps | మ్యాప్స్‌లో %1$s కి దారి చూపించు |
+| `cd_place_share` | Share %1$s | %1$s ని షేర్ చేయి |
+
+**`place_open_now` and `place_closed_now` render only when OSM carries `opening_hours`.** Seventeen
+of the bake's 1444 rows do. On the other 1427 the sheet says the hours it has - none - and the
+open state is absent rather than guessed. When the hours string is one the app cannot read as
+times, the sheet prints OSM's words verbatim and claims nothing about now.
+
+### The attribution
+
+The licence the tiles come under, `© OpenStreetMap contributors`, is reused from the flat map
+rather than restated. On the flat map it renders on a white chip in the bottom-left so it reads
+over any tile; while the place sheet is up, the sheet's own footer carries it and the chip stands
+down, so the licence reads once.
+

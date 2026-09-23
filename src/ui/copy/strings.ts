@@ -30,6 +30,13 @@ export type M4Copy = Readonly<{
   annViewFlat: string;
   annViewWalk: string;
   appName: string;
+  catBars: string;
+  catCafes: string;
+  catEat: string;
+  catGoOut: string;
+  catHotels: string;
+  catLeisure: string;
+  catShops: string;
   cdBack: string;
   cdCancelEscalation: string;
   cdCloseSheet: string;
@@ -41,10 +48,13 @@ export type M4Copy = Readonly<{
   cdDemoReset: string;
   cdDemoZonePicker: string;
   cdMap: string;
+  cdPlaceDirections: string;
+  cdPlaceShare: string;
   cdRecentre: string;
   cdSettings: string;
   cdStationCall: string;
   cdStopSos: string;
+  cdWalkSearch: string;
   cdZone: string;
   ctaCall: string;
   ctaCancelImFine: string;
@@ -55,6 +65,7 @@ export type M4Copy = Readonly<{
   ctaArmManually: string;
   ctaImHome: string;
   ctaOpenDemo: string;
+  ctaShare: string;
   custAxisAccessories: string;
   custAxisBody: string;
   custAxisBottom: string;
@@ -107,6 +118,10 @@ export type M4Copy = Readonly<{
   locSearching: string;
   locSlow: string;
   mapOffline: string;
+  navFeed: string;
+  navMap: string;
+  navProfile: string;
+  navSearch: string;
   onbContactBody: string;
   onbContactPrivacy: string;
   onbContactTitle: string;
@@ -137,6 +152,11 @@ export type M4Copy = Readonly<{
   onbTourTitle: string;
   onbWelcomeBody: string;
   onbWelcomeTitle: string;
+  placeArea: string;
+  placeClosedNow: string;
+  placeDirections: string;
+  placeHours: string;
+  placeOpenNow: string;
   pinNoRecovery: string;
   pinTitle: string;
   policeNoGovtLink: string;
@@ -155,6 +175,8 @@ export type M4Copy = Readonly<{
   setPin: string;
   setPinSub: string;
   setPolice: string;
+  setReplay: string;
+  setReplaySub: string;
   setTitle: string;
   statusCheckin1: string;
   statusCheckin2: string;
@@ -180,6 +202,7 @@ export type M4Copy = Readonly<{
   walkLocDenied: string;
   walkOffline: string;
   walkRiskNote: string;
+  walkSearchHint: string;
   warnKeepOpenBody: string;
   warnLocationDenied: string;
   warnPageStopped: string;
@@ -225,6 +248,13 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     annViewFlat: "Map view.",
     annViewWalk: "Walk view. You can switch back any time.",
     appName: "Saaya Lite",
+    catBars: "bars",
+    catCafes: "cafes",
+    catEat: "eat",
+    catGoOut: "go out",
+    catHotels: "hotels",
+    catLeisure: "leisure",
+    catShops: "shops",
     cdBack: "Go back",
     cdCancelEscalation: "Cancel this preview. It stays on your phone.",
     cdCloseSheet: "Close",
@@ -236,10 +266,13 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     cdDemoReset: "Reset the demo session. Nothing is sent.",
     cdDemoZonePicker: "Choose a zone to simulate entering",
     cdMap: "Map of Visakhapatnam risk areas",
+    cdPlaceDirections: "Open directions to %1$s in maps",
+    cdPlaceShare: "Share %1$s",
     cdRecentre: "Centre the map on your location",
     cdSettings: "Open settings",
     cdStationCall: "Call %1$s",
     cdStopSos: "Stop the SOS. Needs your PIN.",
+    cdWalkSearch: "Open search",
     cdZone: "%1$s, %2$s risk area. Open details.",
     ctaCall: "Call",
     ctaCancelImFine: "Cancel, I am fine",
@@ -250,6 +283,7 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     ctaArmManually: "Start Shadow",
     ctaImHome: "I am home",
     ctaOpenDemo: "Open the demo",
+    ctaShare: "Share",
     custAxisAccessories: "Accessories",
     custAxisBody: "Body",
     custAxisBottom: "Bottom",
@@ -302,6 +336,10 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     locSearching: "Finding you",
     locSlow: "This is taking longer than usual. Check that location is on.",
     mapOffline: "Map offline, zones still work",
+    navFeed: "Feed",
+    navMap: "Map",
+    navProfile: "Profile",
+    navSearch: "Search",
     onbContactBody: "One person is enough. If you miss two check-ins, Saaya shows the message they would receive.",
     onbContactPrivacy: "This stays on your phone. Saaya never uploads your favourites.",
     onbContactTitle: "Your favourites",
@@ -332,6 +370,11 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     onbTourTitle: "See the safety flow first",
     onbWelcomeBody: "Saaya watches the stretch, not you. It wakes on its own when you enter an area that has a record, at an hour that matters.",
     onbWelcomeTitle: "You do not have to press anything",
+    placeArea: "Area",
+    placeClosedNow: "Closed now",
+    placeDirections: "Directions",
+    placeHours: "Hours",
+    placeOpenNow: "Open now",
     pinNoRecovery: "There is no way around this PIN. If there were, anyone holding your phone could use it.",
     pinTitle: "Enter your PIN to stop",
     policeNoGovtLink: "Saaya Lite is a prototype. It is not connected to AP Police, Shakthi, T-Safe, 112 or ERSS, and it is not a government product.",
@@ -350,6 +393,8 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     setPin: "Change PIN",
     setPinSub: "Needs your current PIN",
     setPolice: "State view (round two)",
+    setReplay: "Replay onboarding",
+    setReplaySub: "See the first-run flow again. Nothing you saved is lost.",
     setTitle: "Settings",
     statusCheckin1: "Checking in",
     statusCheckin2: "Still there?",
@@ -375,6 +420,7 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     walkLocDenied: "The walk view needs your location. Turn it on and come back.",
     walkOffline: "Streets will not load without a connection. Your area still shows.",
     walkRiskNote: "Shading follows the area's records, faded from where incidents cluster. It is not a count for any one street.",
+    walkSearchHint: "Where to?",
     warnKeepOpenBody: "Keep this tab open while you are on the stretch. If you close it, Saaya stops watching.",
     warnLocationDenied: "Saaya cannot wake on its own without location.",
     warnPageStopped: "Your browser stopped Saaya while you were travelling. Nothing was sent.",
@@ -418,6 +464,13 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     annViewFlat: "మ్యాప్ వ్యూ.",
     annViewWalk: "వాక్ వ్యూ. ఎప్పుడైనా తిరిగి మారవచ్చు.",
     appName: "సాయ లైట్",
+    catBars: "బార్లు",
+    catCafes: "కేఫ్‌లు",
+    catEat: "తినడం",
+    catGoOut: "తిరగడం",
+    catHotels: "హోటళ్లు",
+    catLeisure: "వినోదం",
+    catShops: "షాపులు",
     cdBack: "వెనక్కి వెళ్ళు",
     cdCancelEscalation: "ఈ ప్రివ్యూను రద్దు చేయి. ఇది మీ ఫోన్‌లోనే ఉంటుంది.",
     cdCloseSheet: "మూసివేయి",
@@ -429,10 +482,13 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     cdDemoReset: "డెమో సెషన్‌ను రీసెట్ చేయి. ఏదీ పంపబడదు.",
     cdDemoZonePicker: "ప్రవేశించినట్టు చూపించడానికి ఒక జోన్ ఎంచుకోండి",
     cdMap: "విశాఖపట్నం ప్రమాద ప్రాంతాల మ్యాప్",
+    cdPlaceDirections: "మ్యాప్స్‌లో %1$s కి దారి చూపించు",
+    cdPlaceShare: "%1$s ని షేర్ చేయి",
     cdRecentre: "మీ స్థానం మీద మ్యాప్ కేంద్రీకరించు",
     cdSettings: "సెట్టింగ్స్ తెరువు",
     cdStationCall: "%1$s కి ఫోన్ చేయి",
     cdStopSos: "SOS ఆపు. మీ PIN అవసరం.",
+    cdWalkSearch: "సెర్చ్ తెరువు",
     cdZone: "%1$s, %2$s ప్రమాద ప్రాంతం. వివరాలు తెరువు.",
     ctaCall: "కాల్ చేయి",
     ctaCancelImFine: "రద్దు చేయి, నేను బాగున్నాను",
@@ -443,6 +499,7 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     ctaArmManually: "షాడో ప్రారంభించు",
     ctaImHome: "నేను ఇంటికి చేరాను",
     ctaOpenDemo: "డెమో తెరువు",
+    ctaShare: "షేర్ చేయి",
     custAxisAccessories: "ఉపకరణాలు",
     custAxisBody: "శరీరం",
     custAxisBottom: "కింది దుస్తులు",
@@ -495,6 +552,10 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     locSearching: "మిమ్మల్ని కనుగొంటున్నాం",
     locSlow: "ఇది మామూలు కంటే ఎక్కువ సమయం తీసుకుంటోంది. లొకేషన్ ఆన్‌లో ఉందో చూడండి.",
     mapOffline: "మ్యాప్ ఆఫ్‌లైన్, జోన్‌లు ఇంకా పనిచేస్తాయి",
+    navFeed: "ఫీడ్",
+    navMap: "మ్యాప్",
+    navProfile: "ప్రొఫైల్",
+    navSearch: "సెర్చ్",
     onbContactBody: "ఒక్కరు చాలు. మీరు రెండు చెక్-ఇన్‌లు మిస్ అయితే, వారు పొందే సందేశాన్ని సాయ చూపిస్తుంది.",
     onbContactPrivacy: "ఇది మీ ఫోన్‌లోనే ఉంటుంది. సాయ మీ ఆత్మీయులను ఎప్పుడూ అప్‌లోడ్ చేయదు.",
     onbContactTitle: "మీ ఆత్మీయులు",
@@ -525,6 +586,11 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     onbTourTitle: "ముందుగా భద్రతా ప్రయాణాన్ని చూడండి",
     onbWelcomeBody: "సాయ మిమ్మల్ని కాదు, మార్గాన్ని గమనిస్తుంది. రికార్డు ఉన్న ప్రాంతంలోకి, ముఖ్యమైన సమయంలో మీరు ప్రవేశించినప్పుడు అది దానంతట అదే మేల్కొంటుంది.",
     onbWelcomeTitle: "మీరు ఏదీ నొక్కాల్సిన అవసరం లేదు",
+    placeArea: "ప్రాంతం",
+    placeClosedNow: "ఇప్పుడు మూసివేయబడింది",
+    placeDirections: "దారి చూపించు",
+    placeHours: "తెరిచే వేళలు",
+    placeOpenNow: "ఇప్పుడు తెరిచి ఉంది",
     pinNoRecovery: "ఈ PIN ని దాటవేసే మార్గం లేదు. ఉంటే, మీ ఫోన్ పట్టుకున్న ఎవరైనా దాన్ని వాడగలరు.",
     pinTitle: "ఆపడానికి మీ PIN నమోదు చేయండి",
     policeNoGovtLink: "సాయ లైట్ ఒక ప్రోటోటైప్. ఇది AP పోలీస్, శక్తి, T-Safe, 112 లేదా ERSS తో అనుసంధానించబడలేదు, ఇది ప్రభుత్వ ఉత్పత్తి కాదు.",
@@ -543,6 +609,8 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     setPin: "PIN మార్చు",
     setPinSub: "మీ ప్రస్తుత PIN అవసరం",
     setPolice: "రాష్ట్ర వ్యూ (రెండో రౌండ్)",
+    setReplay: "ఓన్‌బోర్డింగ్ మళ్ళీ చూడండి",
+    setReplaySub: "మొదటిసారి ప్రక్రియను మళ్ళీ చూడండి. మీరు సేవ్ చేసినవి ఏవీ పోవు.",
     setTitle: "సెట్టింగ్‌లు",
     statusCheckin1: "చెక్-ఇన్ చేస్తోంది",
     statusCheckin2: "ఇంకా అక్కడ ఉన్నారా?",
@@ -568,6 +636,7 @@ export const M4_COPY: Readonly<Record<SaayaLocale, M4Copy>> = {
     walkLocDenied: "వాక్ వ్యూకు మీ లొకేషన్ కావాలి. దాన్ని ఆన్ చేసి తిరిగి రండి.",
     walkOffline: "కనెక్షన్ లేకుండా వీధులు లోడ్ కావు. మీ ప్రాంతం ఇంకా కనిపిస్తుంది.",
     walkRiskNote: "షేడింగ్ ఆ ప్రాంతపు రికార్డుల ఆధారంగా ఉంటుంది, ఘటనలు ఎక్కువగా జరిగిన చోటి నుంచి క్రమంగా తగ్గుతుంది. ఇది ఏ ఒక్క వీధికీ సంఖ్య కాదు.",
+    walkSearchHint: "ఎక్కడికి?",
     warnKeepOpenBody: "మీరు ఆ మార్గంలో ఉన్నంత సేపు ఈ ట్యాబ్ తెరిచి ఉంచండి. మూసివేస్తే సాయ గమనించడం ఆగిపోతుంది.",
     warnLocationDenied: "లొకేషన్ లేకుండా సాయ దానంతట అదే మేల్కొనదు.",
     warnPageStopped: "మీరు ప్రయాణిస్తున్నప్పుడు మీ బ్రౌజర్ సాయను ఆపింది. ఏదీ పంపబడలేదు.",

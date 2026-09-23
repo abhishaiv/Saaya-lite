@@ -8,6 +8,12 @@ export interface SettingsScreenProps {
   readonly onBack: () => void;
   readonly onOpenAbout: () => void;
   readonly onOpenDemo: () => void;
+  /**
+   * Runs the onboarding flow again over the session she is in. `null` - the row ships
+   * disabled - while the engine is not quiet, because a replay is a screen change and no
+   * rung of the ladder takes one.
+   */
+  readonly onReplay: (() => void) | null;
 }
 
 export function SettingsScreen({
@@ -15,6 +21,7 @@ export function SettingsScreen({
   onBack,
   onOpenAbout,
   onOpenDemo,
+  onReplay,
 }: SettingsScreenProps) {
   return (
     <main className="settings-screen">
@@ -27,6 +34,12 @@ export function SettingsScreen({
 
       <nav aria-label={copy.setTitle} className="settings-screen__rows">
         <SettingsRow label={copy.setAbout} onClick={onOpenAbout} />
+        <SettingsRow
+          disabled={onReplay === null}
+          label={copy.setReplay}
+          onClick={() => onReplay?.()}
+          supporting={copy.setReplaySub}
+        />
         <SettingsRow
           label={copy.setDemo}
           onClick={onOpenDemo}
@@ -104,11 +117,22 @@ type SettingsRowProps = Readonly<{
   label: string;
   onClick: () => void;
   supporting?: string;
+  disabled?: boolean;
 }>;
 
-function SettingsRow({ label, onClick, supporting }: SettingsRowProps) {
+function SettingsRow({
+  label,
+  onClick,
+  supporting,
+  disabled = false,
+}: SettingsRowProps) {
   return (
-    <button className="settings-row" onClick={onClick} type="button">
+    <button
+      className="settings-row"
+      disabled={disabled}
+      onClick={onClick}
+      type="button"
+    >
       <span>
         <strong>{label}</strong>
         {supporting === undefined ? null : <small>{supporting}</small>}
@@ -139,6 +163,11 @@ function SettingsRow({ label, onClick, supporting }: SettingsRowProps) {
 
         .settings-row:last-child {
           border-block-end: 0;
+        }
+
+        /* A row that cannot run yet reads dimmer, and says nothing it cannot do. */
+        .settings-row:disabled {
+          color: var(--color-text-secondary);
         }
 
         .settings-row > span:first-child {

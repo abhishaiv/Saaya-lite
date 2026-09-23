@@ -5293,3 +5293,102 @@ assets were fetched from the live preview rather than trusted locally:
 `/assets/world/world_tiled.json` -> 200, 1,173,802 bytes. Part 3b changes no UI, so
 there is no before/after still to judge; the reproduction is the counts (in the
 section above) and the asset serving beside the world.
+
+## 2026-09-23 - Part 3c: Corner's layout on the flat map, and Vizag's places on it
+
+**Founder ruling that scoped this part.** *"These are the reference screens I have provided.
+This is for normal view not the 3D view."* The layout in the references is the **flat** view's
+chrome. The walk view keeps its own chrome, and both views now share one piece of machinery.
+
+**What is built.**
+
+- **The search pill.** Top of the ground, `walk_search_hint` ("Where to?") as placeholder copy
+  inside a control that opens the Search surface in 3d. A slot, never a live input: no keyboard
+  ever floats over the streets.
+- **The category bar.** Horizontally scrolling pills above the nav, one per category the bake's
+  own counts yield - eat, cafes, bars, go out, hotels, leisure, shops. Selection filters the pins.
+  A category with zero places cannot render, because the pills are derived from the file at load.
+- **The bottom nav.** map / feed / search / profile in a white floating pill. Map is this screen;
+  the other three ship **disabled until their surfaces exist**, the same rule as S10's missing row.
+- **The SOS + SUS dock**, floating above the nav on the right. SOS starts an SOS instantly, is
+  never in the nav and never animates; SUS arms and reads End SUS while armed, exactly as M1 built
+  it. The demo mark leaves the dock in 3f, per the work order.
+- **The licence chip**, white, bottom-left, so `(c) OpenStreetMap contributors` reads over any
+  tile. While the place sheet is up the chip stands down and the sheet's footer carries it - the
+  licence reads once. (Before this the chip was drawn over the sheet's own footer and read as a
+  stray bold line.)
+- **Place pills and the place sheet.** Pins are the nearest N to her (N = `walk.places.pinBudget`,
+  12) in the active category, drawn as white pills with a violet dot and the place's name. A tap
+  opens `SaayaBottomSheet`: name, category chip, open state and hours only where OSM carries
+  `opening_hours`, area (`area_name`, never `station_name`), haversine distance, Directions on the
+  place's own lat/lon, Call only where OSM carries a phone, Share. **An absent field is an absent
+  row.** No ratings, no reviews, no photos - none exist in the file.
+- **The Settings replay row** (`set_replay`, S11) runs the onboarding flow again over the session
+  she is in, keeps her data, and returns her to the surface she came from. It ships disabled while
+  any rung of the ladder is live, because a replay is a screen change. The `AppGate` first-run
+  path is untouched.
+
+**One placement pass, both views.** The label placement moved out of the walk view's folder into
+`src/domain/labels/labelPlacement.ts` and is now called by both `src/platform/leafletMap.ts` and
+`WalkView.tsx`. Two amendments landed in it the same day, each from a capture:
+
+- A walk-view capture found "Bata", "Airtel" and "Pantaloons" printed in one box over one place:
+  the search ladder was five candidates and a coincident cluster exhausted it. It runs to
+  `STEP_LIMIT` (four) strides each way now - nine positions.
+- A flat-map capture found twelve places anchored inside one 27 x 30 px blob of Old Town, with 12
+  label-pair overlaps, the worst 64 x 21 px. Rows cannot separate twelve that share nearly one x,
+  so the search took two more columns (one box either side) and rule 4 now takes the **least
+  covered** candidate rather than the clamped centre.
+
+Both views also hand the pass the chrome they measured - search pill, category bar, nav, rails,
+action dock, licence chip - as `reserved`, which no name may land under. Measured on resize, not
+on every settle.
+
+**The legend chip now opens folded** (founder's second pass: *"make the street shading bar
+collapsible or something, because it is taking too much space"*). Title, ramp and both ends render
+as the view opens; the derivation sentence is one tap away. Superseding records were written into
+`SCREENS.md` S14, `MAP_SPEC.md`'s legend amendment and `walkScreen.test.tsx`, quoting the replaced
+claims rather than deleting them.
+
+**Evidence, not impressions.**
+
+```
+13  labelPlacement tests, including the captured dense block of twelve
+418/418  vitest across 55 files
+ 0  ungrounded literals across all 28 changed source files
+```
+
+Probes (`probe-overlap.mjs`, every pill against the chrome and against every other pill):
+flat IDLE 0 chrome hits, 0 label hits; flat cafes 0 chrome hits, 2 slivers (4 x 23, 127 x 3);
+walk 0 chrome hits, 2 slivers (12 x 3, 12 x 19). Before the amendment: 12 label-pair overlaps up
+to 64 x 21 px on the flat IDLE block. Stills: `3c-flat-idle.png`, `3c-flat-filter.png`,
+`3c-flat-sheet.png`, `3c-flat-shadow.png`, `3c-walk-idle.png` in /tmp/walk-verify.
+
+**Spec records.** `SCREENS.md` S3 gains the layout amendment (regions table, pin placement, the
+place sheet's row rules) and S11 gains the replay row. `COPY.md` gains the chrome, category, place
+sheet and replay copy - 22 new keys, both locales, with the "absent field is an absent row" rule
+stated. `MAP_SPEC.md` gains "The place pills, flat and in the walk view", the pass's two
+amendments, and the supersession of the old four rules. `FEATURES.md` gains F30 and Amendment 2:
+the places layer, its bounds, and the line that a pin says nothing about whether an area is safe.
+`TEST_PLAN.md` gains the 3c appendix. `walkScreen.test.tsx` records the folded-chip supersession.
+
+**Open, not blocking, and unchanged from 3b.** The road-signal variant A/B pick, the violet
+spread, the founder's own coordinates, and whether the walk view's own licence line should exist
+(the place sheet's footer carries it in both views today). Two new ones: the search pill is dark
+where Corner's is white, and the pin budget of 12 is a first proposal - both are the founder's
+call. Next: Part 3d, the Search surface the pill opens.
+
+**Closed before shipping: the category pills' touch targets.** Writing C17 into
+`COMPONENT_LIBRARY.md` produced the claim "Every row is a touch target at least 48 x 48 px." The
+category pills did not meet it: a 30 px chip (8 + 8 padding around a 14 px line box) with no
+padding on the target. The doc was not weakened; the code was fixed, using the interface's own
+rule - pad the touch target, do not grow the visual. The pill takes a `::after` at
+`inset-block: calc((var(--minimum-touch-target) - 100%) / -2)` and `position: relative` to anchor
+it. The strip that holds the pills scrolls, and a scrolling box clips what leaves it, so the strip
+carries the room as `padding-block: var(--space-12)` and takes it straight back as
+`margin-block: calc(var(--space-12) * -1)`: the targets fit inside the scroller, the bar still
+paints at the chips' own height. Verified by capture, not by eye: `categoryBar` was `20,726 350x30`
+before and is `20,714 350x54` now - 714 + the 12 px padding is 726, so the chips have not moved a
+pixel. Probes unchanged (flat IDLE 0/0; flat cafes 0 chrome, 2 slivers; walk 0 chrome, 2 slivers).
+`tsc` clean, 418/418 across 55 files, 0 ungrounded across 29 changed files.
+

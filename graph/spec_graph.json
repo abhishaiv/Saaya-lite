@@ -4728,6 +4728,28 @@
    "platform": "web"
   },
   {
+   "id": "walk.places.pinBudget",
+   "kind": "number",
+   "value": 12,
+   "unit": "places",
+   "means": "how many place pins the walk view draws at once: the nearest N the frame can show, by straight-line distance, within the active category when one is chosen. A ceiling on the pills that can stand over the street at one time, not a completeness claim - the bake holds 1444.",
+   "sourced_from": "proposed by the implementer 2026-09-23 under the corner-layout work order, which requires the budget as a fact before the pins are built - \"Pin budget: nearest-N by active category, the N grounded as a new fact (propose the number, splice the fact before building)\". Chosen, not measured: on a 390 px frame the legend chip already holds 224 px on the left and the action dock stands on the right, so a dozen small pills is the most the frame holds before the labels collide and the street stops reading; the reference maps pin their nearby places at a similar scatter. Proposed openly for the founder's review alongside the variant A/B ruling. Amended 2026-09-23, the ceiling unchanged: the first drafting read \"the nearest N by straight-line distance\" and is superseded - a probe at the bake's densest cluster drew 2 of the 12, because ten of the nearest dozen stood behind or below the camera, and a pill behind her cannot stand over the street. Selection now ranks the nearest anchors the camera can show, so the same 12 is spent on pills actually in the frame.",
+   "governs": "MAP_SPEC.md",
+   "frozen": true,
+   "platform": "web"
+  },
+  {
+   "id": "walk.places.pinWidth",
+   "kind": "number",
+   "value": 140,
+   "unit": "px",
+   "means": "the widest a place pill may render before its name wraps - the same cap the zone-name pills carry, so the two kinds of pill over the street read as one family rather than two.",
+   "sourced_from": "chosen 2026-09-23 under the corner-layout work order, which asks the place pins be \"Small white pills with the place's name, violet accent\". Chosen, not measured: it is the zone-name cap the view already draws with, so a restaurant name is held to the same width a locality name is. Without a cap a long OSM name stretches across the street and the pill stops being a pin.",
+   "governs": "MAP_SPEC.md",
+   "frozen": true,
+   "platform": "web"
+  },
+  {
    "id": "color.tile.road",
    "kind": "color",
    "value": "#4B3A70",

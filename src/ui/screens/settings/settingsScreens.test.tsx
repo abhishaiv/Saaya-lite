@@ -15,18 +15,39 @@ describe("M4 Settings ownership", () => {
           onBack={() => undefined}
           onOpenAbout={() => undefined}
           onOpenDemo={() => undefined}
+          onReplay={() => undefined}
         />,
       );
       expect(html).toContain(copy.setTitle);
       expect(html).toContain(copy.setAbout);
       expect(html).toContain(copy.setDemo);
       expect(html).toContain(copy.setDemoSub);
+      expect(html).toContain(copy.setReplay);
+      expect(html).toContain(copy.setReplaySub);
       expect(html).toContain(copy.policeNoGovtLink);
       expect(html).not.toContain(copy.setFavourites);
       expect(html).not.toContain(copy.setLanguage);
       expect(html).not.toContain(copy.setPin);
       expect(html).not.toContain(copy.setPolice);
     }
+  });
+
+  it("ships the replay row enabled only while the engine is quiet", () => {
+    const props = {
+      copy: M4_COPY.en,
+      onBack: () => undefined,
+      onOpenAbout: () => undefined,
+      onOpenDemo: () => undefined,
+    };
+    const quiet = renderToStaticMarkup(<SettingsScreen {...props} onReplay={() => undefined} />);
+    const busy = renderToStaticMarkup(<SettingsScreen {...props} onReplay={null} />);
+    // The row is present either way; what the engine's state decides is whether it can
+    // run. React renders the attribute as `disabled=""`, and the stylesheet's own use of
+    // the word never carries the value.
+    expect(quiet).toContain(M4_COPY.en.setReplay);
+    expect(quiet).not.toContain('disabled=""');
+    expect(busy).toContain(M4_COPY.en.setReplay);
+    expect(busy).toContain('disabled=""');
   });
 });
 

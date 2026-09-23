@@ -38,6 +38,20 @@ export const WALK_CAMERA_LOOK_AT_M = 3.11; // fact: walk.camera.look_at
 // value rather than a measured one, and the fact says so.
 export const WALK_LEGEND_WIDTH_PX = 224; // fact: walk.legend.width
 
+// --- the place pins. Fact: walk.places.pinBudget ---
+//
+// How many place pills may stand over the map at once: the nearest N, within the active
+// category when one is chosen. The number was proposed, not measured - see the fact's own
+// `sourced_from` for the frame arithmetic that picked a dozen - and it is a ceiling, not a
+// completeness claim. The bake holds 1444 places.
+//
+// Named for the walk view because that is where it was first spent. Amended 2026-09-23,
+// the number unchanged: the founder ruled the Corner layout belongs to the normal view
+// ("These are the reference screens I have provided. This is for normal view not the 3D
+// view"), so the same ceiling now governs the flat map's pills as well - there, the
+// nearest N of the places inside the frame. One budget, stated once.
+export const PLACE_PIN_BUDGET = 12; // fact: walk.places.pinBudget
+
 // --- the character. Fact: walk.character.height, walk.speed ---
 export const WALK_CHARACTER_HEIGHT_M = 1.7; // fact: walk.character.height
 export const WALK_SPEED_MPS = 1.4; // fact: walk.speed

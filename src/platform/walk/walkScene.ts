@@ -52,6 +52,7 @@ import {
   WALK_CAMERA_FOV_DEG,
   WALK_CAMERA_LOOK_AT_M,
   WALK_CAMERA_PITCH_DEG,
+  PLACE_PIN_BUDGET,
   WALK_CHARACTER_HEIGHT_M,
   WALK_SPEED_MPS,
 } from "./walkFacts";
@@ -62,6 +63,7 @@ import {
   directionForHeading,
   shortestTurnDegrees,
 } from "./walkHeading";
+import { projectPinAnchors, selectNearestPinIds, type PinAnchor } from "./walkPins";
 import { createSkyLayer } from "./walkSky";
 import {
   toGround,
@@ -277,6 +279,29 @@ export interface WalkScreenLabel {
   readonly onScreen: boolean;
 }
 
+/**
+ * A baked place row, as the scene needs it to place its pins.
+ *
+ * Only the projection fields travel here; the pill's name, category and sheet live in
+ * the DOM layer's own copy of the places. `walk.places.pinBudget` governs how many of
+ * these become pins, not how many may be handed in.
+ */
+export interface WalkScenePlace {
+  readonly id: string;
+  readonly cat: string;
+  readonly lat: number;
+  readonly lon: number;
+}
+
+/** A place pin, positioned on the screen. */
+export interface WalkScreenPin {
+  readonly placeId: string;
+  readonly xPx: number;
+  readonly yPx: number;
+  /** False when the pin's anchor is outside the frustum, so the pill can be hidden. */
+  readonly onScreen: boolean;
+}
+
 export interface WalkSceneView {
   readonly location: LiveLocationFix | null;
   readonly selectedZoneId: string | null;
@@ -292,6 +317,15 @@ export interface WalkSceneCallbacks {
    * and must not retain it.
    */
   onLabels(labels: readonly WalkScreenLabel[]): void;
+  /**
+   * Called once per rendered frame with a **reused** array, under the same contract as
+   * `onLabels`.
+   *
+   * Optional, and the opt-in is the pin layer's own gate: an onboarding mount passes no
+   * chrome and no pins, and a scene with no consumer does no selection or projection at
+   * all rather than computing a dozen pills nobody reads.
+   */
+  onPins?(pins: readonly WalkScreenPin[]): void;
   /** The world asset arrived; tiles, zones and the character are now present. */
   onWorldReady(): void;
   onError(error: unknown): void;
@@ -311,6 +345,15 @@ export interface WalkSceneController {
    * one the composition facts were solved for.
    */
   setHeading(degrees: number | null): void;
+  /**
+   * Hand the scene the places it may pin, and the category they are filtered to.
+   *
+   * `null` means every category. The nearest-N choice against `walk.places.pinBudget`
+   * is the scene's, per frame, because "nearest" is measured from where she stands now.
+   * Re-callable on every category change; the anchors are re-projected only when the
+   * world's `meta` is present, exactly like a location fix arriving before the world.
+   */
+  setPins(places: readonly WalkScenePlace[], category: string | null): void;
   resize(): void;
   destroy(): void;
 }
@@ -553,6 +596,24 @@ export async function mountWalkScene(
   let viewWidthPx = 0;
   let viewHeightPx = 0;
 
+  // --- the place pins. The full set arrives through `setPins`; the anchors are the
+  // category-filtered rows already projected onto the ground, rebuilt only when the set
+  // or the category changes or the world arrives - never per frame. The nearest-N choice
+  // against `walk.places.pinBudget` is per frame, because it is measured from where she
+  // stands, and it runs over squared planar distances in the bake's own ground metres -
+  // the same plane the camera and the character live on, which is the straight line the
+  // view can actually draw. Both steps are `walkPins.ts`'s own functions, checked
+  // outside the renderer.
+  let pinPlaces: readonly WalkScenePlace[] = [];
+  let pinCategory: string | null = null;
+  let pinAnchors: readonly PinAnchor[] = [];
+  // The chosen ids are nearest-first, so projection needs each id's ground point again:
+  // a lookup rebuilt only when the anchor set is, so the frame path allocates nothing.
+  const anchorById = new Map<string, PinAnchor>();
+  const pinVector = new Vector3();
+  // Same reuse contract as `labels` above.
+  const pins: Array<{ placeId: string; xPx: number; yPx: number; onScreen: boolean }> = [];
+
   // The camera's boom is rigid: back by the horizontal component of the stated distance,
   // up by the vertical one, and angled down by the stated pitch. All three are constants, so
   // the boom's own geometry never eases and the reduced-motion rule has nothing to reach
@@ -666,6 +727,9 @@ export async function mountWalkScene(
       world = loaded;
       meta = loaded.meta;
       applyCamera();
+      // Pins wanted before the world are the world-late case, the same one
+      // `applyLocation` handles below for her fix: project them now that `meta` exists.
+      projectPinAnchorRows();
       // The world is late, not early: whatever fix she gave while it loaded is the fix
       // that applies now. Without this the scene sits at the origin until she moves.
       if (lastView !== null) applyLocation(lastView);
@@ -947,6 +1011,88 @@ export async function mountWalkScene(
     labels.length = count;
   }
 
+  /** Project the category-filtered place rows onto the ground, once per set or category change. */
+  function projectPinAnchorRows(): void {
+    if (meta === null) return;
+    pinAnchors = projectPinAnchors(pinPlaces, pinCategory, meta);
+    anchorById.clear();
+    for (const anchor of pinAnchors) {
+      anchorById.set(anchor.id, anchor);
+    }
+  }
+
+  /**
+   * Whether the camera is pointed at this ground point at all - the same box the emitted
+   * pills are held to. Read by the selection, so the budget is spent on pins that can
+   * stand rather than on pins that would be hidden the moment they were placed.
+   */
+  function anchorOnScreen(anchor: PinAnchor): boolean {
+    pinVector.set(anchor.x, 0, anchor.z);
+    pinVector.project(camera);
+    return (
+      pinVector.z <= 1 &&
+      pinVector.z >= -1 &&
+      pinVector.x >= -1 &&
+      pinVector.x <= 1 &&
+      pinVector.y >= -1 &&
+      pinVector.y <= 1
+    );
+  }
+
+  /**
+   * Choose the nearest pins the frame can show, within the budget, into the reused array.
+   *
+   * Nothing runs when there is no consumer (`onPins` absent - the onboarding mount), no
+   * fix for her yet, or no world: a pin's whole meaning is "near her, on screen". Both
+   * halves of that matter: the nearest dozen are usually scattered all round her, and a
+   * pill behind her is not a pill the street can show, so the budget is spent on the
+   * nearest ones the camera is actually pointed at.
+   */
+  function projectPins(): void {
+    if (callbacks.onPins === undefined) return;
+    if (current === null || pinAnchors.length === 0) {
+      pins.length = 0;
+      callbacks.onPins(pins);
+      return;
+    }
+    // Nearest first, among those in frame. The budget is a ceiling: a bake with fewer
+    // places in the category draws fewer pins, and an empty category draws none.
+    const chosen = selectNearestPinIds(
+      pinAnchors,
+      current.x,
+      current.z,
+      PLACE_PIN_BUDGET,
+      anchorOnScreen,
+    );
+    let count = 0;
+    for (const id of chosen) {
+      const anchor = anchorById.get(id);
+      if (anchor === undefined) continue;
+      pinVector.set(anchor.x, 0, anchor.z);
+      pinVector.project(camera);
+      let pin = pins[count];
+      if (pin === undefined) {
+        pin = { placeId: "", xPx: 0, yPx: 0, onScreen: false };
+        pins[count] = pin;
+      }
+      pin.placeId = anchor.id;
+      // The same normalised-to-pixel turn the labels run, so the two layers agree on
+      // where the world puts a point.
+      pin.xPx = ((pinVector.x + 1) / NDC_SPAN) * viewWidthPx;
+      pin.yPx = ((1 - pinVector.y) / NDC_SPAN) * viewHeightPx;
+      pin.onScreen =
+        pinVector.z <= 1 &&
+        pinVector.z >= -1 &&
+        pinVector.x >= -1 &&
+        pinVector.x <= 1 &&
+        pinVector.y >= -1 &&
+        pinVector.y <= 1;
+      count += 1;
+    }
+    pins.length = count;
+    callbacks.onPins(pins);
+  }
+
   function shouldLoop(): boolean {
     return !paused && !reducedMotion && !destroyed;
   }
@@ -974,6 +1120,7 @@ export async function mountWalkScene(
     renderer.render(scene, camera);
     projectLabels();
     callbacks.onLabels(labels);
+    projectPins();
 
     if (shouldLoop()) ensureFrame();
   }
@@ -1027,6 +1174,14 @@ export async function mountWalkScene(
       if (!wasLive) headingDegrees = targetHeadingDegrees;
       // A reading arriving while a rung of the ladder is live changes nothing on screen:
       // that frame is meant to be still, and the heading is eased in on resume.
+      if (!paused) ensureFrame();
+    },
+    setPins(places, category): void {
+      pinPlaces = places;
+      pinCategory = category;
+      projectPinAnchorRows();
+      // The loop is live unless a rung of the ladder is holding it still, so this is a
+      // no-op almost always; it exists for the same reason `update` calls it.
       if (!paused) ensureFrame();
     },
     resize(): void {

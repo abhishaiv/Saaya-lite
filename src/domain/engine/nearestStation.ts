@@ -75,3 +75,55 @@ export function stationDistanceDisplay(
     value: (distanceM / METRES_PER_KILOMETRE).toFixed(1),
   };
 }
+
+/** An area's outline, enough to ask "is she standing in this one?". */
+export interface AreaPolygon {
+  readonly areaName: string;
+  readonly polygon: readonly LatLng[];
+}
+
+/**
+ * The area whose polygon contains a point, or `null` outside every one.
+ *
+ * The even-odd test: a ray from the point eastwards, counting edge crossings. Odd means
+ * inside. Latitude and longitude are read as plane coordinates, which at city scale is
+ * exactly what the frozen polygons are drawn as. A `null` here is a real answer - she is
+ * outside the areas the bake cards - and the caller owes the row nothing in that case.
+ */
+export function zoneContainingPoint(
+  areas: readonly AreaPolygon[],
+  point: LatLng,
+): AreaPolygon | null {
+  for (const area of areas) {
+    if (pointInPolygon(area.polygon, point)) return area;
+  }
+  return null;
+}
+
+function pointInPolygon(
+  polygon: readonly LatLng[],
+  point: LatLng,
+): boolean {
+  let inside = false;
+  for (
+    let index = 0, previousIndex = polygon.length - 1;
+    index < polygon.length;
+    previousIndex = index, index += 1
+  ) {
+    const vertex = polygon[index];
+    const previous = polygon[previousIndex];
+    if (vertex === undefined || previous === undefined) continue;
+    // One edge end above her row of latitude and the other below: this edge crosses it.
+    if ((vertex.latitude > point.latitude) === (previous.latitude > point.latitude)) {
+      continue;
+    }
+    const share =
+      (point.latitude - vertex.latitude) /
+      (previous.latitude - vertex.latitude);
+    const crossingLongitude =
+      vertex.longitude + share * (previous.longitude - vertex.longitude);
+    // The ray runs east; a crossing to the east of her flips the parity.
+    if (point.longitude < crossingLongitude) inside = !inside;
+  }
+  return inside;
+}

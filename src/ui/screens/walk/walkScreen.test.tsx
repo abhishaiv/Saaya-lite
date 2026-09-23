@@ -86,11 +86,17 @@ describe("M4 walk view", () => {
     expect(html).toContain(copy.walkLegendTitle);
     expect(html).toContain(copy.walkLegendLow);
     expect(html).toContain(copy.walkLegendHigh);
-    expect(html).toContain('aria-expanded="true"');
-    // The derivation is stated as the view opens rather than waiting behind a tap.
-    // FEATURES.md Amendment 1 clause 1 asks the view to state that per-road risk comes from
-    // zone data rather than imply it, and a sentence behind a tap states it only on request.
-    expect(html).toContain(copy.walkRiskNote);
+    // **Superseded 2026-09-23.** This line read `expect(html).toContain('aria-expanded="true"')`
+    // plus `expect(html).toContain(copy.walkRiskNote)`, with the note: "The derivation is
+    // stated as the view opens rather than waiting behind a tap. FEATURES.md Amendment 1
+    // clause 1 asks the view to state that per-road risk comes from zone data rather than
+    // imply it, and a sentence behind a tap states it only on request." The founder asked
+    // twice, looking at it on his own phone - "make the street shading bar collapsible or
+    // something, because it is taking too much space" - so the chip opens folded and the
+    // sentence is one tap away. SCREENS.md S14 carries the amendment; the pair below still
+    // holds both of the chip's states, derivation sentence included.
+    expect(html).toContain('aria-expanded="false"');
+    expect(html).not.toContain(copy.walkRiskNote);
   });
 
   it("renders whole and folds to its ramp, so the streets clear without hiding the reading", () => {

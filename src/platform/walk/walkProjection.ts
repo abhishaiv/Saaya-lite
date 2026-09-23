@@ -17,7 +17,7 @@
  */
 
 /** Metres per degree of latitude. GROUNDED-EXEMPT: a geodesy constant, not a product value. */
-const METRES_PER_DEGREE_LATITUDE = 110574; // GROUNDED-EXEMPT: WGS84 metres per degree of latitude, the same constant bake2.py projected with.
+export const METRES_PER_DEGREE_LATITUDE = 110574; // GROUNDED-EXEMPT: WGS84 metres per degree of latitude, the same constant bake2.py projected with.
 /** Metres per degree of longitude at the equator. GROUNDED-EXEMPT: a geodesy constant. */
 const METRES_PER_DEGREE_LONGITUDE_EQUATOR = 111320; // GROUNDED-EXEMPT: WGS84 metres per degree of longitude at the equator, as bake2.py used.
 /** Degrees to radians. GROUNDED-EXEMPT: a mathematical identity, not a product value. */

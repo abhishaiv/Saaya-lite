@@ -16,17 +16,33 @@ import {
 import type {
   WalkSceneController,
   WalkScreenLabel,
+  WalkScreenPin,
 } from "../../../platform/walk/walkScene";
+import {
+  loadPlaces,
+  PLACE_CATEGORIES,
+  PLACES_ASSET_URL,
+  type Place,
+  type PlaceCategory,
+  type Places,
+} from "../../../platform/walk/walkPlaces";
 import { SectionHeader } from "../../components/SectionHeader";
 import { MaterialSymbol } from "../../icons/MaterialSymbol";
 import { localizedRiskBand } from "../../copy/riskBandLabel";
-import { formatCopy, type M4Copy } from "../../copy/strings";
+import { formatCopy, type M4Copy, type SaayaLocale } from "../../copy/strings";
 import {
   type LabelAnchor,
   type LabelBounds,
   type LabelBoxSize,
+  type LabelRect,
   placeLabels,
-} from "./labelPlacement";
+} from "../../../domain/labels/labelPlacement";
+import {
+  HomeChrome,
+  pinLabel,
+  ZERO_CATEGORY_COUNTS,
+} from "../home/HomeChrome";
+import { PlaceSheet } from "../home/PlaceSheet";
 
 export interface WalkViewProps {
   readonly character: CharacterSelection;
@@ -38,6 +54,7 @@ export interface WalkViewProps {
    */
   readonly headingAllowed: boolean;
   readonly hourBand: HourBand;
+  readonly locale?: SaayaLocale;
   readonly location: LiveLocationFix | null;
   readonly locationStatus: LocationStatus;
   readonly mapZones: readonly MapZone[];
@@ -50,6 +67,12 @@ export interface WalkViewProps {
   readonly onWorldSettled?: (outcome: "ready" | "failed") => void;
   readonly selectedZoneId: string | null;
   readonly sessionState: SessionState;
+  /**
+   * The home screen's place layer: the search pill, the category bar, the nav and the
+   * pins. Absent on the onboarding mount, whose view carries no chrome at all - the
+   * chrome is opt-in, never inherited.
+   */
+  readonly showPlaces?: boolean;
 }
 
 /**
@@ -79,6 +102,14 @@ const LABEL_FRAME_INSET_PX = 20; // GROUNDED-EXEMPT: structural frame inset, the
 const LABEL_GAP_PX = 4; // GROUNDED-EXEMPT: structural label gap, the pixel value of --space-4.
 
 /**
+ * A place pill's node key. Pills and zone names share the one ref map and the one size
+ * map, and the prefix is what keeps a place id from ever colliding with a station id.
+ */
+function pinKey(placeId: string): string {
+  return `place:${placeId}`;
+}
+
+/**
  * The walk view: a canvas, the zone labels drawn over it, and the reading she needs to
  * trust what she is looking at.
  *
@@ -97,6 +128,7 @@ export function WalkView({
   copy,
   headingAllowed,
   hourBand,
+  locale = "en",
   location,
   locationStatus,
   mapZones,
@@ -104,6 +136,7 @@ export function WalkView({
   onWorldSettled,
   selectedZoneId,
   sessionState,
+  showPlaces = false,
 }: WalkViewProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const controllerRef = useRef<WalkSceneController | null>(null);
@@ -111,14 +144,23 @@ export function WalkView({
   const [labelIds, setLabelIds] = useState<readonly string[]>([]);
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
-  // The legend renders whole and can be folded to its ramp. Founder instruction,
-  // 2026-09-23: the card was covering the map she came to look at, so it is a chip now.
-  // It still opens with its derivation sentence showing, because FEATURES.md Amendment 1
-  // clause 1 requires the view to *state* that per-road risk comes from zone data rather
-  // than imply it, and a sentence behind a tap states it only on request. The fold is the
-  // answer to the space complaint; hiding the statement by default is not. Recorded in
-  // SCREENS.md S14 and MAP_SPEC.md.
-  const [legendOpen, setLegendOpen] = useState(true);
+  // --- the place layer. The bake's file is fetched once per chrome mount; a failure
+  // leaves her with no pins, no bar and no invented copy for them - the nav and the
+  // search pill still stand, and the map still works.
+  const [places, setPlaces] = useState<Places | null>(null);
+  const [activeCategory, setActiveCategory] = useState<PlaceCategory | null>(null);
+  const [sheetPlace, setSheetPlace] = useState<Place | null>(null);
+  const [pinIds, setPinIds] = useState<readonly string[]>([]);
+  // The legend opens folded to its ramp. Founder instruction, 2026-09-23, second pass:
+  // "make the street shading bar collapsible or something, because it is taking too much
+  // space". The note that stood here read "It still opens with its derivation sentence
+  // showing ... hiding the statement by default is not" and is superseded - the fold was
+  // already there, but it shipped open, and an open card is 154px of street she cannot
+  // see. FEATURES.md Amendment 1 clause 1 still binds and is unchanged: the view states
+  // that per-road risk comes from zone data, one tap away on the control that owns the
+  // ramp, its expanded state announced through aria-expanded. Recorded in SCREENS.md S14
+  // and MAP_SPEC.md.
+  const [legendOpen, setLegendOpen] = useState(false);
 
   const zoneByStation = useMemo(() => {
     const byStation = new Map<string, MapZone>();
@@ -127,6 +169,37 @@ export function WalkView({
     }
     return byStation;
   }, [mapZones]);
+
+  /** Every place the pins and the sheet read, keyed by the id the scene reports. */
+  const placesById = useMemo(() => {
+    const byId = new Map<string, Place>();
+    for (const place of places?.places ?? []) byId.set(place.id, place);
+    return byId;
+  }, [places]);
+
+  /**
+   * The rows handed to the scene: the bake's own seven categories only.
+   *
+   * The bake maps OSM tags onto that vocabulary and the counts the bar reads come from
+   * the same file, so a row outside it is a row the product has no name for. Dropping it
+   * here is the honest reading of "a category with zero places never renders": a pin
+   * whose category the bar cannot name is a pin nothing can filter to.
+   */
+  const pinPlaces = useMemo(() => {
+    if (places === null) return [];
+    const vocabulary: readonly string[] = PLACE_CATEGORIES;
+    return places.places.filter((place) => vocabulary.includes(place.cat));
+  }, [places]);
+
+  /** The carded areas as outlines, for the sheet's area row. */
+  const areaOutlines = useMemo(
+    () =>
+      mapZones.map((zone) => ({
+        areaName: zone.areaName,
+        polygon: zone.zone.polygon,
+      })),
+    [mapZones],
+  );
 
   /**
    * What the mount effect reads.
@@ -144,6 +217,11 @@ export function WalkView({
   // same reason it reads the character through one.
   const settledRef = useRef(onWorldSettled);
   settledRef.current = onWorldSettled;
+  // The same reason again: the mount effect reads both once, at mount.
+  const showPlacesRef = useRef(showPlaces);
+  showPlacesRef.current = showPlaces;
+  const pinsRef = useRef({ category: activeCategory, places: pinPlaces });
+  pinsRef.current = { category: activeCategory, places: pinPlaces };
 
   /**
    * Each label's own box, measured once.
@@ -158,9 +236,84 @@ export function WalkView({
   // is a layout read, and it returns the same number on every frame that is not a resize.
   const boundsRef = useRef<LabelBounds | null>(null);
   // The transform last written to each node, so a frame that moved nothing writes nothing.
-  const lastTransforms = useRef(new Map<HTMLButtonElement, string>());
+  // Keyed by overlay key rather than by element, because the nearest-N set churns: a pill
+  // that leaves the frame unmounts, and its entry has to be able to leave with it.
+  const lastTransforms = useRef(new Map<string, string>());
+  /** A node that unmounts takes every trace of itself out of the three maps. */
+  const forgetOverlay = useCallback((key: string) => {
+    labelRefs.current.delete(key);
+    labelSizes.current.delete(key);
+    lastTransforms.current.delete(key);
+  }, []);
+  // Both overlay sets as the last frame reported them. The scene hands over arrays it
+  // owns and reuses, so each is copied on arrival and read from here, never retained.
+  const labelSnapshot = useRef<readonly WalkScreenLabel[]>([]);
+  const pinSnapshot = useRef<readonly WalkScreenPin[]>([]);
 
-  const handleLabels = useCallback((labels: readonly WalkScreenLabel[]) => {
+  /**
+   * The chrome's own boxes over the frame, which no name may be placed on.
+   *
+   * Measured rather than derived: the search pill, the category bar, the nav, the legend
+   * and the status line are five rows whose heights come from tokens and whose widths come
+   * from their own words, and the placement pass only needs the boxes. Measuring inside the
+   * frame callback would be a reflow per frame, which is the cost this view exists to
+   * avoid, so they are measured when they can change - a resize, the legend opening, the
+   * places arriving - and read from here on every pass.
+   */
+  const chromeRects = useRef<readonly LabelRect[]>([]);
+  const measureChrome = useCallback(() => {
+    const frame = canvasRef.current?.parentElement ?? null;
+    if (frame === null) return;
+    const base = frame.getBoundingClientRect();
+    // Measured from the screen, not from the frame: the safety dock and the two rails are
+    // Home's own and stand outside this view, and a pill under the dock is a pill over SOS.
+    // Their boxes come back in the frame's pixels, which is what the pass works in.
+    const screen = frame.closest(".home-screen") ?? frame;
+    const rows: readonly string[] = [
+      ".home-chrome__search",
+      ".home-chrome__categories",
+      ".home-chrome__nav",
+      ".walk-view__legend",
+      ".walk-view__status",
+      ".home-session-action-dock",
+      ".home-screen__top-rail",
+      ".home-screen__controls",
+    ];
+    const rects: LabelRect[] = [];
+    for (const row of rows) {
+      const node = screen.querySelector(row);
+      if (node === null) continue;
+      const box = node.getBoundingClientRect();
+      if (box.width === 0 || box.height === 0) continue;
+      rects.push({
+        bottomPx: box.bottom - base.top,
+        leftPx: box.left - base.left,
+        rightPx: box.right - base.left,
+        topPx: box.top - base.top,
+      });
+    }
+    chromeRects.current = rects;
+  }, []);
+
+  useEffect(() => {
+    measureChrome();
+    const onResize = (): void => measureChrome();
+    globalThis.addEventListener("resize", onResize);
+    return () => globalThis.removeEventListener("resize", onResize);
+  }, [measureChrome, legendOpen, showPlaces, places]);
+
+  /**
+   * Place both kinds of overlay in one pass.
+   *
+   * Zone names and place pills share one collision solver, so a pill can never land under
+   * a name - the two are placed as one list, zone names first, and the solver keeps them
+   * apart. It runs when either set arrives, reading the other's last report, because the
+   * scene reports them in the same frame but as two calls.
+   *
+   * Everything here is written straight to the DOM: a pill moves every frame she walks,
+   * and re-rendering around it sixty times a second is not a cost this view charges.
+   */
+  const placeOverlays = useCallback(() => {
     const frame = canvasRef.current;
     let bounds = boundsRef.current;
     if (bounds === null) {
@@ -171,52 +324,100 @@ export function WalkView({
       if (widthPx !== 0 && heightPx !== 0) boundsRef.current = bounds;
     }
 
+    const keys: string[] = [];
     const anchors: LabelAnchor[] = [];
     const sizes: LabelBoxSize[] = [];
     const nodes: HTMLButtonElement[] = [];
-    for (const label of labels) {
-      const node = labelRefs.current.get(label.stationId);
-      if (node === undefined || node === null) continue;
-      if (!label.onScreen) {
+    const collect = (
+      key: string,
+      onScreen: boolean,
+      xPx: number,
+      yPx: number,
+    ): void => {
+      const node = labelRefs.current.get(key);
+      if (node === undefined || node === null) return;
+      if (!onScreen) {
         node.hidden = true;
-        continue;
+        return;
       }
       node.hidden = false;
-      let size = labelSizes.current.get(label.stationId);
+      let size = labelSizes.current.get(key);
       if (size === undefined || size.widthPx === 0 || size.heightPx === 0) {
         // Visible before it is measured, or the box comes back zero.
         size = { heightPx: node.offsetHeight, widthPx: node.offsetWidth };
-        labelSizes.current.set(label.stationId, size);
+        labelSizes.current.set(key, size);
       }
-      anchors.push({ xPx: label.xPx, yPx: label.yPx });
+      keys.push(key);
+      anchors.push({ xPx, yPx });
       sizes.push(size);
       nodes.push(node);
+    };
+
+    for (const label of labelSnapshot.current) {
+      collect(label.stationId, label.onScreen, label.xPx, label.yPx);
+    }
+    for (const pin of pinSnapshot.current) {
+      collect(pinKey(pin.placeId), pin.onScreen, pin.xPx, pin.yPx);
     }
 
-    const placed = placeLabels(anchors, sizes, bounds, LABEL_GAP_PX);
+    const placed = placeLabels(
+      anchors,
+      sizes,
+      bounds,
+      LABEL_GAP_PX,
+      chromeRects.current,
+    );
     for (let index = 0; index < nodes.length; index += 1) {
       const node = nodes[index];
+      const key = keys[index];
       const spot = placed[index];
-      if (node === undefined || spot === undefined) continue;
+      if (node === undefined || key === undefined || spot === undefined) continue;
       // The second translate centres the label on the spot, so placement works in centres
       // and never has to know how wide the words turned out to be.
       const transform = `translate3d(${spot.xPx}px, ${spot.yPx}px, 0) translate(-50%, -50%)`;
-      if (lastTransforms.current.get(node) === transform) continue;
-      lastTransforms.current.set(node, transform);
+      if (lastTransforms.current.get(key) === transform) continue;
+      lastTransforms.current.set(key, transform);
       node.style.transform = transform;
     }
-    // The set of zones does not change while she walks, so this settles on the first
-    // frame and reports no update again. Returning the previous array is React's bail-out.
-    setLabelIds((previous) => {
-      if (
-        previous.length === labels.length &&
-        previous.every((id, index) => id === labels[index]?.stationId)
-      ) {
-        return previous;
-      }
-      return labels.map((label) => label.stationId);
-    });
   }, []);
+
+  const handleLabels = useCallback(
+    (labels: readonly WalkScreenLabel[]) => {
+      labelSnapshot.current = labels.slice();
+      placeOverlays();
+      // The set of zones does not change while she walks, so this settles on the first
+      // frame and reports no update again. Returning the previous array is React's bail-out.
+      setLabelIds((previous) => {
+        if (
+          previous.length === labels.length &&
+          previous.every((id, index) => id === labels[index]?.stationId)
+        ) {
+          return previous;
+        }
+        return labels.map((label) => label.stationId);
+      });
+    },
+    [placeOverlays],
+  );
+
+  const handlePins = useCallback(
+    (pins: readonly WalkScreenPin[]) => {
+      pinSnapshot.current = pins.slice();
+      placeOverlays();
+      // The nearest-N set changes as she walks, far slower than the frame: this reports an
+      // update when the dozen changes and bails out on every frame between those.
+      setPinIds((previous) => {
+        if (
+          previous.length === pins.length &&
+          previous.every((id, index) => id === pins[index]?.placeId)
+        ) {
+          return previous;
+        }
+        return pins.map((pin) => pin.placeId);
+      });
+    },
+    [placeOverlays],
+  );
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -236,6 +437,9 @@ export function WalkView({
             settledRef.current?.("failed");
           },
           onLabels: handleLabels,
+          // The place layer's frame report is only subscribed when the chrome is on.
+          // The onboarding mount has no pins, so it pays for no pin projection at all.
+          ...(showPlacesRef.current ? { onPins: handlePins } : {}),
           onWorldReady: () => {
             if (cancelled) return;
             setReady(true);
@@ -256,6 +460,10 @@ export function WalkView({
           selectedZoneId: current.selectedZoneId,
           sessionState: current.sessionState,
         });
+        // Same again for the pins: the places effect has already run by now, so the
+        // first set the scene holds is the one read here.
+        const pins = pinsRef.current;
+        controller.setPins(pins.places, pins.category);
       } catch {
         if (cancelled) return;
         setFailed(true);
@@ -268,11 +476,34 @@ export function WalkView({
       controllerRef.current = null;
       controller?.destroy();
     };
-  }, [handleLabels]);
+  }, [handleLabels, handlePins]);
 
   useEffect(() => {
     controllerRef.current?.update({ location, selectedZoneId, sessionState });
   }, [location, selectedZoneId, sessionState]);
+
+  useEffect(() => {
+    if (!showPlaces) return undefined;
+    let cancelled = false;
+    // The bake's own file, fetched once. A failure here is not a failure of the view:
+    // she keeps the street, the nav and the search pill, and simply gets no pins and no
+    // category bar. Nothing stands in for the missing places, because nothing could.
+    void loadPlaces(PLACES_ASSET_URL)
+      .then((loaded) => {
+        if (!cancelled) setPlaces(loaded);
+      })
+      .catch(() => {
+        // Silence is the honest report: the chrome renders exactly what it has.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [showPlaces]);
+
+  useEffect(() => {
+    // A no-op on mount: the scene took the first set as part of the mount handshake.
+    controllerRef.current?.setPins(pinPlaces, activeCategory);
+  }, [pinPlaces, activeCategory]);
 
   useEffect(() => {
     // A no-op on mount: the scene took this character as an argument. It matters on the
@@ -309,7 +540,7 @@ export function WalkView({
   const status = failed ? copy.walkOffline : ready ? null : copy.walkLoading;
 
   return (
-    <div className="walk-view">
+    <div className="walk-view" data-chrome={showPlaces ? "true" : undefined}>
       <canvas aria-hidden="true" className="walk-view__canvas" ref={canvasRef} />
 
       <div className="walk-view__labels">
@@ -331,10 +562,41 @@ export function WalkView({
               onClick={() => onZoneSelected(stationId)}
               ref={(node) => {
                 labelRefs.current.set(stationId, node);
+                if (node === null) forgetOverlay(stationId);
               }}
               type="button"
             >
               {zone.areaName}
+            </button>
+          );
+        })}
+        {pinIds.map((placeId) => {
+          const place = placesById.get(placeId);
+          if (place === undefined) return null;
+          const key = pinKey(placeId);
+          return (
+            <button
+              className="walk-view__pin"
+              key={key}
+              onClick={() => setSheetPlace(place)}
+              ref={(node) => {
+                labelRefs.current.set(key, node);
+                // The nearest-N set churns as she walks, and each pill that leaves
+                // unmounts: its measurements leave with it, so the maps hold the pills
+                // on screen and nothing else. The next pill to arrive measures itself.
+                if (node === null) {
+                  forgetOverlay(key);
+                } else {
+                  // React commits a pill between frames, and the placement pass runs in
+                  // the frame after: hidden until then, so it cannot paint a frame at the
+                  // container's own corner before it has a place in the world.
+                  node.hidden = true;
+                }
+              }}
+              type="button"
+            >
+              <span aria-hidden="true" className="walk-view__pin-dot" />
+              <span className="walk-view__pin-name">{pinLabel(place, copy)}</span>
             </button>
           );
         })}
@@ -358,6 +620,31 @@ export function WalkView({
         open={legendOpen}
       />
 
+      {showPlaces ? (
+        <HomeChrome
+          activeCategory={activeCategory}
+          categoryCounts={places?.categoryCounts ?? ZERO_CATEGORY_COUNTS}
+          copy={copy}
+          onCategoryChange={setActiveCategory}
+        />
+      ) : null}
+
+      {sheetPlace === null || places === null ? null : (
+        <PlaceSheet
+          areas={areaOutlines}
+          attribution={places.attribution}
+          copy={copy}
+          currentPoint={
+            location === null
+              ? null
+              : { latitude: location.latitude, longitude: location.longitude }
+          }
+          locale={locale}
+          onDismiss={() => setSheetPlace(null)}
+          place={sheetPlace}
+        />
+      )}
+
       <style jsx>{`
         .walk-view {
           /* The right edge of the frame belongs to the home screen's own rail - the
@@ -367,8 +654,13 @@ export function WalkView({
              or the rail lands on top of it. Measured before this: the legend's last line ran
              under the control stack and "Change your character" was cut to "Change your
              cha". One clearance, held by this view's top row; the legend is anchored to the
-             left edge now, so it is the only row that needs it. */
-          --walk-view-rail: calc(var(--minimum-touch-target) + var(--space-8));
+             left edge now, so it is the only row that needs it.
+
+             * Amended 2026-09-23: the number is --home-rail now, declared by the home screen
+             that owns both rails, because the flat map's chrome stops short of the same
+             column. The declaration that stood here read
+             "--walk-view-rail: calc(var(--minimum-touch-target) + var(--space-8))" and is
+             superseded - same value, one owner. */
 
           position: absolute;
           inset: 0;
@@ -413,19 +705,100 @@ export function WalkView({
           transition: none;
         }
 
-        /* The brand lockup holds the top-left corner in every view, so this reading sits
-           below it rather than beside it, and clears the notch the way the lockup does. */
+        /* A place pill: the small white pill the map language calls for, its violet dot
+           the accent that says shopfront. The width cap matches the zone pills' own, so
+           the two kinds of pill over the street read as one family. One line, capped at
+           that width: a shopfront with a long name truncates here and says its whole name
+           in the sheet it opens, rather than growing into a taller box that covers the
+           street it names. */
+        .walk-view__pin {
+          position: absolute;
+          inset-block-start: 0;
+          inset-inline-start: 0;
+          display: inline-flex;
+          align-items: center;
+          gap: var(--space-4);
+          margin: 0;
+          max-inline-size: 140px;
+          white-space: nowrap;
+          padding: var(--space-4) var(--space-8);
+          border: 0;
+          border-radius: var(--radius-small);
+          appearance: none;
+          background: var(--color-text-primary);
+          color: var(--color-background);
+          font-family: inherit;
+          font-size: var(--type-caption-size);
+          font-weight: var(--weight-semibold);
+          line-height: var(--type-caption-line-height);
+          pointer-events: auto;
+          animation: none;
+          transition: none;
+        }
+
+        /* The pill paints small - it is a mark over the street, not a button in a row -
+           so the finger gets the product's own target as an expansion rather than by
+           growing the mark. DESIGN_SYSTEM.md: "Minimum touch target 48 x 48 px, no
+           exceptions", and the interface's own chips read the same rule: pad the touch
+           target, do not grow the visual. The percentage is the pill's own painted box,
+           because a positioned element's percentages resolve against its own padding box. */
+        .walk-view__pin::after {
+          content: "";
+          position: absolute;
+          inset-block: calc((var(--minimum-touch-target) - 100%) / -2);
+          inset-inline: calc(var(--space-8) * -1);
+        }
+
+        /* A pill the pass has put off screen is marked hidden, and this is what takes it
+           out of the frame: the rule above declares its own display, which outranks the
+           user agent's hidden rule, so without this it would paint at the corner. */
+        .walk-view__pin[hidden] {
+          display: none;
+        }
+
+        /* The name is its own box so the cap above truncates it: a flex child will not go
+           under its own content width without min-inline-size. */
+        .walk-view__pin-name {
+          min-inline-size: 0;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .walk-view__pin-dot {
+          flex: none;
+          inline-size: var(--space-4);
+          block-size: var(--space-4);
+          border-radius: var(--radius-small);
+          background: var(--color-brand);
+        }
+
+        /* Amended 2026-09-23: the search pill holds the top-left corner now, in both
+           views, so this reading sits below the pill rather than below the brand lockup
+           that stood there until the founder removed it ("Remove the Saaya logo from the
+           top"), and clears the notch the same way. */
         .walk-view__status {
           position: absolute;
           inset-block-start: calc(
             env(safe-area-inset-top) + var(--space-12) +
               var(--minimum-touch-target) + var(--space-8)
           );
-          inset-inline: var(--screen-padding) calc(var(--screen-padding) + var(--walk-view-rail));
+          inset-inline: var(--screen-padding) calc(var(--screen-padding) + var(--home-rail));
           margin: 0;
           color: var(--color-text-tertiary);
           font-size: var(--type-caption-size);
           line-height: var(--type-caption-line-height);
+        }
+
+        /* With the place layer on, the search pill holds the band this reading used to sit
+           in - the pill is read before the status, and the two may not overlap - so the
+           reading moves one band down, with the same gap the lockup gives it above. */
+        .walk-view[data-chrome="true"] .walk-view__status {
+          inset-block-start: calc(
+            env(safe-area-inset-top) + var(--space-12) +
+              var(--minimum-touch-target) + var(--space-8) +
+              var(--minimum-touch-target) + var(--space-8)
+          );
         }
 
         .walk-view__notice {
@@ -500,9 +873,10 @@ export function WalkLegend({ copy, onToggle, open }: WalkLegendProps) {
          * two line up. The capture's own numbers are in MAP_SPEC.md.
          *
          * Compacted 2026-09-23 on founder instruction ("taking up all the space"): the card
-         * is now a chip in the bottom-left corner. It renders whole - title, ramp, both ends
-         * and the derivation sentence - and folds to the ramp on a tap, so the streets can be
-         * cleared without the statement ever being hidden by default. SCREENS.md S14 carries
+         * is a chip in the bottom-left corner. It lands folded - title, ramp and both ends -
+         * and one tap on it opens the derivation sentence. Second founder pass the same day
+         * ("make the street shading bar collapsible or something, because it is taking too
+         * much space") is what moved the default from open to folded. SCREENS.md S14 carries
          * the amendment, and the width is walk.legend.width rather than a literal. */
         .walk-view__legend {
           position: absolute;

@@ -272,8 +272,11 @@ export function HomeSessionSurface({
         .home-session-action-dock {
           position: fixed;
           z-index: 6; /* GROUNDED-EXEMPT: direct actions remain above the map and below an active ladder or SOS. */
+          /* Direct actions float above the walk view's nav and category bar when that
+             view is showing. The stack is zero on every other screen. */
           inset-block-end: calc(
-            env(safe-area-inset-bottom) + var(--space-12)
+            env(safe-area-inset-bottom) + var(--space-12) +
+              var(--home-nav-stack, 0px)
           );
           inset-inline-end: var(--screen-padding);
           display: flex;
