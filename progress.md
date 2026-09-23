@@ -4762,3 +4762,58 @@ and `CharacterCustomiser.tsx`).
 **Open, unchanged.** The founder's rulings still pending: the legend chip default, promoting the
 branch preview, the horizon-band palette. The canonical iCloud checkout is untouched; it now sits
 behind `origin/main` and is brought forward by the founder's own path.
+
+## 2026-09-23 - The founder asks for an onboarding like the reference video's, and buildings in 3D
+
+**The instruction.** A 150.8 s screen recording of the Corner app's onboarding, attached, with two
+sentences: "WE also want on-boarding like this. Also the building around us should be in 3D view."
+And the session's role: "You are just the researcher and brainstormer who assists the main
+implementer." This session therefore produces the audit and the work order; the implementer session
+owns the code.
+
+**What the recording is.** Corner's full onboarding, 1180x2556, 60 fps - the same Corner whose
+white-map aesthetic the palette ruling already named. Extracted to `/tmp/walk-verify/ref-0922/`:
+7 contact sheets (24 s each, 8x3), 151 one-fps frames, and 21 named full-width stills (`key/`)
+from the splash ("no ads." / "no stress." / "no BS." / "sound good?") through number entry, the SMS
+code, "here from", the world map and city picker, "loading your new map...", the like/not-like
+cards, notifications, the spots card stack, the "what are you into?" tile grid, the on-map
+tooltip and search tutorial, "add 3 spots that are your vibe", the age gate, the learning chips,
+name entry, "your map is ready!!!", and the home map. **No 3D buildings appear anywhere in the
+recording** - its final map is flat 2D - so the buildings ask is about our walk view, not something
+to copy from the video.
+
+**What the buildings audit found (measured, not read).** Buildings already extrude: `appendBuilding`
+writes walls and roof per footprint at the dataset's own heights; walls `#D9D1F0`
+(`color.tile.building`), roof `#FFFFFF` (`color.tile.building.roof`), every wall facing outward
+with one-sided materials, the 3.2 m storey rule, 12,690 fragments over the ~13.3 x 10.2 km bake.
+Two failure modes reproduce at the dense point 17.744174, 83.340164: without the harness's
+`--fast-clock`, the quality ladder dwells to its floor rung and that floor drops "buildings, roofs,
+ground seams, green and water" (MAP_SPEC's own words) - the capture shows a bare pale plane
+(`ref-0922/union-dense-now.png`); with `--fast-clock`, buildings render but read as giant flat
+pale-lavender planes and the character is lost behind them
+(`ref-0922/union-dense-fastclock.png`). At the origin they read as flat pale slabs on the horizon.
+So "in 3D" today means: they exist, they vanish on slow frames, and at close range they read flat.
+
+**The onboarding audit.** The spec'd flow is five moments (welcome, favourite, location, PIN,
+safety tour; `SCREENS.md` S2, under 90 s before the tour, `onboarded = true` written only when she
+opens the demo). Corner's is ~15 beats and 2.5 minutes. What survives: the five moments, restyled.
+What must not be copied: the phone auth, "here from" attribution, friends/contact import,
+photo-library access, the age gate, invite-only parties, and invented stats ("150k+ curators in
+400+ cities" has no Saaya equivalent).
+
+**The handoff.** The full work order is at `/tmp/walk-verify/handoff-onboarding-and-3d-buildings.md`
+and was sent to the implementer session ("Pokémon Go-style 3D view"). It carries the beat sheet
+with frame filenames, the design-language observations, the proposals to ground or rule, the
+binding constraints, and the buildings reproduction-first plan with the capture recipe. One
+correction followed: the work order's mechanics line said the branch was 8 ahead of origin with
+nothing pushed; at `8849dba` main and the branch are both deployed, so that line was corrected in
+the file and the correction sent.
+
+**Nothing in the product changed this session** - research and audit only, no spec amended. The
+amendments (`SCREENS.md` S2, `COPY.md`, `strings.ts` en+te) come with the implementation, with this
+ruling recorded as the amendment. Two of the founder's owed rulings sharpen with this work:
+whether the onboarding may grow past the 90 s target, and what occlusion rate counts as an
+acceptable frame at the shipping boom.
+
+**Tree state at the time of writing.** `m4-walk-view` = `origin/main` = `origin/m4-walk-view` =
+`8849dba`; tree clean apart from untracked `node_modules`.
