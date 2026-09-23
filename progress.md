@@ -4971,3 +4971,36 @@ shading.
 
 **Tree state.** `/tmp/saaya-ui`, branch `m4-walk-view` = `10b4e2c` + this batch (11 modified files,
 `onboardingFlow.test.ts` new). No commit, no push in this batch - the founder calls deploys.
+
+## 2026-09-23 - The founder points Saaya at Corner's layout: her city's places on the map, violet unsafe roads, a friend-energy voice
+
+Founder direction, verbatim, with six Corner screenshots across two messages: "Let's copy the
+layout. We want to highlight the restaurants and cafes from Vizag in a similar way. The unsafe
+places will be violet highlighted roads. We are not trying to be a safety app, we are going with
+the vibe of a friend on your phone who helps you go everywhere in the city with confidence. Let's
+figure oure all the screens and onboarding together, ask me questions if needed." Then: "Use these
+too as references. Let's have a clean UI like this." (Spelling kept as sent.)
+
+The research session put four questions; the founder ruled: (1) **Keep SOS exactly as it behaves**
+- the trust boundary stays frozen, and the voice, screens and onboarding become the friend-energy,
+safety present but never the pitch; (2) **violet becomes the unsafe signal** - the red/orange/yellow
+road ramp retires, roads shade violet by their zone's records, the legend keeps "not a count for
+any one street"; an amendment is owed, the tier colours are frozen facts; (3) **the places are an
+OSM bake** with the existing outside-repo tooling - additive, the frozen data files untouched;
+(4) **all four new surfaces** - feed with tabs, profile on-device, an import flow as a labelled
+demo, search with chips and no AI.
+
+The screen map and the full work order: `/tmp/walk-verify/handoff-corner-layout-and-places.md`
+(sent to the implementer). It covers the Corner -> Saaya map for Home chrome, the place sheet,
+search, feed, profile, import, navigation (SOS never buried), a violet-road Part 3a with two
+variants for the founder to rule from the preview, the places bake (3b), and the onboarding delta
+(3e) - one new "what do you like" beat plus a voice pass, on top of the Part 1 rebuild, not a
+rebuild of it. Parked with reasons: the group-chat promo, create-a-post, collaborative lists,
+followers/following. No place data exists anywhere today; that is why the bake is its own part.
+
+**Verified this session.** The onboarding batch is committed as `affc605` and the tree is clean;
+`onboardingFlow.test.ts` 11/11 green, re-run independently. The main deploy of it is the
+implementer's to record.
+
+**Nothing in the product changed by the research session.** Tree: `/tmp/saaya-ui`, `m4-walk-view`,
+tip `affc605`.
