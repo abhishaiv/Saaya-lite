@@ -5154,3 +5154,56 @@ street and the default draws the dark violet band on the white street, both at t
 the new legend ramp (`preview-branch-{a,b}-signal.png` in the same folder). The research session
 independently checked the commit set, the supersession quotes and the two touched test files, and
 took both instrument findings into the work order's Part 3a "As built".
+
+## 2026-09-23 - The founder says plan the missing items; research session plans them and hands off
+
+The founder opened the preview and reported, verbatim: "I had a look, the onboarding did't chnage.
+None of the style was chnaged, cards aren't shown." and "The nav bar at the bottom is also not
+there."
+
+**Diagnosis, verified before answered.** The branch preview serves the same app chunk as production
+(`511-8b0d844ac4068d7e.js`), and that chunk contains the new onboarding copy ("favourites stay on
+your phone", "It watches the stretch, not you"). The build is correct. The cause is
+`AppGate.tsx:26` - `setRoute(onboarded ? "HOME" : "ONBOARDING")`: the founder's phone completed
+onboarding on that origin long ago, so the app skips straight to Home. The bottom nav is not built
+yet (it is Part 3c), so no Corner chrome exists to see. The founder was told: a private Safari tab
+gets fresh on-device storage and replays the full new onboarding; the nav and the rest come with the
+planned parts.
+
+**Founder instruction, verbatim: "Plan the missing items and hand it over to the implementer."**
+
+**The plan (research session, this session).** The work order
+(`/tmp/walk-verify/handoff-corner-layout-and-places.md`) gains the section "The missing items,
+planned", between Part 3g and Governance:
+
+- **3b first** - the places bake gates the category bar and the search chips; no UI before the real
+  counts.
+- **3c expanded to a component-level plan**, grounded in the tree: `WalkView` already mounts inside
+  `HomeScreen.tsx:726` beside the flat map (`:739`) on `viewMode` (`:398`) - the walk render stays
+  the ground, chrome floats over. Search pill top; category bar bottom derived strictly from the
+  bake's real counts (a category with zero places never renders); a four-tab bottom nav (map / feed /
+  search / profile, rows may ship disabled until 3d); the SOS + SUS dock keeps its floating place
+  above the nav, minus the demo button in 3f; place pins as small white labelled pills with a
+  grounded nearest-N budget, living in `src/platform/walk/` (the no-`three`-from-`src/ui` rule
+  binds); the place sheet with absent-field-means-absent-row and no ratings/reviews/photos.
+- **The replay-onboarding row is new scope** (the founder asked to see the onboarding again): a
+  Settings row (S11; proposed copy slots `setReplay` / `setReplaySub`) launching the onboarding flow
+  over the current session, keeping her data (name, favourite person and PIN re-save idempotently;
+  the `onboardingRepository` interface is the contract), returning her to where she came from; the
+  `AppGate` first-run path untouched. When Part 3f removes the Settings demo row
+  (`SettingsScreen.tsx:30-34`), the replay row takes its place. Governance list updated: S11 - the
+  demo row out, the replay row in.
+- **3d expanded to a data plan**: a new on-device store following the `onboardingRepository` pattern
+  (interface + IndexedDB impl + Fake) holding saved places, picks, and top spots (up to 3). Feed =
+  "near you" (distance) + "for you" (deterministic from her picks, one-line why per card). Profile
+  from `loadUserName` / `loadPrimaryFavourite` plus the stats that exist. Search = text matching plus
+  chips derived from real categories and areas; "open now" from OSM `opening_hours`, parsed
+  deterministically; the no-hours rule recorded, never guessed. Import sheet stays a labelled demo -
+  nothing uploaded, nothing parsed.
+- **3e and 3f+3g unchanged**; 3f and 3g still run together.
+- **Open, not blocking:** the variant A/B pick, the violet-spread question, and the founder's
+  coordinates stay with the founder; 3b-3g proceed regardless.
+
+**Hand-off.** The section was delivered to the implementer session ("Pokémon Go-style 3D view") with
+the founder instruction quoted; delivery confirmed. Order: 3b -> 3c -> 3d -> 3e -> 3f+3g, preview
+after each part. No code changed in this commit - it is the plan record only.
